@@ -1,0 +1,13 @@
+{
+  "SharedAssets": "*.*",
+  "Title": "Core Wars",
+  "Type": "game",
+  "Org": "facepunch",
+  "Ident": "corewars",
+  "Schema": 1,
+  "HasAssets": true,
+  "AssetsPath": "",
+  "HasCode": true,
+  "CodePath": "code",
+  "RootNamespace": "Facepunch.CoreWars"
+}
