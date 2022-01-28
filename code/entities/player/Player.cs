@@ -8,8 +8,6 @@ namespace Facepunch.CoreWars
 
 		public DamageInfo LastDamageTaken { get; private set; }
 
-		private Clothing.Container Clothing { get; set; }
-
 		public Player() : base()
 		{
 
@@ -17,8 +15,7 @@ namespace Facepunch.CoreWars
 
 		public Player( Client client ) : this()
 		{
-			Clothing = new();
-			Clothing.LoadFromClient( client );
+
 		}
 
 		public void SetTeam( Team team )
@@ -33,6 +30,15 @@ namespace Facepunch.CoreWars
 		{
 			EnableHideInFirstPerson = true;
 			EnableAllCollisions = false;
+
+			Controller = new MoveController()
+			{
+				WalkSpeed = 400f,
+				SprintSpeed = 600f
+			};
+
+			Animator = new PlayerAnimator();
+
 			SetModel( "models/citizen/citizen.vmdl" );
 
 			base.Spawn();
@@ -41,7 +47,6 @@ namespace Facepunch.CoreWars
 		public override void Respawn()
 		{
 			Game.Current?.PlayerRespawned( this );
-			Clothing.DressEntity( this );
 
 			base.Respawn();
 		}
@@ -58,7 +63,8 @@ namespace Facepunch.CoreWars
 
 		public override void Simulate( Client client )
 		{
-			base.Simulate( client );
+			var controller = GetActiveController();
+			controller?.Simulate( client, this, GetActiveAnimator() );
 		}
 
 		public override void PostCameraSetup( ref CameraSetup setup )
