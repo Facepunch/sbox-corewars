@@ -3,6 +3,8 @@
 Layer0
 {
 	shader "cw_voxel.vfx"
+	
+	g_flVoxelSize "32.000"
 
 	//---- Color ----
 	g_vColorTint "[1.000000 1.000000 1.000000 0.000000]"
