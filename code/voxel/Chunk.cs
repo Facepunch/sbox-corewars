@@ -83,11 +83,14 @@ namespace Facepunch.CoreWars.Voxel
 				var boundsMin = Vector3.Zero;
 				var boundsMax = boundsMin + (ChunkSize * 32);
 				Mesh.SetBounds( boundsMin, boundsMax );
-
-				modelBuilder.AddMesh( Mesh );
 			}
 
 			Build();
+
+			if ( IsClient )
+			{
+				modelBuilder.AddMesh( Mesh );
+			}
 
 			Model = modelBuilder.Create();
 

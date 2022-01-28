@@ -7,10 +7,10 @@ namespace Facepunch.CoreWars
 	public partial class Game : Sandbox.Game
 	{
 		[Net] public StateSystem StateSystem { get; private set; }
+		[Net] public Map Map { get; private set; }
 
 		public static new Game Current { get; private set; }
 		public static Hud Hud { get; private set; }
-		public static Map Map { get; private set; }
 
 		public Game()
 		{
@@ -24,6 +24,8 @@ namespace Facepunch.CoreWars
 			{
 				Hud = new Hud();
 			}
+
+			Current = this;
 		}
 
 		public void SetBlockInDirection( Vector3 position, Vector3 direction, byte blockType )

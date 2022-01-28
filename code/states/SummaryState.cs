@@ -13,7 +13,7 @@ namespace Facepunch.CoreWars
 
 		public override void OnLeave()
 		{
-			VoxelChunk
+			
 		}
 	}
 }

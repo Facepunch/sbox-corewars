@@ -7,9 +7,12 @@ namespace Facepunch.CoreWars
 	{
 		public override void OnEnter()
 		{
-			foreach ( var player in Entity.All.OfType<Player>() )
+			if ( Host.IsServer )
 			{
-				player.Respawn();
+				foreach ( var player in Entity.All.OfType<Player>() )
+				{
+					player.Respawn();
+				}
 			}
 		}
 
