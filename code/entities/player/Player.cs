@@ -29,7 +29,10 @@ namespace Facepunch.CoreWars
 		public override void Spawn()
 		{
 			EnableHideInFirstPerson = true;
-			EnableAllCollisions = false;
+			EnableAllCollisions = true;
+			EnableDrawing = true;
+
+			Camera = new FirstPersonCamera();
 
 			Controller = new MoveController()
 			{
@@ -63,6 +66,15 @@ namespace Facepunch.CoreWars
 
 		public override void Simulate( Client client )
 		{
+			if ( Input.Pressed( InputButton.Attack1 ) )
+			{
+				Game.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, (byte)Rand.Int( 1, 5 ) );
+			}
+			else if ( Input.Pressed( InputButton.Attack2 ) )
+			{
+				Game.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, 0 );
+			}
+
 			var controller = GetActiveController();
 			controller?.Simulate( client, this, GetActiveAnimator() );
 		}

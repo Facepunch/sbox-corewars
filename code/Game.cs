@@ -1,4 +1,5 @@
-﻿using Sandbox;
+﻿using Facepunch.CoreWars.Voxel;
+using Sandbox;
 using System.Linq;
 
 namespace Facepunch.CoreWars
@@ -9,6 +10,7 @@ namespace Facepunch.CoreWars
 
 		public static new Game Current { get; private set; }
 		public static Hud Hud { get; private set; }
+		public static Map Map { get; private set; }
 
 		public Game()
 		{
@@ -22,6 +24,40 @@ namespace Facepunch.CoreWars
 			{
 				Hud = new Hud();
 			}
+		}
+
+		public void SetBlockInDirection( Vector3 position, Vector3 direction, byte blockType )
+		{
+			var face = Map.GetBlockInDirection( position * (1.0f / 32.0f), direction.Normal, 10000, out var hitPosition, out _ );
+			if ( face == Map.BlockFace.Invalid ) return;
+
+			var blockPos = hitPosition;
+
+			if ( blockType != 0 )
+				blockPos = Map.GetAdjacentBlockPosition( blockPos, (int)face );
+
+			SetBlockOnServer( blockPos.x, blockPos.y, blockPos.z, blockType );
+		}
+
+		public void SetBlockOnServer( int x, int y, int z, byte blockType )
+		{
+			Host.AssertServer();
+
+			var pos = new IntVector3( x, y, z );
+
+			if ( Map.SetBlockAndUpdate( pos, blockType ) )
+			{
+				Map.WriteNetworkDataForChunkAtPosition( pos );
+				SetBlockOnClient( x, y, z, blockType );
+			}
+		}
+
+		[ClientRpc]
+		public void SetBlockOnClient( int x, int y, int z, byte blockType )
+		{
+			Host.AssertClient();
+
+			Map.SetBlockAndUpdate( new IntVector3( x, y, z ), blockType, true );
 		}
 
 		public virtual void PlayerRespawned( Player player )
@@ -73,6 +109,24 @@ namespace Facepunch.CoreWars
 
 			StateSystem.Active?.OnPlayerJoined( player );
 			base.ClientJoined( client );
+		}
+
+		public override void PostLevelLoaded()
+		{
+			if ( !IsServer )
+				return;
+
+			Map = new Map();
+			Map.SetSize( 256, 256, 64 );
+			Map.GeneratePerlin();
+			Map.Init();
+		}
+
+		public override void ClientSpawn()
+		{
+			base.ClientSpawn();
+
+			Map.Init();
 		}
 	}
 }
