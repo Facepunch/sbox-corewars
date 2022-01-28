@@ -6,6 +6,7 @@ namespace Facepunch.CoreWars.Voxel
 	public partial class Chunk : Entity
 	{
 		public static readonly int ChunkSize = 32;
+		public static readonly int VoxelSize = 48;
 
 		public Map Map { get; set; }
 
@@ -13,6 +14,7 @@ namespace Facepunch.CoreWars.Voxel
 		private IntVector3 Offset => Data.Offset;
 
 		private SceneObject SceneObject;
+		private bool Initialized;
 		private Model Model;
 		private Mesh Mesh;
 
@@ -43,8 +45,6 @@ namespace Facepunch.CoreWars.Voxel
 				slice.Body = null;
 			}
 		}
-
-		private bool Initialized;
 
 		[Event.Tick.Client]
 		public void InitTick()
@@ -77,11 +77,11 @@ namespace Facepunch.CoreWars.Voxel
 
 			if ( IsClient )
 			{
-				var material = Material.Load( "materials/voxel/voxel.vmat" );
+				var material = Material.Load( "materials/corewars/voxel.vmat" );
 				Mesh = new Mesh( material );
 
 				var boundsMin = Vector3.Zero;
-				var boundsMax = boundsMin + (ChunkSize * 32);
+				var boundsMax = boundsMin + (ChunkSize * VoxelSize);
 				Mesh.SetBounds( boundsMin, boundsMax );
 			}
 
@@ -96,7 +96,7 @@ namespace Facepunch.CoreWars.Voxel
 
 			if ( IsClient )
 			{
-				var transform = new Transform( Offset * 32.0f );
+				var transform = new Transform( Offset * (float)VoxelSize );
 				SceneObject = new SceneObject( Model, transform );
 			}
 
@@ -183,14 +183,14 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
-		public static int GetBlockIndexAtPosition( IntVector3 pos )
+		public static int GetBlockIndexAtPosition( IntVector3 position )
 		{
-			return pos.x + pos.y * ChunkSize + pos.z * ChunkSize * ChunkSize;
+			return position.x + position.y * ChunkSize + position.z * ChunkSize * ChunkSize;
 		}
 
-		public byte GetBlockTypeAtPosition( IntVector3 pos )
+		public byte GetBlockTypeAtPosition( IntVector3 position )
 		{
-			return Data.GetBlockTypeAtPosition( pos );
+			return Data.GetBlockTypeAtPosition( position );
 		}
 
 		public byte GetBlockTypeAtIndex( int index )
@@ -198,9 +198,9 @@ namespace Facepunch.CoreWars.Voxel
 			return Data.GetBlockTypeAtIndex( index );
 		}
 
-		public void SetBlockTypeAtPosition( IntVector3 pos, byte blockType )
+		public void SetBlockTypeAtPosition( IntVector3 position, byte blockType )
 		{
-			Data.SetBlockTypeAtPosition( pos, blockType );
+			Data.SetBlockTypeAtPosition( position, blockType );
 		}
 
 		public void SetBlockTypeAtIndex( int index, byte blockType )
@@ -262,7 +262,7 @@ namespace Facepunch.CoreWars.Voxel
 
 				slice.Vertices.Add( new BlockVertex( (uint)(x + vOffset.x), (uint)(y + vOffset.y), (uint)(z + vOffset.z), faceData ) );
 
-				slice.CollisionVertices.Add( new Vector3( (x + vOffset.x) + Offset.x, (y + vOffset.y) + Offset.y, (z + vOffset.z) + Offset.z ) * 32.0f );
+				slice.CollisionVertices.Add( new Vector3( (x + vOffset.x) + Offset.x, (y + vOffset.y) + Offset.y, (z + vOffset.z) + Offset.z ) * VoxelSize );
 				slice.CollisionIndices.Add( collisionIndex + i );
 			}
 		}

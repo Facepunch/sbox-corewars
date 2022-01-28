@@ -17,9 +17,9 @@ namespace Facepunch.CoreWars.Voxel
 			BlockTypes = new byte[Chunk.ChunkSize * Chunk.ChunkSize * Chunk.ChunkSize];
 		}
 
-		public byte GetBlockTypeAtPosition( IntVector3 pos )
+		public byte GetBlockTypeAtPosition( IntVector3 position )
 		{
-			return BlockTypes[Chunk.GetBlockIndexAtPosition( pos )];
+			return BlockTypes[Chunk.GetBlockIndexAtPosition( position )];
 		}
 
 		public byte GetBlockTypeAtIndex( int index )
@@ -27,9 +27,9 @@ namespace Facepunch.CoreWars.Voxel
 			return BlockTypes[index];
 		}
 
-		public void SetBlockTypeAtPosition( IntVector3 pos, byte blockType )
+		public void SetBlockTypeAtPosition( IntVector3 position, byte blockType )
 		{
-			BlockTypes[Chunk.GetBlockIndexAtPosition( pos )] = blockType;
+			BlockTypes[Chunk.GetBlockIndexAtPosition( position )] = blockType;
 		}
 
 		public void SetBlockTypeAtIndex( int index, byte blockType )

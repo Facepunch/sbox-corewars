@@ -30,7 +30,7 @@ namespace Facepunch.CoreWars
 
 		public void SetBlockInDirection( Vector3 position, Vector3 direction, byte blockType )
 		{
-			var face = Map.GetBlockInDirection( position * (1.0f / 32.0f), direction.Normal, 10000, out var hitPosition, out _ );
+			var face = Map.GetBlockInDirection( position * (1.0f / Chunk.VoxelSize), direction.Normal, 10000, out var hitPosition, out _ );
 			if ( face == Map.BlockFace.Invalid ) return;
 
 			var blockPos = hitPosition;
