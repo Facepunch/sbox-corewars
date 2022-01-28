@@ -98,6 +98,7 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				var transform = new Transform( Offset * (float)VoxelSize );
 				SceneObject = new SceneObject( Model, transform );
+				SceneObject.SetValue( "VoxelSize", VoxelSize );
 			}
 
 			Initialized = true;
