@@ -36,8 +36,8 @@ namespace Facepunch.CoreWars
 
 			Controller = new MoveController()
 			{
-				WalkSpeed = 400f,
-				SprintSpeed = 600f
+				WalkSpeed = 300f,
+				SprintSpeed = 500f
 			};
 
 			Animator = new PlayerAnimator();
@@ -66,13 +66,16 @@ namespace Facepunch.CoreWars
 
 		public override void Simulate( Client client )
 		{
-			if ( Input.Pressed( InputButton.Attack1 ) )
+			if ( IsServer )
 			{
-				Game.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, (byte)Rand.Int( 1, 5 ) );
-			}
-			else if ( Input.Pressed( InputButton.Attack2 ) )
-			{
-				Game.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, 0 );
+				if ( Input.Pressed( InputButton.Attack1 ) )
+				{
+					Game.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, (byte)Rand.Int( 1, 5 ) );
+				}
+				else if ( Input.Pressed( InputButton.Attack2 ) )
+				{
+					Game.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, 0 );
+				}
 			}
 
 			var controller = GetActiveController();
