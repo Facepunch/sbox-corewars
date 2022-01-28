@@ -313,17 +313,20 @@ namespace Facepunch.CoreWars
 				return;
 			}
 
-			var startZ = Velocity.z;
+			if ( GroundEntity.IsValid() )
+			{
+				var startZ = Velocity.z;
 
-			ClearGroundEntity();
+				ClearGroundEntity();
 
-			var groundFactor = 0.5f;
-			var multiplier = Scale( 268.3281572999747f * 1.2f );
+				var groundFactor = 0.68f;
+				var multiplier = Scale( 268.3281572999747f * 1.2f );
 
-			Velocity = Velocity.WithZ( startZ + multiplier * groundFactor );
-			Velocity -= new Vector3( 0, 0, Gravity * 0.5f ) * Time.Delta;
+				Velocity = Velocity.WithZ( startZ + multiplier * groundFactor );
+				Velocity -= new Vector3( 0, 0, Gravity * 0.5f ) * Time.Delta;
 
-			AddEvent( "jump" );
+				AddEvent( "jump" );
+			}
 		}
 
 		private float Scale( float speed )
