@@ -1,0 +1,140 @@
+//=========================================================================================================================
+// Optional
+//=========================================================================================================================
+HEADER
+{
+	DevShader = true;
+	CompileTargets = ( IS_SM_50 && ( PC || VULKAN ) );
+	Description = "Voxel";
+}
+
+//=========================================================================================================================
+// Optional
+//=========================================================================================================================
+FEATURES
+{
+	#include "common/features.hlsl"
+}
+
+//=========================================================================================================================
+// Optional
+//=========================================================================================================================
+MODES
+{
+	VrForward();
+	Depth( S_MODE_DEPTH );
+	ToolsVis( S_MODE_TOOLS_VIS );
+	ToolsWireframe( S_MODE_TOOLS_WIREFRAME );
+	ToolsShadingComplexity( "vr_tools_shading_complexity.vfx" );
+}
+
+//=========================================================================================================================
+COMMON
+{
+	#include "common/shared.hlsl"
+}
+
+//=========================================================================================================================
+
+struct VertexInput
+{
+	#include "common/vertexinput.hlsl"
+
+	uint vData : TEXCOORD10 < Semantic( None ); >;
+};
+
+//=========================================================================================================================
+
+struct PixelInput
+{
+	#include "common/pixelinput.hlsl"
+};
+
+//=========================================================================================================================
+
+VS
+{
+	#include "common/vertex.hlsl"
+
+	PixelInput MainVs( INSTANCED_SHADER_PARAMS( VertexInput i ) )
+	{
+		float3 position = float3( float( i.vData & ( 63 ) ), float( ( i.vData >> 6 ) & ( 63 ) ), float( ( i.vData >> 12 ) & ( 63 ) ) ) * 32;
+		int texindex = int( ( i.vData >> 18 ) & ( 31 ) );
+		float brightness = ( float( ( i.vData >> 23 ) & ( 15 ) ) + 2 ) / 16.0;
+		int normal = int( ( i.vData >> 27 ) & ( 7 ) );
+		brightness = clamp( brightness, 0, 1 );
+
+		float3 color = float3( 0.75, 0.25, 0.25 );
+		if ( texindex == 1 ) color = float3( 0.25, 0.75, 0.25 );
+		else if ( texindex == 2 ) color = float3( 0.25, 0.25, 0.75 );
+		else if ( texindex == 3 ) color = float3( 0.25, 0.75, 0.75 );
+		else if ( texindex == 4 ) color = float3( 0.75, 0.75, 0.25 );
+
+		i.vPositionOs = position;
+
+		float3 vNormalOs = float3( 0, 0, 1 );
+		if ( normal == 1 ) vNormalOs = float3( 0, 0, -1 );
+		else if ( normal == 2 ) vNormalOs = float3( 0, -1, 0 );
+		else if ( normal == 3 ) vNormalOs = float3( 0, 1, 0 );
+		else if ( normal == 4 ) vNormalOs = float3( -1, 0, 0 );
+		else if ( normal == 5 ) vNormalOs = float3( 1, 0, 0 );
+
+		float3 vTangentOs = float3( 1, 0, 0 );
+		if ( normal == 1 ) vTangentOs = float3( 1, 0, 0 );
+		else if ( normal == 2 ) vTangentOs = float3( 0, 0, -1 );
+		else if ( normal == 3 ) vTangentOs = float3( 0, 0, -1 );
+		else if ( normal == 4 ) vTangentOs = float3( 0, 0, -1 );
+		else if ( normal == 5 ) vTangentOs = float3( 0, 0, -1 );
+
+		float3 vBinormalOs = cross( vNormalOs, vTangentOs );
+		i.vTexCoord = float2( dot( vBinormalOs, position ), dot( vTangentOs, position ) ) * ( 1.0 / 32.0 );
+
+		PixelInput o = ProcessVertex( i );
+		o.vNormalWs = vNormalOs;
+		o.vTangentUWs = vBinormalOs;
+		o.vTangentVWs = vTangentOs;
+		o.vVertexColor = float4( color.rgb, 1.0 );
+		return FinalizeVertex( o );
+	}
+}
+
+//=========================================================================================================================
+
+PS
+{
+	StaticCombo( S_MODE_DEPTH, 0..1, Sys( ALL ) );
+	StaticCombo( S_MODE_TOOLS_WIREFRAME, 0..1, Sys( ALL ) );
+
+	#if ( S_MODE_TOOLS_WIREFRAME )
+		RenderState( FillMode, WIREFRAME );
+		RenderState( SlopeScaleDepthBias, -0.5 );
+		RenderState( DepthBiasClamp, -0.0005 );
+		RenderState( DepthWriteEnable, false );
+		#define DEPTH_STATE_ALREADY_SET
+	#endif
+
+	#include "common/pixel.hlsl"
+
+	PixelOutput MainPs( PixelInput i )
+	{
+		#if ( S_MODE_DEPTH )
+		{
+			PixelOutput o;
+			o.vColor.rgba = float4( 0.0, 0.0, 0.0, 1.0 );
+			return o;
+		}
+		#elif ( S_MODE_TOOLS_WIREFRAME )
+		{
+			PixelOutput o;
+			o.vColor.rgba = float4( g_vWireframeColor.rgb, 1 );
+			return o;
+		}
+		#else
+		{
+			Material m = GatherMaterial( i );
+			m.Albedo.rgb *= i.vVertexColor.rgb;
+			return FinalizePixelMaterial( i, m );
+		}
+		#endif
+	}
+}
