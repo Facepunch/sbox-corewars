@@ -266,7 +266,11 @@ namespace Facepunch.CoreWars.Voxel
 
 		private void AddQuad( ChunkSlice slice, int x, int y, int z, int width, int height, int widthAxis, int heightAxis, int face, byte blockType, int brightness )
 		{
-			var type = BlockType.Find( blockType );
+			if ( !Map.BlockTypes.TryGetValue( blockType, out var type ) )
+			{
+				throw new Exception( $"Unable to find a block type registered with the id: {blockType}!" );
+			}
+
 			var textureId = type.GetTextureId( (BlockFace)face );
 			var normal = (byte)face;
 			var faceData = (uint)((textureId & 31) << 18 | brightness | (normal & 7) << 27);
