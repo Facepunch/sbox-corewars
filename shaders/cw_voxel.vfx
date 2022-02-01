@@ -115,7 +115,7 @@ PS
 	#include "common/pixel.hlsl"
 
 	CreateInputTexture2D( TextureAtlas, Srgb, 8, "", "_color", "Voxel Atlas,10/10", Default3( 1.0f, 1.0f, 1.0f ) );
-	CreateTexture2DWithoutSampler( g_tAtlasColor )  < Channel( RGB,  Box( TextureAtlas ), Srgb ); OutputFormat( BC7 ); SrgbRead( true ); >;
+	CreateTexture2D( g_tAtlasColor )  < Channel( RGB,  Box( TextureAtlas ), Srgb ); OutputFormat( BC7 ); SrgbRead( true ); Filter( POINT ); AddressU( MIRROR ); AddressV( MIRROR ); >;
 
 	PixelOutput MainPs( PixelInput i )
 	{
@@ -145,7 +145,7 @@ PS
 			vTexCoordAtlas = frac((vTexCoordAtlas / vAltasMaxCells) + (vCellLocation * vInvMaxCells));
 
 			Material m = GatherMaterial( i );
-			m.Albedo.rgb = Tex2DLevelS( g_tAtlasColor, TextureFiltering, vTexCoordAtlas, 0 ).rgb;
+			m.Albedo.rgb = Tex2DLevel( g_tAtlasColor, vTexCoordAtlas, 0 ).rgb;
 
 			return FinalizePixelMaterial( i, m );
 		}
