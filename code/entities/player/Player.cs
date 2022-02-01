@@ -1,10 +1,12 @@
-﻿using Sandbox;
+﻿using Facepunch.CoreWars.Voxel;
+using Sandbox;
 
 namespace Facepunch.CoreWars
 {
 	public partial class Player : Sandbox.Player
 	{
 		[Net, Change( nameof( OnTeamChanged ) )] public Team Team { get; private set; }
+		[BindComponent] public ChunkViewer ChunkViewer { get; }
 
 		public DamageInfo LastDamageTaken { get; private set; }
 
@@ -18,6 +20,19 @@ namespace Facepunch.CoreWars
 
 		}
 
+		public void LoadChunk( Chunk chunk )
+		{
+			if ( ChunkViewer.LoadedChunks.Contains( chunk ) )
+				return;
+
+			ChunkViewer.LoadedChunks.Add( chunk );
+
+			var offset = chunk.Data.Offset;
+			var types = chunk.Data.BlockTypes;
+
+			chunk.UpdateAll( To.Single( Client ), offset.x, offset.y, offset.z, types );
+		}
+
 		public void SetTeam( Team team )
 		{
 			Host.AssertServer();
@@ -28,6 +43,8 @@ namespace Facepunch.CoreWars
 
 		public override void Spawn()
 		{
+			Components.Create<ChunkViewer>();
+
 			EnableHideInFirstPerson = true;
 			EnableAllCollisions = true;
 			EnableDrawing = true;
