@@ -6,7 +6,7 @@ namespace Facepunch.CoreWars.Voxel
 {
 	public partial class Map : BaseNetworkable
 	{
-		[Net] public IDictionary<byte, BlockType> BlockTypes { get; private set; }
+		[Net] public Dictionary<byte, BlockType> BlockTypes { get; private set; } = new();
 		[Net] public int SizeX { get; private set; }
 		[Net] public int SizeY { get; private set; }
 		[Net] public int SizeZ { get; private set; }
@@ -21,11 +21,6 @@ namespace Facepunch.CoreWars.Voxel
 		public int NumChunksX => _numChunksX;
 		public int NumChunksY => _numChunksY;
 		public int NumChunksZ => _numChunksZ;
-
-		public Map()
-		{
-			BlockTypes = new Dictionary<byte, BlockType>();
-		}
 
 		public void AddBlockType( BlockType type )
 		{

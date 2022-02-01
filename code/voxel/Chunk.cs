@@ -1,10 +1,14 @@
 ﻿using Sandbox;
 using System;
+using System.Collections.Generic;
 
 namespace Facepunch.CoreWars.Voxel
 {
 	public partial class Chunk : Entity
 	{
+		// We use this cache in the event that an entity RPC is received before the entity is properly created.
+		public static Dictionary<int, ChunkData> DataCache { get; private set; } = new();
+
 		private struct BlockFaceData
 		{
 			public bool Culled;
@@ -23,10 +27,9 @@ namespace Facepunch.CoreWars.Voxel
 		public ChunkData Data { get; set; }
 		public Map Map { get; set; }
 
-		private IntVector3 Offset => Data.Offset;
-
 		private static readonly BlockFaceData[] BlockFaceMask = new BlockFaceData[ChunkSize * ChunkSize * ChunkSize];
 		private readonly ChunkSlice[] Slices = new ChunkSlice[ChunkSize * 6];
+		private IntVector3 Offset => Data.Offset;
 		private SceneObject SceneObject;
 		private bool Initialized;
 		private Model Model;
@@ -38,6 +41,7 @@ namespace Facepunch.CoreWars.Voxel
 		{
 			Map = map;
 			Data = data;
+			Name = $"chunk{data.Offset}";
 			Transmit = TransmitType.Always;
 		}
 
@@ -48,7 +52,12 @@ namespace Facepunch.CoreWars.Voxel
 			Data.Offset = new IntVector3( x, y, z );
 			Data.BlockTypes = data;
 
-			Log.Info( $"Received all bytes for chunk{x},{y},{z} ({data.Length / 1024}kb)" );
+			Log.Info( $"(#{NetworkIdent}) Received all bytes for chunk{x},{y},{z} ({data.Length / 1024}kb)" );
+
+			if ( !DataCache.ContainsKey( NetworkIdent ) )
+			{
+				DataCache.Add( NetworkIdent, Data );
+			}
 		}
 
 		[Event.Tick.Client]
@@ -140,6 +149,17 @@ namespace Facepunch.CoreWars.Voxel
 		public void SetBlockTypeAtIndex( int index, byte blockType )
 		{
 			Data.SetBlockTypeAtIndex( index, blockType );
+		}
+
+		public override void ClientSpawn()
+		{
+			if ( DataCache.ContainsKey( NetworkIdent ) )
+			{
+				Log.Info( $"(#{NetworkIdent}) Loading chunk data from cache" );
+				Data = DataCache[NetworkIdent];
+			}
+
+			base.ClientSpawn();
 		}
 
 		protected override void OnDestroy()
