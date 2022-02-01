@@ -5,22 +5,34 @@ namespace Facepunch.CoreWars.Voxel
 {
 	public partial class Chunk : Entity
 	{
+		private struct BlockFace
+		{
+			public bool Culled;
+			public byte Type;
+			public byte Side;
+
+			public bool Equals( BlockFace face )
+			{
+				return face.Culled == Culled && face.Type == Type;
+			}
+		};
+
 		public static readonly int ChunkSize = 32;
 		public static readonly int VoxelSize = 48;
 
+		public ChunkData Data { get; set; }
 		public Map Map { get; set; }
 
-		public ChunkData Data { get; set; }
 		private IntVector3 Offset => Data.Offset;
 
+		private static readonly BlockFace[] BlockFaceMask = new BlockFace[ChunkSize * ChunkSize * ChunkSize];
+		private readonly ChunkSlice[] Slices = new ChunkSlice[ChunkSize * 6];
 		private SceneObject SceneObject;
 		private bool Initialized;
 		private Model Model;
 		private Mesh Mesh;
 
-		public Chunk()
-		{
-		}
+		public Chunk() { }
 
 		public Chunk( Map map, ChunkData data )
 		{
@@ -100,13 +112,9 @@ namespace Facepunch.CoreWars.Voxel
 		public void Build()
 		{
 			if ( IsServer )
-			{
 				BuildCollision();
-			}
 			else
-			{
 				BuildMeshAndCollision();
-			}
 		}
 
 		public static int GetBlockIndexAtPosition( IntVector3 position )
@@ -278,22 +286,6 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
-		private struct BlockFace
-		{
-			public bool culled;
-			public byte type;
-			public byte side;
-
-			public bool Equals( BlockFace face )
-			{
-				return face.culled == culled && face.type == type;
-			}
-		};
-
-		static readonly BlockFace[] BlockFaceMask = new BlockFace[ChunkSize * ChunkSize * ChunkSize];
-
-		private readonly ChunkSlice[] Slices = new ChunkSlice[ChunkSize * 6];
-
 		BlockFace GetBlockFace( IntVector3 position, int side )
 		{
 			var p = Offset + position;
@@ -302,14 +294,14 @@ namespace Facepunch.CoreWars.Voxel
 
 			var face = new BlockFace
 			{
-				side = (byte)side,
-				culled = blockType == 0,
-				type = blockType,
+				Side = (byte)side,
+				Culled = blockType == 0,
+				Type = blockType,
 			};
 
-			if ( !face.culled && !Map.IsAdjacentBlockEmpty( p, side ) )
+			if ( !face.Culled && !Map.IsAdjacentBlockEmpty( p, side ) )
 			{
-				face.culled = true;
+				face.Culled = true;
 			}
 
 			return face;
@@ -364,9 +356,9 @@ namespace Facepunch.CoreWars.Voxel
 				{
 					faceB = new()
 					{
-						culled = true,
-						side = (byte)faceSide,
-						type = 0,
+						Culled = true,
+						Side = (byte)faceSide,
+						Type = 0,
 					};
 
 					faceA = GetBlockFace( blockPosition, faceSide );
@@ -376,15 +368,15 @@ namespace Facepunch.CoreWars.Voxel
 						faceB = GetBlockFace( blockPosition + blockOffset, faceSide );
 					}
 
-					if ( !faceA.culled && !faceB.culled && faceA.Equals( faceB ) )
+					if ( !faceA.Culled && !faceB.Culled && faceA.Equals( faceB ) )
 					{
-						BlockFaceMask[n].culled = true;
+						BlockFaceMask[n].Culled = true;
 					}
 					else
 					{
 						BlockFaceMask[n] = faceA;
 
-						if ( !faceA.culled )
+						if ( !faceA.Culled )
 						{
 							maskEmpty = false;
 						}
@@ -402,7 +394,7 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				for ( int i = 0; i < ChunkSize; )
 				{
-					if ( BlockFaceMask[n].culled )
+					if ( BlockFaceMask[n].Culled )
 					{
 						i++;
 						n++;
@@ -413,7 +405,7 @@ namespace Facepunch.CoreWars.Voxel
 					int faceWidth;
 					int faceHeight;
 
-					for ( faceWidth = 1; i + faceWidth < ChunkSize && !BlockFaceMask[n + faceWidth].culled && BlockFaceMask[n + faceWidth].Equals( BlockFaceMask[n] ); faceWidth++ ) ;
+					for ( faceWidth = 1; i + faceWidth < ChunkSize && !BlockFaceMask[n + faceWidth].Culled && BlockFaceMask[n + faceWidth].Equals( BlockFaceMask[n] ); faceWidth++ ) ;
 
 					bool done = false;
 
@@ -423,7 +415,7 @@ namespace Facepunch.CoreWars.Voxel
 						{
 							var maskFace = BlockFaceMask[n + k + faceHeight * ChunkSize];
 
-							if ( maskFace.culled || !maskFace.Equals( BlockFaceMask[n] ) )
+							if ( maskFace.Culled || !maskFace.Equals( BlockFaceMask[n] ) )
 							{
 								done = true;
 								break;
@@ -433,7 +425,7 @@ namespace Facepunch.CoreWars.Voxel
 						if ( done ) break;
 					}
 
-					if ( !BlockFaceMask[n].culled )
+					if ( !BlockFaceMask[n].Culled )
 					{
 						blockPosition[uAxis] = i;
 						blockPosition[vAxis] = j;
@@ -443,7 +435,7 @@ namespace Facepunch.CoreWars.Voxel
 						AddQuad( slice,
 							blockPosition.x, blockPosition.y, blockPosition.z,
 							faceWidth, faceHeight, uAxis, vAxis,
-							BlockFaceMask[n].side, BlockFaceMask[n].type, brightness );
+							BlockFaceMask[n].Side, BlockFaceMask[n].Type, brightness );
 
 						vertexOffset += 6;
 					}
@@ -452,7 +444,7 @@ namespace Facepunch.CoreWars.Voxel
 					{
 						for ( int k = 0; k < faceWidth; ++k )
 						{
-							BlockFaceMask[n + k + l * ChunkSize].culled = true;
+							BlockFaceMask[n + k + l * ChunkSize].Culled = true;
 						}
 					}
 
@@ -498,9 +490,9 @@ namespace Facepunch.CoreWars.Voxel
 						{
 							faceB = new()
 							{
-								culled = true,
-								side = (byte)faceSide,
-								type = 0,
+								Culled = true,
+								Side = (byte)faceSide,
+								Type = 0,
 							};
 
 							faceA = GetBlockFace( blockPosition, faceSide );
@@ -510,15 +502,15 @@ namespace Facepunch.CoreWars.Voxel
 								faceB = GetBlockFace( blockPosition + blockOffset, faceSide );
 							}
 
-							if ( !faceA.culled && !faceB.culled && faceA.Equals( faceB ) )
+							if ( !faceA.Culled && !faceB.Culled && faceA.Equals( faceB ) )
 							{
-								BlockFaceMask[n].culled = true;
+								BlockFaceMask[n].Culled = true;
 							}
 							else
 							{
 								BlockFaceMask[n] = faceA;
 
-								if ( !faceA.culled )
+								if ( !faceA.Culled )
 								{
 									maskEmpty = false;
 								}
@@ -539,7 +531,7 @@ namespace Facepunch.CoreWars.Voxel
 					{
 						for ( int i = 0; i < ChunkSize; )
 						{
-							if ( BlockFaceMask[n].culled )
+							if ( BlockFaceMask[n].Culled )
 							{
 								i++;
 								n++;
@@ -550,7 +542,7 @@ namespace Facepunch.CoreWars.Voxel
 							int faceWidth;
 							int faceHeight;
 
-							for ( faceWidth = 1; i + faceWidth < ChunkSize && !BlockFaceMask[n + faceWidth].culled && BlockFaceMask[n + faceWidth].Equals( BlockFaceMask[n] ); faceWidth++ ) ;
+							for ( faceWidth = 1; i + faceWidth < ChunkSize && !BlockFaceMask[n + faceWidth].Culled && BlockFaceMask[n + faceWidth].Equals( BlockFaceMask[n] ); faceWidth++ ) ;
 
 							bool done = false;
 
@@ -560,7 +552,7 @@ namespace Facepunch.CoreWars.Voxel
 								{
 									var maskFace = BlockFaceMask[n + k + faceHeight * ChunkSize];
 
-									if ( maskFace.culled || !maskFace.Equals( BlockFaceMask[n] ) )
+									if ( maskFace.Culled || !maskFace.Equals( BlockFaceMask[n] ) )
 									{
 										done = true;
 
@@ -571,7 +563,7 @@ namespace Facepunch.CoreWars.Voxel
 								if ( done ) break;
 							}
 
-							if ( !BlockFaceMask[n].culled )
+							if ( !BlockFaceMask[n].Culled )
 							{
 								blockPosition[uAxis] = i;
 								blockPosition[vAxis] = j;
@@ -581,14 +573,14 @@ namespace Facepunch.CoreWars.Voxel
 								AddQuad( slice,
 									blockPosition.x, blockPosition.y, blockPosition.z,
 									faceWidth, faceHeight, uAxis, vAxis,
-									BlockFaceMask[n].side, BlockFaceMask[n].type, brightness );
+									BlockFaceMask[n].Side, BlockFaceMask[n].Type, brightness );
 							}
 
 							for ( int l = 0; l < faceHeight; ++l )
 							{
 								for ( int k = 0; k < faceWidth; ++k )
 								{
-									BlockFaceMask[n + k + l * ChunkSize].culled = true;
+									BlockFaceMask[n + k + l * ChunkSize].Culled = true;
 								}
 							}
 
