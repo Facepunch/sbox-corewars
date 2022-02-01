@@ -1,7 +1,9 @@
 ﻿using Facepunch.CoreWars.Voxel;
+using Sandbox;
 
 namespace Facepunch.CoreWars.Blocks
 {
+	[Library]
 	public class AirBlock : BlockType
 	{
 		public override byte TextureId => 0;

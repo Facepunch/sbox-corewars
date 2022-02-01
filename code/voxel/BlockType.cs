@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Facepunch.CoreWars.Voxel
 {
-	public class BlockType : BaseNetworkable
+	public class BlockType
 	{
 		public virtual string FriendlyName => "";
 		public virtual byte TextureId => 0;

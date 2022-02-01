@@ -37,7 +37,7 @@ namespace Facepunch.CoreWars
 		[ClientRpc]
 		public void ReceiveChunk( int x, int y, int z, int index, byte[] data )
 		{
-			Game.Current.Map.ReceiveChunk( index, data );
+			Map.Current.ReceiveChunk( index, data );
 
 			Log.Info( $"(#{NetworkIdent}) Received all bytes for chunk{x},{y},{z} ({data.Length / 1024}kb)" );
 		}

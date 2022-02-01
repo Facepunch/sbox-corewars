@@ -1,15 +1,50 @@
 ﻿using Sandbox;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Facepunch.CoreWars.Voxel
 {
 	public partial class Map : BaseNetworkable
 	{
-		[Net] public Dictionary<byte, BlockType> BlockTypes { get; private set; } = new();
-		[Net] public int SizeX { get; private set; }
-		[Net] public int SizeY { get; private set; }
-		[Net] public int SizeZ { get; private set; }
+		public static Map Current { get; set; }
+
+		[ClientRpc]
+		public static void Receive( byte[] data )
+		{
+			if ( Current != null )
+			{
+				Current.Destroy();
+			}
+
+			using ( var stream = new MemoryStream( data ) )
+			{
+				using ( var reader = new BinaryReader( stream ) )
+				{
+					Current = new Map();
+					Current.SizeX = reader.ReadInt32();
+					Current.SizeY = reader.ReadInt32();
+					Current.SizeZ = reader.ReadInt32();
+
+					var types = reader.ReadInt32();
+
+					for ( var i = 0; i < types; i++ )
+					{
+						var id = reader.ReadByte();
+						var name = reader.ReadString();
+
+						Current.BlockTypes.Add( id, Library.Create<BlockType>( name ) );
+					}
+				}
+			}
+
+			Current.Init();
+		}
+
+		public Dictionary<byte, BlockType> BlockTypes { get; private set; } = new();
+		public int SizeX { get; private set; }
+		public int SizeY { get; private set; }
+		public int SizeZ { get; private set; }
 
 		private int _numChunksX;
 		private int _numChunksY;
@@ -20,6 +55,28 @@ namespace Facepunch.CoreWars.Voxel
 		public int NumChunksZ => _numChunksZ;
 
 		public Chunk[] Chunks { get; private set; }
+
+		public void Send( Client client )
+		{
+			using ( var stream = new MemoryStream() )
+			{
+				using ( var writer = new BinaryWriter( stream ) )
+				{
+					writer.Write( SizeX );
+					writer.Write( SizeY );
+					writer.Write( SizeZ );
+					writer.Write( BlockTypes.Count );
+
+					foreach ( var kv in BlockTypes )
+					{
+						writer.Write( kv.Key );
+						writer.Write( kv.Value.GetType().Name );
+					}
+				}
+
+				Receive( To.Single( client ), stream.GetBuffer() );
+			}
+		}
 
 		public void AddBlockType( BlockType type )
 		{
@@ -46,6 +103,14 @@ namespace Facepunch.CoreWars.Voxel
 			_numChunksZ = SizeZ / Chunk.ChunkSize;
 			
 			SetupChunks();
+		}
+
+		public void Destroy()
+		{
+			foreach ( var chunk in Chunks )
+			{
+				chunk.Destroy();
+			}
 		}
 
 		public void Init()

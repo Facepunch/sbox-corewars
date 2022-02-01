@@ -8,7 +8,6 @@ namespace Facepunch.CoreWars
 	public partial class Game : Sandbox.Game
 	{
 		[Net] public StateSystem StateSystem { get; private set; }
-		[Net] public Map Map { get; private set; }
 
 		public static new Game Current { get; private set; }
 		public static Hud Hud { get; private set; }
@@ -31,7 +30,7 @@ namespace Facepunch.CoreWars
 
 		public void SetBlockInDirection( Vector3 origin, Vector3 direction, byte blockType )
 		{
-			var face = Map.GetBlockInDirection( origin * (1.0f / Chunk.VoxelSize), direction.Normal, 10000, out var endPosition, out _ );
+			var face = Map.Current.GetBlockInDirection( origin * (1.0f / Chunk.VoxelSize), direction.Normal, 10000, out var endPosition, out _ );
 			if ( face == BlockFace.Invalid ) return;
 
 			var position = blockType != 0 ? Map.GetAdjacentBlockPosition( endPosition, (int)face ) : endPosition;
@@ -44,7 +43,7 @@ namespace Facepunch.CoreWars
 
 			var position = new IntVector3( x, y, z );
 
-			if ( Map.SetBlockAndUpdate( position, blockType ) )
+			if ( Map.Current.SetBlockAndUpdate( position, blockType ) )
 			{
 				SetBlockOnClient( x, y, z, blockType );
 			}
@@ -55,7 +54,7 @@ namespace Facepunch.CoreWars
 		{
 			Host.AssertClient();
 
-			Map.SetBlockAndUpdate( new IntVector3( x, y, z ), blockType, true );
+			Map.Current.SetBlockAndUpdate( new IntVector3( x, y, z ), blockType, true );
 		}
 
 		public virtual void PlayerRespawned( Player player )
@@ -107,8 +106,10 @@ namespace Facepunch.CoreWars
 
 			StateSystem.Active?.OnPlayerJoined( player );
 
+			Map.Current.Send( client );
+
 			// For now just load every chunk in the map.
-			foreach ( var chunk in Map.Chunks )
+			foreach ( var chunk in Map.Current.Chunks )
 			{
 				player.LoadChunk( chunk );
 			}
@@ -121,21 +122,17 @@ namespace Facepunch.CoreWars
 			if ( !IsServer )
 				return;
 
-			Map = new Map();
-			Map.SetSize( 256, 256, 64 );
-			Map.AddBlockType( new AirBlock() );
-			Map.AddBlockType( new DirtBlock() );
-			Map.AddBlockType( new SandBlock() );
-			Map.AddBlockType( new StoneBlock() );
-			Map.GeneratePerlin();
-			Map.Init();
-		}
+			var map = new Map();
 
-		public override void ClientSpawn()
-		{
-			base.ClientSpawn();
+			map.SetSize( 256, 256, 64 );
+			map.AddBlockType( new AirBlock() );
+			map.AddBlockType( new DirtBlock() );
+			map.AddBlockType( new SandBlock() );
+			map.AddBlockType( new StoneBlock() );
+			map.GeneratePerlin();
+			map.Init();
 
-			Map.Init();
+			Map.Current = map;
 		}
 	}
 }
