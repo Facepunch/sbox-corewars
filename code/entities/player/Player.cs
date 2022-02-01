@@ -22,15 +22,24 @@ namespace Facepunch.CoreWars
 
 		public void LoadChunk( Chunk chunk )
 		{
-			if ( ChunkViewer.LoadedChunks.Contains( chunk ) )
+			if ( ChunkViewer.LoadedChunks.Contains( chunk.Index ) )
 				return;
 
-			ChunkViewer.LoadedChunks.Add( chunk );
+			ChunkViewer.LoadedChunks.Add( chunk.Index );
 
-			var offset = chunk.Data.Offset;
-			var types = chunk.Data.BlockTypes;
+			var offset = chunk.Offset;
+			var types = chunk.BlockTypes;
+			var index = chunk.Index;
 
-			chunk.UpdateAll( To.Single( Client ), offset.x, offset.y, offset.z, types );
+			ReceiveChunk( To.Single( Client ), offset.x, offset.y, offset.z, index, types );
+		}
+
+		[ClientRpc]
+		public void ReceiveChunk( int x, int y, int z, int index, byte[] data )
+		{
+			Game.Current.Map.ReceiveChunk( index, data );
+
+			Log.Info( $"(#{NetworkIdent}) Received all bytes for chunk{x},{y},{z} ({data.Length / 1024}kb)" );
 		}
 
 		public void SetTeam( Team team )

@@ -1,14 +1,10 @@
 ﻿using Sandbox;
 using System;
-using System.Collections.Generic;
 
 namespace Facepunch.CoreWars.Voxel
 {
-	public partial class Chunk : Entity
+	public partial class Chunk
 	{
-		// We use this cache in the event that an entity RPC is received before the entity is properly created.
-		public static Dictionary<int, ChunkData> DataCache { get; private set; } = new();
-
 		private struct BlockFaceData
 		{
 			public bool Culled;
@@ -24,52 +20,25 @@ namespace Facepunch.CoreWars.Voxel
 		public static readonly int ChunkSize = 32;
 		public static readonly int VoxelSize = 48;
 
-		public ChunkData Data { get; set; }
+		public IntVector3 Offset { get; set; }
+		public byte[] BlockTypes { get; set; }
+		public int Index { get; set; }
 		public Map Map { get; set; }
 
 		private static readonly BlockFaceData[] BlockFaceMask = new BlockFaceData[ChunkSize * ChunkSize * ChunkSize];
 		private readonly ChunkSlice[] Slices = new ChunkSlice[ChunkSize * 6];
-		private IntVector3 Offset => Data.Offset;
-		private SceneObject SceneObject;
-		private bool Initialized;
-		private Model Model;
-		private Mesh Mesh;
+		private SceneObject SceneObject { get; set; }
+		private bool Initialized { get; set; }
+		private Model Model { get; set; }
+		private Mesh Mesh { get; set; }
 
 		public Chunk() { }
 
-		public Chunk( Map map, ChunkData data )
+		public Chunk( Map map, int x, int y, int z )
 		{
-			Map = map;
-			Data = data;
-			Name = $"chunk{data.Offset}";
-			Transmit = TransmitType.Always;
-		}
-
-		[ClientRpc]
-		public void UpdateAll( int x, int y, int z, byte[] data )
-		{
-			Data = new();
-			Data.Offset = new IntVector3( x, y, z );
-			Data.BlockTypes = data;
-
-			Log.Info( $"(#{NetworkIdent}) Received all bytes for chunk{x},{y},{z} ({data.Length / 1024}kb)" );
-
-			if ( !DataCache.ContainsKey( NetworkIdent ) )
-			{
-				DataCache.Add( NetworkIdent, Data );
-			}
-		}
-
-		[Event.Tick.Client]
-		public void InitTick()
-		{
-			if ( Initialized )
-				return;
-
-			if ( Data != null )
-			{
-				Init();
-			}
+			BlockTypes = new byte[ChunkSize * ChunkSize * ChunkSize];
+			Offset = new IntVector3( x * ChunkSize, y * ChunkSize, z * ChunkSize );
+			Index = x + y * map.NumChunksX + z * map.NumChunksX * map.NumChunksY;
 		}
 
 		public void Init()
@@ -77,7 +46,7 @@ namespace Facepunch.CoreWars.Voxel
 			if ( Initialized )
 				return;
 
-			if ( Data == null )
+			if ( BlockTypes == null )
 				return;
 
 			for ( int i = 0; i < Slices.Length; ++i )
@@ -89,7 +58,7 @@ namespace Facepunch.CoreWars.Voxel
 
 			var modelBuilder = new ModelBuilder();
 
-			if ( IsClient )
+			if ( Host.IsClient )
 			{
 				var material = Material.Load( "materials/corewars/voxel.vmat" );
 				Mesh = new Mesh( material );
@@ -101,14 +70,14 @@ namespace Facepunch.CoreWars.Voxel
 
 			Build();
 
-			if ( IsClient )
+			if ( Host.IsClient )
 			{
 				modelBuilder.AddMesh( Mesh );
 			}
 
 			Model = modelBuilder.Create();
 
-			if ( IsClient )
+			if ( Host.IsClient )
 			{
 				var transform = new Transform( Offset * (float)VoxelSize );
 				SceneObject = new SceneObject( Model, transform );
@@ -120,7 +89,7 @@ namespace Facepunch.CoreWars.Voxel
 
 		public void Build()
 		{
-			if ( IsServer )
+			if ( Host.IsServer )
 				BuildCollision();
 			else
 				BuildMeshAndCollision();
@@ -133,36 +102,25 @@ namespace Facepunch.CoreWars.Voxel
 
 		public byte GetBlockTypeAtPosition( IntVector3 position )
 		{
-			return Data.GetBlockTypeAtPosition( position );
+			return BlockTypes[GetBlockIndexAtPosition( position )];
 		}
 
 		public byte GetBlockTypeAtIndex( int index )
 		{
-			return Data.GetBlockTypeAtIndex( index );
+			return BlockTypes[index];
 		}
 
 		public void SetBlockTypeAtPosition( IntVector3 position, byte blockType )
 		{
-			Data.SetBlockTypeAtPosition( position, blockType );
+			BlockTypes[GetBlockIndexAtPosition( position )] = blockType;
 		}
 
 		public void SetBlockTypeAtIndex( int index, byte blockType )
 		{
-			Data.SetBlockTypeAtIndex( index, blockType );
+			BlockTypes[index] = blockType;
 		}
 
-		public override void ClientSpawn()
-		{
-			if ( DataCache.ContainsKey( NetworkIdent ) )
-			{
-				Log.Info( $"(#{NetworkIdent}) Loading chunk data from cache" );
-				Data = DataCache[NetworkIdent];
-			}
-
-			base.ClientSpawn();
-		}
-
-		protected override void OnDestroy()
+		public void Destroy()
 		{
 			if ( SceneObject != null )
 			{
@@ -315,7 +273,7 @@ namespace Facepunch.CoreWars.Voxel
 		{
 			var p = Offset + position;
 			var blockEmpty = Map.IsBlockEmpty( p );
-			var blockType = blockEmpty ? (byte)0 : IsServer ? (byte)1 : Map.GetBlockTypeAtPosition( p );
+			var blockType = blockEmpty ? (byte)0 : Host.IsServer ? (byte)1 : Map.GetBlockTypeAtPosition( p );
 
 			var face = new BlockFaceData
 			{
@@ -479,7 +437,7 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
-		private void UpdateBlockSlices()
+		public void UpdateBlockSlices()
 		{
 			IntVector3 blockPosition;
 			IntVector3 blockOffset;

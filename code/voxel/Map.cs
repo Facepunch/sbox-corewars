@@ -10,9 +10,6 @@ namespace Facepunch.CoreWars.Voxel
 		[Net] public int SizeX { get; private set; }
 		[Net] public int SizeY { get; private set; }
 		[Net] public int SizeZ { get; private set; }
-		[Net] public IList<Chunk> Chunks { get; set; }
-
-		private ChunkData[] ChunkData { get; set; }
 
 		private int _numChunksX;
 		private int _numChunksY;
@@ -22,10 +19,20 @@ namespace Facepunch.CoreWars.Voxel
 		public int NumChunksY => _numChunksY;
 		public int NumChunksZ => _numChunksZ;
 
+		public Chunk[] Chunks { get; private set; }
+
 		public void AddBlockType( BlockType type )
 		{
 			Host.AssertServer();
 			BlockTypes[type.BlockId] = type;
+		}
+
+		public void ReceiveChunk( int index, byte[] data )
+		{
+			var chunk = Chunks[index];
+			chunk.BlockTypes = data;
+			chunk.UpdateBlockSlices();
+			chunk.Build();
 		}
 
 		public void SetSize( int sizeX, int sizeY, int sizeZ )
@@ -37,21 +44,8 @@ namespace Facepunch.CoreWars.Voxel
 			_numChunksX = SizeX / Chunk.ChunkSize;
 			_numChunksY = SizeY / Chunk.ChunkSize;
 			_numChunksZ = SizeZ / Chunk.ChunkSize;
-
-			ChunkData = new ChunkData[_numChunksX * _numChunksY * _numChunksZ];
-
-			for ( int x = 0; x < _numChunksX; ++x )
-			{
-				for ( int y = 0; y < _numChunksY; ++y )
-				{
-					for ( int z = 0; z < _numChunksZ; ++z )
-					{
-						var chunkIndex = x + y * _numChunksX + z * _numChunksX * _numChunksY;
-						var chunk = new ChunkData( new IntVector3( x * Chunk.ChunkSize, y * Chunk.ChunkSize, z * Chunk.ChunkSize ) );
-						ChunkData[chunkIndex] = chunk;
-					}
-				}
-			}
+			
+			SetupChunks();
 		}
 
 		public void Init()
@@ -60,24 +54,18 @@ namespace Facepunch.CoreWars.Voxel
 			_numChunksY = SizeY / Chunk.ChunkSize;
 			_numChunksZ = SizeZ / Chunk.ChunkSize;
 
-			if ( Chunks != null )
+			if ( Chunks == null )
 			{
-				foreach ( var chunk in Chunks )
-				{
-					if ( chunk == null )
-						continue;
-
-					chunk.Map = this;
-					chunk.Init();
-				}
+				SetupChunks();
 			}
-		}
 
-		private void SpawnChunks()
-		{
-			foreach ( var chunkData in ChunkData )
+			foreach ( var chunk in Chunks )
 			{
-				Chunks.Add( new Chunk( this, chunkData ) );
+				if ( chunk == null )
+					continue;
+
+				chunk.Map = this;
+				chunk.Init();
 			}
 		}
 
@@ -153,8 +141,6 @@ namespace Facepunch.CoreWars.Voxel
 					}
 				}
 			}
-
-			SpawnChunks();
 		}
 
 		public byte GetBlockTypeAtPosition( IntVector3 position )
@@ -358,14 +344,30 @@ namespace Facepunch.CoreWars.Voxel
 			return BlockFace.Invalid;
 		}
 
+		private void SetupChunks()
+		{
+			Chunks = new Chunk[_numChunksX * _numChunksY * _numChunksZ];
+
+			for ( int x = 0; x < _numChunksX; ++x )
+			{
+				for ( int y = 0; y < _numChunksY; ++y )
+				{
+					for ( int z = 0; z < _numChunksZ; ++z )
+					{
+						var chunk = new Chunk( this, x, y, z );
+						Chunks[chunk.Index] = chunk;
+					}
+				}
+			}
+		}
+
 		private void SetBlockTypeAtPosition( IntVector3 position, byte blockType )
 		{
-			if ( ChunkData == null )
-				return;
+			Host.AssertServer();
 
 			var chunkIndex = GetBlockChunkIndexAtPosition( position );
 			var blockPositionInChunk = GetBlockPositionInChunk( position );
-			var chunk = ChunkData[chunkIndex];
+			var chunk = Chunks[chunkIndex];
 
 			chunk.SetBlockTypeAtPosition( blockPositionInChunk, blockType );
 		}
