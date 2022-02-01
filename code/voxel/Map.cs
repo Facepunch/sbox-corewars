@@ -33,7 +33,7 @@ namespace Facepunch.CoreWars.Voxel
 						var id = reader.ReadByte();
 						var name = reader.ReadString();
 
-						Current.BlockTypes.Add( id, Library.Create<BlockType>( name ) );
+						Current.BlockData.Add( id, Library.Create<BlockType>( name ) );
 					}
 				}
 			}
@@ -41,7 +41,7 @@ namespace Facepunch.CoreWars.Voxel
 			Current.Init();
 		}
 
-		public Dictionary<byte, BlockType> BlockTypes { get; private set; } = new();
+		public Dictionary<byte, BlockType> BlockData { get; private set; } = new();
 		public int SizeX { get; private set; }
 		public int SizeY { get; private set; }
 		public int SizeZ { get; private set; }
@@ -65,9 +65,9 @@ namespace Facepunch.CoreWars.Voxel
 					writer.Write( SizeX );
 					writer.Write( SizeY );
 					writer.Write( SizeZ );
-					writer.Write( BlockTypes.Count );
+					writer.Write( BlockData.Count );
 
-					foreach ( var kv in BlockTypes )
+					foreach ( var kv in BlockData )
 					{
 						writer.Write( kv.Key );
 						writer.Write( kv.Value.GetType().Name );
@@ -81,7 +81,7 @@ namespace Facepunch.CoreWars.Voxel
 		public void AddBlockType( BlockType type )
 		{
 			Host.AssertServer();
-			BlockTypes[type.BlockId] = type;
+			BlockData[type.BlockId] = type;
 		}
 
 		public void ReceiveChunk( int index, byte[] data )
@@ -90,6 +90,14 @@ namespace Facepunch.CoreWars.Voxel
 			chunk.BlockTypes = data;
 			chunk.UpdateBlockSlices();
 			chunk.Build();
+		}
+
+		public void AddAllBlockTypes()
+		{
+			foreach ( var type in Library.GetAll<BlockType>() )
+			{
+				AddBlockType( Library.Create<BlockType>( type ) );
+			}
 		}
 
 		public void SetSize( int sizeX, int sizeY, int sizeZ )
@@ -134,14 +142,14 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
-		public bool SetBlockAndUpdate( IntVector3 position, byte blockType, bool forceUpdate = false )
+		public bool SetBlockAndUpdate( IntVector3 position, byte blockId, bool forceUpdate = false )
 		{
 			var shouldBuild = false;
 			var chunkids = new HashSet<int>();
 
-			if ( SetBlock( position, blockType ) || forceUpdate )
+			if ( SetBlock( position, blockId ) || forceUpdate )
 			{
-				var chunkIndex = GetBlockChunkIndexAtPosition( position );
+				var chunkIndex = GetBlockChunkIndex( position );
 
 				chunkids.Add( chunkIndex );
 
@@ -158,7 +166,7 @@ namespace Facepunch.CoreWars.Voxel
 					}
 
 					var adjacentPos = GetAdjacentBlockPosition( position, i );
-					var adjadentChunkIndex = GetBlockChunkIndexAtPosition( adjacentPos );
+					var adjadentChunkIndex = GetBlockChunkIndex( adjacentPos );
 					var adjacentPosInChunk = GetBlockPositionInChunk( adjacentPos );
 
 					chunkids.Add( adjadentChunkIndex );
@@ -175,7 +183,7 @@ namespace Facepunch.CoreWars.Voxel
 			return shouldBuild;
 		}
 
-		public int GetBlockChunkIndexAtPosition( IntVector3 position )
+		public int GetBlockChunkIndex( IntVector3 position )
 		{
 			return (position.x / Chunk.ChunkSize) + (position.y / Chunk.ChunkSize) * _numChunksX + (position.z / Chunk.ChunkSize) * _numChunksX * _numChunksY;
 		}
@@ -202,42 +210,48 @@ namespace Facepunch.CoreWars.Voxel
 
 					for ( int z = 0; z < SizeZ; ++z )
 					{
-						SetBlockTypeAtPosition( new IntVector3( x, y, z ), (byte)(z < height ? 1 : 0) );
+						SetBlockIdAtPosition( new IntVector3( x, y, z ), (byte)(z < height ? 1 : 0) );
 					}
 				}
 			}
 		}
 
-		public byte GetBlockTypeAtPosition( IntVector3 position )
+		public byte GetBlock( IntVector3 position )
 		{
-			var chunkIndex = GetBlockChunkIndexAtPosition( position );
+			if ( !IsInMap( position ) ) return 0;
+			var chunkIndex = GetBlockChunkIndex( position );
 			var blockPositionInChunk = GetBlockPositionInChunk( position );
 			var chunk = Chunks[chunkIndex];
-
-			return chunk.GetBlockTypeAtPosition( blockPositionInChunk );
+			return chunk.GetBlockByPosition( blockPositionInChunk );
 		}
 
-		public bool SetBlock( IntVector3 position, byte blockType )
+		public bool IsInMap( IntVector3 position  )
 		{
 			if ( position.x < 0 || position.x >= SizeX ) return false;
 			if ( position.y < 0 || position.y >= SizeY ) return false;
 			if ( position.z < 0 || position.z >= SizeZ ) return false;
 
-			var chunkIndex = GetBlockChunkIndexAtPosition( position );
-			var blockPositionInChunk = GetBlockPositionInChunk( position );
-			int blockindex = Chunk.GetBlockIndexAtPosition( blockPositionInChunk );
-			var chunk = Chunks[chunkIndex];
-			int currentBlockType = chunk.GetBlockTypeAtIndex( blockindex );
+			return true;
+		}
 
-			if ( blockType == currentBlockType )
+		public bool SetBlock( IntVector3 position, byte blockId )
+		{
+			if ( !IsInMap( position ) ) return false;
+
+			var chunkIndex = GetBlockChunkIndex( position );
+			var blockPositionInChunk = GetBlockPositionInChunk( position );
+			int blockIndex = Chunk.GetBlockIndex( blockPositionInChunk );
+			var chunk = Chunks[chunkIndex];
+			int currentBlockId = chunk.GetBlockByIndex( blockIndex );
+
+			if ( blockId == currentBlockId )
 			{
 				return false;
 			}
 
-			if ( (blockType != 0 && currentBlockType == 0) || (blockType == 0 && currentBlockType != 0) )
+			if ( (blockId != 0 && currentBlockId == 0) || (blockId == 0 && currentBlockId != 0) )
 			{
-				chunk.SetBlockTypeAtIndex( blockindex, blockType );
-
+				chunk.SetBlock( blockIndex, blockId );
 				return true;
 			}
 
@@ -249,6 +263,19 @@ namespace Facepunch.CoreWars.Voxel
 			return position + Chunk.BlockDirections[side];
 		}
 
+		public BlockType GetBlockType( byte blockId )
+		{
+			if ( BlockData.TryGetValue( blockId, out var type ) )
+				return type;
+			else
+				return null;
+		}
+
+		public byte GetAdjacentBlock( IntVector3 position, int side )
+		{
+			return GetBlock( GetAdjacentBlockPosition( position, side ) );
+		}
+
 		public bool IsAdjacentBlockEmpty( IntVector3 position, int side )
 		{
 			return IsBlockEmpty( GetAdjacentBlockPosition( position, side ) );
@@ -256,27 +283,13 @@ namespace Facepunch.CoreWars.Voxel
 
 		public bool IsBlockEmpty( IntVector3 position )
 		{
-			if ( position.x < 0 || position.x >= SizeX ||
-				 position.y < 0 || position.y >= SizeY )
-			{
-				return true;
-			}
+			if ( !IsInMap( position ) ) return true;
 
-			if ( position.z < 0 || position.z >= SizeZ )
-			{
-				return true;
-			}
-
-			if ( position.z >= SizeZ )
-			{
-				return true;
-			}
-
-			var chunkIndex = GetBlockChunkIndexAtPosition( position );
+			var chunkIndex = GetBlockChunkIndex( position );
 			var blockPositionInChunk = GetBlockPositionInChunk( position );
 			var chunk = Chunks[chunkIndex];
 
-			return chunk.GetBlockTypeAtPosition( blockPositionInChunk ) == 0;
+			return chunk.GetBlockByPosition( blockPositionInChunk ) == 0;
 		}
 
 		public BlockFace GetBlockInDirection( Vector3 position, Vector3 direction, float length, out IntVector3 hitPosition, out float distance )
@@ -361,12 +374,11 @@ namespace Facepunch.CoreWars.Voxel
 
 				position3i = new( (int)position3f.x, (int)position3f.y, (int)position3f.z );
 
-				byte blockType = GetBlockTypeAtPosition( position3i );
+				byte blockId = GetBlock( position3i );
 
-				if ( blockType != 0 )
+				if ( blockId != 0 )
 				{
 					hitPosition = position3i;
-
 					return lastFace;
 				}
 			}
@@ -392,9 +404,9 @@ namespace Facepunch.CoreWars.Voxel
 				hitPosition3f.z = 0.0f;
 				IntVector3 blockHitPosition = new( (int)hitPosition3f.x, (int)hitPosition3f.y, (int)hitPosition3f.z );
 
-				byte blockType = GetBlockTypeAtPosition( blockHitPosition );
+				byte blockId = GetBlock( blockHitPosition );
 
-				if ( blockType == 0 )
+				if ( blockId == 0 )
 				{
 					distance = distanceHit;
 					hitPosition = blockHitPosition;
@@ -426,15 +438,14 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
-		private void SetBlockTypeAtPosition( IntVector3 position, byte blockType )
+		private void SetBlockIdAtPosition( IntVector3 position, byte blockId )
 		{
 			Host.AssertServer();
 
-			var chunkIndex = GetBlockChunkIndexAtPosition( position );
+			var chunkIndex = GetBlockChunkIndex( position );
 			var blockPositionInChunk = GetBlockPositionInChunk( position );
 			var chunk = Chunks[chunkIndex];
-
-			chunk.SetBlockTypeAtPosition( blockPositionInChunk, blockType );
+			chunk.SetBlock( blockPositionInChunk, blockId );
 		}
 	}
 }

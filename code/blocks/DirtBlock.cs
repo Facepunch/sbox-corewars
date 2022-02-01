@@ -12,7 +12,7 @@ namespace Facepunch.CoreWars.Blocks
 		public override byte GetTextureId( BlockFace face )
 		{
 			if ( face == BlockFace.Top )
-				return (byte)(TextureId + 1);
+				return 2;
 			else
 				return TextureId;
 		}

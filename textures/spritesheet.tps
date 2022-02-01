@@ -34,7 +34,7 @@
         <key>dataFormat</key>
         <string>spritesheet-only</string>
         <key>textureFileName</key>
-        <filename></filename>
+        <filename>spritesheet.png</filename>
         <key>flipPVR</key>
         <false/>
         <key>pvrQualityLevel</key>
@@ -180,6 +180,7 @@
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
             <key type="filename">blocks/dirt.png</key>
+            <key type="filename">blocks/glass.png</key>
             <key type="filename">blocks/grass.png</key>
             <key type="filename">blocks/sand.png</key>
             <key type="filename">blocks/stone.png</key>

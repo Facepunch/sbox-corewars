@@ -28,33 +28,33 @@ namespace Facepunch.CoreWars
 			Current = this;
 		}
 
-		public void SetBlockInDirection( Vector3 origin, Vector3 direction, byte blockType )
+		public void SetBlockInDirection( Vector3 origin, Vector3 direction, byte blockId )
 		{
 			var face = Map.Current.GetBlockInDirection( origin * (1.0f / Chunk.VoxelSize), direction.Normal, 10000, out var endPosition, out _ );
 			if ( face == BlockFace.Invalid ) return;
 
-			var position = blockType != 0 ? Map.GetAdjacentBlockPosition( endPosition, (int)face ) : endPosition;
-			SetBlockOnServer( position.x, position.y, position.z, blockType );
+			var position = blockId != 0 ? Map.GetAdjacentBlockPosition( endPosition, (int)face ) : endPosition;
+			SetBlockOnServer( position.x, position.y, position.z, blockId );
 		}
 
-		public void SetBlockOnServer( int x, int y, int z, byte blockType )
+		public void SetBlockOnServer( int x, int y, int z, byte blockId )
 		{
 			Host.AssertServer();
 
 			var position = new IntVector3( x, y, z );
 
-			if ( Map.Current.SetBlockAndUpdate( position, blockType ) )
+			if ( Map.Current.SetBlockAndUpdate( position, blockId ) )
 			{
-				SetBlockOnClient( x, y, z, blockType );
+				SetBlockOnClient( x, y, z, blockId );
 			}
 		}
 
 		[ClientRpc]
-		public void SetBlockOnClient( int x, int y, int z, byte blockType )
+		public void SetBlockOnClient( int x, int y, int z, byte blockId )
 		{
 			Host.AssertClient();
 
-			Map.Current.SetBlockAndUpdate( new IntVector3( x, y, z ), blockType, true );
+			Map.Current.SetBlockAndUpdate( new IntVector3( x, y, z ), blockId, true );
 		}
 
 		public virtual void PlayerRespawned( Player player )
@@ -125,10 +125,7 @@ namespace Facepunch.CoreWars
 			var map = new Map();
 
 			map.SetSize( 256, 256, 64 );
-			map.AddBlockType( new AirBlock() );
-			map.AddBlockType( new DirtBlock() );
-			map.AddBlockType( new SandBlock() );
-			map.AddBlockType( new StoneBlock() );
+			map.AddAllBlockTypes();
 			map.GeneratePerlin();
 			map.Init();
 

@@ -96,7 +96,7 @@ namespace Facepunch.CoreWars
 			{
 				if ( Input.Pressed( InputButton.Attack1 ) )
 				{
-					Game.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, (byte)Rand.Int( 1, 3 ) );
+					Game.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, (byte)Rand.Int( 1, 4 ) );
 				}
 				else if ( Input.Pressed( InputButton.Attack2 ) )
 				{

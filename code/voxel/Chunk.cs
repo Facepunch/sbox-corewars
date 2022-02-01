@@ -95,29 +95,29 @@ namespace Facepunch.CoreWars.Voxel
 				BuildMeshAndCollision();
 		}
 
-		public static int GetBlockIndexAtPosition( IntVector3 position )
+		public static int GetBlockIndex( IntVector3 position )
 		{
 			return position.x + position.y * ChunkSize + position.z * ChunkSize * ChunkSize;
 		}
 
-		public byte GetBlockTypeAtPosition( IntVector3 position )
+		public byte GetBlockByPosition( IntVector3 position )
 		{
-			return BlockTypes[GetBlockIndexAtPosition( position )];
+			return BlockTypes[GetBlockIndex( position )];
 		}
 
-		public byte GetBlockTypeAtIndex( int index )
+		public byte GetBlockByIndex( int index )
 		{
 			return BlockTypes[index];
 		}
 
-		public void SetBlockTypeAtPosition( IntVector3 position, byte blockType )
+		public void SetBlock( IntVector3 position, byte blockId )
 		{
-			BlockTypes[GetBlockIndexAtPosition( position )] = blockType;
+			BlockTypes[GetBlockIndex( position )] = blockId;
 		}
 
-		public void SetBlockTypeAtIndex( int index, byte blockType )
+		public void SetBlock( int index, byte blockId )
 		{
-			BlockTypes[index] = blockType;
+			BlockTypes[index] = blockId;
 		}
 
 		public void Destroy()
@@ -242,14 +242,14 @@ namespace Facepunch.CoreWars.Voxel
 			2, 2, 1, 1, 0, 0
 		};
 
-		private void AddQuad( ChunkSlice slice, int x, int y, int z, int width, int height, int widthAxis, int heightAxis, int face, byte blockType, int brightness )
+		private void AddQuad( ChunkSlice slice, int x, int y, int z, int width, int height, int widthAxis, int heightAxis, int face, byte blockId, int brightness )
 		{
-			if ( !Map.BlockTypes.TryGetValue( blockType, out var type ) )
-			{
-				throw new Exception( $"Unable to find a block type registered with the id: {blockType}!" );
-			}
+			var block = Map.GetBlockType( blockId );
 
-			var textureId = type.GetTextureId( (BlockFace)face );
+			if ( block == null )
+				throw new Exception( $"Unable to find a block type registered with the id: {blockId}!" );
+
+			var textureId = block.GetTextureId( (BlockFace)face );
 			var normal = (byte)face;
 			var faceData = (uint)((textureId & 31) << 18 | brightness | (normal & 7) << 27);
 			var collisionIndex = slice.CollisionIndices.Count;
@@ -273,16 +273,19 @@ namespace Facepunch.CoreWars.Voxel
 		{
 			var p = Offset + position;
 			var blockEmpty = Map.IsBlockEmpty( p );
-			var blockType = blockEmpty ? (byte)0 : Host.IsServer ? (byte)1 : Map.GetBlockTypeAtPosition( p );
+			var blockId = blockEmpty ? (byte)0 : Host.IsServer ? (byte)1 : Map.GetBlock( p );
 
 			var face = new BlockFaceData
 			{
 				Side = (byte)side,
-				Culled = blockType == 0,
-				Type = blockType,
+				Culled = blockId == 0,
+				Type = blockId,
 			};
 
-			if ( !face.Culled && !Map.IsAdjacentBlockEmpty( p, side ) )
+			var adjacentBlockId = Map.GetAdjacentBlock( p, side );
+			var adjacentBlock = Map.GetBlockType( adjacentBlockId );
+
+			if ( !face.Culled && (adjacentBlock != null && !adjacentBlock.IsTranslucent))
 			{
 				face.Culled = true;
 			}
@@ -538,7 +541,6 @@ namespace Facepunch.CoreWars.Voxel
 									if ( maskFace.Culled || !maskFace.Equals( BlockFaceMask[n] ) )
 									{
 										done = true;
-
 										break;
 									}
 								}
