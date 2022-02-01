@@ -1,0 +1,9 @@
+//
+// Facepunch.CoreWars.Voxel.BlockAsset
+//
+@BaseClass = block : ""
+[
+	friendlyname(string) : "Friendly Name" :  : ""
+	textureid(string) : "Texture Id" :  : ""
+]
+
