@@ -5,13 +5,13 @@ namespace Facepunch.CoreWars.Voxel
 {
 	public partial class Chunk : Entity
 	{
-		private struct BlockFace
+		private struct BlockFaceData
 		{
 			public bool Culled;
 			public byte Type;
 			public byte Side;
 
-			public bool Equals( BlockFace face )
+			public bool Equals( BlockFaceData face )
 			{
 				return face.Culled == Culled && face.Type == Type;
 			}
@@ -25,7 +25,7 @@ namespace Facepunch.CoreWars.Voxel
 
 		private IntVector3 Offset => Data.Offset;
 
-		private static readonly BlockFace[] BlockFaceMask = new BlockFace[ChunkSize * ChunkSize * ChunkSize];
+		private static readonly BlockFaceData[] BlockFaceMask = new BlockFaceData[ChunkSize * ChunkSize * ChunkSize];
 		private readonly ChunkSlice[] Slices = new ChunkSlice[ChunkSize * 6];
 		private SceneObject SceneObject;
 		private bool Initialized;
@@ -266,9 +266,10 @@ namespace Facepunch.CoreWars.Voxel
 
 		private void AddQuad( ChunkSlice slice, int x, int y, int z, int width, int height, int widthAxis, int heightAxis, int face, byte blockType, int brightness )
 		{
-			byte textureId = (byte)(blockType - 1);
-			byte normal = (byte)face;
-			uint faceData = (uint)((textureId & 31) << 18 | brightness | (normal & 7) << 27);
+			var type = BlockType.Find( blockType );
+			var textureId = type.GetTextureId( (BlockFace)face );
+			var normal = (byte)face;
+			var faceData = (uint)((textureId & 31) << 18 | brightness | (normal & 7) << 27);
 			var collisionIndex = slice.CollisionIndices.Count;
 
 			for ( int i = 0; i < 6; ++i )
@@ -286,13 +287,13 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
-		BlockFace GetBlockFace( IntVector3 position, int side )
+		BlockFaceData GetBlockFace( IntVector3 position, int side )
 		{
 			var p = Offset + position;
 			var blockEmpty = Map.IsBlockEmpty( p );
 			var blockType = blockEmpty ? (byte)0 : IsServer ? (byte)1 : Map.GetBlockTypeAtPosition( p );
 
-			var face = new BlockFace
+			var face = new BlockFaceData
 			{
 				Side = (byte)side,
 				Culled = blockType == 0,
@@ -335,8 +336,8 @@ namespace Facepunch.CoreWars.Voxel
 			slice.CollisionVertices.Clear();
 			slice.CollisionIndices.Clear();
 
-			BlockFace faceA;
-			BlockFace faceB;
+			BlockFaceData faceA;
+			BlockFaceData faceB;
 
 			int uAxis = (axis + 1) % 3;
 			int vAxis = (axis + 2) % 3;
@@ -459,8 +460,8 @@ namespace Facepunch.CoreWars.Voxel
 			IntVector3 blockPosition;
 			IntVector3 blockOffset;
 
-			BlockFace faceA;
-			BlockFace faceB;
+			BlockFaceData faceA;
+			BlockFaceData faceB;
 
 			for ( int faceSide = 0; faceSide < 6; faceSide++ )
 			{

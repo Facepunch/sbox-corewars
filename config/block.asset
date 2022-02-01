@@ -3,7 +3,9 @@
 //
 @BaseClass = block : ""
 [
+	blocktypename(string) : "Block Type Name" : "" : ""
 	friendlyname(string) : "Friendly Name" :  : ""
 	textureid(string) : "Texture Id" :  : ""
+	blockid(string) : "Block Id" :  : ""
 ]
 

@@ -1,4 +1,5 @@
-﻿using Facepunch.CoreWars.Voxel;
+﻿using Facepunch.CoreWars.Blocks;
+using Facepunch.CoreWars.Voxel;
 using Sandbox;
 using System.Linq;
 
@@ -31,7 +32,7 @@ namespace Facepunch.CoreWars
 		public void SetBlockInDirection( Vector3 origin, Vector3 direction, byte blockType )
 		{
 			var face = Map.GetBlockInDirection( origin * (1.0f / Chunk.VoxelSize), direction.Normal, 10000, out var endPosition, out _ );
-			if ( face == Map.BlockFace.Invalid ) return;
+			if ( face == BlockFace.Invalid ) return;
 
 			var position = blockType != 0 ? Map.GetAdjacentBlockPosition( endPosition, (int)face ) : endPosition;
 			SetBlockOnServer( position.x, position.y, position.z, blockType );
@@ -122,6 +123,10 @@ namespace Facepunch.CoreWars
 
 			Map = new Map();
 			Map.SetSize( 256, 256, 64 );
+			Map.AddBlockType( new AirBlock() );
+			Map.AddBlockType( new DirtBlock() );
+			Map.AddBlockType( new SandBlock() );
+			Map.AddBlockType( new StoneBlock() );
 			Map.GeneratePerlin();
 			Map.Init();
 		}

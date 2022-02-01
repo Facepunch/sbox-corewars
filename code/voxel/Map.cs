@@ -6,11 +6,12 @@ namespace Facepunch.CoreWars.Voxel
 {
 	public partial class Map : BaseNetworkable
 	{
+		[Net] public IDictionary<byte, BlockType> BlockTypes { get; private set; }
 		[Net] public int SizeX { get; private set; }
 		[Net] public int SizeY { get; private set; }
 		[Net] public int SizeZ { get; private set; }
-
 		[Net] public IList<Chunk> Chunks { get; set; }
+
 		private ChunkData[] ChunkData { get; set; }
 
 		private int _numChunksX;
@@ -20,6 +21,17 @@ namespace Facepunch.CoreWars.Voxel
 		public int NumChunksX => _numChunksX;
 		public int NumChunksY => _numChunksY;
 		public int NumChunksZ => _numChunksZ;
+
+		public Map()
+		{
+			BlockTypes = new Dictionary<byte, BlockType>();
+		}
+
+		public void AddBlockType( BlockType type )
+		{
+			Host.AssertServer();
+			BlockTypes[type.BlockId] = type;
+		}
 
 		public void SetSize( int sizeX, int sizeY, int sizeZ )
 		{
@@ -142,24 +154,12 @@ namespace Facepunch.CoreWars.Voxel
 
 					for ( int z = 0; z < SizeZ; ++z )
 					{
-						SetBlockTypeAtPosition( new IntVector3( x, y, z ), (byte)(z < height ? Rand.Int( 2, 2 ) : 0) );
+						SetBlockTypeAtPosition( new IntVector3( x, y, z ), (byte)(z < height ? 1 : 0) );
 					}
 				}
 			}
 
 			SpawnChunks();
-		}
-
-		private void SetBlockTypeAtPosition( IntVector3 position, byte blockType )
-		{
-			if ( ChunkData == null )
-				return;
-
-			var chunkIndex = GetBlockChunkIndexAtPosition( position );
-			var blockPositionInChunk = GetBlockPositionInChunk( position );
-			var chunk = ChunkData[chunkIndex];
-
-			chunk.SetBlockTypeAtPosition( blockPositionInChunk, blockType );
 		}
 
 		public byte GetBlockTypeAtPosition( IntVector3 position )
@@ -233,17 +233,6 @@ namespace Facepunch.CoreWars.Voxel
 			return chunk.GetBlockTypeAtPosition( blockPositionInChunk ) == 0;
 		}
 
-		public enum BlockFace : int
-		{
-			Invalid = -1,
-			Top = 0,
-			Bottom = 1,
-			West = 2,
-			East = 3,
-			South = 4,
-			North = 5,
-		};
-
 		public BlockFace GetBlockInDirection( Vector3 position, Vector3 direction, float length, out IntVector3 hitPosition, out float distance )
 		{
 			hitPosition = new IntVector3( 0, 0, 0 );
@@ -287,8 +276,8 @@ namespace Facepunch.CoreWars.Voxel
 				}
 
 				Vector3 lengthToNearestEdge = new( MathF.Abs( distanceToNearestEdge.x / direction.x ),
-						MathF.Abs( distanceToNearestEdge.y / direction.y ),
-						MathF.Abs( distanceToNearestEdge.z / direction.z ) );
+					MathF.Abs( distanceToNearestEdge.y / direction.y ),
+					MathF.Abs( distanceToNearestEdge.z / direction.z ) );
 
 				int axis;
 
@@ -372,6 +361,18 @@ namespace Facepunch.CoreWars.Voxel
 			distance = length;
 
 			return BlockFace.Invalid;
+		}
+
+		private void SetBlockTypeAtPosition( IntVector3 position, byte blockType )
+		{
+			if ( ChunkData == null )
+				return;
+
+			var chunkIndex = GetBlockChunkIndexAtPosition( position );
+			var blockPositionInChunk = GetBlockPositionInChunk( position );
+			var chunk = ChunkData[chunkIndex];
+
+			chunk.SetBlockTypeAtPosition( blockPositionInChunk, blockType );
 		}
 	}
 }
