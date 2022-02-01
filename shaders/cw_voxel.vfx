@@ -32,6 +32,8 @@ MODES
 COMMON
 {
 	#include "common/shared.hlsl"
+
+	float g_flVoxelSize < Default( 32.0 ); >;
 }
 
 //=========================================================================================================================
@@ -48,6 +50,8 @@ struct VertexInput
 struct PixelInput
 {
 	#include "common/pixelinput.hlsl"
+	float2 vTexCoord : TEXCOORD9;
+	uint nTextureIndex : TEXCOORD10;
 };
 
 //=========================================================================================================================
@@ -56,21 +60,12 @@ VS
 {
 	#include "common/vertex.hlsl"
 	
-	float g_flVoxelSize < Default( 32.0 ); >;
 
 	PixelInput MainVs( INSTANCED_SHADER_PARAMS( VertexInput i ) )
 	{
 		float3 position = float3( float( i.vData & ( 63 ) ), float( ( i.vData >> 6 ) & ( 63 ) ), float( ( i.vData >> 12 ) & ( 63 ) ) ) * g_flVoxelSize;
 		int texindex = int( ( i.vData >> 18 ) & ( 31 ) );
-		float brightness = ( float( ( i.vData >> 23 ) & ( 15 ) ) + 2 ) / 16.0;
 		int normal = int( ( i.vData >> 27 ) & ( 7 ) );
-		brightness = clamp( brightness, 0, 1 );
-
-		float3 color = float3( 0.75, 0.25, 0.25 );
-		if ( texindex == 1 ) color = float3( 0.25, 0.75, 0.25 );
-		else if ( texindex == 2 ) color = float3( 0.25, 0.25, 0.75 );
-		else if ( texindex == 3 ) color = float3( 0.25, 0.75, 0.75 );
-		else if ( texindex == 4 ) color = float3( 0.75, 0.75, 0.25 );
 
 		i.vPositionOs = position;
 
@@ -89,13 +84,14 @@ VS
 		else if ( normal == 5 ) vTangentOs = float3( 0, 0, -1 );
 
 		float3 vBinormalOs = cross( vNormalOs, vTangentOs );
-		i.vTexCoord = float2( dot( vBinormalOs, position ), dot( vTangentOs, position ) ) * ( 1.0 / 32.0 );
+		float2 vTexCoord = float2( dot( vBinormalOs, position ), dot( vTangentOs, position ) );
 
 		PixelInput o = ProcessVertex( i );
 		o.vNormalWs = vNormalOs;
 		o.vTangentUWs = vBinormalOs;
 		o.vTangentVWs = vTangentOs;
-		o.vVertexColor = float4( color.rgb, 1.0 );
+		o.vTexCoord = vTexCoord;
+		o.nTextureIndex = texindex;
 		return FinalizeVertex( o );
 	}
 }
@@ -104,6 +100,7 @@ VS
 
 PS
 {
+	float flTextureAtlasCellSize< Default(64.0f); >;
 	StaticCombo( S_MODE_DEPTH, 0..1, Sys( ALL ) );
 	StaticCombo( S_MODE_TOOLS_WIREFRAME, 0..1, Sys( ALL ) );
 
@@ -116,6 +113,9 @@ PS
 	#endif
 
 	#include "common/pixel.hlsl"
+
+	CreateInputTexture2D( TextureAtlas, Srgb, 8, "", "_color", "Voxel Atlas,10/10", Default3( 1.0f, 1.0f, 1.0f ) );
+	CreateTexture2DWithoutSampler( g_tAtlasColor )  < Channel( RGB,  Box( TextureAtlas ), Srgb ); OutputFormat( BC7 ); SrgbRead( true ); >;
 
 	PixelOutput MainPs( PixelInput i )
 	{
@@ -133,8 +133,20 @@ PS
 		}
 		#else
 		{
+
+			float2 vAtlasDims = TextureDimensions2D( g_tAtlasColor, 0 ).xy;
+			float2 vAltasMaxCells = vAtlasDims / flTextureAtlasCellSize;
+			float2 vInvMaxCells = 1.0f / vAltasMaxCells;
+
+			float2 vCellLocation =  float2( i.nTextureIndex % vAltasMaxCells.x, floor( i.nTextureIndex / vAltasMaxCells.x ) );
+
+			// Normalized to Atlas Space
+			float2 vTexCoordAtlas = frac((i.vTexCoord.xy % g_flVoxelSize) / g_flVoxelSize);
+			vTexCoordAtlas = frac((vTexCoordAtlas / vAltasMaxCells) + (vCellLocation * vInvMaxCells));
+
 			Material m = GatherMaterial( i );
-			m.Albedo.rgb *= i.vVertexColor.rgb;
+			m.Albedo.rgb = Tex2DLevelS( g_tAtlasColor, TextureFiltering, vTexCoordAtlas, 0 ).rgb;
+
 			return FinalizePixelMaterial( i, m );
 		}
 		#endif
