@@ -62,15 +62,8 @@ namespace Facepunch.CoreWars
 
 			Controller = new MoveController()
 			{
-
 				WalkSpeed = 195f,
-				SprintSpeed = 375f,
-
-				StepSize = 2.0f,
-				AirAcceleration= 24f,
-				EyeHeight = 72f,
-				AirControl = 48f
-
+				SprintSpeed = 375f
 			};
 
 			Animator = new PlayerAnimator();

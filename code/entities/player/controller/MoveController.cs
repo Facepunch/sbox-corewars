@@ -12,20 +12,20 @@ namespace Facepunch.CoreWars
 		public float MinUpSlopeAngle { get; set; } = 100f;
 		public float MoveSpeedScale { get; set; } = 1f;
 		public float Acceleration { get; set; } = 10f;
-		public float AirAcceleration { get; set; } = 50f;
+		public float AirAcceleration { get; set; } = 24f;
 		public float GroundFriction { get; set; } = 4f;
 		public float StopSpeed { get; set; } = 100f;
 		public float FallDamageMin { get; set; } = 0f;
 		public float FallDamageMax { get; set; } = 400f;
-		public float StayOnGroundAngle { get; set; } = 270.0f;
-		public float GroundAngle { get; set; } = 46.0f;
-		public float StepSize { get; set; } = 18.0f;
+		public float StayOnGroundAngle { get; set; } = 270f;
+		public float GroundAngle { get; set; } = 46f;
+		public float StepSize { get; set; } = 2f;
 		public float MaxNonJumpVelocity { get; set; } = 140f;
 		public float BodyGirth { get; set; } = 32f;
 		public float BodyHeight { get; set; } = 72f;
-		public float EyeHeight { get; set; } = 64f;
+		public float EyeHeight { get; set; } = 72f;
 		public float Gravity { get; set; } = 800f;
-		public float AirControl { get; set; } = 30f;
+		public float AirControl { get; set; } = 48f;
 		public bool Swimming { get; set; } = false;
 
 		protected Unstuck Unstuck { get; private set; }
@@ -49,7 +49,7 @@ namespace Facepunch.CoreWars
 
 			GroundEntity = null;
 			GroundNormal = Vector3.Up;
-			SurfaceFriction = 1.0f;
+			SurfaceFriction = 1f;
 		}
 
 		public override BBox GetHull()
@@ -94,13 +94,6 @@ namespace Facepunch.CoreWars
 				// I hope this never really happens.
 				return;
 			}
-
-			//var tr = TraceBBox( Position, Position + Vector3.Down * 8f, 16f );
-
-			//if ( tr.Hit )
-			//{
-			//	UpdateGroundEntity( tr );
-			//}
 
 			CheckLadder();
 			Swimming = Pawn.WaterLevel.Fraction > 0.6f;
@@ -203,7 +196,7 @@ namespace Facepunch.CoreWars
 
 			try
 			{
-				if ( Velocity.Length < 1.0f )
+				if ( Velocity.Length < 1f )
 				{
 					Velocity = Vector3.Zero;
 					return;
@@ -286,7 +279,7 @@ namespace Facepunch.CoreWars
 			Velocity += (pushDir * canPush * Time.Delta);
 		}
 
-		private void ApplyFriction( float frictionAmount = 1.0f )
+		private void ApplyFriction( float frictionAmount = 1f )
 		{
 			var speed = Velocity.Length;
 			if ( speed < 0.1f ) return;
@@ -373,14 +366,14 @@ namespace Facepunch.CoreWars
 		{
 			if ( IsTouchingLadder && Input.Pressed( InputButton.Jump ) )
 			{
-				Velocity = LadderNormal * 100.0f;
+				Velocity = LadderNormal * 100f;
 				IsTouchingLadder = false;
 				return;
 			}
 
-			var ladderDistance = 1.0f;
+			var ladderDistance = 1f;
 			var start = Position;
-			var end = start + (IsTouchingLadder ? (LadderNormal * -1.0f) : WishVelocity.Normal) * ladderDistance;
+			var end = start + (IsTouchingLadder ? (LadderNormal * -1f) : WishVelocity.Normal) * ladderDistance;
 
 			var pm = Trace.Ray( start, end )
 				.Size( Mins, Maxs )
@@ -411,7 +404,7 @@ namespace Facepunch.CoreWars
 
 		private void CategorizePosition( bool stayOnGround )
 		{
-			SurfaceFriction = 1.0f;
+			SurfaceFriction = 1f;
 
 			var point = Position - Vector3.Up * 2f;
 			var bumpOrigin = Position;
@@ -449,7 +442,7 @@ namespace Facepunch.CoreWars
 				UpdateGroundEntity( pm );
 			}
 
-			if ( moveToEndPos && !pm.StartedSolid && pm.Fraction > 0.0f && pm.Fraction < 1.0f )
+			if ( moveToEndPos && !pm.StartedSolid && pm.Fraction > 0f && pm.Fraction < 1f )
 			{
 				Position = pm.EndPos;
 			}
@@ -495,7 +488,7 @@ namespace Facepunch.CoreWars
 			}
 		}
 
-		public override TraceResult TraceBBox( Vector3 start, Vector3 end, float liftFeet = 0.0f )
+		public override TraceResult TraceBBox( Vector3 start, Vector3 end, float liftFeet = 0f )
 		{
 			return TraceBBox( start, end, Mins, Maxs, liftFeet );
 		}
