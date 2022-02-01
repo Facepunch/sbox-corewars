@@ -50,7 +50,7 @@ struct VertexInput
 struct PixelInput
 {
 	#include "common/pixelinput.hlsl"
-	float2 vTexCoord : TEXCOORD9;
+	float3 vTexCoordAndBrightness : TEXCOORD9;
 	uint nTextureIndex : TEXCOORD10;
 };
 
@@ -66,6 +66,7 @@ VS
 		float3 position = float3( float( i.vData & ( 63 ) ), float( ( i.vData >> 6 ) & ( 63 ) ), float( ( i.vData >> 12 ) & ( 63 ) ) ) * g_flVoxelSize;
 		int texindex = int( ( i.vData >> 18 ) & ( 31 ) );
 		int normal = int( ( i.vData >> 27 ) & ( 7 ) );
+		float brightness = ( float( ( i.vData >> 23 ) & ( 15 ) ) + 2 ) / 16.0;
 
 		i.vPositionOs = position;
 
@@ -90,7 +91,7 @@ VS
 		o.vNormalWs = vNormalOs;
 		o.vTangentUWs = vBinormalOs;
 		o.vTangentVWs = vTangentOs;
-		o.vTexCoord = vTexCoord;
+		o.vTexCoordAndBrightness = float3( vTexCoord.xy, brightness );
 		o.nTextureIndex = texindex;
 		return FinalizeVertex( o );
 	}
@@ -115,7 +116,7 @@ PS
 	#include "common/pixel.hlsl"
 
 	CreateInputTexture2D( TextureAtlas, Srgb, 8, "", "_color", "Voxel Atlas,10/10", Default3( 1.0f, 1.0f, 1.0f ) );
-	CreateTexture2D( g_tAtlasColor )  < Channel( RGB,  Box( TextureAtlas ), Srgb ); OutputFormat( BC7 ); SrgbRead( true ); Filter( POINT ); AddressU( MIRROR ); AddressV( MIRROR ); >;
+	CreateTexture2D( g_tAtlasColor )  < Channel( RGB,  None( TextureAtlas ), Srgb ); OutputFormat( BC7 ); SrgbRead( true ); Filter( POINT ); AddressU( MIRROR ); AddressV( MIRROR ); >;
 
 	PixelOutput MainPs( PixelInput i )
 	{
@@ -141,11 +142,11 @@ PS
 			float2 vCellLocation =  float2( i.nTextureIndex % vAltasMaxCells.x, floor( i.nTextureIndex / vAltasMaxCells.x ) );
 
 			// Normalized to Atlas Space
-			float2 vTexCoordAtlas = frac((i.vTexCoord.xy % g_flVoxelSize) / g_flVoxelSize);
+			float2 vTexCoordAtlas = frac((i.vTexCoordAndBrightness.xy % g_flVoxelSize) / g_flVoxelSize);
 			vTexCoordAtlas = frac((vTexCoordAtlas / vAltasMaxCells) + (vCellLocation * vInvMaxCells));
 
 			Material m = GatherMaterial( i );
-			m.Albedo.rgb = Tex2DLevel( g_tAtlasColor, vTexCoordAtlas, 0 ).rgb;
+			m.Albedo.rgb = Tex2DLevel( g_tAtlasColor, vTexCoordAtlas, 0 ).rgb * i.vTexCoordAndBrightness.z;
 
 			return FinalizePixelMaterial( i, m );
 		}
