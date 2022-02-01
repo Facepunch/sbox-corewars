@@ -10,7 +10,7 @@ namespace Facepunch.CoreWars.Voxel
 
 		public Map Map { get; set; }
 
-		[Net] public ChunkData Data { get; set; }
+		public ChunkData Data { get; set; }
 		private IntVector3 Offset => Data.Offset;
 
 		private SceneObject SceneObject;
@@ -29,21 +29,14 @@ namespace Facepunch.CoreWars.Voxel
 			Transmit = TransmitType.Always;
 		}
 
-		protected override void OnDestroy()
+		[ClientRpc]
+		public void UpdateAll( int x, int y, int z, byte[] data )
 		{
-			if ( SceneObject != null )
-			{
-				SceneObject.Delete();
-				SceneObject = null;
-			}
+			Data = new();
+			Data.Offset = new IntVector3( x, y, z );
+			Data.BlockTypes = data;
 
-			foreach ( var slice in Slices )
-			{
-				if ( slice == null )
-					continue;
-
-				slice.Body = null;
-			}
+			Log.Info( $"Received all bytes for chunk{x},{y},{z} ({data.Length / 1024}kb)" );
 		}
 
 		[Event.Tick.Client]
@@ -116,6 +109,48 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
+		public static int GetBlockIndexAtPosition( IntVector3 position )
+		{
+			return position.x + position.y * ChunkSize + position.z * ChunkSize * ChunkSize;
+		}
+
+		public byte GetBlockTypeAtPosition( IntVector3 position )
+		{
+			return Data.GetBlockTypeAtPosition( position );
+		}
+
+		public byte GetBlockTypeAtIndex( int index )
+		{
+			return Data.GetBlockTypeAtIndex( index );
+		}
+
+		public void SetBlockTypeAtPosition( IntVector3 position, byte blockType )
+		{
+			Data.SetBlockTypeAtPosition( position, blockType );
+		}
+
+		public void SetBlockTypeAtIndex( int index, byte blockType )
+		{
+			Data.SetBlockTypeAtIndex( index, blockType );
+		}
+
+		protected override void OnDestroy()
+		{
+			if ( SceneObject != null )
+			{
+				SceneObject.Delete();
+				SceneObject = null;
+			}
+
+			foreach ( var slice in Slices )
+			{
+				if ( slice == null )
+					continue;
+
+				slice.Body = null;
+			}
+		}
+
 		private void BuildMeshAndCollision()
 		{
 			if ( !Mesh.IsValid )
@@ -182,31 +217,6 @@ namespace Facepunch.CoreWars.Voxel
 
 				slice.IsDirty = false;
 			}
-		}
-
-		public static int GetBlockIndexAtPosition( IntVector3 position )
-		{
-			return position.x + position.y * ChunkSize + position.z * ChunkSize * ChunkSize;
-		}
-
-		public byte GetBlockTypeAtPosition( IntVector3 position )
-		{
-			return Data.GetBlockTypeAtPosition( position );
-		}
-
-		public byte GetBlockTypeAtIndex( int index )
-		{
-			return Data.GetBlockTypeAtIndex( index );
-		}
-
-		public void SetBlockTypeAtPosition( IntVector3 position, byte blockType )
-		{
-			Data.SetBlockTypeAtPosition( position, blockType );
-		}
-
-		public void SetBlockTypeAtIndex( int index, byte blockType )
-		{
-			Data.SetBlockTypeAtIndex( index, blockType );
 		}
 
 		static readonly IntVector3[] BlockVertices = new[]
@@ -420,10 +430,7 @@ namespace Facepunch.CoreWars.Voxel
 							}
 						}
 
-						if ( done )
-						{
-							break;
-						}
+						if ( done ) break;
 					}
 
 					if ( !BlockFaceMask[n].culled )

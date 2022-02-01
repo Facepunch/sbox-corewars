@@ -10,7 +10,7 @@ namespace Facepunch.CoreWars.Voxel
 		[Net] public int SizeY { get; private set; }
 		[Net] public int SizeZ { get; private set; }
 
-		[Net] private IList<Chunk> Chunks { get; set; }
+		[Net] public IList<Chunk> Chunks { get; set; }
 		private ChunkData[] ChunkData { get; set; }
 
 		private int _numChunksX;
@@ -74,30 +74,30 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
-		public bool SetBlockAndUpdate( IntVector3 blockPos, byte blocktype, bool forceUpdate = false )
+		public bool SetBlockAndUpdate( IntVector3 position, byte blockType, bool forceUpdate = false )
 		{
-			bool build = false;
+			var shouldBuild = false;
 			var chunkids = new HashSet<int>();
 
-			if ( SetBlock( blockPos, blocktype ) || forceUpdate )
+			if ( SetBlock( position, blockType ) || forceUpdate )
 			{
-				var chunkIndex = GetBlockChunkIndexAtPosition( blockPos );
+				var chunkIndex = GetBlockChunkIndexAtPosition( position );
 
 				chunkids.Add( chunkIndex );
 
-				build = true;
+				shouldBuild = true;
 
 				for ( int i = 0; i < 6; i++ )
 				{
-					if ( IsAdjacentBlockEmpty( blockPos, i ) )
+					if ( IsAdjacentBlockEmpty( position, i ) )
 					{
-						var posInChunk = GetBlockPositionInChunk( blockPos );
+						var posInChunk = GetBlockPositionInChunk( position );
 						Chunks[chunkIndex].UpdateBlockSlice( posInChunk, i );
 
 						continue;
 					}
 
-					var adjacentPos = GetAdjacentBlockPosition( blockPos, i );
+					var adjacentPos = GetAdjacentBlockPosition( position, i );
 					var adjadentChunkIndex = GetBlockChunkIndexAtPosition( adjacentPos );
 					var adjacentPosInChunk = GetBlockPositionInChunk( adjacentPos );
 
@@ -112,20 +112,23 @@ namespace Facepunch.CoreWars.Voxel
 				Chunks[chunkid].Build();
 			}
 
-			return build;
+			return shouldBuild;
 		}
 
-		public int GetBlockChunkIndexAtPosition( IntVector3 pos )
+		public int GetBlockChunkIndexAtPosition( IntVector3 position )
 		{
-			return (pos.x / Chunk.ChunkSize) + (pos.y / Chunk.ChunkSize) * _numChunksX + (pos.z / Chunk.ChunkSize) * _numChunksX * _numChunksY;
+			return (position.x / Chunk.ChunkSize) + (position.y / Chunk.ChunkSize) * _numChunksX + (position.z / Chunk.ChunkSize) * _numChunksX * _numChunksY;
 		}
 
-		public static IntVector3 GetBlockPositionInChunk( IntVector3 pos )
+		public static IntVector3 GetBlockPositionInChunk( IntVector3 position )
 		{
-			return new IntVector3( pos.x % Chunk.ChunkSize, pos.y % Chunk.ChunkSize, pos.z % Chunk.ChunkSize );
+			return new IntVector3( position.x % Chunk.ChunkSize, position.y % Chunk.ChunkSize, position.z % Chunk.ChunkSize );
 		}
 
-		public static int GetOppositeDirection( int direction ) { return direction + ((direction % 2 != 0) ? -1 : 1); }
+		public static int GetOppositeDirection( int direction )
+		{
+			return direction + ((direction % 2 != 0) ? -1 : 1);
+		}
 
 		public void GeneratePerlin()
 		{
@@ -147,62 +150,35 @@ namespace Facepunch.CoreWars.Voxel
 			SpawnChunks();
 		}
 
-		public void GenerateGround()
-		{
-			for ( int x = 0; x < SizeX; ++x )
-			{
-				for ( int y = 0; y < SizeY; ++y )
-				{
-					int height = 10;
-					if ( height <= 0 ) height = 1;
-					if ( height > SizeZ ) height = SizeZ;
-
-					for ( int z = 0; z < SizeZ; ++z )
-					{
-						SetBlockTypeAtPosition( new IntVector3( x, y, z ), (byte)(z < height ? Rand.Int( 1, 5 ) : 0) );
-					}
-				}
-			}
-
-			SpawnChunks();
-		}
-
-		private void SetBlockTypeAtPosition( IntVector3 pos, byte blockType )
+		private void SetBlockTypeAtPosition( IntVector3 position, byte blockType )
 		{
 			if ( ChunkData == null )
 				return;
 
-			var chunkIndex = GetBlockChunkIndexAtPosition( pos );
-			var blockPositionInChunk = GetBlockPositionInChunk( pos );
+			var chunkIndex = GetBlockChunkIndexAtPosition( position );
+			var blockPositionInChunk = GetBlockPositionInChunk( position );
 			var chunk = ChunkData[chunkIndex];
 
 			chunk.SetBlockTypeAtPosition( blockPositionInChunk, blockType );
 		}
 
-		public byte GetBlockTypeAtPosition( IntVector3 pos )
+		public byte GetBlockTypeAtPosition( IntVector3 position )
 		{
-			var chunkIndex = GetBlockChunkIndexAtPosition( pos );
-			var blockPositionInChunk = GetBlockPositionInChunk( pos );
+			var chunkIndex = GetBlockChunkIndexAtPosition( position );
+			var blockPositionInChunk = GetBlockPositionInChunk( position );
 			var chunk = Chunks[chunkIndex];
 
 			return chunk.GetBlockTypeAtPosition( blockPositionInChunk );
 		}
 
-		public void WriteNetworkDataForChunkAtPosition( IntVector3 pos )
+		public bool SetBlock( IntVector3 position, byte blockType )
 		{
-			var chunkIndex = GetBlockChunkIndexAtPosition( pos );
-			var chunkData = ChunkData[chunkIndex];
-			chunkData.WriteNetworkData();
-		}
+			if ( position.x < 0 || position.x >= SizeX ) return false;
+			if ( position.y < 0 || position.y >= SizeY ) return false;
+			if ( position.z < 0 || position.z >= SizeZ ) return false;
 
-		public bool SetBlock( IntVector3 pos, byte blockType )
-		{
-			if ( pos.x < 0 || pos.x >= SizeX ) return false;
-			if ( pos.y < 0 || pos.y >= SizeY ) return false;
-			if ( pos.z < 0 || pos.z >= SizeZ ) return false;
-
-			var chunkIndex = GetBlockChunkIndexAtPosition( pos );
-			var blockPositionInChunk = GetBlockPositionInChunk( pos );
+			var chunkIndex = GetBlockChunkIndexAtPosition( position );
+			var blockPositionInChunk = GetBlockPositionInChunk( position );
 			int blockindex = Chunk.GetBlockIndexAtPosition( blockPositionInChunk );
 			var chunk = Chunks[chunkIndex];
 			int currentBlockType = chunk.GetBlockTypeAtIndex( blockindex );
@@ -222,36 +198,36 @@ namespace Facepunch.CoreWars.Voxel
 			return false;
 		}
 
-		public static IntVector3 GetAdjacentBlockPosition( IntVector3 pos, int side )
+		public static IntVector3 GetAdjacentBlockPosition( IntVector3 position, int side )
 		{
-			return pos + Chunk.BlockDirections[side];
+			return position + Chunk.BlockDirections[side];
 		}
 
-		public bool IsAdjacentBlockEmpty( IntVector3 pos, int side )
+		public bool IsAdjacentBlockEmpty( IntVector3 position, int side )
 		{
-			return IsBlockEmpty( GetAdjacentBlockPosition( pos, side ) );
+			return IsBlockEmpty( GetAdjacentBlockPosition( position, side ) );
 		}
 
-		public bool IsBlockEmpty( IntVector3 pos )
+		public bool IsBlockEmpty( IntVector3 position )
 		{
-			if ( pos.x < 0 || pos.x >= SizeX ||
-				 pos.y < 0 || pos.y >= SizeY )
+			if ( position.x < 0 || position.x >= SizeX ||
+				 position.y < 0 || position.y >= SizeY )
 			{
 				return true;
 			}
 
-			if ( pos.z < 0 || pos.z >= SizeZ )
+			if ( position.z < 0 || position.z >= SizeZ )
 			{
 				return true;
 			}
 
-			if ( pos.z >= SizeZ )
+			if ( position.z >= SizeZ )
 			{
 				return true;
 			}
 
-			var chunkIndex = GetBlockChunkIndexAtPosition( pos );
-			var blockPositionInChunk = GetBlockPositionInChunk( pos );
+			var chunkIndex = GetBlockChunkIndexAtPosition( position );
+			var blockPositionInChunk = GetBlockPositionInChunk( position );
 			var chunk = Chunks[chunkIndex];
 
 			return chunk.GetBlockTypeAtPosition( blockPositionInChunk ) == 0;

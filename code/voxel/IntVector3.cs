@@ -119,7 +119,7 @@ namespace Facepunch.CoreWars.Voxel
 		public static readonly IntVector3 OneY = new( 0, 1, 0 );
 		public static readonly IntVector3 OneZ = new( 0, 0, 1 );
 
-		#region equality
+		#region Equality
 		public static bool operator ==( IntVector3 left, IntVector3 right ) => left.Equals( right );
 		public static bool operator !=( IntVector3 left, IntVector3 right ) => !(left == right);
 		public override bool Equals( object obj ) => obj is IntVector3 o && Equals( o );

@@ -28,28 +28,23 @@ namespace Facepunch.CoreWars
 			Current = this;
 		}
 
-		public void SetBlockInDirection( Vector3 position, Vector3 direction, byte blockType )
+		public void SetBlockInDirection( Vector3 origin, Vector3 direction, byte blockType )
 		{
-			var face = Map.GetBlockInDirection( position * (1.0f / Chunk.VoxelSize), direction.Normal, 10000, out var hitPosition, out _ );
+			var face = Map.GetBlockInDirection( origin * (1.0f / Chunk.VoxelSize), direction.Normal, 10000, out var endPosition, out _ );
 			if ( face == Map.BlockFace.Invalid ) return;
 
-			var blockPos = hitPosition;
-
-			if ( blockType != 0 )
-				blockPos = Map.GetAdjacentBlockPosition( blockPos, (int)face );
-
-			SetBlockOnServer( blockPos.x, blockPos.y, blockPos.z, blockType );
+			var position = blockType != 0 ? Map.GetAdjacentBlockPosition( endPosition, (int)face ) : endPosition;
+			SetBlockOnServer( position.x, position.y, position.z, blockType );
 		}
 
 		public void SetBlockOnServer( int x, int y, int z, byte blockType )
 		{
 			Host.AssertServer();
 
-			var pos = new IntVector3( x, y, z );
+			var position = new IntVector3( x, y, z );
 
-			if ( Map.SetBlockAndUpdate( pos, blockType ) )
+			if ( Map.SetBlockAndUpdate( position, blockType ) )
 			{
-				Map.WriteNetworkDataForChunkAtPosition( pos );
 				SetBlockOnClient( x, y, z, blockType );
 			}
 		}
@@ -110,6 +105,13 @@ namespace Facepunch.CoreWars
 			client.Pawn = player;
 
 			StateSystem.Active?.OnPlayerJoined( player );
+
+			// For now just load every chunk in the map.
+			foreach ( var chunk in Map.Chunks )
+			{
+				player.LoadChunk( chunk );
+			}
+
 			base.ClientJoined( client );
 		}
 
