@@ -8,7 +8,11 @@ Layer0
 	g_flVoxelSize "32.000"
 
 	//---- Color ----
+	g_flModelTintAmount "1.000"
 	g_vColorTint "[1.000000 1.000000 1.000000 0.000000]"
+
+	//---- Fade ----
+	g_flFadeExponent "1.000"
 
 	//---- Fog ----
 	g_bFogEnabled "1"
@@ -34,7 +38,7 @@ Layer0
 	g_vTexCoordScrollSpeed "[0.000 0.000]"
 
 	//---- Voxel Atlas ----
-	TextureAtlas "materials/corewars/atlas.png"
+	TextureAtlas "textures/spritesheet.png"
 
 	DynamicParams
 	{
