@@ -32,7 +32,7 @@
         <key>dpi</key>
         <uint>72</uint>
         <key>dataFormat</key>
-        <string>spritesheet-only</string>
+        <string>json-array</string>
         <key>textureFileName</key>
         <filename>spritesheet.png</filename>
         <key>flipPVR</key>
@@ -132,7 +132,13 @@
             </struct>
         </struct>
         <key>dataFileNames</key>
-        <map type="GFileNameMap"/>
+        <map type="GFileNameMap">
+            <key>data</key>
+            <struct type="DataFile">
+                <key>name</key>
+                <filename></filename>
+            </struct>
+        </map>
         <key>multiPack</key>
         <false/>
         <key>forceIdenticalLayout</key>
@@ -140,7 +146,7 @@
         <key>outputFormat</key>
         <enum type="SettingsBase::OutputFormat">RGBA8888</enum>
         <key>alphaHandling</key>
-        <enum type="SettingsBase::AlphaHandling">ClearTransparentPixels</enum>
+        <enum type="SettingsBase::AlphaHandling">KeepTransparentPixels</enum>
         <key>contentProtection</key>
         <struct type="ContentProtection">
             <key>key</key>
