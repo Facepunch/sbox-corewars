@@ -95,12 +95,12 @@ namespace Facepunch.CoreWars
 				return;
 			}
 
-			var tr = TraceBBox( Position, Position + Vector3.Down * 8f, 16f );
+			//var tr = TraceBBox( Position, Position + Vector3.Down * 8f, 16f );
 
-			if ( tr.Hit )
-			{
-				UpdateGroundEntity( tr );
-			}
+			//if ( tr.Hit )
+			//{
+			//	UpdateGroundEntity( tr );
+			//}
 
 			CheckLadder();
 			Swimming = Pawn.WaterLevel.Fraction > 0.6f;
@@ -320,7 +320,7 @@ namespace Facepunch.CoreWars
 				ClearGroundEntity();
 
 				var groundFactor = 0.68f;
-				var multiplier = Scale( 268.3281572999747f * 1.2f );
+				var multiplier = Scale( 268.3281572999747f * 1.75f );
 
 				Velocity = Velocity.WithZ( startZ + multiplier * groundFactor );
 				Velocity -= new Vector3( 0, 0, Gravity * 0.5f ) * Time.Delta;
