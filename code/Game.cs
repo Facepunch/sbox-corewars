@@ -30,10 +30,10 @@ namespace Facepunch.CoreWars
 
 		public void SetBlockInDirection( Vector3 origin, Vector3 direction, byte blockId )
 		{
-			var face = Map.Current.GetBlockInDirection( origin * (1.0f / Chunk.VoxelSize), direction.Normal, 10000, out var endPosition, out _ );
+			var face = Map.Current.Trace( origin * (1.0f / Chunk.VoxelSize), direction.Normal, 10000f, out var endPosition, out _ );
 			if ( face == BlockFace.Invalid ) return;
 
-			var position = blockId != 0 ? Map.GetAdjacentBlockPosition( endPosition, (int)face ) : endPosition;
+			var position = blockId != 0 ? Map.GetAdjacentPosition( endPosition, (int)face ) : endPosition;
 			SetBlockOnServer( position.x, position.y, position.z, blockId );
 		}
 
@@ -110,12 +110,12 @@ namespace Facepunch.CoreWars
 
 			Map.Current.Send( client );
 
-			await Task.Delay( 1000 );
+			await Task.Delay( 500 );
 
 			// For now just load every chunk in the map.
 			foreach ( var chunk in Map.Current.Chunks )
 			{
-				await player.LoadChunkDelayed( chunk, 5 );
+				await player.LoadChunkDelayed( chunk, 10 );
 			}
 		}
 

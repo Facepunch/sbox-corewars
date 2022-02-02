@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 
 namespace Facepunch.CoreWars.Voxel
 {
@@ -124,29 +125,29 @@ namespace Facepunch.CoreWars.Voxel
 
 		public byte GetSunlight( IntVector3 position )
 		{
-			if ( !IsInMap( position ) ) return 0;
-			var index = GetBlockMapIndex( position );
+			if ( !IsInside( position ) ) return 0;
+			var index = ToMapPosition( position );
 			return LightMapData[index];
 		}
 
 		public void SetSunlight( IntVector3 position, byte value )
 		{
-			if ( !IsInMap( position ) ) return;
-			var index = GetBlockMapIndex( position );
+			if ( !IsInside( position ) ) return;
+			var index = ToMapPosition( position );
 			LightMapData[index] = value;
 		}
 
 		public byte GetTorchlight( IntVector3 position )
 		{
-			if ( !IsInMap( position ) ) return 0;
-			var index = GetBlockMapIndex( position );
+			if ( !IsInside( position ) ) return 0;
+			var index = ToMapPosition( position );
 			return LightMapData[index];
 		}
 
 		public void SetTorchlight( IntVector3 position, byte value )
 		{
-			if ( !IsInMap( position ) ) return;
-			var index = GetBlockMapIndex( position );
+			if ( !IsInside( position ) ) return;
+			var index = ToMapPosition( position );
 			LightMapData[index] = value;
 		}
 
@@ -199,21 +200,21 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				shouldBuild = true;
 
-				var chunkIndex = GetBlockChunkIndex( position );
+				var chunkIndex = GetChunkIndex( position );
 				chunkIds.Add( chunkIndex );
 
 				for ( int i = 0; i < 6; i++ )
 				{
-					if ( IsAdjacentBlockEmpty( position, i ) )
+					if ( IsAdjacentEmpty( position, i ) )
 					{
-						var posInChunk = GetBlockPositionInChunk( position );
+						var posInChunk = ToLocalPosition( position );
 						Chunks[chunkIndex].UpdateBlockSlice( posInChunk, i );
 						continue;
 					}
 
-					var adjacentPos = GetAdjacentBlockPosition( position, i );
-					var adjadentChunkIndex = GetBlockChunkIndex( adjacentPos );
-					var adjacentPosInChunk = GetBlockPositionInChunk( adjacentPos );
+					var adjacentPos = GetAdjacentPosition( position, i );
+					var adjadentChunkIndex = GetChunkIndex( adjacentPos );
+					var adjacentPosInChunk = ToLocalPosition( adjacentPos );
 
 					chunkIds.Add( adjadentChunkIndex );
 					Chunks[adjadentChunkIndex].UpdateBlockSlice( adjacentPosInChunk, GetOppositeDirection( i ) );
@@ -228,17 +229,17 @@ namespace Facepunch.CoreWars.Voxel
 			return shouldBuild;
 		}
 
-		public int GetBlockMapIndex( IntVector3 position )
+		public int ToMapPosition( IntVector3 position )
 		{
 			return position.x * SizeY * SizeZ + position.y * SizeZ + position.z;
 		}
 
-		public int GetBlockChunkIndex( IntVector3 position )
+		public int GetChunkIndex( IntVector3 position )
 		{
 			return (position.x / Chunk.ChunkSize) + (position.y / Chunk.ChunkSize) * NumChunksX + (position.z / Chunk.ChunkSize) * NumChunksX * NumChunksY;
 		}
 
-		public static IntVector3 GetBlockPositionInChunk( IntVector3 position )
+		public static IntVector3 ToLocalPosition( IntVector3 position )
 		{
 			return new IntVector3( position.x % Chunk.ChunkSize, position.y % Chunk.ChunkSize, position.z % Chunk.ChunkSize );
 		}
@@ -260,7 +261,7 @@ namespace Facepunch.CoreWars.Voxel
 
 					for ( int z = 0; z < SizeZ; ++z )
 					{
-						SetBlockIdAtPosition( new IntVector3( x, y, z ), (byte)(z < height ? 1 : 0) );
+						SetBlockAtPosition( new IntVector3( x, y, z ), (byte)(z < height ? 1 : 0) );
 					}
 				}
 			}
@@ -268,14 +269,15 @@ namespace Facepunch.CoreWars.Voxel
 
 		public byte GetBlock( IntVector3 position )
 		{
-			if ( !IsInMap( position ) ) return 0;
-			var chunkIndex = GetBlockChunkIndex( position );
-			var blockPositionInChunk = GetBlockPositionInChunk( position );
+			if ( !IsInside( position ) ) return 0;
+
+			var chunkIndex = GetChunkIndex( position );
 			var chunk = Chunks[chunkIndex];
-			return chunk.GetBlockByPosition( blockPositionInChunk );
+
+			return chunk.GetMapPositionBlock( position );
 		}
 
-		public bool IsInMap( IntVector3 position  )
+		public bool IsInside( IntVector3 position  )
 		{
 			if ( position.x < 0 || position.x >= SizeX ) return false;
 			if ( position.y < 0 || position.y >= SizeY ) return false;
@@ -286,14 +288,13 @@ namespace Facepunch.CoreWars.Voxel
 
 		public BlockInfo GetBlockInfo( IntVector3 position )
 		{
-			var positionInChunk = GetBlockPositionInChunk( position );
+			var positionInChunk = ToLocalPosition( position );
 
 			return new BlockInfo
 			{
 				ChunkPosition = positionInChunk,
-				ChunkIndex = GetBlockChunkIndex( position ),
-				BlockIndex = Chunk.GetBlockIndex( positionInChunk ),
-				IsValid = IsInMap( position ),
+				ChunkIndex = GetChunkIndex( position ),
+				IsValid = IsInside( position ),
 				Position = position,
 				BlockId = GetBlock( position )
 			};
@@ -301,11 +302,12 @@ namespace Facepunch.CoreWars.Voxel
 
 		public bool SetBlock( IntVector3 position, byte blockId )
 		{
-			if ( !IsInMap( position ) ) return false;
+			if ( !IsInside( position ) ) return false;
 
 			var blockInfo = GetBlockInfo( position );
 			var chunk = Chunks[blockInfo.ChunkIndex];
-			var currentBlockId = chunk.GetBlockByIndex( blockInfo.BlockIndex );
+			var blockIndex = chunk.GetLocalPositionIndex( blockInfo.ChunkPosition );
+			var currentBlockId = chunk.GetLocalIndexBlock( blockIndex );
 
 			if ( blockId == currentBlockId ) return false;
 
@@ -314,7 +316,7 @@ namespace Facepunch.CoreWars.Voxel
 				if ( IsClient )
 					chunk.UpdateLighting( blockInfo, blockId );
 
-				chunk.SetBlock( blockInfo.BlockIndex, blockId );
+				chunk.SetBlock( blockIndex, blockId );
 
 				return true;
 
@@ -323,7 +325,7 @@ namespace Facepunch.CoreWars.Voxel
 			return false;
 		}
 
-		public static IntVector3 GetAdjacentBlockPosition( IntVector3 position, int side )
+		public static IntVector3 GetAdjacentPosition( IntVector3 position, int side )
 		{
 			return position + Chunk.BlockDirections[side];
 		}
@@ -338,26 +340,25 @@ namespace Facepunch.CoreWars.Voxel
 
 		public byte GetAdjacentBlock( IntVector3 position, int side )
 		{
-			return GetBlock( GetAdjacentBlockPosition( position, side ) );
+			return GetBlock( GetAdjacentPosition( position, side ) );
 		}
 
-		public bool IsAdjacentBlockEmpty( IntVector3 position, int side )
+		public bool IsAdjacentEmpty( IntVector3 position, int side )
 		{
-			return IsBlockEmpty( GetAdjacentBlockPosition( position, side ) );
+			return IsEmpty( GetAdjacentPosition( position, side ) );
 		}
 
-		public bool IsBlockEmpty( IntVector3 position )
+		public bool IsEmpty( IntVector3 position )
 		{
-			if ( !IsInMap( position ) ) return true;
+			if ( !IsInside( position ) ) return true;
 
-			var chunkIndex = GetBlockChunkIndex( position );
-			var blockPositionInChunk = GetBlockPositionInChunk( position );
+			var chunkIndex = GetChunkIndex( position );
 			var chunk = Chunks[chunkIndex];
 
-			return chunk.GetBlockByPosition( blockPositionInChunk ) == 0;
+			return chunk.GetMapPositionBlock( position ) == 0;
 		}
 
-		public BlockFace GetBlockInDirection( Vector3 position, Vector3 direction, float length, out IntVector3 hitPosition, out float distance )
+		public BlockFace Trace( Vector3 position, Vector3 direction, float length, out IntVector3 hitPosition, out float distance )
 		{
 			hitPosition = new IntVector3( 0, 0, 0 );
 			distance = 0;
@@ -503,13 +504,14 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
-		private void SetBlockIdAtPosition( IntVector3 position, byte blockId )
+		private void SetBlockAtPosition( IntVector3 position, byte blockId )
 		{
 			Host.AssertServer();
 
-			var chunkIndex = GetBlockChunkIndex( position );
-			var blockPositionInChunk = GetBlockPositionInChunk( position );
+			var chunkIndex = GetChunkIndex( position );
+			var blockPositionInChunk = ToLocalPosition( position );
 			var chunk = Chunks[chunkIndex];
+
 			chunk.SetBlock( blockPositionInChunk, blockId );
 		}
 	}

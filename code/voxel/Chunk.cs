@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Facepunch.CoreWars.Voxel
@@ -138,17 +139,26 @@ namespace Facepunch.CoreWars.Voxel
 			BuildMeshAndCollision();
 		}
 
-		public static int GetBlockIndex( IntVector3 position )
+		public int GetLocalPositionIndex( IntVector3 position )
 		{
 			return position.x + position.y * ChunkSize + position.z * ChunkSize * ChunkSize;
 		}
 
-		public byte GetBlockByPosition( IntVector3 position )
+		public byte GetMapPositionBlock( IntVector3 position )
 		{
-			return BlockTypes[GetBlockIndex( position )];
+			var x = position.x % ChunkSize;
+			var y = position.y % ChunkSize;
+			var z = position.z % ChunkSize;
+			var index = x + y * ChunkSize + z * ChunkSize * ChunkSize;
+			return BlockTypes[index];
 		}
 
-		public byte GetBlockByIndex( int index )
+		public byte GetLocalPositionBlock( IntVector3 position )
+		{
+			return BlockTypes[GetLocalPositionIndex( position )];
+		}
+
+		public byte GetLocalIndexBlock( int index )
 		{
 			return BlockTypes[index];
 		}
@@ -179,7 +189,7 @@ namespace Facepunch.CoreWars.Voxel
 
 				for ( var i = 0; i < 6; i++ )
 				{
-					var neighbourPosition = Map.GetAdjacentBlockPosition( node.Position, i );
+					var neighbourPosition = Map.GetAdjacentPosition( node.Position, i );
 					var neighbourBlockInfo = Map.GetBlockInfo( neighbourPosition );
 					if ( !neighbourBlockInfo.IsValid ) continue;
 
@@ -211,18 +221,15 @@ namespace Facepunch.CoreWars.Voxel
 			while ( LightAddQueue.Count > 0 )
 			{
 				var nodePosition = LightAddQueue.Dequeue();
-				var nodeChunkIndex = Map.GetBlockChunkIndex( nodePosition );
-				var nodeChunk = Map.Chunks[nodeChunkIndex];
 				var lightLevel = Map.GetTorchlight( nodePosition );
 
 				for ( var i = 0; i < 6; i++ )
 				{
-					var neighbourPosition = Map.GetAdjacentBlockPosition( nodePosition, i );
+					var neighbourPosition = Map.GetAdjacentPosition( nodePosition, i );
 					var neighbourBlockInfo = Map.GetBlockInfo( neighbourPosition );
 					if ( !neighbourBlockInfo.IsValid ) continue;
 
 					var neighbourBlock = Map.GetBlockType( neighbourBlockInfo.BlockId );
-					var neighbourChunk = Map.Chunks[neighbourBlockInfo.ChunkIndex];
 
 					if ( Map.GetTorchlight( neighbourBlockInfo.Position ) + 2 <= lightLevel )
 					{
@@ -241,7 +248,7 @@ namespace Facepunch.CoreWars.Voxel
 
 		public void SetBlock( IntVector3 position, byte blockId )
 		{
-			BlockTypes[GetBlockIndex( position )] = blockId;
+			BlockTypes[GetLocalPositionIndex( position )] = blockId;
 		}
 
 		public void SetBlock( int index, byte blockId )
@@ -266,7 +273,7 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
-		public void BuildMeshAndCollision( bool keepCollisionMesh = false )
+		public void BuildMeshAndCollision()
 		{
 			if ( !Mesh.IsValid )
 				return;
@@ -286,7 +293,7 @@ namespace Facepunch.CoreWars.Voxel
 
 			foreach ( var slice in Slices )
 			{
-				if ( !keepCollisionMesh && slice.IsDirty )
+				if ( slice.IsDirty )
 				{
 					if ( slice.Shape != null )
 					{
@@ -401,18 +408,18 @@ namespace Facepunch.CoreWars.Voxel
 		BlockFaceData GetBlockFace( IntVector3 position, int side )
 		{
 			var p = Offset + position;
-			var blockEmpty = Map.IsBlockEmpty( p );
+			var blockEmpty = Map.IsEmpty( p );
 			var blockId = blockEmpty ? (byte)0 : Host.IsServer ? (byte)1 : Map.GetBlock( p );
 
 			var face = new BlockFaceData
 			{
-				BlockIndex = GetBlockIndex( position ),
+				BlockIndex = GetLocalPositionIndex( position ),
 				Side = (byte)side,
 				Culled = blockId == 0,
 				Type = blockId,
 			};
 
-			var adjacentBlockPosition = Map.GetAdjacentBlockPosition( p, side );
+			var adjacentBlockPosition = Map.GetAdjacentPosition( p, side );
 			var adjacentBlockId = Map.GetBlock( adjacentBlockPosition );
 			var adjacentBlock = Map.GetBlockType( adjacentBlockId );
 
@@ -589,7 +596,7 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
-		public async Task UpdateBlockSlices( bool keepCollisionMesh = false )
+		public async Task UpdateBlockSlices()
 		{
 			IntVector3 blockPosition;
 			IntVector3 blockOffset;
@@ -618,12 +625,8 @@ namespace Facepunch.CoreWars.Voxel
 					var slice = Slices[sliceIndex];
 					slice.IsDirty = true;
 					slice.Vertices.Clear();
-
-					if ( !keepCollisionMesh )
-					{
-						slice.CollisionVertices.Clear();
-						slice.CollisionIndices.Clear();
-					}
+					slice.CollisionVertices.Clear();
+					slice.CollisionIndices.Clear();
 
 					for ( blockPosition[vAxis] = 0; blockPosition[vAxis] < ChunkSize; blockPosition[vAxis]++ )
 					{
