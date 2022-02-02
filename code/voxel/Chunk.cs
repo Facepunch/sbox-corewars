@@ -391,24 +391,35 @@ namespace Facepunch.CoreWars.Voxel
 					int faceWidth;
 					int faceHeight;
 
-					for ( faceWidth = 1; i + faceWidth < ChunkSize && !BlockFaceMask[n + faceWidth].Culled && BlockFaceMask[n + faceWidth].Equals( BlockFaceMask[n] ); faceWidth++ ) ;
-
-					bool done = false;
-
-					for ( faceHeight = 1; j + faceHeight < ChunkSize; faceHeight++ )
+					if ( Map.GreedyMeshing )
 					{
-						for ( int k = 0; k < faceWidth; k++ )
+						for ( faceWidth = 1; i + faceWidth < ChunkSize && !BlockFaceMask[n + faceWidth].Culled && BlockFaceMask[n + faceWidth].Equals( BlockFaceMask[n] ); faceWidth++ )
 						{
-							var maskFace = BlockFaceMask[n + k + faceHeight * ChunkSize];
 
-							if ( maskFace.Culled || !maskFace.Equals( BlockFaceMask[n] ) )
-							{
-								done = true;
-								break;
-							}
 						}
 
-						if ( done ) break;
+						bool done = false;
+
+						for ( faceHeight = 1; j + faceHeight < ChunkSize; faceHeight++ )
+						{
+							for ( int k = 0; k < faceWidth; k++ )
+							{
+								var maskFace = BlockFaceMask[n + k + faceHeight * ChunkSize];
+
+								if ( maskFace.Culled || !maskFace.Equals( BlockFaceMask[n] ) )
+								{
+									done = true;
+									break;
+								}
+							}
+
+							if ( done ) break;
+						}
+					}
+					else
+					{
+						faceWidth = 1;
+						faceHeight = 1;
 					}
 
 					if ( !BlockFaceMask[n].Culled )
@@ -528,24 +539,35 @@ namespace Facepunch.CoreWars.Voxel
 							int faceWidth;
 							int faceHeight;
 
-							for ( faceWidth = 1; i + faceWidth < ChunkSize && !BlockFaceMask[n + faceWidth].Culled && BlockFaceMask[n + faceWidth].Equals( BlockFaceMask[n] ); faceWidth++ ) ;
-
-							bool done = false;
-
-							for ( faceHeight = 1; j + faceHeight < ChunkSize; faceHeight++ )
+							if ( Map.GreedyMeshing )
 							{
-								for ( int k = 0; k < faceWidth; k++ )
+								for ( faceWidth = 1; i + faceWidth < ChunkSize && !BlockFaceMask[n + faceWidth].Culled && BlockFaceMask[n + faceWidth].Equals( BlockFaceMask[n] ); faceWidth++ )
 								{
-									var maskFace = BlockFaceMask[n + k + faceHeight * ChunkSize];
 
-									if ( maskFace.Culled || !maskFace.Equals( BlockFaceMask[n] ) )
-									{
-										done = true;
-										break;
-									}
 								}
 
-								if ( done ) break;
+								bool done = false;
+
+								for ( faceHeight = 1; j + faceHeight < ChunkSize; faceHeight++ )
+								{
+									for ( int k = 0; k < faceWidth; k++ )
+									{
+										var maskFace = BlockFaceMask[n + k + faceHeight * ChunkSize];
+
+										if ( maskFace.Culled || !maskFace.Equals( BlockFaceMask[n] ) )
+										{
+											done = true;
+											break;
+										}
+									}
+
+									if ( done ) break;
+								}
+							}
+							else
+							{
+								faceWidth = 1;
+								faceHeight = 1;
 							}
 
 							if ( !BlockFaceMask[n].Culled )

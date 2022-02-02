@@ -42,6 +42,7 @@ namespace Facepunch.CoreWars.Voxel
 		}
 
 		public Dictionary<byte, BlockType> BlockData { get; private set; } = new();
+		public bool GreedyMeshing { get; private set; }
 		public int SizeX { get; private set; }
 		public int SizeY { get; private set; }
 		public int SizeZ { get; private set; }
