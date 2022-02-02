@@ -78,7 +78,7 @@
         <key>jpgQuality</key>
         <uint>80</uint>
         <key>pngOptimizationLevel</key>
-        <uint>0</uint>
+        <uint>1</uint>
         <key>webpQualityLevel</key>
         <uint>101</uint>
         <key>textureSubPath</key>
@@ -106,7 +106,7 @@
         <key>algorithmSettings</key>
         <struct type="AlgorithmSettings">
             <key>algorithm</key>
-            <enum type="AlgorithmSettings::AlgorithmId">Basic</enum>
+            <enum type="AlgorithmSettings::AlgorithmId">Grid</enum>
             <key>freeSizeMode</key>
             <enum type="AlgorithmSettings::AlgorithmFreeSizeMode">Best</enum>
             <key>sizeConstraints</key>
@@ -136,7 +136,7 @@
             <key>data</key>
             <struct type="DataFile">
                 <key>name</key>
-                <filename></filename>
+                <filename>spritesheet.json</filename>
             </struct>
         </map>
         <key>multiPack</key>
@@ -146,7 +146,7 @@
         <key>outputFormat</key>
         <enum type="SettingsBase::OutputFormat">RGBA8888</enum>
         <key>alphaHandling</key>
-        <enum type="SettingsBase::AlphaHandling">KeepTransparentPixels</enum>
+        <enum type="SettingsBase::AlphaHandling">ClearTransparentPixels</enum>
         <key>contentProtection</key>
         <struct type="ContentProtection">
             <key>key</key>
@@ -185,11 +185,14 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
-            <key type="filename">blocks/dirt.png</key>
-            <key type="filename">blocks/glass.png</key>
-            <key type="filename">blocks/grass.png</key>
-            <key type="filename">blocks/sand.png</key>
-            <key type="filename">blocks/stone.png</key>
+            <key type="filename">blocks/1.png</key>
+            <key type="filename">blocks/2.png</key>
+            <key type="filename">blocks/3.png</key>
+            <key type="filename">blocks/4.png</key>
+            <key type="filename">blocks/5.png</key>
+            <key type="filename">blocks/6.png</key>
+            <key type="filename">blocks/8.png</key>
+            <key type="filename">blocks/9.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -204,10 +207,33 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
+            <key type="filename">blocks/7.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>spriteScale</key>
+                <double>1</double>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>4,4,8,8</rect>
+                <key>scale9Paddings</key>
+                <rect>4,4,8,8</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
         </map>
         <key>fileList</key>
         <array>
-            <filename>blocks</filename>
+            <filename>blocks/1.png</filename>
+            <filename>blocks/2.png</filename>
+            <filename>blocks/3.png</filename>
+            <filename>blocks/4.png</filename>
+            <filename>blocks/5.png</filename>
+            <filename>blocks/6.png</filename>
+            <filename>blocks/7.png</filename>
+            <filename>blocks/8.png</filename>
+            <filename>blocks/9.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>
