@@ -33,8 +33,11 @@ namespace Facepunch.CoreWars.Voxel
 					{
 						var id = reader.ReadByte();
 						var name = reader.ReadString();
+						var type = Library.Create<BlockType>( name );
 
-						Current.BlockData.Add( id, Library.Create<BlockType>( name ) );
+						Current.BlockData.Add( id, type );
+
+						Log.Info( id + " = " + Current.BlockData[id].FriendlyName + " / " + type.BlockId +  " / " + type.IsTranslucent );
 					}
 				}
 			}
@@ -43,6 +46,7 @@ namespace Facepunch.CoreWars.Voxel
 		}
 
 		public Dictionary<byte, BlockType> BlockData { get; private set; } = new();
+		public Queue<IntVector3> LightNodeQueue { get; private set; } = new();
 		public bool GreedyMeshing { get; private set; }
 
 		public int SizeX;
@@ -147,18 +151,19 @@ namespace Facepunch.CoreWars.Voxel
 			var shouldBuild = false;
 			var chunkIds = new HashSet<int>();
 
-			if ( SetBlock( position, blockId ) || forceUpdate )
+			if ( SetBlock( position, blockId, out var affectedBlocks ) || forceUpdate )
 			{
+				shouldBuild = true;
+
 				var chunkIndex = GetBlockChunkIndex( position );
 				chunkIds.Add( chunkIndex );
-				shouldBuild = true;
 
 				for ( int i = 0; i < 6; i++ )
 				{
 					if ( IsAdjacentBlockEmpty( position, i ) )
 					{
 						var posInChunk = GetBlockPositionInChunk( position );
-						Chunks[chunkIndex].UpdateBlockSlice( posInChunk, i );
+						//Chunks[chunkIndex].UpdateBlockSlice( posInChunk, i );
 						continue;
 					}
 
@@ -167,13 +172,34 @@ namespace Facepunch.CoreWars.Voxel
 					var adjacentPosInChunk = GetBlockPositionInChunk( adjacentPos );
 
 					chunkIds.Add( adjadentChunkIndex );
-					Chunks[adjadentChunkIndex].UpdateBlockSlice( adjacentPosInChunk, GetOppositeDirection( i ) );
+					//Chunks[adjadentChunkIndex].UpdateBlockSlice( adjacentPosInChunk, GetOppositeDirection( i ) );
+				}
+
+				Log.Info( affectedBlocks.Count );
+
+				foreach ( var affectedBlock in affectedBlocks )
+				{
+					var affectedChunkIndex = GetBlockChunkIndex( affectedBlock );
+					chunkIds.Add( chunkIndex );
+
+					for ( int i = 0; i < 6; i++ )
+					{
+						var posInChunk = GetBlockPositionInChunk( affectedBlock );
+						//Chunks[affectedChunkIndex].UpdateBlockSlice( posInChunk, i );
+
+						var adjacentPos = GetAdjacentBlockPosition( position, i );
+						var adjadentChunkIndex = GetBlockChunkIndex( adjacentPos );
+						var adjacentPosInChunk = GetBlockPositionInChunk( adjacentPos );
+
+						chunkIds.Add( adjadentChunkIndex );
+						//Chunks[adjadentChunkIndex].UpdateBlockSlice( adjacentPosInChunk, GetOppositeDirection( i ) );
+					}
 				}
 			}
 
 			foreach ( var chunkid in chunkIds )
 			{
-				Chunks[chunkid].Build();
+				Chunks[chunkid].FullUpdate();
 			}
 
 			return shouldBuild;
@@ -235,24 +261,85 @@ namespace Facepunch.CoreWars.Voxel
 			return true;
 		}
 
-		public bool SetBlock( IntVector3 position, byte blockId )
+		public BlockInfo GetBlockInfo( IntVector3 position )
 		{
+			var positionInChunk = GetBlockPositionInChunk( position );
+
+			return new BlockInfo
+			{
+				ChunkPosition = positionInChunk,
+				ChunkIndex = GetBlockChunkIndex( position ),
+				BlockIndex = Chunk.GetBlockIndex( positionInChunk ),
+				IsValid = IsInMap( position ),
+				Position = position,
+				BlockId = GetBlock( position )
+			};
+		}
+
+		public bool SetBlock( IntVector3 position, byte blockId, out List<IntVector3> affectedBlocks )
+		{
+			affectedBlocks = new List<IntVector3>();
+
 			if ( !IsInMap( position ) ) return false;
 
-			var chunkIndex = GetBlockChunkIndex( position );
-			var blockPositionInChunk = GetBlockPositionInChunk( position );
-			int blockIndex = Chunk.GetBlockIndex( blockPositionInChunk );
-			var chunk = Chunks[chunkIndex];
-			int currentBlockId = chunk.GetBlockByIndex( blockIndex );
+			var blockInfo = GetBlockInfo( position );
+			var chunk = Chunks[blockInfo.ChunkIndex];
+			var currentBlockId = chunk.GetBlockByIndex( blockInfo.BlockIndex );
 
-			if ( blockId == currentBlockId )
-			{
-				return false;
-			}
+			if ( blockId == currentBlockId ) return false;
 
 			if ( (blockId != 0 && currentBlockId == 0) || (blockId == 0 && currentBlockId != 0) )
 			{
-				chunk.SetBlock( blockIndex, blockId );
+				affectedBlocks.Add( position );
+
+				var currentBlock = GetBlockType( currentBlockId );
+
+				if ( currentBlock != null && currentBlock.LightLevel > 0 )
+				{
+
+				}
+
+				var block = GetBlockType( blockId );
+
+				if ( block != null && block.LightLevel > 0 )
+				{
+					chunk.SetTorchlight( blockInfo.ChunkPosition, block.LightLevel );
+
+					LightNodeQueue.Enqueue( position );
+
+					while ( LightNodeQueue.Count > 0 )
+					{
+						var nodePosition = LightNodeQueue.Dequeue();
+						var lightLevel = chunk.GetTorchlight( GetBlockPositionInChunk( nodePosition ) );
+
+						for ( var i = 0; i < 6; i++ )
+						{
+							var neighbourPosition = GetAdjacentBlockPosition( nodePosition, i );
+							var neighbourBlockInfo = GetBlockInfo( neighbourPosition );
+							if ( !neighbourBlockInfo.IsValid ) continue;
+
+							var neighbourBlock = GetBlockType( neighbourBlockInfo.BlockId );
+							var neighbourChunk = Chunks[neighbourBlockInfo.ChunkIndex];
+
+							if ( neighbourChunk.GetTorchlight( neighbourBlockInfo.ChunkPosition ) + 2 <= lightLevel )
+							{
+								if ( neighbourBlock.IsTranslucent )
+								{
+									neighbourChunk.SetTorchlight( neighbourBlockInfo.ChunkPosition, lightLevel - 1 );
+									LightNodeQueue.Enqueue( neighbourPosition );
+								}
+								else
+								{
+									// These are the opaque blocks that may be affected by this light.
+									affectedBlocks.Add( neighbourPosition );
+								}
+							}
+						}
+					}
+				}
+
+				chunk.SetBlock( blockInfo.BlockIndex, blockId );
+
 				return true;
 			}
 

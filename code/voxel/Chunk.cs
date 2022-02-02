@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace Facepunch.CoreWars.Voxel
 {
+	public struct LightNode
+	{
+		public int ChunkIndex;
+		public int BlockIndex;
+	}
+
 	public partial class Chunk
 	{
 		public struct SliceUpdate : IEquatable<SliceUpdate>
@@ -38,10 +44,9 @@ namespace Facepunch.CoreWars.Voxel
 		public static readonly int VoxelSize = 48;
 
 		public HashSet<SliceUpdate> PendingSliceUpdates { get; set; } = new();
-		public bool IsBrightnessDirty { get; set; }
 		public bool Initialized { get; private set; }
 
-		public byte[] Brightness;
+		public char[] LightMap;
 		public byte[] BlockTypes;
 		public IntVector3 Offset;
 		public int Index;
@@ -57,8 +62,7 @@ namespace Facepunch.CoreWars.Voxel
 
 		public Chunk( Map map, int x, int y, int z )
 		{
-			Brightness = new byte[ChunkSize * ChunkSize * ChunkSize];
-			Array.Fill<byte>( Brightness, 10 );
+			LightMap = new char[ChunkSize * ChunkSize * ChunkSize];
 			BlockTypes = new byte[ChunkSize * ChunkSize * ChunkSize];
 			Offset = new IntVector3( x * ChunkSize, y * ChunkSize, z * ChunkSize );
 			Index = x + y * map.NumChunksX + z * map.NumChunksX * map.NumChunksY;
@@ -115,6 +119,46 @@ namespace Facepunch.CoreWars.Voxel
 			Initialized = true;
 		}
 
+		public int GetSunlight( IntVector3 position )
+		{
+			var index = GetLightMapIndex( position );
+			return (LightMap[index] >> 4) & 0xF;
+		}
+
+		public int GetSunlight( int index )
+		{
+			return (LightMap[index] >> 4) & 0xF;
+		}
+
+		public void SetSunlight( IntVector3 position, int value )
+		{
+			var index = GetLightMapIndex( position );
+			LightMap[index] = (char)((LightMap[index] & 0xF) | (value << 4));
+		}
+
+		public int GetTorchlight( IntVector3 position )
+		{
+			var index = GetLightMapIndex( position );
+			return LightMap[index] & 0xF;
+		}
+
+		public int GetTorchlight( int index )
+		{
+			return LightMap[index] & 0xF;
+		}
+
+		public void SetTorchlight( IntVector3 position, int value )
+		{
+			var index = GetLightMapIndex( position );
+			LightMap[index] = (char)((LightMap[index] & 0xF0) | value);
+		}
+
+		public async void FullUpdate()
+		{
+			await UpdateBlockSlices();
+			Build();
+		}
+
 		public void Build()
 		{
 			if ( Host.IsServer )
@@ -124,6 +168,11 @@ namespace Facepunch.CoreWars.Voxel
 			}
 
 			BuildMeshAndCollision();
+		}
+
+		public static int GetLightMapIndex( IntVector3 position )
+		{
+			return position.x + position.y * ChunkSize + position.z * ChunkSize * ChunkSize;
 		}
 
 		public static int GetBlockIndex( IntVector3 position )
@@ -144,15 +193,6 @@ namespace Facepunch.CoreWars.Voxel
 		public IntVector3 ToMapPosition( IntVector3 position )
 		{
 			return Offset + position;
-		}
-
-		public void SetBrightness( int blockIndex, byte brightness )
-		{
-			if ( Brightness[blockIndex] != brightness )
-			{
-				Brightness[blockIndex] = brightness;
-				IsBrightnessDirty = true;
-			}
 		}
 
 		public void SetBlock( IntVector3 position, byte blockId )
@@ -328,13 +368,12 @@ namespace Facepunch.CoreWars.Voxel
 				Type = blockId,
 			};
 
-			var adjacentBlockId = Map.GetAdjacentBlock( p, side );
+			var adjacentBlockPosition = Map.GetAdjacentBlockPosition( p, side );
+			var adjacentBlockId = Map.GetBlock( adjacentBlockPosition );
 			var adjacentBlock = Map.GetBlockType( adjacentBlockId );
 
-			if ( !face.Culled && (adjacentBlock != null && !adjacentBlock.IsTranslucent))
-			{
+			if ( !face.Culled && (adjacentBlock != null && !adjacentBlock.IsTranslucent) )
 				face.Culled = true;
-			}
 
 			return face;
 		}
@@ -484,7 +523,7 @@ namespace Facepunch.CoreWars.Voxel
 						blockPosition[uAxis] = i;
 						blockPosition[vAxis] = j;
 
-						var brightness = Brightness[BlockFaceMask[n].BlockIndex];
+						var brightness = GetTorchlight( BlockFaceMask[n].BlockIndex );
 
 						AddQuad( slice,
 							blockPosition.x, blockPosition.y, blockPosition.z,
@@ -638,7 +677,7 @@ namespace Facepunch.CoreWars.Voxel
 								blockPosition[uAxis] = i;
 								blockPosition[vAxis] = j;
 
-								var brightness = Brightness[BlockFaceMask[n].BlockIndex];
+								var brightness = GetTorchlight( BlockFaceMask[n].BlockIndex );
 
 								AddQuad( slice,
 									blockPosition.x, blockPosition.y, blockPosition.z,

@@ -6,6 +6,7 @@ namespace Facepunch.CoreWars.Blocks
 	[Library]
 	public class DirtBlock : BlockType
 	{
+		public override string FriendlyName => "Dirt";
 		public override byte TextureId => 0;
 		public override byte BlockId => 1;
 
