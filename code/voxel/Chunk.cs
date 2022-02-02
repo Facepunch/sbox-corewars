@@ -44,6 +44,8 @@ namespace Facepunch.CoreWars.Voxel
 		public static readonly int VoxelSize = 48;
 
 		public HashSet<SliceUpdate> PendingSliceUpdates { get; set; } = new();
+		public Queue<LightRemoveNode> LightRemoveQueue { get; private set; } = new();
+		public Queue<IntVector3> LightAddQueue { get; private set; } = new();
 		public bool Initialized { get; private set; }
 
 		public char[] LightMap;
@@ -193,6 +195,97 @@ namespace Facepunch.CoreWars.Voxel
 		public IntVector3 ToMapPosition( IntVector3 position )
 		{
 			return Offset + position;
+		}
+
+		public void UpdateLighting( BlockInfo blockInfo, byte newBlockId, List<IntVector3> affectedBlocks )
+		{
+			affectedBlocks.Add( blockInfo.Position );
+
+			var currentBlock = Map.GetBlockType( blockInfo.BlockId );
+			var block = Map.GetBlockType( newBlockId );
+
+			if ( currentBlock != null && currentBlock.LightLevel > 0 )
+			{
+				int oldValue = GetTorchlight( blockInfo.ChunkPosition );
+				SetTorchlight( blockInfo.ChunkPosition, 0 );
+
+				LightRemoveQueue.Enqueue( new LightRemoveNode
+				{
+					Position = blockInfo.Position,
+					Value = oldValue
+				} );
+
+				while ( LightRemoveQueue.Count > 0 )
+				{
+					var node = LightRemoveQueue.Dequeue();
+
+					for ( var i = 0; i < 6; i++ )
+					{
+						var neighbourPosition = Map.GetAdjacentBlockPosition( node.Position, i );
+						var neighbourBlockInfo = Map.GetBlockInfo( neighbourPosition );
+						if ( !neighbourBlockInfo.IsValid ) continue;
+
+						var neighbourChunk = Map.Chunks[neighbourBlockInfo.ChunkIndex];
+						var lightLevel = neighbourChunk.GetTorchlight( neighbourBlockInfo.ChunkPosition );
+
+						if ( lightLevel != 0 && lightLevel < node.Value )
+						{
+							neighbourChunk.SetTorchlight( neighbourBlockInfo.ChunkPosition, 0 );
+
+							LightRemoveQueue.Enqueue( new LightRemoveNode
+							{
+								Position = neighbourPosition,
+								Value = node.Value
+							} );
+
+							affectedBlocks.Add( neighbourPosition );
+						}
+						else if ( lightLevel >= node.Value )
+						{
+							LightAddQueue.Enqueue( neighbourPosition );
+						}
+					}
+				}
+			}
+
+			if ( block != null && block.LightLevel > 0 )
+			{
+				SetTorchlight( blockInfo.ChunkPosition, block.LightLevel );
+				LightAddQueue.Enqueue( blockInfo.Position );
+			}
+
+			while ( LightAddQueue.Count > 0 )
+			{
+				var nodePosition = LightAddQueue.Dequeue();
+				var nodeChunkIndex = Map.GetBlockChunkIndex( nodePosition );
+				var nodeChunk = Map.Chunks[nodeChunkIndex];
+				var lightLevel = nodeChunk.GetTorchlight( Map.GetBlockPositionInChunk( nodePosition ) );
+
+				for ( var i = 0; i < 6; i++ )
+				{
+					var neighbourPosition = Map.GetAdjacentBlockPosition( nodePosition, i );
+					var neighbourBlockInfo = Map.GetBlockInfo( neighbourPosition );
+					if ( !neighbourBlockInfo.IsValid ) continue;
+
+					var neighbourBlock = Map.GetBlockType( neighbourBlockInfo.BlockId );
+					var neighbourChunk = Map.Chunks[neighbourBlockInfo.ChunkIndex];
+
+					if ( neighbourChunk.GetTorchlight( neighbourBlockInfo.ChunkPosition ) + 2 <= lightLevel )
+					{
+						if ( neighbourBlock.IsTranslucent )
+						{
+							// For testing purposes move this up outside of this scope.
+							neighbourChunk.SetTorchlight( neighbourBlockInfo.ChunkPosition, lightLevel - 1 );
+							LightAddQueue.Enqueue( neighbourPosition );
+						}
+						else
+						{
+							// These are the opaque blocks that may be affected by this light.
+							affectedBlocks.Add( neighbourPosition );
+						}
+					}
+				}
+			}
 		}
 
 		public void SetBlock( IntVector3 position, byte blockId )

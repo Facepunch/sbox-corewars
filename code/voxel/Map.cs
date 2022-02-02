@@ -5,6 +5,12 @@ using System.IO;
 
 namespace Facepunch.CoreWars.Voxel
 {
+	public struct LightRemoveNode
+	{
+		public int Value;
+		public IntVector3 Position;
+	}
+
 	public partial class Map
 	{
 		public static Map Current { get; set; }
@@ -36,8 +42,6 @@ namespace Facepunch.CoreWars.Voxel
 						var type = Library.Create<BlockType>( name );
 
 						Current.BlockData.Add( id, type );
-
-						Log.Info( id + " = " + Current.BlockData[id].FriendlyName + " / " + type.BlockId +  " / " + type.IsTranslucent );
 					}
 				}
 			}
@@ -46,7 +50,6 @@ namespace Facepunch.CoreWars.Voxel
 		}
 
 		public Dictionary<byte, BlockType> BlockData { get; private set; } = new();
-		public Queue<IntVector3> LightNodeQueue { get; private set; } = new();
 		public bool GreedyMeshing { get; private set; }
 
 		public int SizeX;
@@ -163,7 +166,7 @@ namespace Facepunch.CoreWars.Voxel
 					if ( IsAdjacentBlockEmpty( position, i ) )
 					{
 						var posInChunk = GetBlockPositionInChunk( position );
-						//Chunks[chunkIndex].UpdateBlockSlice( posInChunk, i );
+						Chunks[chunkIndex].UpdateBlockSlice( posInChunk, i );
 						continue;
 					}
 
@@ -172,10 +175,10 @@ namespace Facepunch.CoreWars.Voxel
 					var adjacentPosInChunk = GetBlockPositionInChunk( adjacentPos );
 
 					chunkIds.Add( adjadentChunkIndex );
-					//Chunks[adjadentChunkIndex].UpdateBlockSlice( adjacentPosInChunk, GetOppositeDirection( i ) );
+					Chunks[adjadentChunkIndex].UpdateBlockSlice( adjacentPosInChunk, GetOppositeDirection( i ) );
 				}
 
-				Log.Info( affectedBlocks.Count );
+				Log.Info( "Updated block and it affected a total of " + affectedBlocks.Count + " block(s)." );
 
 				foreach ( var affectedBlock in affectedBlocks )
 				{
@@ -185,21 +188,21 @@ namespace Facepunch.CoreWars.Voxel
 					for ( int i = 0; i < 6; i++ )
 					{
 						var posInChunk = GetBlockPositionInChunk( affectedBlock );
-						//Chunks[affectedChunkIndex].UpdateBlockSlice( posInChunk, i );
+						Chunks[affectedChunkIndex].UpdateBlockSlice( posInChunk, i );
 
 						var adjacentPos = GetAdjacentBlockPosition( position, i );
 						var adjadentChunkIndex = GetBlockChunkIndex( adjacentPos );
 						var adjacentPosInChunk = GetBlockPositionInChunk( adjacentPos );
 
 						chunkIds.Add( adjadentChunkIndex );
-						//Chunks[adjadentChunkIndex].UpdateBlockSlice( adjacentPosInChunk, GetOppositeDirection( i ) );
+						Chunks[adjadentChunkIndex].UpdateBlockSlice( adjacentPosInChunk, GetOppositeDirection( i ) );
 					}
 				}
 			}
 
 			foreach ( var chunkid in chunkIds )
 			{
-				Chunks[chunkid].FullUpdate();
+				Chunks[chunkid].Build();
 			}
 
 			return shouldBuild;
@@ -290,54 +293,7 @@ namespace Facepunch.CoreWars.Voxel
 
 			if ( (blockId != 0 && currentBlockId == 0) || (blockId == 0 && currentBlockId != 0) )
 			{
-				affectedBlocks.Add( position );
-
-				var currentBlock = GetBlockType( currentBlockId );
-
-				if ( currentBlock != null && currentBlock.LightLevel > 0 )
-				{
-
-				}
-
-				var block = GetBlockType( blockId );
-
-				if ( block != null && block.LightLevel > 0 )
-				{
-					chunk.SetTorchlight( blockInfo.ChunkPosition, block.LightLevel );
-
-					LightNodeQueue.Enqueue( position );
-
-					while ( LightNodeQueue.Count > 0 )
-					{
-						var nodePosition = LightNodeQueue.Dequeue();
-						var lightLevel = chunk.GetTorchlight( GetBlockPositionInChunk( nodePosition ) );
-
-						for ( var i = 0; i < 6; i++ )
-						{
-							var neighbourPosition = GetAdjacentBlockPosition( nodePosition, i );
-							var neighbourBlockInfo = GetBlockInfo( neighbourPosition );
-							if ( !neighbourBlockInfo.IsValid ) continue;
-
-							var neighbourBlock = GetBlockType( neighbourBlockInfo.BlockId );
-							var neighbourChunk = Chunks[neighbourBlockInfo.ChunkIndex];
-
-							if ( neighbourChunk.GetTorchlight( neighbourBlockInfo.ChunkPosition ) + 2 <= lightLevel )
-							{
-								if ( neighbourBlock.IsTranslucent )
-								{
-									neighbourChunk.SetTorchlight( neighbourBlockInfo.ChunkPosition, lightLevel - 1 );
-									LightNodeQueue.Enqueue( neighbourPosition );
-								}
-								else
-								{
-									// These are the opaque blocks that may be affected by this light.
-									affectedBlocks.Add( neighbourPosition );
-								}
-							}
-						}
-					}
-				}
-
+				chunk.UpdateLighting( blockInfo, blockId, affectedBlocks );
 				chunk.SetBlock( blockInfo.BlockIndex, blockId );
 
 				return true;
