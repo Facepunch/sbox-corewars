@@ -1,12 +1,29 @@
 ﻿using Sandbox;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
 
 namespace Facepunch.CoreWars.Voxel
 {
 	public partial class Chunk
 	{
+		public struct SliceUpdate : IEquatable<SliceUpdate>
+		{
+			public IntVector3 Position;
+			public int Direction;
+
+			#region Equality
+			public static bool operator ==( SliceUpdate left, SliceUpdate right ) => left.Equals( right );
+			public static bool operator !=( SliceUpdate left, SliceUpdate right ) => !(left == right);
+			public override bool Equals( object obj ) => obj is SliceUpdate o && Equals( o );
+			public bool Equals( SliceUpdate o ) => Position == o.Position && Direction == o.Direction;
+			public override int GetHashCode() => HashCode.Combine( Position.x, Position.y, Position.z, Direction );
+			#endregion
+		}
 		private struct BlockFaceData
 		{
+			public int BlockIndex;
 			public bool Culled;
 			public byte Type;
 			public byte Side;
@@ -20,7 +37,11 @@ namespace Facepunch.CoreWars.Voxel
 		public static readonly int ChunkSize = 32;
 		public static readonly int VoxelSize = 48;
 
+		public HashSet<SliceUpdate> PendingSliceUpdates { get; set; } = new();
+		public bool IsBrightnessDirty { get; set; }
 		public IntVector3 Offset { get; set; }
+		public bool Initialized { get; private set; }
+		public byte[] Brightness { get; set; }
 		public byte[] BlockTypes { get; set; }
 		public int Index { get; set; }
 		public Map Map { get; set; }
@@ -28,7 +49,6 @@ namespace Facepunch.CoreWars.Voxel
 		private static readonly BlockFaceData[] BlockFaceMask = new BlockFaceData[ChunkSize * ChunkSize * ChunkSize];
 		private readonly ChunkSlice[] Slices = new ChunkSlice[ChunkSize * 6];
 		private SceneObject SceneObject { get; set; }
-		private bool Initialized { get; set; }
 		private Model Model { get; set; }
 		private Mesh Mesh { get; set; }
 
@@ -36,17 +56,16 @@ namespace Facepunch.CoreWars.Voxel
 
 		public Chunk( Map map, int x, int y, int z )
 		{
+			Brightness = new byte[ChunkSize * ChunkSize * ChunkSize];
 			BlockTypes = new byte[ChunkSize * ChunkSize * ChunkSize];
 			Offset = new IntVector3( x * ChunkSize, y * ChunkSize, z * ChunkSize );
 			Index = x + y * map.NumChunksX + z * map.NumChunksX * map.NumChunksY;
+			Map = map;
 		}
 
-		public void Init()
+		public async void Init()
 		{
 			if ( Initialized )
-				return;
-
-			if ( BlockTypes == null )
 				return;
 
 			for ( int i = 0; i < Slices.Length; ++i )
@@ -54,7 +73,14 @@ namespace Facepunch.CoreWars.Voxel
 				Slices[i] = new ChunkSlice();
 			}
 
-			UpdateBlockSlices();
+			await UpdateBlockSlices();
+
+			foreach ( var update in PendingSliceUpdates )
+			{
+				UpdateBlockSlice( update.Position, update.Direction );
+			}
+
+			PendingSliceUpdates.Clear();
 
 			var modelBuilder = new ModelBuilder();
 
@@ -90,9 +116,12 @@ namespace Facepunch.CoreWars.Voxel
 		public void Build()
 		{
 			if ( Host.IsServer )
+			{
 				BuildCollision();
-			else
-				BuildMeshAndCollision();
+				return;
+			}
+
+			BuildMeshAndCollision();
 		}
 
 		public static int GetBlockIndex( IntVector3 position )
@@ -108,6 +137,20 @@ namespace Facepunch.CoreWars.Voxel
 		public byte GetBlockByIndex( int index )
 		{
 			return BlockTypes[index];
+		}
+
+		public IntVector3 ToMapPosition( IntVector3 position )
+		{
+			return Offset + position;
+		}
+
+		public void SetBrightness( int blockIndex, byte brightness )
+		{
+			if ( Brightness[blockIndex] != brightness )
+			{
+				Brightness[blockIndex] = brightness;
+				IsBrightnessDirty = true;
+			}
 		}
 
 		public void SetBlock( IntVector3 position, byte blockId )
@@ -137,7 +180,7 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
-		private void BuildMeshAndCollision()
+		public void BuildMeshAndCollision( bool keepCollisionMesh = false )
 		{
 			if ( !Mesh.IsValid )
 				return;
@@ -157,7 +200,7 @@ namespace Facepunch.CoreWars.Voxel
 
 			foreach ( var slice in Slices )
 			{
-				if ( slice.IsDirty )
+				if ( !keepCollisionMesh && slice.IsDirty )
 				{
 					if ( slice.Shape != null )
 					{
@@ -277,6 +320,7 @@ namespace Facepunch.CoreWars.Voxel
 
 			var face = new BlockFaceData
 			{
+				BlockIndex = GetBlockIndex( position ),
 				Side = (byte)side,
 				Culled = blockId == 0,
 				Type = blockId,
@@ -309,6 +353,17 @@ namespace Facepunch.CoreWars.Voxel
 
 		public void UpdateBlockSlice( IntVector3 position, int direction )
 		{
+			if ( !Initialized )
+			{
+				PendingSliceUpdates.Add( new SliceUpdate
+				{
+					Position = position,
+					Direction = direction
+				} );
+
+				return;
+			}
+
 			int vertexOffset = 0;
 			int axis = BlockDirectionAxis[direction];
 			int sliceIndex = GetSliceIndex( position[axis], direction );
@@ -427,7 +482,7 @@ namespace Facepunch.CoreWars.Voxel
 						blockPosition[uAxis] = i;
 						blockPosition[vAxis] = j;
 
-						var brightness = Rand.Int( 0, 15 );
+						var brightness = Brightness[BlockFaceMask[n].BlockIndex];
 
 						AddQuad( slice,
 							blockPosition.x, blockPosition.y, blockPosition.z,
@@ -451,7 +506,7 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
-		public void UpdateBlockSlices()
+		public async Task UpdateBlockSlices( bool keepCollisionMesh = false )
 		{
 			IntVector3 blockPosition;
 			IntVector3 blockOffset;
@@ -461,6 +516,8 @@ namespace Facepunch.CoreWars.Voxel
 
 			for ( int faceSide = 0; faceSide < 6; faceSide++ )
 			{
+				await GameTask.Delay( 20 );
+
 				int axis = BlockDirectionAxis[faceSide];
 
 				int uAxis = (axis + 1) % 3;
@@ -478,8 +535,12 @@ namespace Facepunch.CoreWars.Voxel
 					var slice = Slices[sliceIndex];
 					slice.IsDirty = true;
 					slice.Vertices.Clear();
-					slice.CollisionVertices.Clear();
-					slice.CollisionIndices.Clear();
+
+					if ( !keepCollisionMesh )
+					{
+						slice.CollisionVertices.Clear();
+						slice.CollisionIndices.Clear();
+					}
 
 					for ( blockPosition[vAxis] = 0; blockPosition[vAxis] < ChunkSize; blockPosition[vAxis]++ )
 					{
@@ -575,7 +636,7 @@ namespace Facepunch.CoreWars.Voxel
 								blockPosition[uAxis] = i;
 								blockPosition[vAxis] = j;
 
-								var brightness = Rand.Int( 0, 15 );
+								var brightness = Brightness[BlockFaceMask[n].BlockIndex];
 
 								AddQuad( slice,
 									blockPosition.x, blockPosition.y, blockPosition.z,

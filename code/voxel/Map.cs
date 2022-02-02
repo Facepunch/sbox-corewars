@@ -5,7 +5,7 @@ using System.IO;
 
 namespace Facepunch.CoreWars.Voxel
 {
-	public partial class Map : BaseNetworkable
+	public partial class Map
 	{
 		public static Map Current { get; set; }
 
@@ -91,8 +91,7 @@ namespace Facepunch.CoreWars.Voxel
 		{
 			var chunk = Chunks[index];
 			chunk.BlockTypes = data;
-			chunk.UpdateBlockSlices();
-			chunk.Build();
+			chunk.Init();
 		}
 
 		public void AddAllBlockTypes()
@@ -122,6 +121,8 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				chunk.Destroy();
 			}
+
+			Event.Unregister( this );
 		}
 
 		public void Init()
@@ -135,27 +136,26 @@ namespace Facepunch.CoreWars.Voxel
 				SetupChunks();
 			}
 
-			foreach ( var chunk in Chunks )
+			if ( Host.IsServer )
 			{
-				if ( chunk == null )
-					continue;
-
-				chunk.Map = this;
-				chunk.Init();
+				foreach ( var chunk in Chunks )
+				{
+					chunk.Init();
+				}
 			}
+
+			Event.Register( this );
 		}
 
 		public bool SetBlockAndUpdate( IntVector3 position, byte blockId, bool forceUpdate = false )
 		{
 			var shouldBuild = false;
-			var chunkids = new HashSet<int>();
+			var chunkIds = new HashSet<int>();
 
 			if ( SetBlock( position, blockId ) || forceUpdate )
 			{
 				var chunkIndex = GetBlockChunkIndex( position );
-
-				chunkids.Add( chunkIndex );
-
+				chunkIds.Add( chunkIndex );
 				shouldBuild = true;
 
 				for ( int i = 0; i < 6; i++ )
@@ -164,7 +164,6 @@ namespace Facepunch.CoreWars.Voxel
 					{
 						var posInChunk = GetBlockPositionInChunk( position );
 						Chunks[chunkIndex].UpdateBlockSlice( posInChunk, i );
-
 						continue;
 					}
 
@@ -172,18 +171,22 @@ namespace Facepunch.CoreWars.Voxel
 					var adjadentChunkIndex = GetBlockChunkIndex( adjacentPos );
 					var adjacentPosInChunk = GetBlockPositionInChunk( adjacentPos );
 
-					chunkids.Add( adjadentChunkIndex );
-
+					chunkIds.Add( adjadentChunkIndex );
 					Chunks[adjadentChunkIndex].UpdateBlockSlice( adjacentPosInChunk, GetOppositeDirection( i ) );
 				}
 			}
 
-			foreach ( var chunkid in chunkids )
+			foreach ( var chunkid in chunkIds )
 			{
 				Chunks[chunkid].Build();
 			}
 
 			return shouldBuild;
+		}
+
+		public int GetBlockMapIndex( IntVector3 position )
+		{
+			return position.x * SizeY * SizeZ + position.y * SizeZ + position.z;
 		}
 
 		public int GetBlockChunkIndex( IntVector3 position )
@@ -449,6 +452,16 @@ namespace Facepunch.CoreWars.Voxel
 			var blockPositionInChunk = GetBlockPositionInChunk( position );
 			var chunk = Chunks[chunkIndex];
 			chunk.SetBlock( blockPositionInChunk, blockId );
+		}
+
+		[Event.Tick.Client]
+		private void ClientTick()
+		{
+			if ( IsSunlightDirty )
+			{
+				PropagateBrightness();
+				IsSunlightDirty = false;
+			}
 		}
 	}
 }

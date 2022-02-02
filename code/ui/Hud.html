@@ -1,5 +1,8 @@
 ﻿<link rel="stylesheet" href="./Hud.scss" />
 
 <div>
-
+    <div @ref="LoadingScreen" class="loading">
+        <label class="title">Loading World</label>
+        <label @text="ChunksLoaded">Chunks (0/0)</label>
+    </div>
 </div>

@@ -99,8 +99,10 @@ namespace Facepunch.CoreWars
 			base.ClientDisconnect( client, reason );
 		}
 
-		public override void ClientJoined( Client client )
+		public override async void ClientJoined( Client client )
 		{
+			base.ClientJoined( client );
+
 			var player = new Player( client );
 			client.Pawn = player;
 
@@ -108,13 +110,13 @@ namespace Facepunch.CoreWars
 
 			Map.Current.Send( client );
 
+			await Task.Delay( 1000 );
+
 			// For now just load every chunk in the map.
 			foreach ( var chunk in Map.Current.Chunks )
 			{
-				player.LoadChunk( chunk );
+				await player.LoadChunkDelayed( chunk, 5 );
 			}
-
-			base.ClientJoined( client );
 		}
 
 		public override void PostLevelLoaded()

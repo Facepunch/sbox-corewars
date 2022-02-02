@@ -1,5 +1,6 @@
 ﻿using Facepunch.CoreWars.Voxel;
 using Sandbox;
+using System.Threading.Tasks;
 
 namespace Facepunch.CoreWars
 {
@@ -18,6 +19,12 @@ namespace Facepunch.CoreWars
 		public Player( Client client ) : this()
 		{
 
+		}
+
+		public async Task LoadChunkDelayed( Chunk chunk, int delayMs )
+		{
+			await GameTask.Delay( delayMs );
+			LoadChunk( chunk );
 		}
 
 		public void LoadChunk( Chunk chunk )
