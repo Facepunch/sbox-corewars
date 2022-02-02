@@ -25,6 +25,7 @@ namespace Facepunch.CoreWars.Voxel
 					Current.SizeX = reader.ReadInt32();
 					Current.SizeY = reader.ReadInt32();
 					Current.SizeZ = reader.ReadInt32();
+					Current.GreedyMeshing = reader.ReadBoolean();
 
 					var types = reader.ReadInt32();
 
@@ -66,6 +67,7 @@ namespace Facepunch.CoreWars.Voxel
 					writer.Write( SizeX );
 					writer.Write( SizeY );
 					writer.Write( SizeZ );
+					writer.Write( GreedyMeshing );
 					writer.Write( BlockData.Count );
 
 					foreach ( var kv in BlockData )
