@@ -236,13 +236,13 @@ namespace Facepunch.CoreWars.Voxel
 							Position = neighbourPosition,
 							Value = node.Value
 						} );
-
-						affectedBlocks.Add( neighbourPosition );
 					}
 					else if ( lightLevel >= node.Value )
 					{
 						LightAddQueue.Enqueue( neighbourPosition );
 					}
+
+					affectedBlocks.Add( neighbourPosition );
 				}
 			}
 
@@ -276,11 +276,9 @@ namespace Facepunch.CoreWars.Voxel
 							neighbourChunk.SetTorchlight( neighbourBlockInfo.ChunkPosition, lightLevel - 1 );
 							LightAddQueue.Enqueue( neighbourPosition );
 						}
-						else
-						{
-							affectedBlocks.Add( neighbourPosition );
-						}
 					}
+
+					affectedBlocks.Add( neighbourPosition );
 				}
 			}
 		}
