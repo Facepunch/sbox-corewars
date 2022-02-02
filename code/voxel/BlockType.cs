@@ -9,7 +9,7 @@ namespace Facepunch.CoreWars.Voxel
 		public virtual bool IsTranslucent => false;
 		public virtual byte TextureId => 0;
 		public virtual byte BlockId => 0;
-		public virtual int LightLevel => 0;
+		public virtual byte LightLevel => 0;
 
 		public virtual byte GetTextureId( BlockFace face )
 		{
