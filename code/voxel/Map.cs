@@ -44,19 +44,14 @@ namespace Facepunch.CoreWars.Voxel
 
 		public Dictionary<byte, BlockType> BlockData { get; private set; } = new();
 		public bool GreedyMeshing { get; private set; }
-		public int SizeX { get; private set; }
-		public int SizeY { get; private set; }
-		public int SizeZ { get; private set; }
 
-		private int _numChunksX;
-		private int _numChunksY;
-		private int _numChunksZ;
-
-		public int NumChunksX => _numChunksX;
-		public int NumChunksY => _numChunksY;
-		public int NumChunksZ => _numChunksZ;
-
-		public Chunk[] Chunks { get; private set; }
+		public int SizeX;
+		public int SizeY;
+		public int SizeZ;
+		public int NumChunksX;
+		public int NumChunksY;
+		public int NumChunksZ;
+		public Chunk[] Chunks;
 
 		public void Send( Client client )
 		{
@@ -108,9 +103,9 @@ namespace Facepunch.CoreWars.Voxel
 			SizeY = sizeY;
 			SizeZ = sizeZ;
 
-			_numChunksX = SizeX / Chunk.ChunkSize;
-			_numChunksY = SizeY / Chunk.ChunkSize;
-			_numChunksZ = SizeZ / Chunk.ChunkSize;
+			NumChunksX = SizeX / Chunk.ChunkSize;
+			NumChunksY = SizeY / Chunk.ChunkSize;
+			NumChunksZ = SizeZ / Chunk.ChunkSize;
 			
 			SetupChunks();
 		}
@@ -127,9 +122,9 @@ namespace Facepunch.CoreWars.Voxel
 
 		public void Init()
 		{
-			_numChunksX = SizeX / Chunk.ChunkSize;
-			_numChunksY = SizeY / Chunk.ChunkSize;
-			_numChunksZ = SizeZ / Chunk.ChunkSize;
+			NumChunksX = SizeX / Chunk.ChunkSize;
+			NumChunksY = SizeY / Chunk.ChunkSize;
+			NumChunksZ = SizeZ / Chunk.ChunkSize;
 
 			if ( Chunks == null )
 			{
@@ -191,7 +186,7 @@ namespace Facepunch.CoreWars.Voxel
 
 		public int GetBlockChunkIndex( IntVector3 position )
 		{
-			return (position.x / Chunk.ChunkSize) + (position.y / Chunk.ChunkSize) * _numChunksX + (position.z / Chunk.ChunkSize) * _numChunksX * _numChunksY;
+			return (position.x / Chunk.ChunkSize) + (position.y / Chunk.ChunkSize) * NumChunksX + (position.z / Chunk.ChunkSize) * NumChunksX * NumChunksY;
 		}
 
 		public static IntVector3 GetBlockPositionInChunk( IntVector3 position )
@@ -429,13 +424,13 @@ namespace Facepunch.CoreWars.Voxel
 
 		private void SetupChunks()
 		{
-			Chunks = new Chunk[_numChunksX * _numChunksY * _numChunksZ];
+			Chunks = new Chunk[NumChunksX * NumChunksY * NumChunksZ];
 
-			for ( int x = 0; x < _numChunksX; ++x )
+			for ( int x = 0; x < NumChunksX; ++x )
 			{
-				for ( int y = 0; y < _numChunksY; ++y )
+				for ( int y = 0; y < NumChunksY; ++y )
 				{
-					for ( int z = 0; z < _numChunksZ; ++z )
+					for ( int z = 0; z < NumChunksZ; ++z )
 					{
 						var chunk = new Chunk( this, x, y, z );
 						Chunks[chunk.Index] = chunk;

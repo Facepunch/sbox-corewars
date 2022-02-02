@@ -39,12 +39,13 @@ namespace Facepunch.CoreWars.Voxel
 
 		public HashSet<SliceUpdate> PendingSliceUpdates { get; set; } = new();
 		public bool IsBrightnessDirty { get; set; }
-		public IntVector3 Offset { get; set; }
 		public bool Initialized { get; private set; }
-		public byte[] Brightness { get; set; }
-		public byte[] BlockTypes { get; set; }
-		public int Index { get; set; }
-		public Map Map { get; set; }
+
+		public byte[] Brightness;
+		public byte[] BlockTypes;
+		public IntVector3 Offset;
+		public int Index;
+		public Map Map;
 
 		private static readonly BlockFaceData[] BlockFaceMask = new BlockFaceData[ChunkSize * ChunkSize * ChunkSize];
 		private readonly ChunkSlice[] Slices = new ChunkSlice[ChunkSize * 6];
@@ -57,6 +58,7 @@ namespace Facepunch.CoreWars.Voxel
 		public Chunk( Map map, int x, int y, int z )
 		{
 			Brightness = new byte[ChunkSize * ChunkSize * ChunkSize];
+			Array.Fill<byte>( Brightness, 10 );
 			BlockTypes = new byte[ChunkSize * ChunkSize * ChunkSize];
 			Offset = new IntVector3( x * ChunkSize, y * ChunkSize, z * ChunkSize );
 			Index = x + y * map.NumChunksX + z * map.NumChunksX * map.NumChunksY;
