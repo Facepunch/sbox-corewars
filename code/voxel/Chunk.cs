@@ -251,7 +251,7 @@ namespace Facepunch.CoreWars.Voxel
 
 			var textureId = block.GetTextureId( (BlockFace)face );
 			var normal = (byte)face;
-			var faceData = (uint)((textureId & 31) << 18 | brightness | (normal & 7) << 27);
+			var faceData = (uint)((textureId & 31) << 18 | (brightness & 15) << 23 | (normal & 7) << 27);
 			var collisionIndex = slice.CollisionIndices.Count;
 
 			for ( int i = 0; i < 6; ++i )
@@ -427,7 +427,7 @@ namespace Facepunch.CoreWars.Voxel
 						blockPosition[uAxis] = i;
 						blockPosition[vAxis] = j;
 
-						var brightness = (15 & 15) << 23;
+						var brightness = Rand.Int( 0, 15 );
 
 						AddQuad( slice,
 							blockPosition.x, blockPosition.y, blockPosition.z,
@@ -575,7 +575,7 @@ namespace Facepunch.CoreWars.Voxel
 								blockPosition[uAxis] = i;
 								blockPosition[vAxis] = j;
 
-								var brightness = (15 & 15) << 23;
+								var brightness = Rand.Int( 0, 15 );
 
 								AddQuad( slice,
 									blockPosition.x, blockPosition.y, blockPosition.z,
