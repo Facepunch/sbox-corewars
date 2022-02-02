@@ -4,20 +4,20 @@ using Sandbox;
 namespace Facepunch.CoreWars.Blocks
 {
 	[Library]
-	public class DirtBlock : BlockType
+	public class WoodBlock : BlockType
 	{
-		public override string FriendlyName => "Dirt";
-		public override byte TextureId => 1;
-		public override byte BlockId => 1;
-
+		public override string FriendlyName => "Wood";
+		public override byte TextureId => 6;
+		public override byte BlockId => 5;
 		public override byte GetTextureId( BlockFace face )
 		{
 			if ( face == BlockFace.Top )
-				return 2;
+				return 7;
 			else if ( face == BlockFace.Bottom )
-				return 0;
+				return 7;
 			else
 				return TextureId;
 		}
 	}
 }
+

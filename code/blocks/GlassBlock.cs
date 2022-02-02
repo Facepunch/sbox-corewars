@@ -8,7 +8,7 @@ namespace Facepunch.CoreWars.Blocks
 	{
 		public override string FriendlyName => "Glass";
 		public override bool IsTranslucent => false;
-		public override byte TextureId => 1;
+		public override byte TextureId => 5;
 		public override byte BlockId => 4;
 		public override byte LightLevel => 14;
 	}
