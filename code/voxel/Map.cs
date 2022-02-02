@@ -453,15 +453,5 @@ namespace Facepunch.CoreWars.Voxel
 			var chunk = Chunks[chunkIndex];
 			chunk.SetBlock( blockPositionInChunk, blockId );
 		}
-
-		[Event.Tick.Client]
-		private void ClientTick()
-		{
-			if ( IsSunlightDirty )
-			{
-				PropagateBrightness();
-				IsSunlightDirty = false;
-			}
-		}
 	}
 }
