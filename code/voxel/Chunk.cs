@@ -66,19 +66,11 @@ namespace Facepunch.CoreWars.Voxel
 
 		public Chunk( Map map, int x, int y, int z )
 		{
-			Event.Register( this );
 			BlockTypes = new byte[ChunkSize * ChunkSize * ChunkSize];
 			LightMap = new ChunkLightMap( this );
 			Offset = new IntVector3( x * ChunkSize, y * ChunkSize, z * ChunkSize );
 			Index = x + y * map.NumChunksX + z * map.NumChunksX * map.NumChunksY;
 			Map = map;
-		}
-
-		[Event.Frame]
-		public void OnFrame()
-		{
-			if ( !Host.IsClient ) return;
-			SceneObject.SetValue( "LightMap", LightMap.Texture );
 		}
 
 		public async void Init()
