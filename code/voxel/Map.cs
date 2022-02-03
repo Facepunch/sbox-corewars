@@ -178,28 +178,28 @@ namespace Facepunch.CoreWars.Voxel
 		public byte GetSunlight( IntVector3 position )
 		{
 			if ( !IsInside( position ) ) return 0;
-			var index = ToMapPosition( position );
+			var index = ToMapIndex( position );
 			return LightMapData[index];
 		}
 
 		public void SetSunlight( IntVector3 position, byte value )
 		{
 			if ( !IsInside( position ) ) return;
-			var index = ToMapPosition( position );
+			var index = ToMapIndex( position );
 			LightMapData[index] = value;
 		}
 
 		public byte GetTorchlight( IntVector3 position )
 		{
 			if ( !IsInside( position ) ) return 0;
-			var index = ToMapPosition( position );
+			var index = ToMapIndex( position );
 			return LightMapData[index];
 		}
 
 		public void SetTorchlight( IntVector3 position, byte value )
 		{
 			if ( !IsInside( position ) ) return;
-			var index = ToMapPosition( position );
+			var index = ToMapIndex( position );
 			LightMapData[index] = value;
 		}
 
@@ -281,7 +281,7 @@ namespace Facepunch.CoreWars.Voxel
 			return shouldBuild;
 		}
 
-		public int ToMapPosition( IntVector3 position )
+		public int ToMapIndex( IntVector3 position )
 		{
 			return (position.z * SizeX * SizeY) + (position.y * SizeX) + position.x;
 		}
