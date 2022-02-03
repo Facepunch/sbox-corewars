@@ -157,7 +157,6 @@ namespace Facepunch.CoreWars.Voxel
 
 			if ( IsSunLightDirty )
 			{
-				Log.Info( "Dirty Sun " + Chunk.Offset );
 				IsSunLightDirty = false;
 				Texture2.Update( Data2 );
 			}
