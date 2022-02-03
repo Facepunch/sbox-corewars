@@ -283,7 +283,7 @@ namespace Facepunch.CoreWars.Voxel
 
 		public int ToMapPosition( IntVector3 position )
 		{
-			return position.x * SizeY * SizeZ + position.y * SizeZ + position.z;
+			return (position.z * SizeX * SizeY) + (position.y * SizeX) + position.x;
 		}
 
 		public int GetChunkIndex( IntVector3 position )
