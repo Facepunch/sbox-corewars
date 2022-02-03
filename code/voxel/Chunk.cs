@@ -46,8 +46,6 @@ namespace Facepunch.CoreWars.Voxel
 		public static readonly int VoxelSize = 48;
 
 		public HashSet<SliceUpdate> PendingSliceUpdates { get; set; } = new();
-		public Queue<LightRemoveNode> LightRemoveQueue { get; private set; } = new();
-		public Queue<IntVector3> LightAddQueue { get; private set; } = new();
 		public bool Initialized { get; private set; }
 
 		public ChunkLightMap LightMap { get; set; }
@@ -67,7 +65,7 @@ namespace Facepunch.CoreWars.Voxel
 		public Chunk( Map map, int x, int y, int z )
 		{
 			BlockTypes = new byte[ChunkSize * ChunkSize * ChunkSize];
-			LightMap = new ChunkLightMap( this );
+			LightMap = new ChunkLightMap( this, map );
 			Offset = new IntVector3( x * ChunkSize, y * ChunkSize, z * ChunkSize );
 			Index = x + y * map.NumChunksX + z * map.NumChunksX * map.NumChunksY;
 			Map = map;
@@ -121,6 +119,8 @@ namespace Facepunch.CoreWars.Voxel
 				SceneObject.SetValue( "LightMap", LightMap.Texture );
 				SceneObject.SetValue( "SunLight", LightMap.Texture2 );
 			}
+
+			Event.Register( this );
 
 			Initialized = true;
 		}
@@ -185,6 +185,7 @@ namespace Facepunch.CoreWars.Voxel
 		{
 			if ( true ) return;
 
+			/*
 			var positionAbove = Offset + (BlockDirections[0] * ChunkSize);
 
 			if ( Map.IsInside( positionAbove ) )
@@ -252,83 +253,7 @@ namespace Facepunch.CoreWars.Voxel
 					}
 				}
 			}
-		}
-
-		public void UpdateLighting( BlockInfo blockInfo, byte newBlockId )
-		{
-			Host.AssertClient();
-
-			var block = Map.GetBlockType( newBlockId );
-			int oldValue = Map.GetTorchlight( blockInfo.Position );
-
-			Map.SetTorchlight( blockInfo.Position, 0 );
-
-			LightRemoveQueue.Enqueue( new LightRemoveNode
-			{
-				Position = blockInfo.Position,
-				Value = oldValue
-			} );
-
-			while ( LightRemoveQueue.Count > 0 )
-			{
-				var node = LightRemoveQueue.Dequeue();
-
-				for ( var i = 0; i < 6; i++ )
-				{
-					var neighbourPosition = Map.GetAdjacentPosition( node.Position, i );
-					var neighbourBlockInfo = Map.GetBlockInfo( neighbourPosition );
-					if ( !neighbourBlockInfo.IsValid ) continue;
-
-					var lightLevel = Map.GetTorchlight( neighbourBlockInfo.Position );
-
-					if ( lightLevel != 0 && lightLevel < node.Value )
-					{
-						Map.SetTorchlight( neighbourBlockInfo.Position, 0 );
-
-						LightRemoveQueue.Enqueue( new LightRemoveNode
-						{
-							Position = neighbourPosition,
-							Value = node.Value
-						} );
-					}
-					else if ( lightLevel >= node.Value )
-					{
-						LightAddQueue.Enqueue( neighbourPosition );
-					}
-				}
-			}
-
-			if ( block != null && block.LightLevel > 0 )
-			{
-				Map.SetTorchlight( blockInfo.Position, block.LightLevel );
-				LightAddQueue.Enqueue( blockInfo.Position );
-			}
-
-			while ( LightAddQueue.Count > 0 )
-			{
-				var nodePosition = LightAddQueue.Dequeue();
-				var lightLevel = Map.GetTorchlight( nodePosition );
-
-				for ( var i = 0; i < 6; i++ )
-				{
-					var neighbourPosition = Map.GetAdjacentPosition( nodePosition, i );
-					var neighbourBlockInfo = Map.GetBlockInfo( neighbourPosition );
-					if ( !neighbourBlockInfo.IsValid ) continue;
-
-					var neighbourBlock = Map.GetBlockType( neighbourBlockInfo.BlockId );
-
-					if ( Map.GetTorchlight( neighbourBlockInfo.Position ) + 2 <= lightLevel )
-					{
-						if ( neighbourBlock.IsTranslucent )
-						{
-							Map.SetTorchlight( neighbourBlockInfo.Position, (byte)(lightLevel - 1) );
-							LightAddQueue.Enqueue( neighbourPosition );
-						}
-					}
-				}
-			}
-
-			LightMap.Update();
+			*/
 		}
 
 		public void SetBlock( IntVector3 position, byte blockId )
@@ -356,6 +281,8 @@ namespace Facepunch.CoreWars.Voxel
 
 				slice.Body = null;
 			}
+
+			Event.Unregister( this );
 		}
 
 		public void BuildMeshAndCollision()
@@ -827,6 +754,12 @@ namespace Facepunch.CoreWars.Voxel
 					}
 				}
 			}
+		}
+
+		[Event.Tick.Client]
+		private void ClientTick()
+		{
+			LightMap.UpdateTorchLight();
 		}
 	}
 }
