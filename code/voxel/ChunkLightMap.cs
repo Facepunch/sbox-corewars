@@ -18,24 +18,26 @@ namespace Facepunch.CoreWars.Voxel
 		public Queue<LightRemoveNode> SunLightRemoveQueue { get; private set; } = new();
 		public Queue<IntVector3> SunLightAddQueue { get; private set; } = new();
 
+		private bool IsTorchLightDirty { get; set; }
+		private bool IsSunLightDirty { get; set; }
+
 		public ChunkLightMap( Chunk chunk, Map map )
 		{
 			ChunkSize = Chunk.ChunkSize;
+			Chunk = chunk;
+			Map = map;
+
 			Data = new byte[ChunkSize * ChunkSize * ChunkSize];
-			Data2 = new byte[ChunkSize * ChunkSize * ChunkSize];
-			
 			Texture = Texture.CreateVolume( ChunkSize, ChunkSize, ChunkSize )
 				.WithFormat( ImageFormat.A8 )
 				.WithData( Data )
 				.Finish();
 
+			Data2 = new byte[ChunkSize * ChunkSize * ChunkSize];
 			Texture2 = Texture.CreateVolume( ChunkSize, ChunkSize, ChunkSize )
 				.WithFormat( ImageFormat.A8 )
-				.WithData( Data )
+				.WithData( Data2 )
 				.Finish();
-
-			Chunk = chunk;
-			Map = map;
 		}
 
 		public int ToIndex( IntVector3 position, int component )
@@ -53,6 +55,7 @@ namespace Facepunch.CoreWars.Voxel
 		{
 			var index = ToIndex( position, 0 );
 			if ( Data2[index] == value ) return false;
+			IsSunLightDirty = true;
 			Data2[index] = value;
 			return true;
 		}
@@ -61,7 +64,7 @@ namespace Facepunch.CoreWars.Voxel
 		{
 			if ( SetTorchLight( position, value ) )
 			{
-				TorchLightAddQueue.Enqueue( position );
+				TorchLightAddQueue.Enqueue( Chunk.Offset + position );
 			}
 		}
 
@@ -69,7 +72,7 @@ namespace Facepunch.CoreWars.Voxel
 		{
 			if ( SetSunLight( position, value ) )
 			{
-				SunLightAddQueue.Enqueue( position );
+				SunLightAddQueue.Enqueue( Chunk.Offset + position );
 			}
 		}
 
@@ -77,7 +80,7 @@ namespace Facepunch.CoreWars.Voxel
 		{
 			TorchLightRemoveQueue.Enqueue( new LightRemoveNode
 			{
-				Position = position,
+				Position = Chunk.Offset + position,
 				Value = GetTorchLight( position )
 			} );
 
@@ -132,21 +135,24 @@ namespace Facepunch.CoreWars.Voxel
 					{
 						if ( neighbourBlock.IsTranslucent )
 						{
-							Map.SetTorchlight( neighbourBlockInfo.Position, (byte)(lightLevel - 1) );
-							TorchLightAddQueue.Enqueue( neighbourPosition );
+							Map.AddTorchLight( neighbourPosition, (byte)(lightLevel - 1) );
 						}
 					}
 				}
 			}
 
-			Texture.Update( Data );
+			if ( IsTorchLightDirty )
+			{
+				IsTorchLightDirty = false;
+				Texture.Update( Data );
+			}
 		}
 
 		public bool RemoveSunLight( IntVector3 position )
 		{
 			SunLightRemoveQueue.Enqueue( new LightRemoveNode
 			{
-				Position = position,
+				Position = Chunk.Offset + position,
 				Value = GetSunLight( position )
 			} );
 
@@ -163,14 +169,9 @@ namespace Facepunch.CoreWars.Voxel
 		{
 			var index = ToIndex( position, 0 );
 			if ( Data[index] == value ) return false;
+			IsTorchLightDirty = true;
 			Data[index] = value;
 			return true;
-		}
-
-		public void Update()
-		{
-			Texture.Update( Data );
-			Texture2.Update( Data2 );
 		}
 	}
 }
