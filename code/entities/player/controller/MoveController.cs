@@ -38,8 +38,11 @@ namespace Facepunch.CoreWars
 		protected Vector3 LadderNormal { get; set; }
 		protected Player Player { get; set; }
 
+		public MoveDuck Duck;
+
 		public MoveController()
 		{
+			Duck = new MoveDuck( this );
 			Unstuck = new Unstuck( this );
 		}
 
@@ -74,6 +77,9 @@ namespace Facepunch.CoreWars
 			var girth = BodyGirth * 0.5f;
 			var mins = Scale( new Vector3( -girth, -girth, 0 ) );
 			var maxs = Scale( new Vector3( +girth, +girth, BodyHeight ) );
+
+			//We Dont actually make the player shorter
+			//Duck.UpdateBBox( ref mins, ref maxs, Pawn.Scale );
 
 			SetBBox( mins, maxs );
 		}
@@ -132,6 +138,8 @@ namespace Facepunch.CoreWars
 			WishVelocity = WishVelocity.Normal * inSpeed;
 			WishVelocity *= GetWishSpeed();
 
+			Duck.PreTick();
+
 			var stayOnGround = false;
 
 			if ( Swimming )
@@ -170,8 +178,10 @@ namespace Facepunch.CoreWars
 		private float GetWishSpeed()
 		{
 			var speed = 0f;
+			var ws = Duck.GetWishSpeed();
+			if ( ws >= 0 ) return ws;
 
-			if ( Input.Down( InputButton.Run ) )
+			if ( Input.Down( InputButton.Duck ) )
 				speed = Scale( SprintSpeed * MoveSpeedScale );
 			else
 				speed = Scale( WalkSpeed * MoveSpeedScale );

@@ -177,7 +177,7 @@ namespace Facepunch.CoreWars.Voxel
 			NumChunksX = SizeX / Chunk.ChunkSize;
 			NumChunksY = SizeY / Chunk.ChunkSize;
 			NumChunksZ = SizeZ / Chunk.ChunkSize;
-			
+
 			SetupChunks();
 		}
 
@@ -290,11 +290,6 @@ namespace Facepunch.CoreWars.Voxel
 			return shouldBuild;
 		}
 
-		public int ToMapIndex( IntVector3 position )
-		{
-			return (position.z * SizeX * SizeY) + (position.y * SizeX) + position.x;
-		}
-
 		public int GetChunkIndex( IntVector3 position )
 		{
 			return (position.x / Chunk.ChunkSize) + (position.y / Chunk.ChunkSize) * NumChunksX + (position.z / Chunk.ChunkSize) * NumChunksX * NumChunksY;
@@ -338,7 +333,7 @@ namespace Facepunch.CoreWars.Voxel
 			return chunk.GetMapPositionBlock( position );
 		}
 
-		public bool IsInside( IntVector3 position  )
+		public bool IsInside( IntVector3 position )
 		{
 			if ( position.x < 0 || position.x >= SizeX ) return false;
 			if ( position.y < 0 || position.y >= SizeY ) return false;
