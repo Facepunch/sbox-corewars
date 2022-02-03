@@ -14,7 +14,7 @@ namespace Facepunch.CoreWars.Voxel
 			ChunkSize = Chunk.ChunkSize;
 			Data = new byte[ChunkSize * ChunkSize * ChunkSize * 4];
 			Texture = Texture.CreateVolume( ChunkSize, ChunkSize, ChunkSize )
-				.WithFormat( ImageFormat.RGBA8888_LINEAR )
+				.WithFormat( ImageFormat.RGBA8888 )
 				.WithData( Data )
 				.Finish();
 
