@@ -52,6 +52,7 @@ struct PixelInput
 	#include "common/pixelinput.hlsl"
 	float3 vTexCoordAndBrightness : TEXCOORD9;
 	uint nTextureIndex : TEXCOORD10;
+	float3 vPositionOs : TEXCOORD11;
 };
 
 //=========================================================================================================================
@@ -63,12 +64,12 @@ VS
 
 	PixelInput MainVs( INSTANCED_SHADER_PARAMS( VertexInput i ) )
 	{
-		float3 position = float3( float( i.vData & ( 63 ) ), float( ( i.vData >> 6 ) & ( 63 ) ), float( ( i.vData >> 12 ) & ( 63 ) ) ) * g_flVoxelSize;
+		float3 position = float3( float( i.vData & ( 63 ) ), float( ( i.vData >> 6 ) & ( 63 ) ), float( ( i.vData >> 12 ) & ( 63 ) ) );
 		int texindex = int( ( i.vData >> 18 ) & ( 31 ) );
 		int normal = int( ( i.vData >> 27 ) & ( 7 ) );
 		float brightness = ( float( ( i.vData >> 23 ) & ( 15 ) ) + 2 ) / 16.0;
 
-		i.vPositionOs = position;
+		i.vPositionOs = position * g_flVoxelSize;
 
 		float3 vNormalOs = float3( 0, 0, 1 );
 		if ( normal == 1 ) vNormalOs = float3( 0, 0, -1 );
@@ -85,7 +86,7 @@ VS
 		else if ( normal == 5 ) vTangentOs = float3( 0, 0, -1 );
 
 		float3 vBinormalOs = cross( vNormalOs, vTangentOs );
-		float2 vTexCoord = float2( dot( vBinormalOs, position ), dot( vTangentOs, position ) );
+		float2 vTexCoord = float2( dot( vBinormalOs, i.vPositionOs ), dot( vTangentOs, i.vPositionOs ) );
 
 		PixelInput o = ProcessVertex( i );
 		o.vNormalWs = vNormalOs;
@@ -93,6 +94,7 @@ VS
 		o.vTangentVWs = vTangentOs;
 		o.vTexCoordAndBrightness = float3( vTexCoord.xy, brightness );
 		o.nTextureIndex = texindex;
+		o.vPositionOs = position;
 		return FinalizeVertex( o );
 	}
 }
@@ -117,6 +119,9 @@ PS
 
 	CreateInputTexture2D( TextureAtlas, Srgb, 8, "", "_color", "Voxel Atlas,10/10", Default3( 1.0f, 1.0f, 1.0f ) );
 	CreateTexture2D( g_tAtlasColor )  < Channel( RGB,  None( TextureAtlas ), Srgb ); OutputFormat( BC7 ); SrgbRead( true ); Filter( POINT ); AddressU( MIRROR ); AddressV( MIRROR ); >;
+
+	CreateInputTexture3D( TextureLightmap, Linear, 8, "", "_lightmap", "Voxel Atlas,20/10", Default3( 1.0, 1.0, 1.0 ) );
+	CreateTexture3D( g_tLightmap ) < Channel( A, None( TextureLightmap ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( CLAMP ); AddressV( CLAMP ); AddressW( CLAMP ); > ;
 
 	PixelOutput MainPs( PixelInput i )
 	{
@@ -145,8 +150,10 @@ PS
 			float2 vTexCoordAtlas = frac((i.vTexCoordAndBrightness.xy % g_flVoxelSize) / g_flVoxelSize);
 			vTexCoordAtlas = frac((vTexCoordAtlas / vAltasMaxCells) + (vCellLocation * vInvMaxCells));
 
+			float lightmapBrightness = Tex3DLoad( g_tLightmap, int4( i.vPositionOs.x, i.vPositionOs.y, i.vPositionOs.z, 0 ) ).a * 16.0f;
+
 			Material m = GatherMaterial( i );
-			m.Albedo.rgb = Tex2DLevel( g_tAtlasColor, vTexCoordAtlas, 0 ).rgb * i.vTexCoordAndBrightness.z;
+			m.Albedo.rgb = Tex2DLevel( g_tAtlasColor, vTexCoordAtlas, 0 ).rgb * saturate(0.03f + lightmapBrightness);
 
 			return FinalizePixelMaterial( i, m );
 		}

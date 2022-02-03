@@ -4,6 +4,7 @@ Layer0
 {
 	shader "cw_voxel.vfx"
 
+	AmbientLighting "0.000"
 	flTextureAtlasCellSize "64.000"
 	g_flVoxelSize "32.000"
 
@@ -39,9 +40,11 @@ Layer0
 
 	//---- Voxel Atlas ----
 	TextureAtlas "textures/blocks.png"
+	TextureLightmap "materials/default/default_lightmap.tga"
 
 	DynamicParams
 	{
 		g_flVoxelSize "VoxelSize"
+		TextureLightmap "Lightmap"
 	}
 }
