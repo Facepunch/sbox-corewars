@@ -150,10 +150,12 @@ PS
 			float2 vTexCoordAtlas = frac((i.vTexCoordAndBrightness.xy % g_flVoxelSize) / g_flVoxelSize);
 			vTexCoordAtlas = frac((vTexCoordAtlas / vAltasMaxCells) + (vCellLocation * vInvMaxCells));
 
-			float lightmapBrightness = Tex3DLoad( g_tLightmap, int4( i.vPositionOs.x, i.vPositionOs.y, i.vPositionOs.z, 0 ) ).a * 16.0f;
+			uint lightmapValue = asuint(Tex3DLoad( g_tLightmap, int4( i.vPositionOs.x, i.vPositionOs.y, i.vPositionOs.z, 0 ) ).a);
+			float torchBrightness = (float)((lightmapValue >> 4) & 0xf) / 16.0f;
+			float sunlightBrightness = (float)(lightmapValue & 0xf) / 16.0f;
 
 			Material m = GatherMaterial( i );
-			m.Albedo.rgb = Tex2DLevel( g_tAtlasColor, vTexCoordAtlas, 0 ).rgb * saturate(0.03f + lightmapBrightness);
+			m.Albedo.rgb = Tex2DLevel( g_tAtlasColor, vTexCoordAtlas, 0 ).rgb * saturate(0.03f + torchBrightness + sunlightBrightness);
 
 			return FinalizePixelMaterial( i, m );
 		}

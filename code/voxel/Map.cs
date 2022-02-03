@@ -179,28 +179,28 @@ namespace Facepunch.CoreWars.Voxel
 		{
 			if ( !IsInside( position ) ) return 0;
 			var index = ToMapIndex( position );
-			return LightMapData[index];
+			return (byte)(LightMapData[index] & 0xf);
 		}
 
 		public void SetSunlight( IntVector3 position, byte value )
 		{
 			if ( !IsInside( position ) ) return;
 			var index = ToMapIndex( position );
-			LightMapData[index] = value;
+			LightMapData[index] = (byte)((LightMapData[index] & 0xf0) | (value & 0xf));
 		}
 
 		public byte GetTorchlight( IntVector3 position )
 		{
 			if ( !IsInside( position ) ) return 0;
 			var index = ToMapIndex( position );
-			return LightMapData[index];
+			return (byte)((LightMapData[index] >> 4)& 0xf);
 		}
 
 		public void SetTorchlight( IntVector3 position, byte value )
 		{
 			if ( !IsInside( position ) ) return;
 			var index = ToMapIndex( position );
-			LightMapData[index] = value;
+			LightMapData[index] = (byte)((LightMapData[index] & 0xf) | ((value & 0xf) << 4));
 		}
 
 		public void Destroy()
