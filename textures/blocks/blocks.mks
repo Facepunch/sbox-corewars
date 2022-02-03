@@ -1,0 +1,35 @@
+sequence 0
+frame cloth.png 1
+
+sequence 1
+frame cobble.png 1
+
+sequence 2
+frame dirt.png 1
+
+sequence 3
+frame dirt_grass.png 1
+
+sequence 4
+frame grass.png 1
+
+sequence 5
+frame gravel.png 1
+
+sequence 6
+frame leaf.png 1
+
+sequence 7
+frame log_side.png 1
+
+sequence 8
+frame log_top.png 1
+
+sequence 9				
+frame sand.png 1
+
+sequence 10
+frame stone.png 1
+
+sequence 11
+frame window.png 1
