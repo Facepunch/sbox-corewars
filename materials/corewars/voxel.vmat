@@ -4,7 +4,6 @@ Layer0
 {
 	shader "cw_voxel.vfx"
 
-	AmbientLighting "0.000"
 	flTextureAtlasCellSize "64.000"
 	g_flVoxelSize "32.000"
 

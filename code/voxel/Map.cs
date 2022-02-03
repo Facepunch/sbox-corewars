@@ -171,35 +171,35 @@ namespace Facepunch.CoreWars.Voxel
 			NumChunksX = SizeX / Chunk.ChunkSize;
 			NumChunksY = SizeY / Chunk.ChunkSize;
 			NumChunksZ = SizeZ / Chunk.ChunkSize;
-			
+
 			SetupChunks();
 		}
 
 		public byte GetSunlight( IntVector3 position )
 		{
 			if ( !IsInside( position ) ) return 0;
-			var index = ToMapIndex( position );
+			var index = ToMapIndex( position, 0 );
 			return (byte)(LightMapData[index] & 0xf);
 		}
 
 		public void SetSunlight( IntVector3 position, byte value )
 		{
 			if ( !IsInside( position ) ) return;
-			var index = ToMapIndex( position );
+			var index = ToMapIndex( position, 0 );
 			LightMapData[index] = (byte)((LightMapData[index] & 0xf0) | (value & 0xf));
 		}
 
 		public byte GetTorchlight( IntVector3 position )
 		{
 			if ( !IsInside( position ) ) return 0;
-			var index = ToMapIndex( position );
-			return (byte)((LightMapData[index] >> 4)& 0xf);
+			var index = ToMapIndex( position, 0 );
+			return (byte)((LightMapData[index] >> 4) & 0xf);
 		}
 
 		public void SetTorchlight( IntVector3 position, byte value )
 		{
 			if ( !IsInside( position ) ) return;
-			var index = ToMapIndex( position );
+			var index = ToMapIndex( position, 0 );
 			LightMapData[index] = (byte)((LightMapData[index] & 0xf) | ((value & 0xf) << 4));
 		}
 
@@ -233,9 +233,9 @@ namespace Facepunch.CoreWars.Voxel
 			}
 			else
 			{
-				LightMapData = new byte[SizeX * SizeY * SizeZ];
+				LightMapData = new byte[SizeX * SizeY * SizeZ * 4];
 				LightMapTexture = Texture.CreateVolume( SizeX, SizeY, SizeZ )
-					.WithFormat( ImageFormat.A8 )
+					.WithFormat( ImageFormat.R32_UINT )
 					.WithData( LightMapData )
 					.Finish();
 			}
@@ -281,9 +281,9 @@ namespace Facepunch.CoreWars.Voxel
 			return shouldBuild;
 		}
 
-		public int ToMapIndex( IntVector3 position )
+		public int ToMapIndex( IntVector3 position, int component = 0 )
 		{
-			return (position.z * SizeX * SizeY) + (position.y * SizeX) + position.x;
+			return (((position.z * SizeX * SizeY) + (position.y * SizeX) + position.x) * 4) + component;
 		}
 
 		public int GetChunkIndex( IntVector3 position )
@@ -329,7 +329,7 @@ namespace Facepunch.CoreWars.Voxel
 			return chunk.GetMapPositionBlock( position );
 		}
 
-		public bool IsInside( IntVector3 position  )
+		public bool IsInside( IntVector3 position )
 		{
 			if ( position.x < 0 || position.x >= SizeX ) return false;
 			if ( position.y < 0 || position.y >= SizeY ) return false;
