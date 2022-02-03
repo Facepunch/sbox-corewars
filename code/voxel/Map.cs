@@ -179,28 +179,28 @@ namespace Facepunch.CoreWars.Voxel
 		{
 			if ( !IsInside( position ) ) return 0;
 			var index = ToMapIndex( position, 0 );
-			return (byte)(LightMapData[index] & 0xf);
+			return LightMapData[index];
 		}
 
 		public void SetSunlight( IntVector3 position, byte value )
 		{
 			if ( !IsInside( position ) ) return;
 			var index = ToMapIndex( position, 0 );
-			LightMapData[index] = (byte)((LightMapData[index] & 0xf0) | (value & 0xf));
+			LightMapData[index] = value;
 		}
 
 		public byte GetTorchlight( IntVector3 position )
 		{
 			if ( !IsInside( position ) ) return 0;
-			var index = ToMapIndex( position, 0 );
-			return (byte)((LightMapData[index] >> 4) & 0xf);
+			var index = ToMapIndex( position, 1 );
+			return LightMapData[index];
 		}
 
 		public void SetTorchlight( IntVector3 position, byte value )
 		{
 			if ( !IsInside( position ) ) return;
-			var index = ToMapIndex( position, 0 );
-			LightMapData[index] = (byte)((LightMapData[index] & 0xf) | ((value & 0xf) << 4));
+			var index = ToMapIndex( position, 1 );
+			LightMapData[index] = value;
 		}
 
 		public void Destroy()
@@ -235,7 +235,7 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				LightMapData = new byte[SizeX * SizeY * SizeZ * 4];
 				LightMapTexture = Texture.CreateVolume( SizeX, SizeY, SizeZ )
-					.WithFormat( ImageFormat.R32_UINT )
+					.WithFormat( ImageFormat.RGBA8888_LINEAR )
 					.WithData( LightMapData )
 					.Finish();
 			}

@@ -121,7 +121,7 @@ PS
 	CreateTexture2D( g_tAtlasColor )  < Channel( RGB,  None( TextureAtlas ), Srgb ); OutputFormat( BC7 ); SrgbRead( true ); Filter( POINT ); AddressU( MIRROR ); AddressV( MIRROR ); >;
 
 	CreateInputTexture3D( TextureLightmap, Linear, 8, "", "_lightmap", "Voxel Atlas,20/10", Default3( 1.0, 1.0, 1.0 ) );
-	Texture3D<uint4> g_tLightmap < Channel( R, None( TextureLightmap ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( CLAMP ); AddressV( CLAMP ); AddressW( CLAMP ); >;
+	Texture3D<float4> g_tLightmap < Channel( RGBA, None( TextureLightmap ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( CLAMP ); AddressV( CLAMP ); AddressW( CLAMP ); >;
 
 	struct LightingValues
 	{
@@ -129,19 +129,23 @@ PS
 		float SunlightBrightness;
 	};
 
-	LightingValues GetLightingValues(int3 BlockPosition)
+	LightingValues GetLightingValues(int3 BlockPosition, int3 BlockOffset)
 	{
-		uint lightmapValue = (Tex3DLoad( g_tLightmap, int4( BlockPosition.xyz, 0 ) ).r) & 0xff;
-		float torchBrightness = (float)((lightmapValue >> 4) & 0xf) / 16.0f;
-		float sunlightBrightness = (float)(lightmapValue & 0xf) / 16.0f;
+		float2 lightmapValue = (Tex3DLoadWithOffset( g_tLightmap, int4( BlockPosition.xyz, 0 ), BlockOffset ).rg);
+		float sunlightBrightness = (float)lightmapValue.r * 16.0f;
+		float torchBrightness = (float)lightmapValue.g * 16.0f;
 
 		LightingValues o;
 		o.TorchBrightness = torchBrightness;
-		o.SunlightBrightness = sunlightBrightness;
+		o.SunlightBrightness = 0.0f;
 		return o;
 	}
 
-
+	float TapBrightest(int3 BlockPosition, int3 BlockOffset)
+	{
+		LightingValues i = GetLightingValues(BlockPosition, BlockOffset);
+		return max(i.TorchBrightness, i.SunlightBrightness);
+	}
 
 	PixelOutput MainPs( PixelInput i )
 	{
@@ -169,14 +173,13 @@ PS
 			// Normalized to Atlas Space
 			float2 vTexCoordAtlas = frac((i.vTexCoordAndBrightness.xy % g_flVoxelSize) / g_flVoxelSize);
 			vTexCoordAtlas = frac((vTexCoordAtlas / vAltasMaxCells) + (vCellLocation * vInvMaxCells));
-
-			LightingValues baseLighting = GetLightingValues(i.vPositionOs.xyz);
-
+			LightingValues baseLighting = GetLightingValues(i.vPositionOs.xyz, int3(0, 0, 0));
 			
 			Material m = GatherMaterial( i );
 			m.Albedo.rgb = Tex2DLevel( g_tAtlasColor, vTexCoordAtlas, 0 ).rgb * saturate(0.03f + baseLighting.TorchBrightness + baseLighting.SunlightBrightness);
 
 			return FinalizePixelMaterial( i, m );
+
 		}
 		#endif
 	}
