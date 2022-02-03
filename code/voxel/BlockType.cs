@@ -13,7 +13,7 @@ namespace Facepunch.CoreWars.Voxel
 		public virtual bool IsTranslucent => false;
 		public virtual byte LightLevel => 0;
 
-		public virtual byte GetTextureId( BlockFace face, int x, int y, int z )
+		public virtual byte GetTextureId( BlockFace face, Chunk chunk, int x, int y, int z )
 		{
 			if ( string.IsNullOrEmpty( DefaultTexture ) ) return 0;
 

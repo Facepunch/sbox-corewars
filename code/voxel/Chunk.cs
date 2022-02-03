@@ -365,7 +365,7 @@ namespace Facepunch.CoreWars.Voxel
 			if ( block == null )
 				throw new Exception( $"Unable to find a block type registered with the id: {blockId}!" );
 
-			var textureId = block.GetTextureId( (BlockFace)face, x, y, z );
+			var textureId = block.GetTextureId( (BlockFace)face, this, x, y, z );
 			var normal = (byte)face;
 			var faceData = (uint)((textureId & 31) << 18 | (brightness & 15) << 23 | (normal & 7) << 27);
 			var collisionIndex = slice.CollisionIndices.Count;
