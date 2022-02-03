@@ -120,22 +120,8 @@ PS
 	CreateInputTexture2D( TextureAtlas, Srgb, 8, "", "_color", "Voxel Atlas,10/10", Default3( 1.0f, 1.0f, 1.0f ) );
 	CreateTexture2D( g_tAtlasColor )  < Channel( RGB,  None( TextureAtlas ), Srgb ); OutputFormat( BC7 ); SrgbRead( true ); Filter( POINT ); AddressU( MIRROR ); AddressV( MIRROR ); >;
 
-	CreateTexture3D( g_tLightmap ) < Attribute( "Lightmap" ); SrgbRead( false ); Filter( POINT ); AddressU( CLAMP ); AddressV( CLAMP ); AddressW( CLAMP ); >;
-
-	float2 GetLightingValues(float3 BlockPosition, float3 BlockOffset)
-	{
-		float3 lightmapDims = (float3)TextureDimensions3D( g_tLightmap, 0 );
-
-		float2 lightmapValue = (Tex3DLevel( g_tLightmap, BlockPosition.xyz / lightmapDims, 0 ).rg);
-
-		return float2(saturate((float)lightmapValue.r * 16.0f), saturate((float)lightmapValue.g * 16.0f));
-	}
-
-	float TapBrightest(float3 BlockPosition, float3 BlockOffset)
-	{
-		float2 i = GetLightingValues(BlockPosition, BlockOffset);
-		return max(i.x, i.y);
-	}
+	CreateInputTexture3D( TextureLightmap, Linear, 8, "", "_lightmap", "Voxel Atlas,20/10", Default3( 1.0, 1.0, 1.0 ) );
+	CreateTexture3D( g_tLightmap ) < Channel( A, None( TextureLightmap ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( CLAMP ); AddressV( CLAMP ); AddressW( CLAMP ); > ;
 
 	PixelOutput MainPs( PixelInput i )
 	{
@@ -163,16 +149,13 @@ PS
 			// Normalized to Atlas Space
 			float2 vTexCoordAtlas = frac((i.vTexCoordAndBrightness.xy % g_flVoxelSize) / g_flVoxelSize);
 			vTexCoordAtlas = frac((vTexCoordAtlas / vAltasMaxCells) + (vCellLocation * vInvMaxCells));
-			float2 baseLighting = GetLightingValues(i.vPositionOs.xyz + i.vNormalWs, int3(0, 0, 0));
-			//LightingValues adjacentLighting = GetLightingValues(i.vPositionOs.xyz + i.vNormalWs, int3(0, 0, 0));
-			
-			PixelOutput o;
 
-			o.vColor = float4(0,0,0,1);
-			o.vColor.rgb = Tex2DLevel( g_tAtlasColor, vTexCoordAtlas, 0 ).rgb * saturate(baseLighting.x + baseLighting.y);
+			float lightmapBrightness = Tex3DLoad( g_tLightmap, int4( i.vPositionOs.x, i.vPositionOs.y, i.vPositionOs.z, 0 ) ).a * 16.0f;
 
-			return o;
+			Material m = GatherMaterial( i );
+			m.Albedo.rgb = Tex2DLevel( g_tAtlasColor, vTexCoordAtlas, 0 ).rgb * saturate(0.03f + lightmapBrightness);
 
+			return FinalizePixelMaterial( i, m );
 		}
 		#endif
 	}

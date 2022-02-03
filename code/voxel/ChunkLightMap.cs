@@ -12,9 +12,9 @@ namespace Facepunch.CoreWars.Voxel
 		public ChunkLightMap( Chunk chunk )
 		{
 			ChunkSize = Chunk.ChunkSize;
-			Data = new byte[ChunkSize * ChunkSize * ChunkSize * 4];
+			Data = new byte[ChunkSize * ChunkSize * ChunkSize];
 			Texture = Texture.CreateVolume( ChunkSize, ChunkSize, ChunkSize )
-				.WithFormat( ImageFormat.RGBA8888 )
+				.WithFormat( ImageFormat.A8 )
 				.WithData( Data )
 				.Finish();
 
@@ -23,7 +23,7 @@ namespace Facepunch.CoreWars.Voxel
 
 		public int ToIndex( IntVector3 position, int component )
 		{
-			return (((position.z * ChunkSize * ChunkSize) + (position.y * ChunkSize) + position.x) * 4) + component;
+			return (position.z * ChunkSize * ChunkSize) + (position.y * ChunkSize) + position.x;
 		}
 
 		public byte GetSunlight( IntVector3 position )
@@ -40,13 +40,13 @@ namespace Facepunch.CoreWars.Voxel
 
 		public byte GetTorchlight( IntVector3 position )
 		{
-			var index = ToIndex( position, 1 );
+			var index = ToIndex( position, 0 );
 			return Data[index];
 		}
 
 		public void SetTorchlight( IntVector3 position, byte value )
 		{
-			var index = ToIndex( position, 1 );
+			var index = ToIndex( position, 0 );
 			Data[index] = value;
 		}
 
