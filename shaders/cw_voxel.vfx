@@ -123,30 +123,19 @@ PS
 	CreateInputTexture3D( TextureLightmap, Linear, 8, "", "_lightmap", "Voxel Atlas,20/10", Default3( 1.0, 1.0, 1.0 ) );
 	CreateTexture3D( g_tLightmap ) < Channel( RGBA, None( TextureLightmap ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( CLAMP ); AddressV( CLAMP ); AddressW( CLAMP ); >;
 
-	struct LightingValues
-	{
-		float TorchBrightness;
-		float SunlightBrightness;
-	};
-
-	LightingValues GetLightingValues(float3 BlockPosition, float3 BlockOffset)
+	float2 GetLightingValues(float3 BlockPosition, float3 BlockOffset)
 	{
 		float3 lightmapDims = (float3)TextureDimensions3D( g_tLightmap, 0 );
 
 		float2 lightmapValue = (Tex3DLevel( g_tLightmap, BlockPosition.xyz / lightmapDims, 0 ).rg);
-		float sunlightBrightness = (float)lightmapValue.r * 16.0f;
-		float torchBrightness = (float)lightmapValue.g * 16.0f;
 
-		LightingValues o;
-		o.TorchBrightness = torchBrightness;
-		o.SunlightBrightness = sunlightBrightness;
-		return o;
+		return float2(saturate((float)lightmapValue.r * 16.0f), saturate((float)lightmapValue.g * 16.0f));
 	}
 
 	float TapBrightest(float3 BlockPosition, float3 BlockOffset)
 	{
-		LightingValues i = GetLightingValues(BlockPosition, BlockOffset);
-		return max(i.TorchBrightness, i.SunlightBrightness);
+		float2 i = GetLightingValues(BlockPosition, BlockOffset);
+		return max(i.x, i.y);
 	}
 
 	PixelOutput MainPs( PixelInput i )
@@ -175,12 +164,13 @@ PS
 			// Normalized to Atlas Space
 			float2 vTexCoordAtlas = frac((i.vTexCoordAndBrightness.xy % g_flVoxelSize) / g_flVoxelSize);
 			vTexCoordAtlas = frac((vTexCoordAtlas / vAltasMaxCells) + (vCellLocation * vInvMaxCells));
-			LightingValues baseLighting = GetLightingValues(i.vPositionOs.xyz, int3(0, 0, 0));
+			float2 baseLighting = GetLightingValues(i.vPositionOs.xyz, int3(0, 0, 0));
+			//LightingValues adjacentLighting = GetLightingValues(i.vPositionOs.xyz + i.vNormalWs, int3(0, 0, 0));
 			
 			PixelOutput o;
 
 			o.vColor = float4(0,0,0,1);
-			o.vColor.rgb = Tex2DLevel( g_tAtlasColor, vTexCoordAtlas, 0 ).rgb * saturate(0.03f + baseLighting.TorchBrightness + baseLighting.SunlightBrightness);
+			o.vColor.rgb = Tex2DLevel( g_tAtlasColor, vTexCoordAtlas, 0 ).rgb * saturate(baseLighting.x + baseLighting.y);
 
 			return o;
 
