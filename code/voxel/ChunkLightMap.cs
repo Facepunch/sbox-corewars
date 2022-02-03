@@ -1,5 +1,4 @@
 ﻿using Sandbox;
-using System.Runtime.InteropServices;
 
 namespace Facepunch.CoreWars.Voxel
 {
