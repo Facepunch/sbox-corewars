@@ -40,10 +40,12 @@ Layer0
 	//---- Voxel Atlas ----
 	TextureAtlas "textures/blocks.png"
 	TextureLightmap "materials/default/default_lightmap.tga"
+	TextureSunlight "materials/default/default.tga"
 
 	DynamicParams
 	{
 		g_flVoxelSize "VoxelSize"
 		TextureLightmap "Lightmap"
+		TextureSunlight "SunLight"
 	}
 }

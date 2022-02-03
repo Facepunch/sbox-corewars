@@ -119,6 +119,7 @@ namespace Facepunch.CoreWars.Voxel
 				SceneObject = new SceneObject( Model, transform );
 				SceneObject.SetValue( "VoxelSize", VoxelSize );
 				SceneObject.SetValue( "LightMap", LightMap.Texture );
+				SceneObject.SetValue( "SunLight", LightMap.Texture2 );
 			}
 
 			Initialized = true;
