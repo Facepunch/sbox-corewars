@@ -87,6 +87,82 @@ namespace Facepunch.CoreWars.Voxel
 			return SetTorchLight( position, 0 );
 		}
 
+		public void UpdateSunLight()
+		{
+			while ( SunLightRemoveQueue.Count > 0 )
+			{
+				var node = SunLightRemoveQueue.Dequeue();
+
+				for ( var i = 0; i < 6; i++ )
+				{
+					var neighbourPosition = Map.GetAdjacentPosition( node.Position, i );
+					var lightLevel = Map.GetSunLight( neighbourPosition );
+
+					if ( (lightLevel == 15 && neighbourPosition.z == node.Position.z - 1) || (lightLevel != 0 && lightLevel < node.Value) )
+					{
+						Map.SetSunLight( neighbourPosition, 0 );
+
+						SunLightRemoveQueue.Enqueue( new LightRemoveNode
+						{
+							Position = neighbourPosition,
+							Value = lightLevel
+						} );
+					}
+					else if ( lightLevel >= node.Value )
+					{
+						SunLightAddQueue.Enqueue( neighbourPosition );
+					}
+				}
+			}
+
+			while ( SunLightAddQueue.Count > 0 )
+			{
+				var node = SunLightAddQueue.Dequeue();
+				var blockId = Map.GetBlock( node );
+				var block = Map.GetBlockType( blockId );
+
+				if ( !block.IsTranslucent )
+					continue;
+
+				var lightLevel = Map.GetSunLight( node );
+
+				for ( var i = 0; i < 6; i++ )
+				{
+					var neighbourPosition = Map.GetAdjacentPosition( node, i );
+					var neighbourLightLevel = Map.GetSunLight( neighbourPosition );
+
+					if ( neighbourLightLevel + 2 <= lightLevel || (lightLevel == 15 && neighbourLightLevel != 15 && neighbourPosition.z == node.z - 1) )
+					{
+						var neighbourBlockId = Map.GetBlock( neighbourPosition );
+						var neighbourBlock = Map.GetBlockType( neighbourBlockId );
+
+						if ( neighbourBlock.IsTranslucent )
+						{
+							if ( lightLevel == 15 && neighbourPosition.z == node.z - 1 && !neighbourBlock.AttenuatesSunLight )
+							{
+								Map.AddSunLight( neighbourPosition, lightLevel );
+							}
+							else if ( lightLevel == 15 && neighbourPosition.z == node.z + 1 )
+							{
+								continue;
+							}
+							else
+							{
+								Map.AddSunLight( neighbourPosition, (byte)(lightLevel - 1) );
+							}
+						}
+					}
+				}
+			}
+
+			if ( IsSunLightDirty )
+			{
+				Log.Info( "Dirty Sun " + Chunk.Offset );
+				IsSunLightDirty = false;
+				Texture2.Update( Data2 );
+			}
+		}
+
 		public void UpdateTorchLight()
 		{
 			while ( TorchLightRemoveQueue.Count > 0 )
@@ -96,14 +172,11 @@ namespace Facepunch.CoreWars.Voxel
 				for ( var i = 0; i < 6; i++ )
 				{
 					var neighbourPosition = Map.GetAdjacentPosition( node.Position, i );
-					var neighbourBlockInfo = Map.GetBlockInfo( neighbourPosition );
-					if ( !neighbourBlockInfo.IsValid ) continue;
-
-					var lightLevel = Map.GetTorchlight( neighbourBlockInfo.Position );
+					var lightLevel = Map.GetTorchLight( neighbourPosition );
 
 					if ( lightLevel != 0 && lightLevel < node.Value )
 					{
-						Map.SetTorchlight( neighbourBlockInfo.Position, 0 );
+						Map.SetTorchLight( neighbourPosition, 0 );
 
 						TorchLightRemoveQueue.Enqueue( new LightRemoveNode
 						{
@@ -121,7 +194,7 @@ namespace Facepunch.CoreWars.Voxel
 			while ( TorchLightAddQueue.Count > 0 )
 			{
 				var nodePosition = TorchLightAddQueue.Dequeue();
-				var lightLevel = Map.GetTorchlight( nodePosition );
+				var lightLevel = Map.GetTorchLight( nodePosition );
 
 				for ( var i = 0; i < 6; i++ )
 				{
@@ -131,7 +204,7 @@ namespace Facepunch.CoreWars.Voxel
 
 					var neighbourBlock = Map.GetBlockType( neighbourBlockInfo.BlockId );
 
-					if ( Map.GetTorchlight( neighbourBlockInfo.Position ) + 2 <= lightLevel )
+					if ( Map.GetTorchLight( neighbourBlockInfo.Position ) + 2 <= lightLevel )
 					{
 						if ( neighbourBlock.IsTranslucent )
 						{

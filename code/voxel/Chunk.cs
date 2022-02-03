@@ -183,9 +183,6 @@ namespace Facepunch.CoreWars.Voxel
 
 		public void PropagateSunlight()
 		{
-			if ( true ) return;
-
-			/*
 			var positionAbove = Offset + (BlockDirections[0] * ChunkSize);
 
 			if ( Map.IsInside( positionAbove ) )
@@ -197,11 +194,11 @@ namespace Facepunch.CoreWars.Voxel
 				{
 					for ( var y = 0; y < ChunkSize; y++ )
 					{
-						var position = chunkAbove.Offset + new IntVector3( x, y, 0 );
+						var lightLevel = Map.GetSunLight( chunkAbove.Offset + new IntVector3( x, y, 0 ) );
 
-						if ( Map.GetTorchlight( position ) > 0 )
+						if ( lightLevel > 0 )
 						{
-							LightAddQueue.Enqueue( position );
+							LightMap.AddSunLight( new IntVector3( x, y, ChunkSize - 1 ), lightLevel );
 						}
 					}
 				}
@@ -220,40 +217,11 @@ namespace Facepunch.CoreWars.Voxel
 
 						if ( block.IsTranslucent )
 						{
-							var mapPosition = Offset + position;
-							Map.SetTorchlight( mapPosition, 15 );
-							LightAddQueue.Enqueue( mapPosition );
+							LightMap.AddSunLight( position, 15 );
 						}
 					}
 				}
 			}
-
-			while ( LightAddQueue.Count > 0 )
-			{
-				var nodePosition = LightAddQueue.Dequeue();
-				var lightLevel = Map.GetTorchlight( nodePosition );
-
-				for ( var i = 0; i < 6; i++ )
-				{
-					var neighbourPosition = Map.GetAdjacentPosition( nodePosition, i );
-					var neighbourBlockId = Map.GetBlock( neighbourPosition );
-					var neighbourBlock = Map.GetBlockType( neighbourBlockId );
-
-					if ( Map.GetTorchlight( neighbourPosition ) + 2 <= lightLevel )
-					{
-						if ( neighbourBlock.IsTranslucent )
-						{
-							if ( lightLevel == 15 && i == (int)BlockFace.Bottom )
-								Map.SetTorchlight( neighbourPosition, lightLevel );
-							else
-								Map.SetTorchlight( neighbourPosition, (byte)(lightLevel - 1) );
-
-							LightAddQueue.Enqueue( neighbourPosition );
-						}
-					}
-				}
-			}
-			*/
 		}
 
 		public void SetBlock( IntVector3 position, byte blockId )
@@ -760,6 +728,7 @@ namespace Facepunch.CoreWars.Voxel
 		private void ClientTick()
 		{
 			LightMap.UpdateTorchLight();
+			LightMap.UpdateSunLight();
 		}
 	}
 }

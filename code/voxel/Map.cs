@@ -74,13 +74,6 @@ namespace Facepunch.CoreWars.Voxel
 
 		private string BlockAtlasFileName { get; set; }
 		private byte NextAvailableBlockId { get; set; }
-		private bool HasPropagatedSunlight { get; set; } = true;
-
-		[ClientCmd( "sun" )]
-		public static void CmdTest()
-		{
-			Current.HasPropagatedSunlight = false;
-		}
 
 		private Map()
 		{
@@ -153,6 +146,7 @@ namespace Facepunch.CoreWars.Voxel
 			var chunk = Chunks[index];
 			chunk.BlockTypes = data;
 			chunk.Init();
+			chunk.PropagateSunlight();
 		}
 
 		public void AddAllBlockTypes()
@@ -181,7 +175,7 @@ namespace Facepunch.CoreWars.Voxel
 			SetupChunks();
 		}
 
-		public byte GetSunlight( IntVector3 position )
+		public byte GetSunLight( IntVector3 position )
 		{
 			if ( !IsInside( position ) ) return 0;
 			var chunkIndex = GetChunkIndex( position );
@@ -189,7 +183,7 @@ namespace Facepunch.CoreWars.Voxel
 			return Chunks[chunkIndex].LightMap.GetSunLight( localPosition );
 		}
 
-		public bool SetSunlight( IntVector3 position, byte value )
+		public bool SetSunLight( IntVector3 position, byte value )
 		{
 			if ( !IsInside( position ) ) return false;
 			var chunkIndex = GetChunkIndex( position );
@@ -197,7 +191,7 @@ namespace Facepunch.CoreWars.Voxel
 			return Chunks[chunkIndex].LightMap.SetSunLight( localPosition, value );
 		}
 
-		public byte GetTorchlight( IntVector3 position )
+		public byte GetTorchLight( IntVector3 position )
 		{
 			if ( !IsInside( position ) ) return 0;
 			var chunkIndex = GetChunkIndex( position );
@@ -205,7 +199,7 @@ namespace Facepunch.CoreWars.Voxel
 			return Chunks[chunkIndex].LightMap.GetTorchLight( localPosition );
 		}
 
-		public bool SetTorchlight( IntVector3 position, byte value )
+		public bool SetTorchLight( IntVector3 position, byte value )
 		{
 			if ( !IsInside( position ) ) return false;
 			var chunkIndex = GetChunkIndex( position );
@@ -310,13 +304,6 @@ namespace Facepunch.CoreWars.Voxel
 			foreach ( var chunkid in chunkIds )
 			{
 				Chunks[chunkid].Build();
-			}
-
-			if ( IsClient )
-			{
-				Log.Info( "Propagating" );
-				//Chunks[chunkIndex].PropagateSunlight();
-				//LightMapTexture.Update( LightMapData );
 			}
 
 			return shouldBuild;
@@ -613,28 +600,6 @@ namespace Facepunch.CoreWars.Voxel
 			var chunk = Chunks[chunkIndex];
 
 			chunk.SetBlock( blockPositionInChunk, blockId );
-		}
-
-		[Event.Tick.Client]
-		private void Tick()
-		{
-			if ( HasPropagatedSunlight ) return;
-			if ( Chunks.Any( c => !c.Initialized ) ) return;
-
-			HasPropagatedSunlight = true;
-
-			var z = NumChunksZ - 1;
-
-			for ( int x = 0; x < NumChunksX; ++x )
-			{
-				for ( int y = 0; y < NumChunksY; ++y )
-				{
-					Log.Info( $"Performing initial top-down propagation on: {x},{y}" );
-					var chunkIndex = x + y * NumChunksX + z * NumChunksX * NumChunksY;
-					var chunk = Chunks[chunkIndex];
-					chunk.PropagateSunlight();
-				}
-			}
 		}
 	}
 }
