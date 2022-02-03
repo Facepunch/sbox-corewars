@@ -2,19 +2,17 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.CompilerServices;
 
 namespace Facepunch.CoreWars.Voxel
 {
-	public struct LightRemoveNode
-	{
-		public int Value;
-		public IntVector3 Position;
-	}
-
 	public partial class Map
 	{
-		public static Map Current { get; set; }
+		public static Map Current { get; private set; }
+
+		public static Map Create()
+		{
+			return new Map();
+		}
 
 		[ClientRpc]
 		public static void Receive( byte[] data )
@@ -28,11 +26,15 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				using ( var reader = new BinaryReader( stream ) )
 				{
-					Current = new Map();
-					Current.SizeX = reader.ReadInt32();
-					Current.SizeY = reader.ReadInt32();
-					Current.SizeZ = reader.ReadInt32();
-					Current.GreedyMeshing = reader.ReadBoolean();
+					Current = new Map
+					{
+						SizeX = reader.ReadInt32(),
+						SizeY = reader.ReadInt32(),
+						SizeZ = reader.ReadInt32(),
+						GreedyMeshing = reader.ReadBoolean()
+					};
+
+					Current.LoadBlockAtlas( reader.ReadString() );
 
 					var types = reader.ReadInt32();
 
@@ -42,6 +44,9 @@ namespace Facepunch.CoreWars.Voxel
 						var name = reader.ReadString();
 						var type = Library.Create<BlockType>( name );
 
+						Log.Info( $"[Client] Initializing block type {name} with id #{id}" );
+
+						Current.BlockTypes.Add( name, id );
 						Current.BlockData.Add( id, type );
 					}
 				}
@@ -51,6 +56,8 @@ namespace Facepunch.CoreWars.Voxel
 		}
 
 		public Dictionary<byte, BlockType> BlockData { get; private set; } = new();
+		public Dictionary<string, byte> BlockTypes { get; private set; } = new();
+		public BlockAtlas BlockAtlas { get; private set; }
 		public Texture LightMapTexture { get; private set; }
 		public bool GreedyMeshing { get; private set; }
 
@@ -66,6 +73,17 @@ namespace Facepunch.CoreWars.Voxel
 		public Chunk[] Chunks;
 		public byte[] LightMapData;
 
+		private string BlockAtlasFileName { get; set; }
+		private byte NextAvailableBlockId { get; set; }
+
+		private Map()
+		{
+			BlockTypes[typeof( AirBlock ).Name] = NextAvailableBlockId;
+			BlockData[NextAvailableBlockId] = new AirBlock( this );
+			NextAvailableBlockId++;
+			Current = this;
+		}
+
 		public void Send( Client client )
 		{
 			using ( var stream = new MemoryStream() )
@@ -76,10 +94,13 @@ namespace Facepunch.CoreWars.Voxel
 					writer.Write( SizeY );
 					writer.Write( SizeZ );
 					writer.Write( GreedyMeshing );
-					writer.Write( BlockData.Count );
+					writer.Write( BlockAtlasFileName );
+					writer.Write( BlockData.Count - 1 );
 
 					foreach ( var kv in BlockData )
 					{
+						if ( kv.Key == 0 ) continue;
+
 						writer.Write( kv.Key );
 						writer.Write( kv.Value.GetType().Name );
 					}
@@ -89,10 +110,36 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
+		public byte FindBlockId<T>() where T : BlockType
+		{
+			if ( BlockTypes.TryGetValue( typeof( T ).Name, out var id ) )
+				return id;
+			else
+				return 0;
+		}
+
+		public void LoadBlockAtlas( string fileName )
+		{
+			if ( BlockAtlas != null )
+				throw new Exception( "Unable to load a block atlas as one is already loaded for this map!" );
+
+			BlockAtlasFileName = fileName;
+			BlockAtlas = FileSystem.Mounted.ReadJsonOrDefault<BlockAtlas>( fileName );
+			BlockAtlas.Initialize();
+		}
+
 		public void AddBlockType( BlockType type )
 		{
 			Host.AssertServer();
-			BlockData[type.BlockId] = type;
+
+			if ( BlockAtlas == null )
+				throw new Exception( "Unable to add any block types with no loaded block atlas!" );
+
+			Log.Info( $"[Client] Initializing block type {type.GetType().Name} with id #{NextAvailableBlockId}" );
+
+			BlockTypes[type.GetType().Name] = NextAvailableBlockId;
+			BlockData[NextAvailableBlockId] = type;
+			NextAvailableBlockId++;
 		}
 
 		public void ReceiveChunk( int index, byte[] data )
@@ -104,6 +151,11 @@ namespace Facepunch.CoreWars.Voxel
 
 		public void AddAllBlockTypes()
 		{
+			Host.AssertServer();
+
+			if ( BlockAtlas == null )
+				throw new Exception( "Unable to add any block types with no loaded block atlas!" );
+
 			foreach ( var type in Library.GetAll<BlockType>() )
 			{
 				AddBlockType( Library.Create<BlockType>( type ) );
@@ -249,7 +301,7 @@ namespace Facepunch.CoreWars.Voxel
 			return direction + ((direction % 2 != 0) ? -1 : 1);
 		}
 
-		public void GeneratePerlin()
+		public void GeneratePerlin( byte groundBlockId )
 		{
 			for ( int x = 0; x < SizeX; ++x )
 			{
@@ -261,7 +313,7 @@ namespace Facepunch.CoreWars.Voxel
 
 					for ( int z = 0; z < SizeZ; ++z )
 					{
-						SetBlockAtPosition( new IntVector3( x, y, z ), (byte)(z < height ? 1 : 0) );
+						SetBlockAtPosition( new IntVector3( x, y, z ), (byte)(z < height ? groundBlockId : 0) );
 					}
 				}
 			}

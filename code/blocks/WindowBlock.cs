@@ -4,12 +4,11 @@ using Sandbox;
 namespace Facepunch.CoreWars.Blocks
 {
 	[Library]
-	public class GlassBlock : BlockType
+	public class WindowBlock : BlockType
 	{
-		public override string FriendlyName => "Glass";
+		public override string DefaultTexture => "window";
+		public override string FriendlyName => "Window";
 		public override bool IsTranslucent => false;
-		public override byte TextureId => 5;
-		public override byte BlockId => 4;
 		public override byte LightLevel => 14;
 	}
 }

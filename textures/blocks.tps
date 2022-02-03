@@ -34,7 +34,7 @@
         <key>dataFormat</key>
         <string>json-array</string>
         <key>textureFileName</key>
-        <filename>spritesheet.png</filename>
+        <filename>blocks.png</filename>
         <key>flipPVR</key>
         <false/>
         <key>pvrQualityLevel</key>
@@ -60,7 +60,7 @@
         <key>jxrCompressionLevel</key>
         <uint>0</uint>
         <key>ditherType</key>
-        <enum type="SettingsBase::DitherType">NearestNeighbour</enum>
+        <enum type="SettingsBase::DitherType">PngQuantLow</enum>
         <key>backgroundColor</key>
         <uint>0</uint>
         <key>libGdx</key>
@@ -78,7 +78,7 @@
         <key>jpgQuality</key>
         <uint>80</uint>
         <key>pngOptimizationLevel</key>
-        <uint>1</uint>
+        <uint>0</uint>
         <key>webpQualityLevel</key>
         <uint>101</uint>
         <key>textureSubPath</key>
@@ -106,7 +106,7 @@
         <key>algorithmSettings</key>
         <struct type="AlgorithmSettings">
             <key>algorithm</key>
-            <enum type="AlgorithmSettings::AlgorithmId">Grid</enum>
+            <enum type="AlgorithmSettings::AlgorithmId">Basic</enum>
             <key>freeSizeMode</key>
             <enum type="AlgorithmSettings::AlgorithmFreeSizeMode">Best</enum>
             <key>sizeConstraints</key>
@@ -136,7 +136,7 @@
             <key>data</key>
             <struct type="DataFile">
                 <key>name</key>
-                <filename>spritesheet.json</filename>
+                <filename>blocks.json</filename>
             </struct>
         </map>
         <key>multiPack</key>
@@ -155,7 +155,7 @@
         <key>autoAliasEnabled</key>
         <false/>
         <key>trimSpriteNames</key>
-        <false/>
+        <true/>
         <key>prependSmartFolderName</key>
         <false/>
         <key>autodetectAnimations</key>
@@ -185,14 +185,16 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
-            <key type="filename">blocks/1.png</key>
-            <key type="filename">blocks/2.png</key>
-            <key type="filename">blocks/3.png</key>
-            <key type="filename">blocks/4.png</key>
-            <key type="filename">blocks/5.png</key>
-            <key type="filename">blocks/6.png</key>
-            <key type="filename">blocks/8.png</key>
-            <key type="filename">blocks/9.png</key>
+            <key type="filename">blocks/cobble.png</key>
+            <key type="filename">blocks/dirt.png</key>
+            <key type="filename">blocks/dirt_grass.png</key>
+            <key type="filename">blocks/grass.png</key>
+            <key type="filename">blocks/leaf.png</key>
+            <key type="filename">blocks/log_side.png</key>
+            <key type="filename">blocks/log_top.png</key>
+            <key type="filename">blocks/sand.png</key>
+            <key type="filename">blocks/stone.png</key>
+            <key type="filename">blocks/window.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -204,36 +206,13 @@
                 <rect>16,16,32,32</rect>
                 <key>scale9Paddings</key>
                 <rect>16,16,32,32</rect>
-                <key>scale9FromFile</key>
-                <false/>
-            </struct>
-            <key type="filename">blocks/7.png</key>
-            <struct type="IndividualSpriteSettings">
-                <key>pivotPoint</key>
-                <point_f>0.5,0.5</point_f>
-                <key>spriteScale</key>
-                <double>1</double>
-                <key>scale9Enabled</key>
-                <false/>
-                <key>scale9Borders</key>
-                <rect>4,4,8,8</rect>
-                <key>scale9Paddings</key>
-                <rect>4,4,8,8</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
         </map>
         <key>fileList</key>
         <array>
-            <filename>blocks/1.png</filename>
-            <filename>blocks/2.png</filename>
-            <filename>blocks/3.png</filename>
-            <filename>blocks/4.png</filename>
-            <filename>blocks/5.png</filename>
-            <filename>blocks/6.png</filename>
-            <filename>blocks/7.png</filename>
-            <filename>blocks/8.png</filename>
-            <filename>blocks/9.png</filename>
+            <filename>blocks</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>
@@ -256,6 +235,17 @@
         <key>normalMapSheetFileName</key>
         <filename></filename>
         <key>exporterProperties</key>
-        <map type="ExporterProperties"/>
+        <map type="ExporterProperties">
+            <key>plain::bool-property</key>
+            <struct type="ExporterProperty">
+                <key>value</key>
+                <string>false</string>
+            </struct>
+            <key>plain::string-property</key>
+            <struct type="ExporterProperty">
+                <key>value</key>
+                <string>hello world</string>
+            </struct>
+        </map>
     </struct>
 </data>

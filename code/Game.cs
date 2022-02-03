@@ -124,14 +124,14 @@ namespace Facepunch.CoreWars
 			if ( !IsServer )
 				return;
 
-			var map = new Map();
-
+			var map = Map.Create();
 			map.SetSize( 256, 256, 64 );
+			map.LoadBlockAtlas( "textures/blocks.json" );
 			map.AddAllBlockTypes();
-			map.GeneratePerlin();
+			map.GeneratePerlin( map.FindBlockId<GrassBlock>() );
 			map.Init();
 
-			Map.Current = map;
+			Log.Info( $"[Server] Creating perlin ground with id #{map.FindBlockId<GrassBlock>()}" );
 		}
 	}
 }

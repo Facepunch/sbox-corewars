@@ -38,7 +38,7 @@ Layer0
 	g_vTexCoordScrollSpeed "[0.000 0.000]"
 
 	//---- Voxel Atlas ----
-	TextureAtlas "textures/spritesheet.png"
+	TextureAtlas "textures/blocks.png"
 
 	DynamicParams
 	{

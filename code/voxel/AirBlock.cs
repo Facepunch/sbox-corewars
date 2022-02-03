@@ -1,14 +1,16 @@
 ﻿using Facepunch.CoreWars.Voxel;
 using Sandbox;
 
-namespace Facepunch.CoreWars.Blocks
+namespace Facepunch.CoreWars.Voxel
 {
-	[Library]
 	public class AirBlock : BlockType
 	{
+		public AirBlock( Map map )
+		{
+			Map = map;
+		}
+
 		public override string FriendlyName => "Air";
 		public override bool IsTranslucent => true;
-		public override byte TextureId => 0;
-		public override byte BlockId => 0;
 	}
 }

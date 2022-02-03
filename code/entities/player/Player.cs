@@ -1,5 +1,6 @@
 ﻿using Facepunch.CoreWars.Voxel;
 using Sandbox;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Facepunch.CoreWars
@@ -103,7 +104,8 @@ namespace Facepunch.CoreWars
 			{
 				if ( Input.Pressed( InputButton.Attack1 ) )
 				{
-					Game.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, (byte)Rand.Int( 1, 7 ) );
+					var randomBlock = Map.Current.BlockData.ElementAt( Rand.Int( Map.Current.BlockData.Count - 1 ) ).Key;
+					Game.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, randomBlock );
 				}
 				else if ( Input.Pressed( InputButton.Attack2 ) )
 				{

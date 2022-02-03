@@ -5,15 +5,23 @@ namespace Facepunch.CoreWars.Voxel
 {
 	public class BlockType
 	{
+		public Map Map { get; init; }
+
+		public virtual string DefaultTexture => "";
 		public virtual string FriendlyName => "";
 		public virtual bool IsTranslucent => false;
-		public virtual byte TextureId => 0;
-		public virtual byte BlockId => 0;
 		public virtual byte LightLevel => 0;
 
-		public virtual byte GetTextureId( BlockFace face )
+		public virtual byte GetTextureId( BlockFace face, int x, int y, int z )
 		{
-			return TextureId;
+			if ( string.IsNullOrEmpty( DefaultTexture ) ) return 0;
+
+			return Map.BlockAtlas.GetTextureId( DefaultTexture );
+		}
+
+		public BlockType()
+		{
+			Map = Map.Current;
 		}
 	}
 }
