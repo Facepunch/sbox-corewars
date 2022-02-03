@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Facepunch.CoreWars.Voxel
 {
@@ -58,7 +59,6 @@ namespace Facepunch.CoreWars.Voxel
 		public Dictionary<byte, BlockType> BlockData { get; private set; } = new();
 		public Dictionary<string, byte> BlockTypes { get; private set; } = new();
 		public BlockAtlas BlockAtlas { get; private set; }
-		public Texture LightMapTexture { get; private set; }
 		public bool GreedyMeshing { get; private set; }
 
 		public bool IsServer => Host.IsServer;
@@ -71,10 +71,16 @@ namespace Facepunch.CoreWars.Voxel
 		public int NumChunksY;
 		public int NumChunksZ;
 		public Chunk[] Chunks;
-		public byte[] LightMapData;
 
 		private string BlockAtlasFileName { get; set; }
 		private byte NextAvailableBlockId { get; set; }
+		private bool HasPropagatedSunlight { get; set; } = true;
+
+		[ClientCmd( "sun" )]
+		public static void CmdTest()
+		{
+			Current.HasPropagatedSunlight = false;
+		}
 
 		private Map()
 		{
@@ -178,29 +184,33 @@ namespace Facepunch.CoreWars.Voxel
 		public byte GetSunlight( IntVector3 position )
 		{
 			if ( !IsInside( position ) ) return 0;
-			var index = ToMapIndex( position );
-			return (byte)(LightMapData[index] & 0xf);
+			var chunkIndex = GetChunkIndex( position );
+			var localPosition = ToLocalPosition( position );
+			return Chunks[chunkIndex].LightMap.GetSunlight( localPosition );
 		}
 
 		public void SetSunlight( IntVector3 position, byte value )
 		{
 			if ( !IsInside( position ) ) return;
-			var index = ToMapIndex( position );
-			LightMapData[index] = (byte)((LightMapData[index] & 0xf0) | (value & 0xf));
+			var chunkIndex = GetChunkIndex( position );
+			var localPosition = ToLocalPosition( position );
+			Chunks[chunkIndex].LightMap.SetSunlight( localPosition, value );
 		}
 
 		public byte GetTorchlight( IntVector3 position )
 		{
 			if ( !IsInside( position ) ) return 0;
-			var index = ToMapIndex( position );
-			return (byte)((LightMapData[index] >> 4)& 0xf);
+			var chunkIndex = GetChunkIndex( position );
+			var localPosition = ToLocalPosition( position );
+			return Chunks[chunkIndex].LightMap.GetTorchlight( localPosition );
 		}
 
 		public void SetTorchlight( IntVector3 position, byte value )
 		{
 			if ( !IsInside( position ) ) return;
-			var index = ToMapIndex( position );
-			LightMapData[index] = (byte)((LightMapData[index] & 0xf) | ((value & 0xf) << 4));
+			var chunkIndex = GetChunkIndex( position );
+			var localPosition = ToLocalPosition( position );
+			Chunks[chunkIndex].LightMap.SetTorchlight( localPosition, value );
 		}
 
 		public void Destroy()
@@ -231,20 +241,13 @@ namespace Facepunch.CoreWars.Voxel
 					chunk.Init();
 				}
 			}
-			else
-			{
-				LightMapData = new byte[SizeX * SizeY * SizeZ];
-				LightMapTexture = Texture.CreateVolume( SizeX, SizeY, SizeZ )
-					.WithFormat( ImageFormat.A8 )
-					.WithData( LightMapData )
-					.Finish();
-			}
 
 			Event.Register( this );
 		}
 
 		public bool SetBlockAndUpdate( IntVector3 position, byte blockId, bool forceUpdate = false )
 		{
+			var chunkIndex = GetChunkIndex( position );
 			var shouldBuild = false;
 			var chunkIds = new HashSet<int>();
 
@@ -252,7 +255,6 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				shouldBuild = true;
 
-				var chunkIndex = GetChunkIndex( position );
 				chunkIds.Add( chunkIndex );
 
 				for ( int i = 0; i < 6; i++ )
@@ -276,6 +278,13 @@ namespace Facepunch.CoreWars.Voxel
 			foreach ( var chunkid in chunkIds )
 			{
 				Chunks[chunkid].Build();
+			}
+
+			if ( IsClient )
+			{
+				Log.Info( "Propagating" );
+				//Chunks[chunkIndex].PropagateSunlight();
+				//LightMapTexture.Update( LightMapData );
 			}
 
 			return shouldBuild;
@@ -565,6 +574,28 @@ namespace Facepunch.CoreWars.Voxel
 			var chunk = Chunks[chunkIndex];
 
 			chunk.SetBlock( blockPositionInChunk, blockId );
+		}
+
+		[Event.Tick.Client]
+		private void Tick()
+		{
+			if ( HasPropagatedSunlight ) return;
+			if ( Chunks.Any( c => !c.Initialized ) ) return;
+
+			HasPropagatedSunlight = true;
+
+			var z = NumChunksZ - 1;
+
+			for ( int x = 0; x < NumChunksX; ++x )
+			{
+				for ( int y = 0; y < NumChunksY; ++y )
+				{
+					Log.Info( $"Performing initial top-down propagation on: {x},{y}" );
+					var chunkIndex = x + y * NumChunksX + z * NumChunksX * NumChunksY;
+					var chunk = Chunks[chunkIndex];
+					chunk.PropagateSunlight();
+				}
+			}
 		}
 	}
 }
