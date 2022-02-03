@@ -13,42 +13,42 @@ namespace Facepunch.CoreWars.Voxel
 		public ChunkLightMap( Chunk chunk )
 		{
 			ChunkSize = Chunk.ChunkSize;
-			Data = new byte[ChunkSize * ChunkSize * ChunkSize];
+			Data = new byte[ChunkSize * ChunkSize * ChunkSize * 4];
 			Texture = Texture.CreateVolume( ChunkSize, ChunkSize, ChunkSize )
-				.WithFormat( ImageFormat.A8 )
+				.WithFormat( ImageFormat.RGBA8888_LINEAR )
 				.WithData( Data )
 				.Finish();
 
 			Chunk = chunk;
 		}
 
-		public int ToIndex( IntVector3 position )
+		public int ToIndex( IntVector3 position, int component )
 		{
-			return (position.z * ChunkSize * ChunkSize) + (position.y * ChunkSize) + position.x;
+			return (((position.z * ChunkSize * ChunkSize) + (position.y * ChunkSize) + position.x) * 4) + component;
 		}
 
 		public byte GetSunlight( IntVector3 position )
 		{
-			var index = ToIndex( position );
-			return (byte)(Data[index] & 0xf);
+			var index = ToIndex( position, 0 );
+			return Data[index];
 		}
 
 		public void SetSunlight( IntVector3 position, byte value )
 		{
-			var index = ToIndex( position );
-			Data[index] = (byte)((Data[index] & 0xf0) | (value & 0xf));
+			var index = ToIndex( position, 0 );
+			Data[index] = value;
 		}
 
 		public byte GetTorchlight( IntVector3 position )
 		{
-			var index = ToIndex( position );
-			return (byte)((Data[index] >> 4) & 0xf);
+			var index = ToIndex( position, 1 );
+			return Data[index];
 		}
 
 		public void SetTorchlight( IntVector3 position, byte value )
 		{
-			var index = ToIndex( position );
-			Data[index] = (byte)((Data[index] & 0xf) | ((value & 0xf) << 4));
+			var index = ToIndex( position, 1 );
+			Data[index] = value;
 		}
 
 		public void Update()
