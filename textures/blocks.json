@@ -81,7 +81,7 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "sand",
+	"filename": "metalgrate",
 	"frame": {"x":640,"y":0,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
@@ -89,7 +89,7 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "stone",
+	"filename": "metalplatered",
 	"frame": {"x":704,"y":0,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
@@ -97,7 +97,7 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "stonecube",
+	"filename": "sand",
 	"frame": {"x":768,"y":0,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
@@ -105,7 +105,7 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "window",
+	"filename": "stone",
 	"frame": {"x":832,"y":0,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
@@ -113,8 +113,24 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "woodplanks",
+	"filename": "stonecube",
 	"frame": {"x":896,"y":0,"w":64,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
+	"sourceSize": {"w":64,"h":64}
+},
+{
+	"filename": "window",
+	"frame": {"x":960,"y":0,"w":64,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
+	"sourceSize": {"w":64,"h":64}
+},
+{
+	"filename": "woodplanks",
+	"frame": {"x":1024,"y":0,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -125,8 +141,8 @@
 	"version": "1.0",
 	"image": "blocks.png",
 	"format": "RGBA8888",
-	"size": {"w":960,"h":64},
+	"size": {"w":1088,"h":64},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:6e6081e21b5d73c9c84e7086836da639:10bbb657e3908435e2d52156068e55ba:b1f1a031cef7856acce3e479bba415bf$"
+	"smartupdate": "$TexturePacker:SmartUpdate:f3f1d1828f64c39ab8561f6ec6d8c4e7:cb6ce143843a0f5c966de327e040d3cd:b1f1a031cef7856acce3e479bba415bf$"
 }
 }
