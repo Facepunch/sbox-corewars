@@ -353,7 +353,7 @@ namespace Facepunch.CoreWars.Voxel
 
 		public void BuildMeshAndCollision()
 		{
-			if ( !OpaqueMesh.IsValid )
+			if ( !OpaqueMesh.IsValid || !TranslucentMesh.IsValid )
 				return;
 
 			int translucentVertexCount = 0;
@@ -375,6 +375,7 @@ namespace Facepunch.CoreWars.Voxel
 			else
 				OpaqueMesh.CreateVertexBuffer<BlockVertex>( Math.Max( 1, opaqueVertexCount ), BlockVertex.Layout );
 
+			translucentVertexCount = 0;
 			opaqueVertexCount = 0;
 
 			foreach ( var slice in Slices )
