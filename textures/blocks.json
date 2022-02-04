@@ -1,7 +1,7 @@
 {"frames": [
 
 {
-	"filename": "brick",
+	"filename": "birchlog_side",
 	"frame": {"x":0,"y":0,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
@@ -9,7 +9,7 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "cloth",
+	"filename": "birchlog_top",
 	"frame": {"x":64,"y":0,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
@@ -17,7 +17,7 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "cobble",
+	"filename": "brick",
 	"frame": {"x":128,"y":0,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
@@ -25,7 +25,7 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "dirt",
+	"filename": "cloth",
 	"frame": {"x":192,"y":0,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
@@ -33,7 +33,7 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "dirt_grass",
+	"filename": "cobble",
 	"frame": {"x":256,"y":0,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
@@ -41,7 +41,7 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "grass",
+	"filename": "dirt",
 	"frame": {"x":320,"y":0,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
@@ -49,7 +49,7 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "gravel",
+	"filename": "dirt_grass",
 	"frame": {"x":384,"y":0,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
@@ -57,7 +57,7 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "leaf",
+	"filename": "grass",
 	"frame": {"x":448,"y":0,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
@@ -65,7 +65,7 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "log_side",
+	"filename": "gravel",
 	"frame": {"x":512,"y":0,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
@@ -73,7 +73,7 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "log_top",
+	"filename": "leaf",
 	"frame": {"x":576,"y":0,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
@@ -81,7 +81,7 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "metalgrate",
+	"filename": "log_side",
 	"frame": {"x":640,"y":0,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
@@ -89,7 +89,7 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "metalplatered",
+	"filename": "log_top",
 	"frame": {"x":704,"y":0,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
@@ -97,7 +97,7 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "sand",
+	"filename": "metalgrate",
 	"frame": {"x":768,"y":0,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
@@ -105,7 +105,7 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "stone",
+	"filename": "metalplatered",
 	"frame": {"x":832,"y":0,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
@@ -113,7 +113,7 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "stonecube",
+	"filename": "sand",
 	"frame": {"x":896,"y":0,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
@@ -121,7 +121,7 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "window",
+	"filename": "stone",
 	"frame": {"x":960,"y":0,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
@@ -129,8 +129,40 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "woodplanks",
+	"filename": "stonebrick",
 	"frame": {"x":1024,"y":0,"w":64,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
+	"sourceSize": {"w":64,"h":64}
+},
+{
+	"filename": "stonecube",
+	"frame": {"x":1088,"y":0,"w":64,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
+	"sourceSize": {"w":64,"h":64}
+},
+{
+	"filename": "window",
+	"frame": {"x":1152,"y":0,"w":64,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
+	"sourceSize": {"w":64,"h":64}
+},
+{
+	"filename": "woodbirchplanks",
+	"frame": {"x":1216,"y":0,"w":64,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
+	"sourceSize": {"w":64,"h":64}
+},
+{
+	"filename": "woodplanks",
+	"frame": {"x":1280,"y":0,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -141,8 +173,8 @@
 	"version": "1.0",
 	"image": "blocks.png",
 	"format": "RGBA8888",
-	"size": {"w":1088,"h":64},
+	"size": {"w":1344,"h":64},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:f3f1d1828f64c39ab8561f6ec6d8c4e7:cb6ce143843a0f5c966de327e040d3cd:b1f1a031cef7856acce3e479bba415bf$"
+	"smartupdate": "$TexturePacker:SmartUpdate:0b9ce50a461e5862e0b27a5529ba9e21:5ec32257fb6a0699ef085d9e8f56b35d:b1f1a031cef7856acce3e479bba415bf$"
 }
 }
