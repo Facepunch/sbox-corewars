@@ -356,18 +356,26 @@ namespace Facepunch.CoreWars.Voxel
 			if ( !OpaqueMesh.IsValid )
 				return;
 
-			int vertexCount = 0;
+			int translucentVertexCount = 0;
+			int opaqueVertexCount = 0;
+
 			foreach ( var slice in Slices )
 			{
-				vertexCount += slice.OpaqueVertices.Count;
+				translucentVertexCount += slice.TranslucentVertices.Count;
+				opaqueVertexCount += slice.OpaqueVertices.Count;
 			}
 
-			if ( OpaqueMesh.HasVertexBuffer )
-				OpaqueMesh.SetVertexBufferSize( vertexCount );
+			if ( TranslucentMesh.HasVertexBuffer )
+				TranslucentMesh.SetVertexBufferSize( translucentVertexCount );
 			else
-				OpaqueMesh.CreateVertexBuffer<BlockVertex>( Math.Max( 1, vertexCount ), BlockVertex.Layout );
+				TranslucentMesh.CreateVertexBuffer<BlockVertex>( Math.Max( 1, translucentVertexCount ), BlockVertex.Layout );
 
-			vertexCount = 0;
+			if ( OpaqueMesh.HasVertexBuffer )
+				OpaqueMesh.SetVertexBufferSize( opaqueVertexCount );
+			else
+				OpaqueMesh.CreateVertexBuffer<BlockVertex>( Math.Max( 1, opaqueVertexCount ), BlockVertex.Layout );
+
+			opaqueVertexCount = 0;
 
 			foreach ( var slice in Slices )
 			{
@@ -387,38 +395,21 @@ namespace Facepunch.CoreWars.Voxel
 
 				slice.IsDirty = false;
 
-				if ( slice.OpaqueVertices.Count == 0 )
-					continue;
+				if ( slice.OpaqueVertices.Count > 0 )
+				{
+					OpaqueMesh.SetVertexBufferData( slice.OpaqueVertices, opaqueVertexCount );
+					opaqueVertexCount += slice.OpaqueVertices.Count;
+				}
 
-				OpaqueMesh.SetVertexBufferData( slice.OpaqueVertices, vertexCount );
-				vertexCount += slice.OpaqueVertices.Count;
+				if ( slice.TranslucentVertices.Count > 0 )
+				{
+					TranslucentMesh.SetVertexBufferData( slice.TranslucentVertices, translucentVertexCount );
+					translucentVertexCount += slice.TranslucentVertices.Count;
+				}
 			}
 
-			OpaqueMesh.SetVertexRange( 0, vertexCount );
-
-			vertexCount = 0;
-			foreach ( var slice in Slices )
-			{
-				vertexCount += slice.TranslucentVertices.Count;
-			}
-
-			if ( TranslucentMesh.HasVertexBuffer )
-				TranslucentMesh.SetVertexBufferSize( vertexCount );
-			else
-				TranslucentMesh.CreateVertexBuffer<BlockVertex>( Math.Max( 1, vertexCount ), BlockVertex.Layout );
-
-			vertexCount = 0;
-
-			foreach ( var slice in Slices )
-			{
-				if ( slice.TranslucentVertices.Count == 0 )
-					continue;
-
-				TranslucentMesh.SetVertexBufferData( slice.TranslucentVertices, vertexCount );
-				vertexCount += slice.TranslucentVertices.Count;
-			}
-
-			TranslucentMesh.SetVertexRange( 0, vertexCount );
+			OpaqueMesh.SetVertexRange( 0, opaqueVertexCount );
+			TranslucentMesh.SetVertexRange( 0, translucentVertexCount );
 		}
 
 		private void BuildCollision()
