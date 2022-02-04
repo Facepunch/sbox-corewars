@@ -185,6 +185,8 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
+            <key type="filename">blocks/birchlog_side.png</key>
+            <key type="filename">blocks/birchlog_top.png</key>
             <key type="filename">blocks/brick.png</key>
             <key type="filename">blocks/cloth.png</key>
             <key type="filename">blocks/cobble.png</key>
@@ -199,8 +201,10 @@
             <key type="filename">blocks/metalplatered.png</key>
             <key type="filename">blocks/sand.png</key>
             <key type="filename">blocks/stone.png</key>
+            <key type="filename">blocks/stonebrick.png</key>
             <key type="filename">blocks/stonecube.png</key>
             <key type="filename">blocks/window.png</key>
+            <key type="filename">blocks/woodbirchplanks.png</key>
             <key type="filename">blocks/woodplanks.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
