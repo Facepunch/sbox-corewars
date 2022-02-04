@@ -358,7 +358,7 @@ namespace Facepunch.CoreWars.Voxel
 			2, 2, 1, 1, 0, 0
 		};
 
-		private void AddQuad( ChunkSlice slice, int x, int y, int z, int width, int height, int widthAxis, int heightAxis, int face, byte blockId, int brightness )
+		private void AddQuad( ChunkSlice slice, int x, int y, int z, int width, int height, int widthAxis, int heightAxis, int face, byte blockId )
 		{
 			var block = Map.GetBlockType( blockId );
 
@@ -367,7 +367,7 @@ namespace Facepunch.CoreWars.Voxel
 
 			var textureId = block.GetTextureId( (BlockFace)face, this, x, y, z );
 			var normal = (byte)face;
-			var faceData = (uint)((textureId & 31) << 18 | (brightness & 15) << 23 | (normal & 7) << 27);
+			var faceData = (uint)((textureId & 31) << 18 | (0 & 15) << 23 | (normal & 7) << 27);
 			var collisionIndex = slice.CollisionIndices.Count;
 
 			for ( int i = 0; i < 6; ++i )
@@ -378,7 +378,7 @@ namespace Facepunch.CoreWars.Voxel
 				vOffset[widthAxis] *= width;
 				vOffset[heightAxis] *= height;
 
-				slice.Vertices.Add( new BlockVertex( (uint)(x + vOffset.x), (uint)(y + vOffset.y), (uint)(z + vOffset.z), faceData ) );
+				slice.Vertices.Add( new BlockVertex( (uint)(x + vOffset.x), (uint)(y + vOffset.y), (uint)(z + vOffset.z), (uint)x, (uint)y, (uint)z, faceData ) );
 
 				slice.CollisionVertices.Add( new Vector3( (x + vOffset.x) + Offset.x, (y + vOffset.y) + Offset.y, (z + vOffset.z) + Offset.z ) * VoxelSize );
 				slice.CollisionIndices.Add( collisionIndex + i );
@@ -557,7 +557,7 @@ namespace Facepunch.CoreWars.Voxel
 						AddQuad( slice,
 							blockPosition.x, blockPosition.y, blockPosition.z,
 							faceWidth, faceHeight, uAxis, vAxis,
-							BlockFaceMask[n].Side, BlockFaceMask[n].Type, 15 );
+							BlockFaceMask[n].Side, BlockFaceMask[n].Type );
 
 						vertexOffset += 6;
 					}
@@ -705,7 +705,7 @@ namespace Facepunch.CoreWars.Voxel
 								AddQuad( slice,
 									blockPosition.x, blockPosition.y, blockPosition.z,
 									faceWidth, faceHeight, uAxis, vAxis,
-									BlockFaceMask[n].Side, BlockFaceMask[n].Type, 15 );
+									BlockFaceMask[n].Side, BlockFaceMask[n].Type );
 							}
 
 							for ( int l = 0; l < faceHeight; ++l )
