@@ -32,7 +32,10 @@ MODES
 //=========================================================================================================================
 COMMON
 {
-	#include "common/shared.hlsl"
+	#include "system.fxc" // This should always be the first include in COMMON
+	#include "sbox_shared.fxc"
+	#define VS_INPUT_HAS_TANGENT_BASIS 1
+	#define PS_INPUT_HAS_TANGENT_BASIS 1
 
 	float g_flVoxelSize < Default( 32.0 ); >;
 }
