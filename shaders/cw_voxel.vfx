@@ -124,10 +124,37 @@ PS
 	CreateTexture2D( g_tAtlasColor )  < Channel( RGB,  None( TextureAtlas ), Srgb ); OutputFormat( BC7 ); SrgbRead( true ); Filter( POINT ); AddressU( MIRROR ); AddressV( MIRROR ); >;
 
 	CreateInputTexture3D( TextureLightmap, Linear, 8, "", "_lightmap", "Voxel Atlas,20/10", Default3( 1.0, 1.0, 1.0 ) );
-	CreateTexture3D( g_tLightmap ) < Channel( A, None( TextureLightmap ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( CLAMP ); AddressV( CLAMP ); AddressW( CLAMP ); > ;
+	
+	// Move all this to C#
+	CreateInputTexture3D( TextureLightmapAdj0, Linear, 8, "", "_lightmap", "Voxel Atlas,30/10", Default3( 1.0, 1.0, 1.0 ) );
+	CreateInputTexture3D( TextureLightmapAdj1, Linear, 8, "", "_lightmap", "Voxel Atlas,40/10", Default3( 1.0, 1.0, 1.0 ) );
+	CreateInputTexture3D( TextureLightmapAdj2, Linear, 8, "", "_lightmap", "Voxel Atlas,50/10", Default3( 1.0, 1.0, 1.0 ) );
+	CreateInputTexture3D( TextureLightmapAdj3, Linear, 8, "", "_lightmap", "Voxel Atlas,60/10", Default3( 1.0, 1.0, 1.0 ) );
 
-	CreateInputTexture3D( TextureSunlight, Linear, 8, "", "_sunlight", "Voxel Atlas,20/10", Default3( 1.0, 1.0, 1.0 ) );
-	CreateTexture3D( g_tSunlight ) < Channel( A, None( TextureSunlight ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( CLAMP ); AddressV( CLAMP ); AddressW( CLAMP ); > ;
+	CreateTexture3DWithoutSampler( g_tLightmap ) < Channel( A, None( TextureLightmap ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( CLAMP ); AddressV( CLAMP ); AddressW( CLAMP ); > ;
+	
+	// We can't do this because the inputs are dynamic :(
+	//CreateTexture3DWithoutSampler( g_tLightmapAdjacent ) < Channel( R, None( TextureLightmapAdj0 ), Linear ); Channel( G, None( TextureLightmapAdj1 ), Linear ); Channel( B, None( TextureLightmapAdj2 ), Linear ); Channel( A, None( TextureLightmapAdj3 ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( MIRROR ); AddressV( MIRROR ); AddressW( MIRROR ); > ;
+	CreateTexture3DWithoutSampler( g_tLightmapAdjacent0 ) < Channel( A, None( TextureLightmapAdj0 ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
+	CreateTexture3DWithoutSampler( g_tLightmapAdjacent1 ) < Channel( A, None( TextureLightmapAdj1 ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
+	CreateTexture3DWithoutSampler( g_tLightmapAdjacent2 ) < Channel( A, None( TextureLightmapAdj2 ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
+	CreateTexture3DWithoutSampler( g_tLightmapAdjacent3 ) < Channel( A, None( TextureLightmapAdj3 ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
+
+
+	CreateInputTexture3D( TextureSunlight, Linear, 8, "", "_sunlight", "Voxel Atlas,70/10", Default3( 1.0, 1.0, 1.0 ) );
+
+	// Move all this to C#
+	CreateInputTexture3D( TextureSunlightAdj0, Linear, 8, "", "_sunlight", "Voxel Atlas,80/10", Default3( 1.0, 1.0, 1.0 ) );
+	CreateInputTexture3D( TextureSunlightAdj1, Linear, 8, "", "_sunlight", "Voxel Atlas,90/10", Default3( 1.0, 1.0, 1.0 ) );
+	CreateInputTexture3D( TextureSunlightAdj2, Linear, 8, "", "_sunlight", "Voxel Atlas,100/10", Default3( 1.0, 1.0, 1.0 ) );
+	CreateInputTexture3D( TextureSunlightAdj3, Linear, 8, "", "_sunlight", "Voxel Atlas,110/10", Default3( 1.0, 1.0, 1.0 ) );
+
+	CreateTexture3DWithoutSampler( g_tSunlight ) < Channel( A, None( TextureSunlight ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( CLAMP ); AddressV( CLAMP ); AddressW( CLAMP ); > ;
+	CreateTexture3DWithoutSampler( g_tSunlightAdjacent0 ) < Channel( A, None( TextureSunlightAdj0 ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV( WRAP ); AddressW( WRAP ); > ;
+	CreateTexture3DWithoutSampler( g_tSunlightAdjacent1 ) < Channel( A, None( TextureSunlightAdj1 ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV( WRAP ); AddressW( WRAP ); > ;
+	CreateTexture3DWithoutSampler( g_tSunlightAdjacent2 ) < Channel( A, None( TextureSunlightAdj2 ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV( WRAP ); AddressW( WRAP ); > ;
+	CreateTexture3DWithoutSampler( g_tSunlightAdjacent3 ) < Channel( A, None( TextureSunlightAdj3 ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV( WRAP ); AddressW( WRAP ); > ;
+	//CreateTexture3DWithoutSampler( g_tSunlightAdjacent ) < Channel( R, None( TextureSunlightAdj0 ), Linear ); Channel( G, None( TextureSunlightAdj1 ), Linear ); Channel( B, None( TextureSunlightAdj2 ), Linear ); Channel( A, None( TextureSunlightAdj3 ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( MIRROR ); AddressV( MIRROR ); AddressW( MIRROR ); > ;
 
 
 	PixelOutput MainPs( PixelInput i )
@@ -146,8 +173,9 @@ PS
 		}
 		#else
 		{
-
 			float2 vAtlasDims = TextureDimensions2D( g_tAtlasColor, 0 ).xy;
+			int3 vLightmapDim = TextureDimensions3D( g_tLightmap, 0 );
+
 			float2 vAltasMaxCells = vAtlasDims / flTextureAtlasCellSize;
 			float2 vInvMaxCells = 1.0f / vAltasMaxCells;
 
@@ -157,9 +185,36 @@ PS
 			float2 vTexCoordAtlas = frac((i.vTexCoord.xy % g_flVoxelSize) / g_flVoxelSize);
 			vTexCoordAtlas = frac((vTexCoordAtlas / vAltasMaxCells) + (vCellLocation * vInvMaxCells));
 
-			float lightmapBrightness = Tex3DLoad( g_tLightmap, int4( i.vPositionOs.xyz, 0 ) ).a * 16.0f;
-			float sunlightBrightness = Tex3DLoad( g_tSunlight, int4( i.vPositionOs.xyz, 0 ) ).a * 16.0f;
-			
+			float lightmapBrightness = 0.0f;
+			float sunlightBrightness = 0.0f;
+			if( i.vPositionOs.x < 0 )
+			{
+				// x - 1
+				lightmapBrightness = Tex3DLoad( g_tLightmapAdjacent0, int4( vLightmapDim.x - 1, i.vPositionOs.yz, 0 ) ).a * 16.0f;
+				sunlightBrightness = Tex3DLoad( g_tSunlightAdjacent0, int4( vLightmapDim.x - 1, i.vPositionOs.yz, 0 ) ).a * 16.0f;
+			}
+			else if(i.vPositionOs.y < 0)
+			{
+				// y - 1
+				lightmapBrightness = Tex3DLoad( g_tLightmapAdjacent1, int4( i.vPositionOs.x, vLightmapDim.y - 1, i.vPositionOs.z, 0 ) ).a * 16.0f;
+				sunlightBrightness = Tex3DLoad( g_tSunlightAdjacent1, int4( i.vPositionOs.x, vLightmapDim.y - 1, i.vPositionOs.z, 0 ) ).a * 16.0f;
+			}
+			else if(i.vPositionOs.x >= vLightmapDim.x)
+			{
+				lightmapBrightness = Tex3DLoad( g_tLightmapAdjacent2, int4( 0, i.vPositionOs.yz, 0 ) ).a * 16.0f;
+				sunlightBrightness = Tex3DLoad( g_tSunlightAdjacent2, int4( 0, i.vPositionOs.yz, 0 ) ).a * 16.0f;
+			}
+			else if(i.vPositionOs.y >= vLightmapDim.y)
+			{
+				lightmapBrightness = Tex3DLoad( g_tLightmapAdjacent3, int4( i.vPositionOs.x, 0, i.vPositionOs.z, 0 ) ).a * 16.0f;
+				sunlightBrightness = Tex3DLoad( g_tSunlightAdjacent3, int4( i.vPositionOs.x, 0, i.vPositionOs.z, 0 ) ).a * 16.0f;
+			}
+			else
+			{
+				lightmapBrightness = Tex3DLoad( g_tLightmap, int4( i.vPositionOs.xyz, 0 ) ).a * 16.0f;
+				sunlightBrightness = Tex3DLoad( g_tSunlight, int4( i.vPositionOs.xyz, 0 ) ).a * 16.0f;
+			}
+
 			Material m = GatherMaterial( i );
 			m.Albedo.rgb = Tex2DLevel( g_tAtlasColor, vTexCoordAtlas, 0 ).rgb * saturate(0.03f + (lightmapBrightness + sunlightBrightness));
 

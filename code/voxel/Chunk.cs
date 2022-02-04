@@ -118,6 +118,46 @@ namespace Facepunch.CoreWars.Voxel
 				SceneObject.SetValue( "VoxelSize", VoxelSize );
 				SceneObject.SetValue( "LightMap", LightMap.Texture );
 				SceneObject.SetValue( "SunLight", LightMap.Texture2 );
+
+				var currentOffset = Offset;
+				currentOffset.x--;
+				var XMinus = Map.GetChunkIndex( currentOffset );
+				currentOffset.x++;
+				currentOffset.y--;
+				var YMinus = Map.GetChunkIndex( currentOffset );
+				currentOffset.y++;
+
+				currentOffset.y += ChunkSize + 1;
+				var YPlus = Map.GetChunkIndex( currentOffset );
+				currentOffset.y -= ChunkSize + 1;
+				currentOffset.x += ChunkSize + 1;
+
+				var XPlus = Map.GetChunkIndex( currentOffset );
+
+				int maxChunkSize = Map.Chunks.Length;
+
+				if ( XMinus >= 0 && XMinus < maxChunkSize )
+				{
+					SceneObject.SetValue( "LightMapXMinus", Map.Chunks[XMinus].LightMap.Texture );
+					SceneObject.SetValue( "SunLightXMinus", Map.Chunks[XMinus].LightMap.Texture2 );
+				}
+				if ( YMinus >= 0 && YMinus < maxChunkSize )
+				{
+					SceneObject.SetValue( "LightMapYMinus", Map.Chunks[YMinus].LightMap.Texture );
+					SceneObject.SetValue( "SunLightYMinus", Map.Chunks[YMinus].LightMap.Texture2 );
+				}
+
+				if ( XPlus >= 0 && XPlus < maxChunkSize )
+				{
+					SceneObject.SetValue( "LightMapXPlus", Map.Chunks[XPlus].LightMap.Texture );
+					SceneObject.SetValue( "SunLightXPlus", Map.Chunks[XPlus].LightMap.Texture2 );
+				}
+				if ( YPlus >= 0 && YPlus < maxChunkSize )
+				{
+					SceneObject.SetValue( "LightMapYPlus", Map.Chunks[YPlus].LightMap.Texture );
+					SceneObject.SetValue( "SunLightYPlus", Map.Chunks[YPlus].LightMap.Texture2 );
+				}
+
 			}
 
 			Event.Register( this );
