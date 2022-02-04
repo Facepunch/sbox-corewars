@@ -11,7 +11,8 @@ namespace Facepunch.CoreWars.Voxel
 		}
 
 		public bool IsDirty = false;
-		public List<BlockVertex> Vertices = new();
+		public List<BlockVertex> TranslucentVertices = new();
+		public List<BlockVertex> OpaqueVertices = new();
 		public List<Vector3> CollisionVertices = new();
 		public List<int> CollisionIndices = new();
 		public PhysicsBody Body;

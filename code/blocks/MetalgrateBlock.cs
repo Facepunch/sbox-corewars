@@ -8,7 +8,6 @@ namespace Facepunch.CoreWars.Blocks
 	{
 		public override string DefaultTexture => "metalgrate";
 		public override string FriendlyName => "Metal Grate";
-
 		public override bool IsTranslucent => true;
 	}
 }

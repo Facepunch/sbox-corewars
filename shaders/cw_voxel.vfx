@@ -129,35 +129,35 @@ PS
 	CreateInputTexture3D( TextureLightmap, Linear, 8, "", "_lightmap", "Voxel Atlas,20/10", Default3( 1.0, 1.0, 1.0 ) );
 	
 	// Move all this to C#
-	CreateInputTexture3D( TextureLightmapAdj0, Linear, 8, "", "_lightmap", "Voxel Atlas,30/10", Default3( 1.0, 1.0, 1.0 ) );
-	CreateInputTexture3D( TextureLightmapAdj1, Linear, 8, "", "_lightmap", "Voxel Atlas,40/10", Default3( 1.0, 1.0, 1.0 ) );
-	CreateInputTexture3D( TextureLightmapAdj2, Linear, 8, "", "_lightmap", "Voxel Atlas,50/10", Default3( 1.0, 1.0, 1.0 ) );
-	CreateInputTexture3D( TextureLightmapAdj3, Linear, 8, "", "_lightmap", "Voxel Atlas,60/10", Default3( 1.0, 1.0, 1.0 ) );
+	CreateInputTexture3D( TextureLightmapWest, Linear, 8, "", "_lightmap", "Voxel Atlas,30/10", Default3( 1.0, 1.0, 1.0 ) );
+	CreateInputTexture3D( TextureLightmapSouth, Linear, 8, "", "_lightmap", "Voxel Atlas,40/10", Default3( 1.0, 1.0, 1.0 ) );
+	CreateInputTexture3D( TextureLightmapEast, Linear, 8, "", "_lightmap", "Voxel Atlas,50/10", Default3( 1.0, 1.0, 1.0 ) );
+	CreateInputTexture3D( TextureLightmapNorth, Linear, 8, "", "_lightmap", "Voxel Atlas,60/10", Default3( 1.0, 1.0, 1.0 ) );
 
 	CreateTexture3DWithoutSampler( g_tLightmap ) < Channel( A, None( TextureLightmap ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( CLAMP ); AddressV( CLAMP ); AddressW( CLAMP ); > ;
 	
 	// We can't do this because the inputs are dynamic :(
-	//CreateTexture3DWithoutSampler( g_tLightmapAdjacent ) < Channel( R, None( TextureLightmapAdj0 ), Linear ); Channel( G, None( TextureLightmapAdj1 ), Linear ); Channel( B, None( TextureLightmapAdj2 ), Linear ); Channel( A, None( TextureLightmapAdj3 ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( MIRROR ); AddressV( MIRROR ); AddressW( MIRROR ); > ;
-	CreateTexture3DWithoutSampler( g_tLightmapAdjacent0 ) < Channel( A, None( TextureLightmapAdj0 ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
-	CreateTexture3DWithoutSampler( g_tLightmapAdjacent1 ) < Channel( A, None( TextureLightmapAdj1 ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
-	CreateTexture3DWithoutSampler( g_tLightmapAdjacent2 ) < Channel( A, None( TextureLightmapAdj2 ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
-	CreateTexture3DWithoutSampler( g_tLightmapAdjacent3 ) < Channel( A, None( TextureLightmapAdj3 ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
+	//CreateTexture3DWithoutSampler( g_tLightmapAdjacent ) < Channel( R, None( TextureLightmapWest ), Linear ); Channel( G, None( TextureLightmapSouth ), Linear ); Channel( B, None( TextureLightmapEast ), Linear ); Channel( A, None( TextureLightmapNorth ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( MIRROR ); AddressV( MIRROR ); AddressW( MIRROR ); > ;
+	CreateTexture3DWithoutSampler( g_tLightmapAdjacent0 ) < Channel( A, None( TextureLightmapWest ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
+	CreateTexture3DWithoutSampler( g_tLightmapAdjacent1 ) < Channel( A, None( TextureLightmapSouth ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
+	CreateTexture3DWithoutSampler( g_tLightmapAdjacent2 ) < Channel( A, None( TextureLightmapEast ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
+	CreateTexture3DWithoutSampler( g_tLightmapAdjacent3 ) < Channel( A, None( TextureLightmapNorth ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
 
 
 	CreateInputTexture3D( TextureSunlight, Linear, 8, "", "_sunlight", "Voxel Atlas,70/10", Default3( 1.0, 1.0, 1.0 ) );
 
 	// Move all this to C#
-	CreateInputTexture3D( TextureSunlightAdj0, Linear, 8, "", "_sunlight", "Voxel Atlas,80/10", Default3( 1.0, 1.0, 1.0 ) );
-	CreateInputTexture3D( TextureSunlightAdj1, Linear, 8, "", "_sunlight", "Voxel Atlas,90/10", Default3( 1.0, 1.0, 1.0 ) );
-	CreateInputTexture3D( TextureSunlightAdj2, Linear, 8, "", "_sunlight", "Voxel Atlas,100/10", Default3( 1.0, 1.0, 1.0 ) );
-	CreateInputTexture3D( TextureSunlightAdj3, Linear, 8, "", "_sunlight", "Voxel Atlas,110/10", Default3( 1.0, 1.0, 1.0 ) );
+	CreateInputTexture3D( TextureSunlightWest, Linear, 8, "", "_sunlight", "Voxel Atlas,80/10", Default3( 1.0, 1.0, 1.0 ) );
+	CreateInputTexture3D( TextureSunlightSouth, Linear, 8, "", "_sunlight", "Voxel Atlas,90/10", Default3( 1.0, 1.0, 1.0 ) );
+	CreateInputTexture3D( TextureSunlightEast, Linear, 8, "", "_sunlight", "Voxel Atlas,100/10", Default3( 1.0, 1.0, 1.0 ) );
+	CreateInputTexture3D( TextureSunlightNorth, Linear, 8, "", "_sunlight", "Voxel Atlas,110/10", Default3( 1.0, 1.0, 1.0 ) );
 
 	CreateTexture3DWithoutSampler( g_tSunlight ) < Channel( A, None( TextureSunlight ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( CLAMP ); AddressV( CLAMP ); AddressW( CLAMP ); > ;
-	CreateTexture3DWithoutSampler( g_tSunlightAdjacent0 ) < Channel( A, None( TextureSunlightAdj0 ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV( WRAP ); AddressW( WRAP ); > ;
-	CreateTexture3DWithoutSampler( g_tSunlightAdjacent1 ) < Channel( A, None( TextureSunlightAdj1 ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV( WRAP ); AddressW( WRAP ); > ;
-	CreateTexture3DWithoutSampler( g_tSunlightAdjacent2 ) < Channel( A, None( TextureSunlightAdj2 ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV( WRAP ); AddressW( WRAP ); > ;
-	CreateTexture3DWithoutSampler( g_tSunlightAdjacent3 ) < Channel( A, None( TextureSunlightAdj3 ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV( WRAP ); AddressW( WRAP ); > ;
-	//CreateTexture3DWithoutSampler( g_tSunlightAdjacent ) < Channel( R, None( TextureSunlightAdj0 ), Linear ); Channel( G, None( TextureSunlightAdj1 ), Linear ); Channel( B, None( TextureSunlightAdj2 ), Linear ); Channel( A, None( TextureSunlightAdj3 ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( MIRROR ); AddressV( MIRROR ); AddressW( MIRROR ); > ;
+	CreateTexture3DWithoutSampler( g_tSunlightAdjacent0 ) < Channel( A, None( TextureSunlightWest ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV( WRAP ); AddressW( WRAP ); > ;
+	CreateTexture3DWithoutSampler( g_tSunlightAdjacent1 ) < Channel( A, None( TextureSunlightSouth ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV( WRAP ); AddressW( WRAP ); > ;
+	CreateTexture3DWithoutSampler( g_tSunlightAdjacent2 ) < Channel( A, None( TextureSunlightEast ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV( WRAP ); AddressW( WRAP ); > ;
+	CreateTexture3DWithoutSampler( g_tSunlightAdjacent3 ) < Channel( A, None( TextureSunlightNorth ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV( WRAP ); AddressW( WRAP ); > ;
+	//CreateTexture3DWithoutSampler( g_tSunlightAdjacent ) < Channel( R, None( TextureSunlightWest ), Linear ); Channel( G, None( TextureSunlightSouth ), Linear ); Channel( B, None( TextureSunlightEast ), Linear ); Channel( A, None( TextureSunlightNorth ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( MIRROR ); AddressV( MIRROR ); AddressW( MIRROR ); > ;
 
 
 	PixelOutput MainPs( PixelInput i )

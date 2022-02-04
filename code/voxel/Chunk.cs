@@ -56,9 +56,12 @@ namespace Facepunch.CoreWars.Voxel
 
 		private static readonly BlockFaceData[] BlockFaceMask = new BlockFaceData[ChunkSize * ChunkSize * ChunkSize];
 		private readonly ChunkSlice[] Slices = new ChunkSlice[ChunkSize * 6];
-		private SceneObject SceneObject { get; set; }
-		private Model Model { get; set; }
-		private Mesh Mesh { get; set; }
+		private SceneObject TranslucentSceneObject { get; set; }
+		private SceneObject OpaqueSceneObject { get; set; }
+		private Model TranslucentModel { get; set; }
+		private Model OpaqueModel { get; set; }
+		private Mesh TranslucentMesh { get; set; }
+		private Mesh OpaqueMesh { get; set; }
 
 		public Chunk() { }
 
@@ -90,74 +93,47 @@ namespace Facepunch.CoreWars.Voxel
 
 			PendingSliceUpdates.Clear();
 
-			var modelBuilder = new ModelBuilder();
+			var translucentModelBuilder = new ModelBuilder();
+			var opaqueModelBuilder = new ModelBuilder();
 
 			if ( Host.IsClient )
 			{
 				var material = Material.Load( "materials/corewars/voxel.vmat" );
-				Mesh = new Mesh( material );
+				TranslucentMesh = new Mesh( material );
+				OpaqueMesh = new Mesh( material );
 
 				var boundsMin = Vector3.Zero;
 				var boundsMax = boundsMin + (ChunkSize * VoxelSize);
-				Mesh.SetBounds( boundsMin, boundsMax );
+				TranslucentMesh.SetBounds( boundsMin, boundsMax );
+				OpaqueMesh.SetBounds( boundsMin, boundsMax );
 			}
 
 			Build();
 
 			if ( Host.IsClient )
 			{
-				modelBuilder.AddMesh( Mesh );
+				translucentModelBuilder.AddMesh( TranslucentMesh );
+				opaqueModelBuilder.AddMesh( OpaqueMesh );
 			}
 
-			Model = modelBuilder.Create();
+			TranslucentModel = translucentModelBuilder.Create();
+			OpaqueModel = opaqueModelBuilder.Create();
 
 			if ( Host.IsClient )
 			{
 				var transform = new Transform( Offset * (float)VoxelSize );
-				SceneObject = new SceneObject( Model, transform );
-				SceneObject.SetValue( "VoxelSize", VoxelSize );
-				SceneObject.SetValue( "LightMap", LightMap.Texture );
-				SceneObject.SetValue( "SunLight", LightMap.Texture2 );
 
-				var currentOffset = Offset;
-				currentOffset.x--;
-				var XMinus = Map.GetChunkIndex( currentOffset );
-				currentOffset.x++;
-				currentOffset.y--;
-				var YMinus = Map.GetChunkIndex( currentOffset );
-				currentOffset.y++;
+				OpaqueSceneObject = new SceneObject( OpaqueModel, transform );
+				OpaqueSceneObject.SetValue( "VoxelSize", VoxelSize );
+				OpaqueSceneObject.SetValue( "LightMap", LightMap.TorchLightTexture );
+				OpaqueSceneObject.SetValue( "SunLight", LightMap.SunLightTexture );
 
-				currentOffset.y += ChunkSize + 1;
-				var YPlus = Map.GetChunkIndex( currentOffset );
-				currentOffset.y -= ChunkSize + 1;
-				currentOffset.x += ChunkSize + 1;
+				TranslucentSceneObject = new SceneObject( TranslucentModel, transform );
+				TranslucentSceneObject.SetValue( "VoxelSize", VoxelSize );
+				TranslucentSceneObject.SetValue( "LightMap", LightMap.TorchLightTexture );
+				TranslucentSceneObject.SetValue( "SunLight", LightMap.SunLightTexture );
 
-				var XPlus = Map.GetChunkIndex( currentOffset );
-
-				int maxChunkSize = Map.Chunks.Length;
-
-				if ( XMinus >= 0 && XMinus < maxChunkSize )
-				{
-					SceneObject.SetValue( "LightMapXMinus", Map.Chunks[XMinus].LightMap.Texture );
-					SceneObject.SetValue( "SunLightXMinus", Map.Chunks[XMinus].LightMap.Texture2 );
-				}
-				if ( YMinus >= 0 && YMinus < maxChunkSize )
-				{
-					SceneObject.SetValue( "LightMapYMinus", Map.Chunks[YMinus].LightMap.Texture );
-					SceneObject.SetValue( "SunLightYMinus", Map.Chunks[YMinus].LightMap.Texture2 );
-				}
-
-				if ( XPlus >= 0 && XPlus < maxChunkSize )
-				{
-					SceneObject.SetValue( "LightMapXPlus", Map.Chunks[XPlus].LightMap.Texture );
-					SceneObject.SetValue( "SunLightXPlus", Map.Chunks[XPlus].LightMap.Texture2 );
-				}
-				if ( YPlus >= 0 && YPlus < maxChunkSize )
-				{
-					SceneObject.SetValue( "LightMapYPlus", Map.Chunks[YPlus].LightMap.Texture );
-					SceneObject.SetValue( "SunLightYPlus", Map.Chunks[YPlus].LightMap.Texture2 );
-				}
-
+				UpdateAdjacents( true );
 			}
 
 			Event.Register( this );
@@ -169,6 +145,82 @@ namespace Facepunch.CoreWars.Voxel
 		{
 			await UpdateBlockSlices();
 			Build();
+		}
+
+		public void UpdateAdjacents( bool recurseNeighbours = false )
+		{
+			UpdateAdjacents( TranslucentSceneObject, recurseNeighbours );
+			UpdateAdjacents( OpaqueSceneObject, recurseNeighbours );
+		}
+
+		public void UpdateAdjacents( SceneObject sceneObject, bool recurseNeighbours = false )
+		{
+			var currentOffset = Offset;
+			currentOffset.x--;
+
+			var westChunk = Map.GetChunkIndex( currentOffset );
+			currentOffset.x++;
+			currentOffset.y--;
+
+			var southChunk = Map.GetChunkIndex( currentOffset );
+			currentOffset.y++;
+			currentOffset.y += ChunkSize + 1;
+
+			var northChunk = Map.GetChunkIndex( currentOffset );
+			currentOffset.y -= ChunkSize + 1;
+			currentOffset.x += ChunkSize + 1;
+
+			var eastChunk = Map.GetChunkIndex( currentOffset );
+
+			int maxChunkSize = Map.Chunks.Length;
+
+			if ( westChunk >= 0 && westChunk < maxChunkSize )
+			{
+				var neighbour = Map.Chunks[westChunk];
+
+				if ( neighbour != null && neighbour.Initialized )
+				{
+					sceneObject.SetValue( "LightMapWest", neighbour.LightMap.TorchLightTexture );
+					sceneObject.SetValue( "SunLightWest", neighbour.LightMap.SunLightTexture );
+					if ( recurseNeighbours ) neighbour.UpdateAdjacents();
+				}
+			}
+
+			if ( southChunk >= 0 && southChunk < maxChunkSize )
+			{
+				var neighbour = Map.Chunks[southChunk];
+
+				if ( neighbour != null && neighbour.Initialized )
+				{
+					sceneObject.SetValue( "LightMapSouth", neighbour.LightMap.TorchLightTexture );
+					sceneObject.SetValue( "SunLightSouth", neighbour.LightMap.SunLightTexture );
+					if ( recurseNeighbours ) neighbour.UpdateAdjacents();
+				}
+			}
+
+			if ( eastChunk >= 0 && eastChunk < maxChunkSize )
+			{
+				var neighbour = Map.Chunks[eastChunk];
+
+				if ( neighbour != null && neighbour.Initialized )
+				{
+					sceneObject.SetValue( "LightMapEast", neighbour.LightMap.TorchLightTexture );
+					sceneObject.SetValue( "SunLightEast", neighbour.LightMap.SunLightTexture );
+					if ( recurseNeighbours ) neighbour.UpdateAdjacents();
+				}
+			}
+
+			if ( northChunk >= 0 && northChunk < maxChunkSize )
+			{
+				var neighbour = Map.Chunks[northChunk];
+
+				if ( neighbour != null && neighbour.Initialized )
+				{
+					sceneObject.SetValue( "LightMapNorth", neighbour.LightMap.TorchLightTexture );
+					sceneObject.SetValue( "SunLightNorth", neighbour.LightMap.SunLightTexture );
+					if ( recurseNeighbours ) neighbour.UpdateAdjacents();
+				}
+			}
 		}
 
 		public void Build()
@@ -276,10 +328,16 @@ namespace Facepunch.CoreWars.Voxel
 
 		public void Destroy()
 		{
-			if ( SceneObject != null )
+			if ( TranslucentSceneObject != null )
 			{
-				SceneObject.Delete();
-				SceneObject = null;
+				TranslucentSceneObject.Delete();
+				TranslucentSceneObject = null;
+			}
+
+			if ( OpaqueSceneObject != null )
+			{
+				OpaqueSceneObject.Delete();
+				OpaqueSceneObject = null;
 			}
 
 			foreach ( var slice in Slices )
@@ -295,19 +353,19 @@ namespace Facepunch.CoreWars.Voxel
 
 		public void BuildMeshAndCollision()
 		{
-			if ( !Mesh.IsValid )
+			if ( !OpaqueMesh.IsValid )
 				return;
 
 			int vertexCount = 0;
 			foreach ( var slice in Slices )
 			{
-				vertexCount += slice.Vertices.Count;
+				vertexCount += slice.OpaqueVertices.Count;
 			}
 
-			if ( Mesh.HasVertexBuffer )
-				Mesh.SetVertexBufferSize( vertexCount );
+			if ( OpaqueMesh.HasVertexBuffer )
+				OpaqueMesh.SetVertexBufferSize( vertexCount );
 			else
-				Mesh.CreateVertexBuffer<BlockVertex>( Math.Max( 1, vertexCount ), BlockVertex.Layout );
+				OpaqueMesh.CreateVertexBuffer<BlockVertex>( Math.Max( 1, vertexCount ), BlockVertex.Layout );
 
 			vertexCount = 0;
 
@@ -329,14 +387,38 @@ namespace Facepunch.CoreWars.Voxel
 
 				slice.IsDirty = false;
 
-				if ( slice.Vertices.Count == 0 )
+				if ( slice.OpaqueVertices.Count == 0 )
 					continue;
 
-				Mesh.SetVertexBufferData( slice.Vertices, vertexCount );
-				vertexCount += slice.Vertices.Count;
+				OpaqueMesh.SetVertexBufferData( slice.OpaqueVertices, vertexCount );
+				vertexCount += slice.OpaqueVertices.Count;
 			}
 
-			Mesh.SetVertexRange( 0, vertexCount );
+			OpaqueMesh.SetVertexRange( 0, vertexCount );
+
+			vertexCount = 0;
+			foreach ( var slice in Slices )
+			{
+				vertexCount += slice.TranslucentVertices.Count;
+			}
+
+			if ( TranslucentMesh.HasVertexBuffer )
+				TranslucentMesh.SetVertexBufferSize( vertexCount );
+			else
+				TranslucentMesh.CreateVertexBuffer<BlockVertex>( Math.Max( 1, vertexCount ), BlockVertex.Layout );
+
+			vertexCount = 0;
+
+			foreach ( var slice in Slices )
+			{
+				if ( slice.TranslucentVertices.Count == 0 )
+					continue;
+
+				TranslucentMesh.SetVertexBufferData( slice.TranslucentVertices, vertexCount );
+				vertexCount += slice.TranslucentVertices.Count;
+			}
+
+			TranslucentMesh.SetVertexRange( 0, vertexCount );
 		}
 
 		private void BuildCollision()
@@ -418,7 +500,12 @@ namespace Facepunch.CoreWars.Voxel
 				vOffset[widthAxis] *= width;
 				vOffset[heightAxis] *= height;
 
-				slice.Vertices.Add( new BlockVertex( (uint)(x + vOffset.x), (uint)(y + vOffset.y), (uint)(z + vOffset.z), (uint)x, (uint)y, (uint)z, faceData ) );
+				var vertex = new BlockVertex( (uint)(x + vOffset.x), (uint)(y + vOffset.y), (uint)(z + vOffset.z), (uint)x, (uint)y, (uint)z, faceData );
+
+				if ( block.IsTranslucent )
+					slice.TranslucentVertices.Add( vertex );
+				else
+					slice.OpaqueVertices.Add( vertex );
 
 				slice.CollisionVertices.Add( new Vector3( (x + vOffset.x) + Offset.x, (y + vOffset.y) + Offset.y, (z + vOffset.z) + Offset.z ) * VoxelSize );
 				slice.CollisionIndices.Add( collisionIndex + i );
@@ -484,7 +571,8 @@ namespace Facepunch.CoreWars.Voxel
 			if ( slice.IsDirty ) return;
 
 			slice.IsDirty = true;
-			slice.Vertices.Clear();
+			slice.OpaqueVertices.Clear();
+			slice.TranslucentVertices.Clear();
 			slice.CollisionVertices.Clear();
 			slice.CollisionIndices.Clear();
 
@@ -644,7 +732,8 @@ namespace Facepunch.CoreWars.Voxel
 					int sliceIndex = GetSliceIndex( blockPosition[axis], faceSide );
 					var slice = Slices[sliceIndex];
 					slice.IsDirty = true;
-					slice.Vertices.Clear();
+					slice.OpaqueVertices.Clear();
+					slice.TranslucentVertices.Clear();
 					slice.CollisionVertices.Clear();
 					slice.CollisionIndices.Clear();
 

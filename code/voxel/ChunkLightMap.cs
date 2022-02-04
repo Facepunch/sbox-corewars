@@ -5,12 +5,12 @@ namespace Facepunch.CoreWars.Voxel
 {
 	public class ChunkLightMap
 	{
-		public Texture Texture { get; private set; }
-		public Texture Texture2 { get; private set; } // We'll nuke this later.
+		public Texture TorchLightTexture { get; private set; }
+		public Texture SunLightTexture { get; private set; } // We'll nuke this later.
 		public Chunk Chunk { get; private set; }
 		public Map Map { get; private set; }
-		public byte[] Data;
-		public byte[] Data2;
+		public byte[] TorchLightData;
+		public byte[] SunLightData;
 		public int ChunkSize;
 
 		public Queue<LightRemoveNode> TorchLightRemoveQueue { get; private set; } = new();
@@ -27,16 +27,16 @@ namespace Facepunch.CoreWars.Voxel
 			Chunk = chunk;
 			Map = map;
 
-			Data = new byte[ChunkSize * ChunkSize * ChunkSize];
-			Texture = Texture.CreateVolume( ChunkSize, ChunkSize, ChunkSize )
+			TorchLightData = new byte[ChunkSize * ChunkSize * ChunkSize];
+			TorchLightTexture = Texture.CreateVolume( ChunkSize, ChunkSize, ChunkSize )
 				.WithFormat( ImageFormat.A8 )
-				.WithData( Data )
+				.WithData( TorchLightData )
 				.Finish();
 
-			Data2 = new byte[ChunkSize * ChunkSize * ChunkSize];
-			Texture2 = Texture.CreateVolume( ChunkSize, ChunkSize, ChunkSize )
+			SunLightData = new byte[ChunkSize * ChunkSize * ChunkSize];
+			SunLightTexture = Texture.CreateVolume( ChunkSize, ChunkSize, ChunkSize )
 				.WithFormat( ImageFormat.A8 )
-				.WithData( Data2 )
+				.WithData( SunLightData )
 				.Finish();
 		}
 
@@ -48,15 +48,15 @@ namespace Facepunch.CoreWars.Voxel
 		public byte GetSunLight( IntVector3 position )
 		{
 			var index = ToIndex( position, 0 );
-			return Data2[index];
+			return SunLightData[index];
 		}
 
 		public bool SetSunLight( IntVector3 position, byte value )
 		{
 			var index = ToIndex( position, 0 );
-			if ( Data2[index] == value ) return false;
+			if ( SunLightData[index] == value ) return false;
 			IsSunLightDirty = true;
-			Data2[index] = value;
+			SunLightData[index] = value;
 			return true;
 		}
 
@@ -158,7 +158,7 @@ namespace Facepunch.CoreWars.Voxel
 			if ( IsSunLightDirty )
 			{
 				IsSunLightDirty = false;
-				Texture2.Update( Data2 );
+				SunLightTexture.Update( SunLightData );
 			}
 		}
 
@@ -216,7 +216,7 @@ namespace Facepunch.CoreWars.Voxel
 			if ( IsTorchLightDirty )
 			{
 				IsTorchLightDirty = false;
-				Texture.Update( Data );
+				TorchLightTexture.Update( TorchLightData );
 			}
 		}
 
@@ -234,15 +234,15 @@ namespace Facepunch.CoreWars.Voxel
 		public byte GetTorchLight( IntVector3 position )
 		{
 			var index = ToIndex( position, 0 );
-			return Data[index];
+			return TorchLightData[index];
 		}
 
 		public bool SetTorchLight( IntVector3 position, byte value )
 		{
 			var index = ToIndex( position, 0 );
-			if ( Data[index] == value ) return false;
+			if ( TorchLightData[index] == value ) return false;
 			IsTorchLightDirty = true;
-			Data[index] = value;
+			TorchLightData[index] = value;
 			return true;
 		}
 	}
