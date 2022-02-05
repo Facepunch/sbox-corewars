@@ -145,9 +145,7 @@ PS
 
 	struct LightmapData
 	{
-		float RedTorch;
-		float GreenTorch;
-		float BlueTorch;
+		float3 Torch;
 		float Sunlight;
 	};
 
@@ -157,16 +155,50 @@ PS
 		uint texData = asuint(texDataFl) & 0xbfffffff; // Skip bit we're using for denormalization
 
 		LightmapData o;
-
-		o.RedTorch = float(texData.r & 15) / 16.0f;
-		o.GreenTorch = float((texData.r >> 4) & 15) / 16.0f;
-		o.BlueTorch = float((texData.r >> 8) & 15) / 16.0f;
+		o.Torch = float3(
+			float(texData.r & 15) / 16.0f,
+			float((texData.r >> 4) & 15) / 16.0f,
+			float((texData.r >> 8) & 15) / 16.0f
+		);
 		o.Sunlight = float((texData.r >> 12) & 15) / 16.0f;
 		o.Sunlight *= o.Sunlight;
 
 		return o;
 	}
 
+	LightmapData FetchBestLightmap( int3 vPositionOs )
+	{
+		int3 vLightmapDim = TextureDimensions3D( g_tLightmap, 0 );
+		if( vPositionOs.x < 0 )
+		{
+			// x - 1
+			return UnpackLightmap( g_tLightmapAdjacent0, int3(vLightmapDim.x - 1, vPositionOs.yz) );
+		}
+		else if( vPositionOs.y < 0 )
+		{
+			// y - 1
+			return UnpackLightmap( g_tLightmapAdjacent1, int3(vPositionOs.x, vLightmapDim.y - 1, vPositionOs.z) );
+		}
+		else if( vPositionOs.x >= vLightmapDim.x )
+		{
+			return UnpackLightmap( g_tLightmapAdjacent2, int3(0, vPositionOs.yz) );
+		}
+		else if( vPositionOs.y >= vLightmapDim.y )
+		{
+			return UnpackLightmap( g_tLightmapAdjacent3, int3(vPositionOs.x, 0, vPositionOs.z) );
+		}
+		else
+		{
+			return UnpackLightmap( g_tLightmap, vPositionOs.xyz );
+		}
+	}
+
+	float TapLightmap( int3 vPositionOs )
+	{
+		LightmapData data = FetchBestLightmap(vPositionOs);
+		float LightLevel = max(data.Torch.z, max(data.Torch.x, data.Torch.y)) + data.Sunlight;
+		return min(1.0f, LightLevel);
+	}
 
 	PixelOutput MainPs( PixelInput i )
 	{
@@ -197,49 +229,27 @@ PS
 		}
 		#else
 		{
-			int3 vLightmapDim = TextureDimensions3D( g_tLightmap, 0 );
-
-			LightmapData LightData;
-			
-			if( i.vPositionOs.x < 0 )
-			{
-				// x - 1
-				LightData = UnpackLightmap( g_tLightmapAdjacent0, int3(vLightmapDim.x - 1, i.vPositionOs.yz) );
-			}
-			else if(i.vPositionOs.y < 0)
-			{
-				// y - 1
-				LightData = UnpackLightmap( g_tLightmapAdjacent1, int3(i.vPositionOs.x, vLightmapDim.y - 1, i.vPositionOs.z) );
-			}
-			else if(i.vPositionOs.x >= vLightmapDim.x)
-			{
-				LightData = UnpackLightmap( g_tLightmapAdjacent2, int3(0, i.vPositionOs.yz) );
-			}
-			else if(i.vPositionOs.y >= vLightmapDim.y)
-			{
-				LightData = UnpackLightmap( g_tLightmapAdjacent3, int3(i.vPositionOs.x, 0, i.vPositionOs.z) );
-			}
-			else
-			{
-				LightData = UnpackLightmap( g_tLightmap, i.vPositionOs.xyz );
-			}
-			
-
-			float3 torchColor = float3(LightData.RedTorch, LightData.GreenTorch, LightData.BlueTorch);
+			LightmapData LightData = FetchBestLightmap( i.vPositionOs );
+			float3 Torch = LightData.Torch;
+			// Blue looks really dim so lets skip it
+			Torch.rg *= Torch.rg;
+			float Sunlight = LightData.Sunlight;
 
 			// Torch flickering
-			torchColor *= 1.0f - (((sin(g_flTime * 8.0f) + 1.0f) * 0.5f) * 0.2f);
+			float3 torchColor = Torch * (1.0f - (((sin(g_flTime * 8.0f) + 1.0f) * 0.5f) * 0.2f));
 
 			float4 vColor = Tex2DLevel( g_tAtlasColor, vTexCoordAtlas, 0 );
 
 			if( vColor.a < 0.50f ) {
 				discard;
 			}
-
+			
 			Material m = GatherMaterial( i );
-			m.Emission.rgb = vColor.rgb * saturate(0.003f + torchColor + LightData.Sunlight * 0.8f);
-			m.Albedo.rgb = vColor.rgb * saturate(0.03f + torchColor + LightData.Sunlight * 0.8f);
+			m.Emission.rgb = vColor.rgb * saturate(0.003f + torchColor + Sunlight * 0.8f);
+			m.Albedo.rgb = vColor.rgb * saturate(0.03f + torchColor + Sunlight * 0.8f);
 			return FinalizePixelMaterial( i, m );
+			
+
 		}
 		#endif
 	}
