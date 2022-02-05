@@ -17,8 +17,10 @@ namespace Facepunch.CoreWars.Blocks
 				return Map.BlockAtlas.GetTextureId( "dirt" );
 
 			var position = chunk.Offset + new IntVector3( x, y, z );
+			var adjacentBlockId = Map.GetAdjacentBlock( position, (int)BlockFace.Top );
+			var adjacentBlock = Map.GetBlockType( adjacentBlockId );
 
-			if ( Map.IsAdjacentEmpty( position, (int)BlockFace.Top ) )
+			if ( adjacentBlock.IsTranslucent )
 				return Map.BlockAtlas.GetTextureId( DefaultTexture );
 
 			return Map.BlockAtlas.GetTextureId( "dirt" );
