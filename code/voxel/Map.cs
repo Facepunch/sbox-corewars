@@ -487,18 +487,16 @@ namespace Facepunch.CoreWars.Voxel
 
 				if ( IsClient )
 				{
+					RemoveRedTorchLight( position );
+					RemoveGreenTorchLight( position );
+					RemoveBlueTorchLight( position );
+					RemoveSunLight( position );
+
 					if ( block.LightLevel.x > 0 || block.LightLevel.y > 0 || block.LightLevel.z > 0 )
 					{
 						AddRedTorchLight( position, (byte)block.LightLevel.x );
 						AddGreenTorchLight( position, (byte)block.LightLevel.y );
 						AddBlueTorchLight( position, (byte)block.LightLevel.z );
-					}
-					else
-					{
-						RemoveRedTorchLight( position );
-						RemoveGreenTorchLight( position );
-						RemoveBlueTorchLight( position );
-						RemoveSunLight( position );
 					}
 				}
 
