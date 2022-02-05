@@ -44,11 +44,6 @@ Layer0
 	TextureLightmapNorth "materials/default/default_lightmap.tga"
 	TextureLightmapSouth "materials/default/default_lightmap.tga"
 	TextureLightmapWest "materials/default/default_lightmap.tga"
-	TextureSunlight "materials/default/default.tga"
-	TextureSunlightEast "materials/default/default.tga"
-	TextureSunlightNorth "materials/default/default.tga"
-	TextureSunlightSouth "materials/default/default.tga"
-	TextureSunlightWest "materials/default/default.tga"
 
 	DynamicParams
 	{
@@ -58,10 +53,5 @@ Layer0
 		TextureLightmapNorth "LightMapNorth"
 		TextureLightmapSouth "LightMapSouth"
 		TextureLightmapWest "LightMapWest"
-		TextureSunlight "SunLight"
-		TextureSunlightEast "SunLightEast"
-		TextureSunlightNorth "SunLightNorth"
-		TextureSunlightSouth "SunLightSouth"
-		TextureSunlightWest "SunLightWest"
 	}
 }

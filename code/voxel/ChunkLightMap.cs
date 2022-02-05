@@ -22,8 +22,8 @@ namespace Facepunch.CoreWars.Voxel
 
 		public ChunkLightMap( Chunk chunk, Map map )
 		{
-			TorchLightRemoveQueue = Array.Empty<Queue<LightRemoveNode>>();
-			TorchLightAddQueue = Array.Empty<Queue<LightAddNode>>();
+			TorchLightRemoveQueue = new Queue<LightRemoveNode>[3];
+			TorchLightAddQueue = new Queue<LightAddNode>[3];
 
 			for ( var i = 0; i < 3; i++ )
 				TorchLightRemoveQueue[i] = new();
@@ -37,14 +37,14 @@ namespace Facepunch.CoreWars.Voxel
 
 			LightData = new byte[ChunkSize * ChunkSize * ChunkSize * 2];
 			LightTexture = Texture.CreateVolume( ChunkSize, ChunkSize, ChunkSize )
-				.WithFormat( ImageFormat.A8 )
+				.WithFormat( ImageFormat.R16 )
 				.WithData( LightData )
 				.Finish();
 		}
 
 		public int ToIndex( IntVector3 position, int component )
 		{
-			return ((position.z * ChunkSize * ChunkSize) + (position.y * ChunkSize) + position.x) * component;
+			return ((position.z * ChunkSize * ChunkSize) + (position.y * ChunkSize) + position.x) * 2 + component;
 		}
 
 		public byte GetSunLight( IntVector3 position )
@@ -58,7 +58,7 @@ namespace Facepunch.CoreWars.Voxel
 			var index = ToIndex( position, 1 );
 			if ( GetSunLight( position ) == value ) return false;
 			IsSunLightDirty = true;
-			LightData[index] = (byte)((LightData[index] & 0xF0FF) | (value << 4));
+			LightData[index] = (byte)((LightData[index] & 0x0F) | ((value & 0xf) << 4));
 			return true;
 		}
 
@@ -340,7 +340,7 @@ namespace Facepunch.CoreWars.Voxel
 		public byte GetRedTorchLight( IntVector3 position )
 		{
 			var index = ToIndex( position, 0 );
-			return (byte)((LightData[index] >> 8) & 0xF);
+			return (byte)(LightData[index] & 0xF);
 		}
 
 		public bool SetRedTorchLight( IntVector3 position, byte value )
@@ -348,7 +348,7 @@ namespace Facepunch.CoreWars.Voxel
 			var index = ToIndex( position, 0 );
 			if ( GetRedTorchLight( position ) == value ) return false;
 			IsTorchLightDirty = true;
-			LightData[index] = (byte)((LightData[index] & 0xF0FF) | (value << 8));
+			LightData[index] = (byte)((LightData[index] & 0xF0) | (value & 0xF));
 			return true;
 		}
 
@@ -363,14 +363,14 @@ namespace Facepunch.CoreWars.Voxel
 			var index = ToIndex( position, 0 );
 			if ( GetGreenTorchLight( position ) == value ) return false;
 			IsTorchLightDirty = true;
-			LightData[index] = (byte)((LightData[index] & 0xF0FF) | (value << 4));
+			LightData[index] = (byte)((LightData[index] & 0x0F) | (value << 4));
 			return true;
 		}
 
 		public byte GetBlueTorchLight( IntVector3 position )
 		{
 			var index = ToIndex( position, 1 );
-			return (byte)((LightData[index] >> 8) & 0xF);
+			return (byte)(LightData[index] & 0xF);
 		}
 
 		public bool SetBlueTorchLight( IntVector3 position, byte value )
@@ -378,7 +378,7 @@ namespace Facepunch.CoreWars.Voxel
 			var index = ToIndex( position, 1 );
 			if ( GetBlueTorchLight( position ) == value ) return false;
 			IsTorchLightDirty = true;
-			LightData[index] = (byte)((LightData[index] & 0xF0FF) | (value << 8));
+			LightData[index] = (byte)((LightData[index] & 0x0F) | (value & 0xF));
 			return true;
 		}
 	}
