@@ -162,6 +162,15 @@ namespace Facepunch.CoreWars
 					ShuffleHotbarBlocks();
 				}
 			}
+			else
+			{
+				Vector3 fPosition = Input.Position * (1.0f / Chunk.VoxelSize);
+				IntVector3 intPosition = new IntVector3( (int)fPosition.x, (int)fPosition.y, (int)fPosition.z );
+				DebugOverlay.ScreenText( 2, $"Sunlight Level: {Map.Current.GetSunLight(intPosition)}", 0.1f );
+				DebugOverlay.ScreenText( 3, $"Torch Level: ({Map.Current.GetRedTorchLight( intPosition )}, {Map.Current.GetGreenTorchLight( intPosition )}, {Map.Current.GetBlueTorchLight( intPosition )})", 0.1f );
+				DebugOverlay.ScreenText( 4, $"Chunk Index: {Map.Current.GetChunkIndex( intPosition )}", 0.1f );
+				DebugOverlay.ScreenText( 5, $"Position: {intPosition}", 0.1f );
+			}
 
 			var controller = GetActiveController();
 			controller?.Simulate( client, this, GetActiveAnimator() );
