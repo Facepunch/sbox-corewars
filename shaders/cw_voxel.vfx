@@ -237,7 +237,7 @@ PS
 			}
 
 			Material m = GatherMaterial( i );
-			m.Emission.rgb = vColor.rgb * saturate(0.01f + torchColor + LightData.Sunlight * 0.8f);
+			m.Emission.rgb = vColor.rgb * saturate(0.003f + torchColor + LightData.Sunlight * 0.8f);
 			m.Albedo.rgb = vColor.rgb * saturate(0.03f + torchColor + LightData.Sunlight * 0.8f);
 			return FinalizePixelMaterial( i, m );
 		}
