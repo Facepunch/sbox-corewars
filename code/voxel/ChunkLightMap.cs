@@ -1,20 +1,19 @@
 ﻿using Sandbox;
+using System;
 using System.Collections.Generic;
 
 namespace Facepunch.CoreWars.Voxel
 {
 	public class ChunkLightMap
 	{
-		public Texture TorchLightTexture { get; private set; }
-		public Texture SunLightTexture { get; private set; } // We'll nuke this later.
+		public Texture LightTexture { get; private set; }
 		public Chunk Chunk { get; private set; }
 		public Map Map { get; private set; }
-		public byte[] TorchLightData;
-		public byte[] SunLightData;
+		public byte[] LightData;                            
 		public int ChunkSize;
 
-		public Queue<LightRemoveNode> TorchLightRemoveQueue { get; private set; } = new();
-		public Queue<IntVector3> TorchLightAddQueue { get; private set; } = new();
+		public Queue<LightRemoveNode>[] TorchLightRemoveQueue { get; private set; }
+		public Queue<LightAddNode>[] TorchLightAddQueue { get; private set; }
 		public Queue<LightRemoveNode> SunLightRemoveQueue { get; private set; } = new();
 		public Queue<IntVector3> SunLightAddQueue { get; private set; } = new();
 
@@ -23,48 +22,79 @@ namespace Facepunch.CoreWars.Voxel
 
 		public ChunkLightMap( Chunk chunk, Map map )
 		{
+			TorchLightRemoveQueue = Array.Empty<Queue<LightRemoveNode>>();
+			TorchLightAddQueue = Array.Empty<Queue<LightAddNode>>();
+
+			for ( var i = 0; i < 3; i++ )
+				TorchLightRemoveQueue[i] = new();
+
+			for ( var i = 0; i < 3; i++ )
+				TorchLightAddQueue[i] = new();
+
 			ChunkSize = Chunk.ChunkSize;
 			Chunk = chunk;
 			Map = map;
 
-			TorchLightData = new byte[ChunkSize * ChunkSize * ChunkSize];
-			TorchLightTexture = Texture.CreateVolume( ChunkSize, ChunkSize, ChunkSize )
+			LightData = new byte[ChunkSize * ChunkSize * ChunkSize * 2];
+			LightTexture = Texture.CreateVolume( ChunkSize, ChunkSize, ChunkSize )
 				.WithFormat( ImageFormat.A8 )
-				.WithData( TorchLightData )
-				.Finish();
-
-			SunLightData = new byte[ChunkSize * ChunkSize * ChunkSize];
-			SunLightTexture = Texture.CreateVolume( ChunkSize, ChunkSize, ChunkSize )
-				.WithFormat( ImageFormat.A8 )
-				.WithData( SunLightData )
+				.WithData( LightData )
 				.Finish();
 		}
 
 		public int ToIndex( IntVector3 position, int component )
 		{
-			return (position.z * ChunkSize * ChunkSize) + (position.y * ChunkSize) + position.x;
+			return ((position.z * ChunkSize * ChunkSize) + (position.y * ChunkSize) + position.x) * component;
 		}
 
 		public byte GetSunLight( IntVector3 position )
 		{
-			var index = ToIndex( position, 0 );
-			return SunLightData[index];
+			var index = ToIndex( position, 1 );
+			return (byte)((LightData[index] >> 4) & 0xF);
 		}
 
 		public bool SetSunLight( IntVector3 position, byte value )
 		{
-			var index = ToIndex( position, 0 );
-			if ( SunLightData[index] == value ) return false;
+			var index = ToIndex( position, 1 );
+			if ( GetSunLight( position ) == value ) return false;
 			IsSunLightDirty = true;
-			SunLightData[index] = value;
+			LightData[index] = (byte)((LightData[index] & 0xF0FF) | (value << 4));
 			return true;
 		}
 
-		public void AddTorchLight( IntVector3 position, byte value )
+		public void AddRedTorchLight( IntVector3 position, byte value )
 		{
-			if ( SetTorchLight( position, value ) )
+			if ( SetRedTorchLight( position, value ) )
 			{
-				TorchLightAddQueue.Enqueue( Chunk.Offset + position );
+				TorchLightAddQueue[0].Enqueue( new LightAddNode
+				{
+					Position = Chunk.Offset + position,
+					Channel = 0
+				} );
+			}
+		}
+
+		public void AddGreenTorchLight( IntVector3 position, byte value )
+		{
+			if ( SetGreenTorchLight( position, value ) )
+			{
+				TorchLightAddQueue[1].Enqueue( new LightAddNode
+				{
+					Position = Chunk.Offset + position,
+					Channel = 1
+				} );
+			}
+		}
+
+		public void AddBlueTorchLight( IntVector3 position, byte value )
+		{
+			if ( SetBlueTorchLight( position, value ) )
+			{
+				TorchLightAddQueue[2].Enqueue( new LightAddNode
+				{
+					Position = Chunk.Offset + position,
+					Channel = 2
+				} );
 			}
 		}
 
@@ -76,15 +106,40 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
-		public bool RemoveTorchLight( IntVector3 position )
+		public bool RemoveRedTorchLight( IntVector3 position )
 		{
-			TorchLightRemoveQueue.Enqueue( new LightRemoveNode
+			TorchLightRemoveQueue[0].Enqueue( new LightRemoveNode
 			{
 				Position = Chunk.Offset + position,
-				Value = GetTorchLight( position )
+				Channel = 0,
+				Value = GetRedTorchLight( position )
 			} );
 
-			return SetTorchLight( position, 0 );
+			return SetRedTorchLight( position, 0 );
+		}
+
+		public bool RemoveGreenTorchLight( IntVector3 position )
+		{
+			TorchLightRemoveQueue[0].Enqueue( new LightRemoveNode
+			{
+				Position = Chunk.Offset + position,
+				Channel = 1,
+				Value = GetGreenTorchLight( position )
+			} );
+
+			return SetGreenTorchLight( position, 0 );
+		}
+
+		public bool RemoveBlueTorchLight( IntVector3 position )
+		{
+			TorchLightRemoveQueue[0].Enqueue( new LightRemoveNode
+			{
+				Position = Chunk.Offset + position,
+				Channel = 2,
+				Value = GetBlueTorchLight( position )
+			} );
+
+			return SetBlueTorchLight( position, 0 );
 		}
 
 		public void UpdateSunLight()
@@ -158,26 +213,29 @@ namespace Facepunch.CoreWars.Voxel
 			if ( IsSunLightDirty )
 			{
 				IsSunLightDirty = false;
-				SunLightTexture.Update( SunLightData );
+				LightTexture.Update( LightData );
 			}
 		}
 
-		public void UpdateTorchLight()
+		public void UpdateTorchLight( int channel )
 		{
-			while ( TorchLightRemoveQueue.Count > 0 )
+			var removeQueue = TorchLightRemoveQueue[channel];
+			var addQueue = TorchLightAddQueue[channel];
+
+			while ( removeQueue.Count > 0 )
 			{
-				var node = TorchLightRemoveQueue.Dequeue();
+				var node = removeQueue.Dequeue();
 
 				for ( var i = 0; i < 6; i++ )
 				{
 					var neighbourPosition = Map.GetAdjacentPosition( node.Position, i );
-					var lightLevel = Map.GetTorchLight( neighbourPosition );
+					var lightLevel = Map.GetTorchLight( neighbourPosition, channel );
 
 					if ( lightLevel != 0 && lightLevel < node.Value )
 					{
-						Map.SetTorchLight( neighbourPosition, 0 );
+						Map.SetTorchLight( neighbourPosition, channel, 0 );
 
-						TorchLightRemoveQueue.Enqueue( new LightRemoveNode
+						removeQueue.Enqueue( new LightRemoveNode
 						{
 							Position = neighbourPosition,
 							Value = node.Value
@@ -185,38 +243,49 @@ namespace Facepunch.CoreWars.Voxel
 					}
 					else if ( lightLevel >= node.Value )
 					{
-						TorchLightAddQueue.Enqueue( neighbourPosition );
+						addQueue.Enqueue( new LightAddNode
+						{
+							Position = neighbourPosition,
+							Channel = channel
+						} );
 					}
 				}
 			}
 
-			while ( TorchLightAddQueue.Count > 0 )
+			while ( addQueue.Count > 0 )
 			{
-				var nodePosition = TorchLightAddQueue.Dequeue();
-				var lightLevel = Map.GetTorchLight( nodePosition );
+				var node = addQueue.Dequeue();
+				var lightLevel = Map.GetTorchLight( node.Position, channel );
 
 				for ( var i = 0; i < 6; i++ )
 				{
-					var neighbourPosition = Map.GetAdjacentPosition( nodePosition, i );
+					var neighbourPosition = Map.GetAdjacentPosition( node.Position, i );
 					var neighbourBlockInfo = Map.GetBlockInfo( neighbourPosition );
 					if ( !neighbourBlockInfo.IsValid ) continue;
 
 					var neighbourBlock = Map.GetBlockType( neighbourBlockInfo.BlockId );
 
-					if ( Map.GetTorchLight( neighbourBlockInfo.Position ) + 2 <= lightLevel )
+					if ( Map.GetTorchLight( neighbourBlockInfo.Position, channel ) + 2 <= lightLevel )
 					{
 						if ( neighbourBlock.IsTranslucent )
 						{
-							Map.AddTorchLight( neighbourPosition, (byte)(lightLevel - 1) );
+							Map.AddTorchLight( neighbourPosition, channel, (byte)(lightLevel - 1) );
 						}
 					}
 				}
 			}
+		}
+
+		public void UpdateTorchLight()
+		{
+			UpdateTorchLight( 0 );
+			UpdateTorchLight( 1 );
+			UpdateTorchLight( 2 );
 
 			if ( IsTorchLightDirty )
 			{
 				IsTorchLightDirty = false;
-				TorchLightTexture.Update( TorchLightData );
+				LightTexture.Update( LightData );
 			}
 		}
 
@@ -231,18 +300,85 @@ namespace Facepunch.CoreWars.Voxel
 			return SetSunLight( position, 0 );
 		}
 
-		public byte GetTorchLight( IntVector3 position )
+		public byte GetTorchLight( IntVector3 position, int channel )
 		{
-			var index = ToIndex( position, 0 );
-			return TorchLightData[index];
+			if ( channel == 0 ) return GetRedTorchLight( position );
+			if ( channel == 1 ) return GetGreenTorchLight( position );
+			return GetBlueTorchLight( position );
 		}
 
-		public bool SetTorchLight( IntVector3 position, byte value )
+		public void RemoveTorchLight( IntVector3 position, int channel )
+		{
+			if ( channel == 0 )
+				RemoveRedTorchLight( position );
+			else if ( channel == 1 )
+				RemoveGreenTorchLight( position );
+			else
+				RemoveBlueTorchLight( position );
+		}
+
+		public void AddTorchLight( IntVector3 position, int channel, byte value )
+		{
+			if ( channel == 0 )
+				AddRedTorchLight( position, value );
+			else if ( channel == 1 )
+				AddGreenTorchLight( position, value );
+			else
+				AddBlueTorchLight( position, value );
+		}
+
+		public bool SetTorchLight( IntVector3 position, int channel, byte value )
+		{
+			if ( channel == 0 )
+				return SetRedTorchLight( position, value );
+			else if ( channel == 1 )
+				return SetGreenTorchLight( position, value );
+			else
+				return SetBlueTorchLight( position, value );
+		}
+
+		public byte GetRedTorchLight( IntVector3 position )
 		{
 			var index = ToIndex( position, 0 );
-			if ( TorchLightData[index] == value ) return false;
+			return (byte)((LightData[index] >> 8) & 0xF);
+		}
+
+		public bool SetRedTorchLight( IntVector3 position, byte value )
+		{
+			var index = ToIndex( position, 0 );
+			if ( GetRedTorchLight( position ) == value ) return false;
 			IsTorchLightDirty = true;
-			TorchLightData[index] = value;
+			LightData[index] = (byte)((LightData[index] & 0xF0FF) | (value << 8));
+			return true;
+		}
+
+		public byte GetGreenTorchLight( IntVector3 position )
+		{
+			var index = ToIndex( position, 0 );
+			return (byte)((LightData[index] >> 4) & 0xF);
+		}
+
+		public bool SetGreenTorchLight( IntVector3 position, byte value )
+		{
+			var index = ToIndex( position, 0 );
+			if ( GetGreenTorchLight( position ) == value ) return false;
+			IsTorchLightDirty = true;
+			LightData[index] = (byte)((LightData[index] & 0xF0FF) | (value << 4));
+			return true;
+		}
+
+		public byte GetBlueTorchLight( IntVector3 position )
+		{
+			var index = ToIndex( position, 1 );
+			return (byte)((LightData[index] >> 8) & 0xF);
+		}
+
+		public bool SetBlueTorchLight( IntVector3 position, byte value )
+		{
+			var index = ToIndex( position, 1 );
+			if ( GetBlueTorchLight( position ) == value ) return false;
+			IsTorchLightDirty = true;
+			LightData[index] = (byte)((LightData[index] & 0xF0FF) | (value << 8));
 			return true;
 		}
 	}

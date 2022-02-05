@@ -1,8 +1,7 @@
 ﻿namespace Facepunch.CoreWars.Voxel
 {
-	public struct LightRemoveNode
+	public struct LightAddNode
 	{
-		public int Value;
 		public int Channel;
 		public IntVector3 Position;
 	}

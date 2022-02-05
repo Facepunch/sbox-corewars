@@ -11,7 +11,7 @@ namespace Facepunch.CoreWars.Voxel
 		public virtual string FriendlyName => "";
 		public virtual bool AttenuatesSunLight => false;
 		public virtual bool IsTranslucent => false;
-		public virtual byte LightLevel => 0;
+		public virtual IntVector3 LightLevel => 0;
 
 		public virtual byte GetTextureId( BlockFace face, Chunk chunk, int x, int y, int z )
 		{

@@ -191,20 +191,68 @@ namespace Facepunch.CoreWars.Voxel
 			return Chunks[chunkIndex].LightMap.SetSunLight( localPosition, value );
 		}
 
-		public byte GetTorchLight( IntVector3 position )
+		public byte GetTorchLight( IntVector3 position, int channel )
 		{
 			if ( !IsInside( position ) ) return 0;
 			var chunkIndex = GetChunkIndex( position );
 			var localPosition = ToLocalPosition( position );
-			return Chunks[chunkIndex].LightMap.GetTorchLight( localPosition );
+			return Chunks[chunkIndex].LightMap.GetTorchLight( localPosition, channel );
 		}
 
-		public bool SetTorchLight( IntVector3 position, byte value )
+		public bool SetTorchLight( IntVector3 position, int channel, byte value )
 		{
 			if ( !IsInside( position ) ) return false;
 			var chunkIndex = GetChunkIndex( position );
 			var localPosition = ToLocalPosition( position );
-			return Chunks[chunkIndex].LightMap.SetTorchLight( localPosition, value );
+			return Chunks[chunkIndex].LightMap.SetTorchLight( localPosition, channel, value );
+		}
+
+		public byte GetRedTorchLight( IntVector3 position )
+		{
+			if ( !IsInside( position ) ) return 0;
+			var chunkIndex = GetChunkIndex( position );
+			var localPosition = ToLocalPosition( position );
+			return Chunks[chunkIndex].LightMap.GetRedTorchLight( localPosition );
+		}
+
+		public bool SetRedTorchLight( IntVector3 position, byte value )
+		{
+			if ( !IsInside( position ) ) return false;
+			var chunkIndex = GetChunkIndex( position );
+			var localPosition = ToLocalPosition( position );
+			return Chunks[chunkIndex].LightMap.SetRedTorchLight( localPosition, value );
+		}
+
+		public byte GetGreenTorchLight( IntVector3 position )
+		{
+			if ( !IsInside( position ) ) return 0;
+			var chunkIndex = GetChunkIndex( position );
+			var localPosition = ToLocalPosition( position );
+			return Chunks[chunkIndex].LightMap.GetGreenTorchLight( localPosition );
+		}
+
+		public bool SetGreenTorchLight( IntVector3 position, byte value )
+		{
+			if ( !IsInside( position ) ) return false;
+			var chunkIndex = GetChunkIndex( position );
+			var localPosition = ToLocalPosition( position );
+			return Chunks[chunkIndex].LightMap.SetGreenTorchLight( localPosition, value );
+		}
+
+		public byte GetBlueTorchLight( IntVector3 position )
+		{
+			if ( !IsInside( position ) ) return 0;
+			var chunkIndex = GetChunkIndex( position );
+			var localPosition = ToLocalPosition( position );
+			return Chunks[chunkIndex].LightMap.GetGreenTorchLight( localPosition );
+		}
+
+		public bool SetBlueTorchLight( IntVector3 position, byte value )
+		{
+			if ( !IsInside( position ) ) return false;
+			var chunkIndex = GetChunkIndex( position );
+			var localPosition = ToLocalPosition( position );
+			return Chunks[chunkIndex].LightMap.SetGreenTorchLight( localPosition, value );
 		}
 
 		public void RemoveSunLight( IntVector3 position )
@@ -215,12 +263,36 @@ namespace Facepunch.CoreWars.Voxel
 			Chunks[chunkIndex].LightMap.RemoveSunLight( localPosition );
 		}
 
-		public void RemoveTorchLight( IntVector3 position )
+		public void RemoveTorchLight( IntVector3 position, int channel )
 		{
 			if ( !IsInside( position ) ) return;
 			var chunkIndex = GetChunkIndex( position );
 			var localPosition = ToLocalPosition( position );
-			Chunks[chunkIndex].LightMap.RemoveTorchLight( localPosition );
+			Chunks[chunkIndex].LightMap.RemoveTorchLight( localPosition, channel );
+		}
+
+		public void RemoveRedTorchLight( IntVector3 position )
+		{
+			if ( !IsInside( position ) ) return;
+			var chunkIndex = GetChunkIndex( position );
+			var localPosition = ToLocalPosition( position );
+			Chunks[chunkIndex].LightMap.RemoveRedTorchLight( localPosition );
+		}
+
+		public void RemoveGreenTorchLight( IntVector3 position )
+		{
+			if ( !IsInside( position ) ) return;
+			var chunkIndex = GetChunkIndex( position );
+			var localPosition = ToLocalPosition( position );
+			Chunks[chunkIndex].LightMap.RemoveGreenTorchLight( localPosition );
+		}
+
+		public void RemoveBlueTorchLight( IntVector3 position )
+		{
+			if ( !IsInside( position ) ) return;
+			var chunkIndex = GetChunkIndex( position );
+			var localPosition = ToLocalPosition( position );
+			Chunks[chunkIndex].LightMap.RemoveBlueTorchLight( localPosition );
 		}
 
 		public void AddSunLight( IntVector3 position, byte value )
@@ -231,12 +303,36 @@ namespace Facepunch.CoreWars.Voxel
 			Chunks[chunkIndex].LightMap.AddSunLight( localPosition, value );
 		}
 
-		public void AddTorchLight( IntVector3 position, byte value )
+		public void AddTorchLight( IntVector3 position, int channel, byte value )
 		{
 			if ( !IsInside( position ) ) return;
 			var chunkIndex = GetChunkIndex( position );
 			var localPosition = ToLocalPosition( position );
-			Chunks[chunkIndex].LightMap.AddTorchLight( localPosition, value );
+			Chunks[chunkIndex].LightMap.AddTorchLight( localPosition, channel, value );
+		}
+
+		public void AddRedTorchLight( IntVector3 position, byte value )
+		{
+			if ( !IsInside( position ) ) return;
+			var chunkIndex = GetChunkIndex( position );
+			var localPosition = ToLocalPosition( position );
+			Chunks[chunkIndex].LightMap.AddRedTorchLight( localPosition, value );
+		}
+
+		public void AddGreenTorchLight( IntVector3 position, byte value )
+		{
+			if ( !IsInside( position ) ) return;
+			var chunkIndex = GetChunkIndex( position );
+			var localPosition = ToLocalPosition( position );
+			Chunks[chunkIndex].LightMap.AddGreenTorchLight( localPosition, value );
+		}
+
+		public void AddBlueTorchLight( IntVector3 position, byte value )
+		{
+			if ( !IsInside( position ) ) return;
+			var chunkIndex = GetChunkIndex( position );
+			var localPosition = ToLocalPosition( position );
+			Chunks[chunkIndex].LightMap.AddBlueTorchLight( localPosition, value );
 		}
 
 		public void Destroy()
@@ -392,13 +488,17 @@ namespace Facepunch.CoreWars.Voxel
 				{
 					var block = GetBlockType( blockId );
 
-					if ( block.LightLevel > 0 )
+					if ( block.LightLevel.x > 0 || block.LightLevel.y > 0 || block.LightLevel.z > 0 )
 					{
-						AddTorchLight( position, block.LightLevel );
+						AddRedTorchLight( position, (byte)block.LightLevel.x );
+						AddGreenTorchLight( position, (byte)block.LightLevel.y );
+						AddBlueTorchLight( position, (byte)block.LightLevel.z );
 					}
 					else
 					{
-						RemoveTorchLight( position );
+						RemoveRedTorchLight( position );
+						RemoveGreenTorchLight( position );
+						RemoveBlueTorchLight( position );
 						RemoveSunLight( position );
 					}
 				}

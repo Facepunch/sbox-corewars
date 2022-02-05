@@ -7,12 +7,6 @@ using System.Threading.Tasks;
 
 namespace Facepunch.CoreWars.Voxel
 {
-	public struct LightNode
-	{
-		public int ChunkIndex;
-		public int BlockIndex;
-	}
-
 	public partial class Chunk
 	{
 		public struct SliceUpdate : IEquatable<SliceUpdate>
@@ -125,13 +119,11 @@ namespace Facepunch.CoreWars.Voxel
 
 				OpaqueSceneObject = new SceneObject( OpaqueModel, transform );
 				OpaqueSceneObject.SetValue( "VoxelSize", VoxelSize );
-				OpaqueSceneObject.SetValue( "LightMap", LightMap.TorchLightTexture );
-				OpaqueSceneObject.SetValue( "SunLight", LightMap.SunLightTexture );
+				OpaqueSceneObject.SetValue( "LightMap", LightMap.LightTexture );
 
 				TranslucentSceneObject = new SceneObject( TranslucentModel, transform );
 				TranslucentSceneObject.SetValue( "VoxelSize", VoxelSize );
-				TranslucentSceneObject.SetValue( "LightMap", LightMap.TorchLightTexture );
-				TranslucentSceneObject.SetValue( "SunLight", LightMap.SunLightTexture );
+				TranslucentSceneObject.SetValue( "LightMap", LightMap.LightTexture );
 
 				UpdateAdjacents( true );
 			}
@@ -180,8 +172,7 @@ namespace Facepunch.CoreWars.Voxel
 
 				if ( neighbour != null && neighbour.Initialized )
 				{
-					sceneObject.SetValue( "LightMapWest", neighbour.LightMap.TorchLightTexture );
-					sceneObject.SetValue( "SunLightWest", neighbour.LightMap.SunLightTexture );
+					sceneObject.SetValue( "LightMapWest", neighbour.LightMap.LightTexture );
 					if ( recurseNeighbours ) neighbour.UpdateAdjacents();
 				}
 			}
@@ -192,8 +183,7 @@ namespace Facepunch.CoreWars.Voxel
 
 				if ( neighbour != null && neighbour.Initialized )
 				{
-					sceneObject.SetValue( "LightMapSouth", neighbour.LightMap.TorchLightTexture );
-					sceneObject.SetValue( "SunLightSouth", neighbour.LightMap.SunLightTexture );
+					sceneObject.SetValue( "LightMapSouth", neighbour.LightMap.LightTexture );
 					if ( recurseNeighbours ) neighbour.UpdateAdjacents();
 				}
 			}
@@ -204,8 +194,7 @@ namespace Facepunch.CoreWars.Voxel
 
 				if ( neighbour != null && neighbour.Initialized )
 				{
-					sceneObject.SetValue( "LightMapEast", neighbour.LightMap.TorchLightTexture );
-					sceneObject.SetValue( "SunLightEast", neighbour.LightMap.SunLightTexture );
+					sceneObject.SetValue( "LightMapEast", neighbour.LightMap.LightTexture );
 					if ( recurseNeighbours ) neighbour.UpdateAdjacents();
 				}
 			}
@@ -216,8 +205,7 @@ namespace Facepunch.CoreWars.Voxel
 
 				if ( neighbour != null && neighbour.Initialized )
 				{
-					sceneObject.SetValue( "LightMapNorth", neighbour.LightMap.TorchLightTexture );
-					sceneObject.SetValue( "SunLightNorth", neighbour.LightMap.SunLightTexture );
+					sceneObject.SetValue( "LightMapNorth", neighbour.LightMap.LightTexture );
 					if ( recurseNeighbours ) neighbour.UpdateAdjacents();
 				}
 			}
