@@ -78,9 +78,6 @@ namespace Facepunch.CoreWars
 			var mins = Scale( new Vector3( -girth, -girth, 0 ) );
 			var maxs = Scale( new Vector3( +girth, +girth, BodyHeight ) );
 
-			//We Dont actually make the player shorter
-			//Duck.UpdateBBox( ref mins, ref maxs, Pawn.Scale );
-
 			SetBBox( mins, maxs );
 		}
 
@@ -178,8 +175,8 @@ namespace Facepunch.CoreWars
 		private float GetWishSpeed()
 		{
 			var speed = 0f;
-			var ws = Duck.GetWishSpeed();
-			if ( ws >= 0 ) return ws;
+			var wishSpeed = Duck.GetWishSpeed();
+			if ( wishSpeed >= 0f ) return wishSpeed;
 
 			if ( Input.Down( InputButton.Duck ) )
 				speed = Scale( SprintSpeed * MoveSpeedScale );
