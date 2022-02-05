@@ -33,4 +33,12 @@ hud {
             opacity: 0;
         }
     }
+
+    .bottom {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 }

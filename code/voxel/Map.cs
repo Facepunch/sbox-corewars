@@ -457,27 +457,14 @@ namespace Facepunch.CoreWars.Voxel
 			return true;
 		}
 
-		public BlockInfo GetBlockInfo( IntVector3 position )
-		{
-			var positionInChunk = ToLocalPosition( position );
-
-			return new BlockInfo
-			{
-				ChunkPosition = positionInChunk,
-				ChunkIndex = GetChunkIndex( position ),
-				IsValid = IsInside( position ),
-				Position = position,
-				BlockId = GetBlock( position )
-			};
-		}
-
 		public bool SetBlock( IntVector3 position, byte blockId )
 		{
 			if ( !IsInside( position ) ) return false;
 
-			var blockInfo = GetBlockInfo( position );
-			var chunk = Chunks[blockInfo.ChunkIndex];
-			var blockIndex = chunk.GetLocalPositionIndex( blockInfo.ChunkPosition );
+			var chunkIndex = GetChunkIndex( position );
+			var localPosition = ToLocalPosition( position );
+			var chunk = Chunks[chunkIndex];
+			var blockIndex = chunk.GetLocalPositionIndex( localPosition );
 			var currentBlockId = chunk.GetLocalIndexBlock( blockIndex );
 
 			if ( blockId == currentBlockId ) return false;

@@ -1,0 +1,10 @@
+﻿Hotbar {
+    position: absolute;
+    bottom: 32px;
+    display: flex;
+    flex-direction: row;
+
+    HotbarSlot {
+        margin-right: 8px;
+    }
+}

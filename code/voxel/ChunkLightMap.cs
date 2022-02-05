@@ -253,12 +253,10 @@ namespace Facepunch.CoreWars.Voxel
 				for ( var i = 0; i < 6; i++ )
 				{
 					var neighbourPosition = Map.GetAdjacentPosition( node.Position, i );
-					var neighbourBlockInfo = Map.GetBlockInfo( neighbourPosition );
-					if ( !neighbourBlockInfo.IsValid ) continue;
+					var neighbourBlockId = Map.GetBlock( neighbourPosition );
+					var neighbourBlock = Map.GetBlockType( neighbourBlockId );
 
-					var neighbourBlock = Map.GetBlockType( neighbourBlockInfo.BlockId );
-
-					if ( Map.GetTorchLight( neighbourBlockInfo.Position, channel ) + 2 <= lightLevel )
+					if ( Map.GetTorchLight( neighbourPosition, channel ) + 2 <= lightLevel )
 					{
 						if ( neighbourBlock.IsTranslucent )
 						{

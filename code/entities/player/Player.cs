@@ -1,5 +1,7 @@
 ﻿using Facepunch.CoreWars.Voxel;
 using Sandbox;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -9,6 +11,8 @@ namespace Facepunch.CoreWars
 	{
 		[Net, Change( nameof( OnTeamChanged ) )] public Team Team { get; private set; }
 		[BindComponent] public ChunkViewer ChunkViewer { get; }
+		[Net] public byte CurrentBlockId { get; private set; }
+		[Net] public List<byte> HotbarBlocks { get; private set; }
 
 		public DamageInfo LastDamageTaken { get; private set; }
 
@@ -19,7 +23,22 @@ namespace Facepunch.CoreWars
 
 		public Player( Client client ) : this()
 		{
+			CurrentBlockId = 1;
+			HotbarBlocks = new List<byte>();
 
+			for ( var i = 0; i < 8; i++ )
+			{
+				HotbarBlocks.Add( (byte)(i + 1) );
+			}
+		}
+
+		[ServerCmd]
+		public static void SetBlockId( int blockId )
+		{
+			if ( ConsoleSystem.Caller.Pawn is Player player )
+			{
+				player.CurrentBlockId = (byte)blockId;
+			}
 		}
 
 		public async Task LoadChunkDelayed( Chunk chunk, int delayMs )
@@ -103,13 +122,44 @@ namespace Facepunch.CoreWars
 			if ( IsServer )
 			{
 				if ( Input.Pressed( InputButton.Attack1 ) )
-				{
-					var randomBlock = Map.Current.BlockData.ElementAt( Rand.Int( Map.Current.BlockData.Count - 1 ) ).Key;
-					Game.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, randomBlock );
-				}
+					Game.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, CurrentBlockId );
 				else if ( Input.Pressed( InputButton.Attack2 ) )
-				{
 					Game.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, 0 );
+			}
+
+			if ( IsClient && Prediction.FirstTime )
+			{
+				var currentSlotIndex = 0;
+
+				for ( var i = 0; i < Hotbar.Current.Slots.Count; i++ )
+				{
+					if ( CurrentBlockId == Hotbar.Current.Slots[i].BlockId )
+					{
+						currentSlotIndex = i;
+						break;
+					}
+				}
+
+				if ( Input.MouseWheel > 0 )
+					currentSlotIndex++;
+				else if ( Input.MouseWheel < 0 )
+					currentSlotIndex--;
+
+				currentSlotIndex = Math.Clamp( currentSlotIndex, 0, Hotbar.Current.Slots.Count - 1 );
+
+				var newBlockId = Hotbar.Current.Slots[currentSlotIndex].BlockId;
+
+				if ( newBlockId != CurrentBlockId )
+				{
+					SetBlockId( (int)newBlockId );
+				}
+			}
+
+			if ( IsServer && Prediction.FirstTime )
+			{
+				if ( Input.Released( InputButton.Reload ) )
+				{
+					ShuffleHotbarBlocks();
 				}
 			}
 
@@ -132,6 +182,28 @@ namespace Facepunch.CoreWars
 		protected virtual void OnTeamChanged( Team team )
 		{
 
+		}
+
+		private void ShuffleHotbarBlocks()
+		{
+			var oldSlotIndex = 0;
+
+			for ( var i = 0; i < HotbarBlocks.Count; i++ )
+			{
+				if ( CurrentBlockId == HotbarBlocks[i] )
+				{
+					oldSlotIndex = i;
+					break;
+				}
+			}
+
+			for ( var i = 0; i < HotbarBlocks.Count; i++ )
+			{
+				var randomBlock = Map.Current.BlockData.ElementAt( Rand.Int( 1, Map.Current.BlockData.Count - 1 ) ).Key;
+				HotbarBlocks[i] = randomBlock;
+			}
+
+			CurrentBlockId = HotbarBlocks[oldSlotIndex];
 		}
 	}
 }
