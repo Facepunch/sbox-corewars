@@ -837,8 +837,7 @@ namespace Facepunch.CoreWars.Voxel
 		[Event.Tick.Client]
 		private void ClientTick()
 		{
-			LightMap.UpdateTorchLight();
-			LightMap.UpdateSunLight();
+			LightMap.Update();
 		}
 	}
 }
