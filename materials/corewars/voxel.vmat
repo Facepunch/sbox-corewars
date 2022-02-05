@@ -40,28 +40,28 @@ Layer0
 	//---- Voxel Atlas ----
 	TextureAtlas "textures/blocks.png"
 	TextureLightmap "materials/default/default_lightmap.tga"
-	TextureLightmapWest "materials/default/default_lightmap.tga"
-	TextureLightmapSouth "materials/default/default_lightmap.tga"
 	TextureLightmapEast "materials/default/default_lightmap.tga"
 	TextureLightmapNorth "materials/default/default_lightmap.tga"
+	TextureLightmapSouth "materials/default/default_lightmap.tga"
+	TextureLightmapWest "materials/default/default_lightmap.tga"
 	TextureSunlight "materials/default/default.tga"
-	TextureSunlightWest "materials/default/default.tga"
-	TextureSunlightSouth "materials/default/default.tga"
 	TextureSunlightEast "materials/default/default.tga"
 	TextureSunlightNorth "materials/default/default.tga"
+	TextureSunlightSouth "materials/default/default.tga"
+	TextureSunlightWest "materials/default/default.tga"
 
 	DynamicParams
 	{
 		g_flVoxelSize "VoxelSize"
 		TextureLightmap "Lightmap"
-		TextureLightmapWest "LightMapWest"
-		TextureLightmapSouth "LightMapSouth"
 		TextureLightmapEast "LightMapEast"
 		TextureLightmapNorth "LightMapNorth"
+		TextureLightmapSouth "LightMapSouth"
+		TextureLightmapWest "LightMapWest"
 		TextureSunlight "SunLight"
-		TextureSunlightWest "SunLightWest"
-		TextureSunlightSouth "SunLightSouth"
 		TextureSunlightEast "SunLightEast"
 		TextureSunlightNorth "SunLightNorth"
+		TextureSunlightSouth "SunLightSouth"
+		TextureSunlightWest "SunLightWest"
 	}
 }

@@ -112,6 +112,7 @@ PS
 	float flTextureAtlasCellSize< Default(64.0f); >;
 	StaticCombo( S_MODE_DEPTH, 0..1, Sys( ALL ) );
 	StaticCombo( S_MODE_TOOLS_WIREFRAME, 0..1, Sys( ALL ) );
+	DynamicCombo( D_TRANSLUCENT, 0..1, Sys( ALL ) );
 
 	#if ( S_MODE_TOOLS_WIREFRAME )
 		RenderState( FillMode, WIREFRAME );
@@ -123,8 +124,8 @@ PS
 
 	#include "common/pixel.hlsl"
 
-	CreateInputTexture2D( TextureAtlas, Srgb, 8, "", "_color", "Voxel Atlas,10/10", Default3( 1.0f, 1.0f, 1.0f ) );
-	CreateTexture2D( g_tAtlasColor )  < Channel( RGB,  None( TextureAtlas ), Srgb ); OutputFormat( BC7 ); SrgbRead( true ); Filter( POINT ); AddressU( MIRROR ); AddressV( MIRROR ); >;
+	CreateInputTexture2D( TextureAtlas, Srgb, 8, "", "_color", "Voxel Atlas,10/10", Default4( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	CreateTexture2D( g_tAtlasColor )  < Channel( RGBA,  None( TextureAtlas ), Srgb ); OutputFormat( BC7 ); SrgbRead( true ); Filter( POINT ); AddressU( MIRROR ); AddressV( MIRROR ); >;
 
 	CreateInputTexture3D( TextureLightmap, Linear, 8, "", "_lightmap", "Voxel Atlas,20/10", Default3( 1.0, 1.0, 1.0 ) );
 	
@@ -162,10 +163,24 @@ PS
 
 	PixelOutput MainPs( PixelInput i )
 	{
+
+		float2 vAtlasDims = TextureDimensions2D( g_tAtlasColor, 0 ).xy;
+		
+		float2 vAltasMaxCells = vAtlasDims / flTextureAtlasCellSize;
+		float2 vInvMaxCells = 1.0f / vAltasMaxCells;
+
+		float2 vCellLocation =  float2( i.nTextureIndex % vAltasMaxCells.x, floor( i.nTextureIndex / vAltasMaxCells.x ) );
+
+		// Normalized to Atlas Space
+		float2 vTexCoordAtlas = frac((i.vTexCoord.xy % g_flVoxelSize) / g_flVoxelSize);
+		vTexCoordAtlas = frac((vTexCoordAtlas / vAltasMaxCells) + (vCellLocation * vInvMaxCells));
+
 		#if ( S_MODE_DEPTH )
 		{
 			PixelOutput o;
-			o.vColor.rgba = float4( 0.0, 0.0, 0.0, 1.0 );
+			float4 vColor = Tex2DLevel( g_tAtlasColor, vTexCoordAtlas, 0 );
+			if(vColor.a < 0.5f) discard;
+			o.vColor.rgba = float4( 0.0, 0.0, 0.0, 1.0f );
 			return o;
 		}
 		#elif ( S_MODE_TOOLS_WIREFRAME )
@@ -176,17 +191,7 @@ PS
 		}
 		#else
 		{
-			float2 vAtlasDims = TextureDimensions2D( g_tAtlasColor, 0 ).xy;
 			int3 vLightmapDim = TextureDimensions3D( g_tLightmap, 0 );
-
-			float2 vAltasMaxCells = vAtlasDims / flTextureAtlasCellSize;
-			float2 vInvMaxCells = 1.0f / vAltasMaxCells;
-
-			float2 vCellLocation =  float2( i.nTextureIndex % vAltasMaxCells.x, floor( i.nTextureIndex / vAltasMaxCells.x ) );
-
-			// Normalized to Atlas Space
-			float2 vTexCoordAtlas = frac((i.vTexCoord.xy % g_flVoxelSize) / g_flVoxelSize);
-			vTexCoordAtlas = frac((vTexCoordAtlas / vAltasMaxCells) + (vCellLocation * vInvMaxCells));
 
 			float lightmapBrightness = 0.0f;
 			float sunlightBrightness = 0.0f;
@@ -218,8 +223,14 @@ PS
 				sunlightBrightness = Tex3DLoad( g_tSunlight, int4( i.vPositionOs.xyz, 0 ) ).a * 16.0f;
 			}
 
+			float4 vColor = Tex2DLevel( g_tAtlasColor, vTexCoordAtlas, 0 );
+
+			if( vColor.a < 0.5f ) {
+				discard;
+			}
+
 			Material m = GatherMaterial( i );
-			m.Albedo.rgb = Tex2DLevel( g_tAtlasColor, vTexCoordAtlas, 0 ).rgb * saturate(0.03f + (lightmapBrightness + sunlightBrightness));
+			m.Albedo.rgb = vColor.rgb * saturate(0.03f + (lightmapBrightness + sunlightBrightness));
 
 			return FinalizePixelMaterial( i, m );
 		}
