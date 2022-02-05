@@ -120,7 +120,7 @@ namespace Facepunch.CoreWars.Voxel
 
 		public bool RemoveGreenTorchLight( IntVector3 position )
 		{
-			TorchLightRemoveQueue[0].Enqueue( new LightRemoveNode
+			TorchLightRemoveQueue[1].Enqueue( new LightRemoveNode
 			{
 				Position = Chunk.Offset + position,
 				Channel = 1,
@@ -132,7 +132,7 @@ namespace Facepunch.CoreWars.Voxel
 
 		public bool RemoveBlueTorchLight( IntVector3 position )
 		{
-			TorchLightRemoveQueue[0].Enqueue( new LightRemoveNode
+			TorchLightRemoveQueue[2].Enqueue( new LightRemoveNode
 			{
 				Position = Chunk.Offset + position,
 				Channel = 2,
@@ -269,7 +269,7 @@ namespace Facepunch.CoreWars.Voxel
 					{
 						if ( neighbourBlock.IsTranslucent )
 						{
-							Map.AddTorchLight( neighbourPosition, channel, (byte)(lightLevel - 1) );
+							Map.AddTorchLight( neighbourPosition, channel, (byte)((lightLevel - 1) * neighbourBlock.LightFilter[channel]) );
 						}
 					}
 				}
