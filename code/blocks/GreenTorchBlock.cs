@@ -11,6 +11,6 @@ namespace Facepunch.CoreWars.Blocks
 		public override string ClientEntity => "cw_torch";
 		public override bool HasTexture => false;
 		public override bool IsPassable => true;
-		public override IntVector3 LightLevel => new IntVector3( 0, 14, 0 );
+		public override IntVector3 LightLevel => new IntVector3( 0, 6, 0 );
 	}
 }
