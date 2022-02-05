@@ -497,6 +497,7 @@ namespace Facepunch.CoreWars.Voxel
 			var p = Offset + position;
 			var blockEmpty = Map.IsEmpty( p );
 			var blockId = blockEmpty ? (byte)0 : Host.IsServer ? (byte)1 : Map.GetBlock( p );
+			var block = Map.GetBlockType( blockId );
 
 			var face = new BlockFaceData
 			{
@@ -510,7 +511,7 @@ namespace Facepunch.CoreWars.Voxel
 			var adjacentBlockId = Map.GetBlock( adjacentBlockPosition );
 			var adjacentBlock = Map.GetBlockType( adjacentBlockId );
 
-			if ( !face.Culled && (adjacentBlock != null && !adjacentBlock.IsTranslucent) )
+			if ( !block.IsTranslucent && !face.Culled && (adjacentBlock != null && !adjacentBlock.IsTranslucent) )
 				face.Culled = true;
 
 			return face;
