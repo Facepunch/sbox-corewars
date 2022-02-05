@@ -147,6 +147,7 @@ namespace Facepunch.CoreWars.Voxel
 			chunk.BlockTypes = data;
 			chunk.Init();
 			chunk.PropagateSunlight();
+			chunk.CreateEntities();
 		}
 
 		public void AddAllBlockTypes()
@@ -471,10 +472,10 @@ namespace Facepunch.CoreWars.Voxel
 
 			if ( (blockId != 0 && currentBlockId == 0) || (blockId == 0 && currentBlockId != 0) )
 			{
+				var block = GetBlockType( blockId );
+
 				if ( IsClient )
 				{
-					var block = GetBlockType( blockId );
-
 					if ( block.LightLevel.x > 0 || block.LightLevel.y > 0 || block.LightLevel.z > 0 )
 					{
 						AddRedTorchLight( position, (byte)block.LightLevel.x );
@@ -490,7 +491,19 @@ namespace Facepunch.CoreWars.Voxel
 					}
 				}
 
+				var currentBlock = GetBlockType( currentBlockId );
+				currentBlock.OnBlockRemoved( chunk, position.x, position.y, position.z );
+
 				chunk.SetBlock( blockIndex, blockId );
+				block.OnBlockAdded( chunk, position.x, position.y, position.z );
+
+				var entityName = IsServer ? block.ServerEntity : block.ClientEntity;
+
+				if ( !string.IsNullOrEmpty( entityName ) )
+				{
+					var entity = Library.Create<Entity>( entityName );
+					chunk.SetEntity( localPosition, entity );
+				}
 
 				return true;
 
@@ -683,10 +696,21 @@ namespace Facepunch.CoreWars.Voxel
 			Host.AssertServer();
 
 			var chunkIndex = GetChunkIndex( position );
-			var blockPositionInChunk = ToLocalPosition( position );
+			var localPosition = ToLocalPosition( position );
 			var chunk = Chunks[chunkIndex];
+			var block = GetBlockType( blockId );
 
-			chunk.SetBlock( blockPositionInChunk, blockId );
+			chunk.SetBlock( localPosition, blockId );
+
+			block.OnBlockAdded( chunk, position.x, position.y, position.z );
+
+			var entityName = IsServer ? block.ServerEntity : block.ClientEntity;
+
+			if ( !string.IsNullOrEmpty( entityName ) )
+			{
+				var entity = Library.Create<Entity>( entityName );
+				chunk.SetEntity( localPosition, entity );
+			}
 		}
 	}
 }

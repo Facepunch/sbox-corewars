@@ -42,6 +42,9 @@ namespace Facepunch.CoreWars.Voxel
 		public HashSet<SliceUpdate> PendingSliceUpdates { get; set; } = new();
 		public bool Initialized { get; private set; }
 
+		public bool IsServer => Host.IsServer;
+		public bool IsClient => Host.IsClient;
+
 		public ChunkLightMap LightMap { get; set; }
 		public byte[] BlockTypes;
 		public IntVector3 Offset;
@@ -50,6 +53,7 @@ namespace Facepunch.CoreWars.Voxel
 
 		private static readonly BlockFaceData[] BlockFaceMask = new BlockFaceData[ChunkSize * ChunkSize * ChunkSize];
 		private readonly ChunkSlice[] Slices = new ChunkSlice[ChunkSize * 6];
+		private Dictionary<int,Entity> Entities { get; set; }
 		private SceneObject TranslucentSceneObject { get; set; }
 		private SceneObject OpaqueSceneObject { get; set; }
 		private Model TranslucentModel { get; set; }
@@ -62,6 +66,7 @@ namespace Facepunch.CoreWars.Voxel
 		public Chunk( Map map, int x, int y, int z )
 		{
 			BlockTypes = new byte[ChunkSize * ChunkSize * ChunkSize];
+			Entities = new();
 			LightMap = new ChunkLightMap( this, map );
 			Offset = new IntVector3( x * ChunkSize, y * ChunkSize, z * ChunkSize );
 			Index = x + y * map.NumChunksX + z * map.NumChunksX * map.NumChunksY;
@@ -90,7 +95,7 @@ namespace Facepunch.CoreWars.Voxel
 			var translucentModelBuilder = new ModelBuilder();
 			var opaqueModelBuilder = new ModelBuilder();
 
-			if ( Host.IsClient )
+			if ( IsClient )
 			{
 				var material = Material.Load( "materials/corewars/voxel.vmat" );
 				TranslucentMesh = new Mesh( material );
@@ -104,7 +109,7 @@ namespace Facepunch.CoreWars.Voxel
 
 			Build();
 
-			if ( Host.IsClient )
+			if ( IsClient )
 			{
 				translucentModelBuilder.AddMesh( TranslucentMesh );
 				opaqueModelBuilder.AddMesh( OpaqueMesh );
@@ -113,7 +118,7 @@ namespace Facepunch.CoreWars.Voxel
 			TranslucentModel = translucentModelBuilder.Create();
 			OpaqueModel = opaqueModelBuilder.Create();
 
-			if ( Host.IsClient )
+			if ( IsClient )
 			{
 				var transform = new Transform( Offset * (float)VoxelSize );
 
@@ -213,7 +218,7 @@ namespace Facepunch.CoreWars.Voxel
 
 		public void Build()
 		{
-			if ( Host.IsServer )
+			if ( IsServer )
 			{
 				BuildCollision();
 				return;
@@ -259,6 +264,29 @@ namespace Facepunch.CoreWars.Voxel
 		public IntVector3 ToMapPosition( IntVector3 position )
 		{
 			return Offset + position;
+		}
+
+		public void CreateEntities()
+		{
+			for ( var x = 0; x < ChunkSize; x++ )
+			{
+				for ( var y = 0; y < ChunkSize; y++ )
+				{
+					for ( var z = 0; z < ChunkSize; z++ )
+					{
+						var position = new IntVector3( x, y, z );
+						var blockId = GetLocalPositionBlock( position );
+						var block = Map.GetBlockType( blockId );
+						var entityName = IsServer ? block.ServerEntity : block.ClientEntity;
+
+						if ( !string.IsNullOrEmpty( entityName ) )
+						{
+							var entity = Library.Create<Entity>( entityName );
+							SetEntity( localPosition, entity );
+						}
+					}
+				}
+			}
 		}
 
 		public void PropagateSunlight()
@@ -328,6 +356,13 @@ namespace Facepunch.CoreWars.Voxel
 				OpaqueSceneObject = null;
 			}
 
+			foreach ( var kv in Entities )
+			{
+				kv.Value.Delete();
+			}
+
+			Entities.Clear();
+
 			foreach ( var slice in Slices )
 			{
 				if ( slice == null )
@@ -337,6 +372,32 @@ namespace Facepunch.CoreWars.Voxel
 			}
 
 			Event.Unregister( this );
+		}
+
+		public Entity GetEntity( IntVector3 position )
+		{
+			var index = GetLocalPositionIndex( position );
+			if ( Entities.TryGetValue( index, out var entity ) )
+				return entity;
+			else
+				return null;
+		}
+
+		public void SetEntity( IntVector3 position, Entity entity )
+		{
+			var index = GetLocalPositionIndex( position );
+			RemoveEntity( index );
+			Entities.Add( index, entity );
+		}
+
+		public void RemoveEntity( IntVector3 position )
+		{
+			var index = GetLocalPositionIndex( position );
+			if ( Entities.TryGetValue( index, out var entity ) )
+			{
+				entity.Delete();
+				Entities.Remove( index );
+			}
 		}
 
 		public void BuildMeshAndCollision()
@@ -496,7 +557,7 @@ namespace Facepunch.CoreWars.Voxel
 		{
 			var p = Offset + position;
 			var blockEmpty = Map.IsEmpty( p );
-			var blockId = blockEmpty ? (byte)0 : Host.IsServer ? (byte)1 : Map.GetBlock( p );
+			var blockId = blockEmpty ? (byte)0 : IsServer ? (byte)1 : Map.GetBlock( p );
 			var block = Map.GetBlockType( blockId );
 
 			var face = new BlockFaceData
