@@ -1,4 +1,5 @@
-﻿using Facepunch.CoreWars.Voxel;
+﻿using Facepunch.CoreWars.Blocks;
+using Facepunch.CoreWars.Voxel;
 using Sandbox;
 using System;
 using System.Collections.Generic;
@@ -160,6 +161,20 @@ namespace Facepunch.CoreWars
 				if ( Input.Released( InputButton.Reload ) )
 				{
 					ShuffleHotbarBlocks();
+				}
+				else if ( Input.Released( InputButton.Use) )
+				{
+					var random = Rand.Float();
+
+					byte blockId;
+					if ( random >= 0.66f )
+						blockId = Map.Current.FindBlockId<RedTorchBlock>();
+					else if ( random >= 0.33f )
+						blockId = Map.Current.FindBlockId<GreenTorchBlock>();
+					else
+						blockId = Map.Current.FindBlockId<BlueTorchBlock>();
+
+					Game.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, blockId );
 				}
 			}
 			else

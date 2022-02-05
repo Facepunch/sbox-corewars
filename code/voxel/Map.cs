@@ -127,6 +127,17 @@ namespace Facepunch.CoreWars.Voxel
 			BlockAtlas.Initialize();
 		}
 
+		public Vector3 ToSourcePosition( IntVector3 position )
+		{
+			return new Vector3( position.x * Chunk.VoxelSize, position.y * Chunk.VoxelSize, position.z * Chunk.VoxelSize );
+		}
+
+		public IntVector3 ToVoxelPosition( Vector3 position )
+		{
+			var fPosition = position * (1.0f / Chunk.VoxelSize);
+			return new IntVector3( (int)fPosition.x, (int)fPosition.y, (int)fPosition.z );
+		}
+
 		public void AddBlockType( BlockType type )
 		{
 			Host.AssertServer();
@@ -501,8 +512,13 @@ namespace Facepunch.CoreWars.Voxel
 
 				if ( !string.IsNullOrEmpty( entityName ) )
 				{
-					var entity = Library.Create<Entity>( entityName );
+					var entity = Library.Create<BlockEntity>( entityName );
+					entity.BlockType = block;
 					chunk.SetEntity( localPosition, entity );
+				}
+				else
+				{
+					chunk.RemoveEntity( localPosition );
 				}
 
 				return true;
@@ -708,7 +724,8 @@ namespace Facepunch.CoreWars.Voxel
 
 			if ( !string.IsNullOrEmpty( entityName ) )
 			{
-				var entity = Library.Create<Entity>( entityName );
+				var entity = Library.Create<BlockEntity>( entityName );
+				entity.BlockType = block;
 				chunk.SetEntity( localPosition, entity );
 			}
 		}

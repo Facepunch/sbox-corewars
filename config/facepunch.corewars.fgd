@@ -39,3 +39,13 @@ metadata
 	]
 ]
 
+//
+// Facepunch.CoreWars.Blocks.TorchEntity
+//
+@PointClass base(BaseProperties_facepunch_corewars) = cw_torch : ""
+[
+	enable_shadows(boolean) { group = "Rendering" } : "Shadow Casting" : 1 : "Whether this entity should cast shadows or not"
+
+	input SetColor(string) : "Sets the color of this entity. Format is '255 255 255 255'."
+]
+

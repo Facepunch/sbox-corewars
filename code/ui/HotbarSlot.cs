@@ -20,6 +20,8 @@ namespace Facepunch.CoreWars
 			if ( Map.Current == null ) return;
 
 			var block = Map.Current.GetBlockType( blockId );
+			if ( string.IsNullOrEmpty( block.DefaultTexture ) ) return;
+
 			var texture = Texture.Load( FileSystem.Mounted, $"textures/blocks/{ block.DefaultTexture }.png" );
 			Style.SetBackgroundImage( texture );
 		}

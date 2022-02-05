@@ -12,5 +12,7 @@ namespace Facepunch.CoreWars.Voxel
 
 		public override string FriendlyName => "Air";
 		public override bool IsTranslucent => true;
+		public override bool HasTexture => false;
+		public override bool IsPassable => true;
 	}
 }
