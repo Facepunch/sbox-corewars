@@ -389,10 +389,12 @@ namespace Facepunch.CoreWars.Voxel
 		{
 			var mapPosition = Offset + position;
 
+			entity.Map = Map;
 			entity.Chunk = this;
-			entity.Position = Map.ToSourcePosition( mapPosition );
 			entity.BlockPosition = mapPosition;
 			entity.LocalBlockPosition = position;
+			entity.CenterOnBlock( true, false );
+			entity.Initialize();
 
 			var index = GetLocalPositionIndex( position );
 			RemoveEntity( position );
