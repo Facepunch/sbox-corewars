@@ -83,7 +83,7 @@ namespace Facepunch.CoreWars.Voxel
 				Slices[i] = new ChunkSlice();
 			}
 
-			await UpdateBlockSlices();
+			await GameTask.RunInThreadAsync( UpdateBlockSlices );
 
 			foreach ( var update in PendingSliceUpdates )
 			{
@@ -143,7 +143,7 @@ namespace Facepunch.CoreWars.Voxel
 
 		public async void FullUpdate()
 		{
-			await UpdateBlockSlices();
+			await GameTask.RunInThreadAsync( UpdateBlockSlices );
 			Build();
 		}
 
@@ -760,8 +760,10 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
-		public async Task UpdateBlockSlices()
+		public void UpdateBlockSlices()
 		{
+			Log.Info( "Update Block Slices" );
+
 			IntVector3 blockPosition;
 			IntVector3 blockOffset;
 
@@ -770,8 +772,6 @@ namespace Facepunch.CoreWars.Voxel
 
 			for ( int faceSide = 0; faceSide < 6; faceSide++ )
 			{
-				await GameTask.Delay( 20 );
-
 				int axis = BlockDirectionAxis[faceSide];
 
 				int uAxis = (axis + 1) % 3;

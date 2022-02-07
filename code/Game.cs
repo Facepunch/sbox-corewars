@@ -115,7 +115,7 @@ namespace Facepunch.CoreWars
 			// For now just load every chunk in the map.
 			foreach ( var chunk in Map.Current.Chunks )
 			{
-				await player.LoadChunkDelayed( chunk, 10 );
+				player.LoadChunk( chunk );
 			}
 		}
 
