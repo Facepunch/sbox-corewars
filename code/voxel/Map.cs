@@ -148,7 +148,6 @@ namespace Facepunch.CoreWars.Voxel
 
 			if ( SetBlockAndUpdate( position, blockId ) )
 			{
-				Log.Info( "Change Block On Client" );
 				SetBlockOnClient( x, y, z, blockId );
 			}
 		}
@@ -451,9 +450,7 @@ namespace Facepunch.CoreWars.Voxel
 
 			if ( SetBlock( position, blockId ) || forceUpdate )
 			{
-				Log.Info( "Yes Change To: " + blockId + " / " + Host.IsClient );
 				shouldBuild = true;
-
 				chunkIds.Add( chunkIndex );
 
 				for ( int i = 0; i < 6; i++ )
@@ -584,7 +581,6 @@ namespace Facepunch.CoreWars.Voxel
 					chunk.RemoveEntity( localPosition );
 				}
 
-				Log.Info( Host.IsClient + " Set Block To: " + blockId );
 				SetHealth( position, 100 );
 
 				return true;
@@ -783,7 +779,6 @@ namespace Facepunch.CoreWars.Voxel
 			var block = GetBlockType( blockId );
 
 			chunk.SetBlock( localPosition, blockId );
-
 			block.OnBlockAdded( chunk, position.x, position.y, position.z );
 
 			var entityName = IsServer ? block.ServerEntity : block.ClientEntity;
