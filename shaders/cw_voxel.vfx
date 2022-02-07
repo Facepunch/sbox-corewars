@@ -123,16 +123,29 @@ PS
 
 	#include "common/pixel.hlsl"
 
-	CreateInputTexture2D( TextureAtlas, Srgb, 8, "", "_color", "Voxel Atlas,10/10", Default4( 1.0f, 1.0f, 1.0f, 1.0f ) );
-	CreateTexture2D( g_tAtlasColor )  < Channel( RGBA,  None( TextureAtlas ), Srgb ); OutputFormat( BC7 ); SrgbRead( true ); Filter( POINT ); AddressU( MIRROR ); AddressV( MIRROR ); >;
+	CreateInputTexture2D( TextureAtlasColor, Srgb, 8, "", "_color", "Voxel Atlas,10/10", Default4( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
-	CreateInputTexture3D( TextureLightmap, Linear, 32, "", "_lightmap", "Voxel Atlas,20/10", Default3( 1.0, 1.0, 1.0 ) );
+	SamplerState g_sPointSampler < Filter( POINT ); AddressU( MIRROR ); AddressV( MIRROR ); >;
+
+	CreateTexture2DWithoutSampler( g_tAtlasColor )  < Channel( RGBA,  None( TextureAtlasColor ), Srgb ); OutputFormat( BC7 ); SrgbRead( true ); Filter( POINT ); AddressU( MIRROR ); AddressV( MIRROR ); >;
+
+	CreateInputTexture2D( TextureAtlasNormal,           Linear, 8, "NormalizeNormals", "_normal", 		"Voxel Atlas,10/20", Default3( 0.5, 0.5, 1.0 ) );
+	CreateInputTexture2D( TextureAtlasRoughness,        Linear, 8, "",                 "_rough",  		"Voxel Atlas,10/30", Default( 0.5 ) );
+	CreateInputTexture2D( TextureAtlasMetalness,        Linear, 8, "",                 "_metal",  		"Voxel Atlas,10/40", Default( 1.0 ) );
+	CreateInputTexture2D( TextureAtlasAmbientOcclusion, Linear, 8, "",                 "_ao",     		"Voxel Atlas,10/50", Default( 1.0 ) );
+	CreateInputTexture2D( TextureAtlasEmission, 		Linear, 8, "",                 "_emission",     "Voxel Atlas,10/60", Default3( 0.0, 0.0, 0.0 ) );
+
+	CreateTexture2DWithoutSampler( g_tAtlasNormal )   < Channel( RGBA, None( TextureAtlasNormal ), Linear ); OutputFormat( BC7 ); SrgbRead( false ); >;
+	CreateTexture2DWithoutSampler( g_tAtlasRma )      < Channel( R,    None( TextureAtlasRoughness ), Linear ); Channel( G, None( TextureAtlasMetalness ), Linear ); Channel( B, None( TextureAtlasAmbientOcclusion ), Linear ); OutputFormat( BC7 ); SrgbRead( false ); >;
+	CreateTexture2DWithoutSampler( g_tAtlasEmission ) < Channel( RGB, None( TextureAtlasEmission ), Linear ); OutputFormat( BC7 ); SrgbRead( false ); >;
+	
+	CreateInputTexture3D( TextureLightmap, Linear, 32, "", "_lightmap", "Voxel Atlas,10/70", Default3( 1.0, 1.0, 1.0 ) );
 	
 	// Move all this to C#
-	CreateInputTexture3D( TextureLightmapWest, Linear, 32, "", "_lightmap", "Voxel Atlas,30/10", Default3( 1.0, 1.0, 1.0 ) );
-	CreateInputTexture3D( TextureLightmapSouth, Linear, 32, "", "_lightmap", "Voxel Atlas,40/10", Default3( 1.0, 1.0, 1.0 ) );
-	CreateInputTexture3D( TextureLightmapEast, Linear, 32, "", "_lightmap", "Voxel Atlas,50/10", Default3( 1.0, 1.0, 1.0 ) );
-	CreateInputTexture3D( TextureLightmapNorth, Linear, 32, "", "_lightmap", "Voxel Atlas,60/10", Default3( 1.0, 1.0, 1.0 ) );
+	CreateInputTexture3D( TextureLightmapWest, Linear, 32, "", "_lightmap", "Voxel Atlas,10/80", Default3( 1.0, 1.0, 1.0 ) );
+	CreateInputTexture3D( TextureLightmapSouth, Linear, 32, "", "_lightmap", "Voxel Atlas,10/90", Default3( 1.0, 1.0, 1.0 ) );
+	CreateInputTexture3D( TextureLightmapEast, Linear, 32, "", "_lightmap", "Voxel Atlas,10/100", Default3( 1.0, 1.0, 1.0 ) );
+	CreateInputTexture3D( TextureLightmapNorth, Linear, 32, "", "_lightmap", "Voxel Atlas,10/110", Default3( 1.0, 1.0, 1.0 ) );
 
 	CreateTexture3DWithoutSampler( g_tLightmap ) < Channel( R, None( TextureLightmap ), Linear ); SrgbRead( false ); Filter( POINT ); OutputFormat( R32F ); AddressU( CLAMP ); AddressV( CLAMP ); AddressW( CLAMP ); > ;
 	
@@ -216,7 +229,7 @@ PS
 		#if ( S_MODE_DEPTH )
 		{
 			PixelOutput o;
-			float4 vColor = Tex2DLevel( g_tAtlasColor, vTexCoordAtlas, 0 );
+			float4 vColor = Tex2DLevelS( g_tAtlasColor, g_sPointSampler, vTexCoordAtlas, 0 );
 			if(vColor.a < 0.5f) discard;
 			o.vColor.rgba = float4( 0.0, 0.0, 0.0, 1.0f );
 			return o;
@@ -231,22 +244,32 @@ PS
 		{
 			LightmapData LightData = FetchBestLightmap( i.vPositionOs );
 			float3 Torch = LightData.Torch;
-			// Blue looks really dim so lets skip it
-			Torch.rg *= Torch.rg;
 			float Sunlight = LightData.Sunlight;
 
 			// Torch flickering
 			float3 torchColor = Torch * (1.0f - (((sin(g_flTime * 8.0f) + 1.0f) * 0.5f) * 0.2f));
 
-			float4 vColor = Tex2DLevel( g_tAtlasColor, vTexCoordAtlas, 0 );
+			float4 vColor = Tex2DLevelS( g_tAtlasColor, g_sPointSampler, vTexCoordAtlas, 0 );
 
 			if( vColor.a < 0.50f ) {
 				discard;
 			}
+
+			float3 vRma = Tex2DLevelS( g_tAtlasRma, g_sPointSampler, vTexCoordAtlas, 0 ).rgb;
+			float3 vEmission = Tex2DLevelS( g_tAtlasEmission, g_sPointSampler, vTexCoordAtlas, 0 ).rgb;
 			
-			Material m = GatherMaterial( i );
-			m.Emission.rgb = vColor.rgb * saturate(0.003f + torchColor + Sunlight * 0.8f);
-			m.Albedo.rgb = vColor.rgb * saturate(0.03f + torchColor + Sunlight * 0.8f);
+			Material m;
+			m.Albedo.rgb = vColor.rgb * saturate(0.007f + torchColor + Sunlight * 0.8f);
+			m.Normal = Tex2DLevelS( g_tAtlasNormal, g_sPointSampler, vTexCoordAtlas, 0 ).rgb;
+			m.Roughness = vRma.r;
+			m.Metalness = vRma.g;
+			m.AmbientOcclusion = vRma.b;
+			m.BlendMask = 1.0f;
+			m.TintMask = 1.0f;
+			m.Opacity = 1.0f;
+			m.TransmissiveMask = 1.0f;
+			m.Emission.rgb = vEmission;
+			
 			return FinalizePixelMaterial( i, m );
 			
 
