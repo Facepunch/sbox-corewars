@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Facepunch.CoreWars.Inventory
 {
-	public static class Inventory
+	public static partial class Inventory
 	{
 		public enum NetworkEvent
 		{
@@ -146,7 +146,7 @@ namespace Facepunch.CoreWars.Inventory
 				using ( var writer = new BinaryWriter( stream ) )
 				{
 					writer.Write( container.InventoryId );
-					SendEventData( to, NetworkEvent.OpenInventory, stream.GetBuffer() );
+					SendEventDataToClient( to, NetworkEvent.OpenInventory, stream.GetBuffer() );
 				}
 			}
 		}
@@ -158,7 +158,7 @@ namespace Facepunch.CoreWars.Inventory
 				using ( var writer = new BinaryWriter( stream ) )
 				{
 					writer.Write( container.InventoryId );
-					SendEventData( to, NetworkEvent.CloseInventory, stream.GetBuffer() );
+					SendEventDataToClient( to, NetworkEvent.CloseInventory, stream.GetBuffer() );
 				}
 			}
 		}
@@ -173,7 +173,7 @@ namespace Facepunch.CoreWars.Inventory
 					writer.Write( from.InventoryId );
 					writer.Write( toSlot );
 					writer.Write( to.InventoryId );
-					SendEventData( NetworkEvent.MoveInventory, Encoding.UTF8.GetString( stream.GetBuffer() ) );
+					SendEventDataToServer( NetworkEvent.MoveInventory, Encoding.UTF8.GetString( stream.GetBuffer() ) );
 				}
 			}
 		}
@@ -185,7 +185,7 @@ namespace Facepunch.CoreWars.Inventory
 				using ( var writer = new BinaryWriter( stream ) )
 				{
 					writer.Write( container.InventoryId );
-					SendEventData( NetworkEvent.CloseInventory, Encoding.UTF8.GetString( stream.GetBuffer() ) );
+					SendEventDataToServer( NetworkEvent.CloseInventory, Encoding.UTF8.GetString( stream.GetBuffer() ) );
 				}
 			}
 		}
@@ -199,7 +199,7 @@ namespace Facepunch.CoreWars.Inventory
 					writer.Write( container.InventoryId );
 					writer.WriteInventoryItem( instance );
 					writer.Write( slotId );
-					SendEventData( to, NetworkEvent.GiveItem, stream.GetBuffer() );
+					SendEventDataToClient( to, NetworkEvent.GiveItem, stream.GetBuffer() );
 				}
 			}
 		}
@@ -212,7 +212,7 @@ namespace Facepunch.CoreWars.Inventory
 				{
 					writer.Write( container.InventoryId );
 					writer.Write( slotId );
-					SendEventData( to, NetworkEvent.TakeItem, stream.GetBuffer() );
+					SendEventDataToClient( to, NetworkEvent.TakeItem, stream.GetBuffer() );
 				}
 			}
 		}
@@ -251,7 +251,7 @@ namespace Facepunch.CoreWars.Inventory
 						}
 					}
 
-					SendEventData( to, NetworkEvent.SendDirtyItems, stream.GetBuffer() );
+					SendEventDataToClient( to, NetworkEvent.SendDirtyItems, stream.GetBuffer() );
 				}
 			}
 		}
@@ -330,7 +330,7 @@ namespace Facepunch.CoreWars.Inventory
 		}
 
 		[ServerCmd]
-		public static void SendEventData( NetworkEvent type, string data )
+		public static void SendEventDataToServer( NetworkEvent type, string data )
 		{
 			var decoded = Encoding.UTF8.GetBytes( data );
 
@@ -352,7 +352,7 @@ namespace Facepunch.CoreWars.Inventory
 		}
 
 		[ClientRpc]
-		private static void SendEventData( NetworkEvent type, byte[] data )
+		public static void SendEventDataToClient( NetworkEvent type, byte[] data )
 		{
 			using ( var stream = new MemoryStream( data ) )
 			{
