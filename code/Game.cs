@@ -110,12 +110,20 @@ namespace Facepunch.CoreWars
 
 			Map.Current.Send( client );
 
-			await Task.Delay( 1000 );
+			await Task.Delay( 500 );
+			var totalChunksSent = 0;
 
 			// For now just load every chunk in the map.
 			foreach ( var chunk in Map.Current.Chunks )
 			{
+				if ( totalChunksSent > 8 )
+				{
+					await GameTask.Delay( 1 );
+					totalChunksSent = 0;
+				}
+
 				player.LoadChunk( chunk );
+				totalChunksSent++;
 			}
 		}
 
