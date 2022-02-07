@@ -204,7 +204,6 @@ namespace Facepunch.CoreWars.Inventory
 			if ( IsClient )
 			{
 				InventorySystem.SendMoveInventoryEvent( this, target, fromSlot, toSlot );
-
 				return true;
 			}
 

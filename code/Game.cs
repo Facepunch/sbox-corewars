@@ -28,35 +28,6 @@ namespace Facepunch.CoreWars
 			Current = this;
 		}
 
-		public void SetBlockInDirection( Vector3 origin, Vector3 direction, byte blockId )
-		{
-			var face = Map.Current.Trace( origin * (1.0f / Chunk.VoxelSize), direction.Normal, 10000f, out var endPosition, out _ );
-			if ( face == BlockFace.Invalid ) return;
-
-			var position = blockId != 0 ? Map.GetAdjacentPosition( endPosition, (int)face ) : endPosition;
-			SetBlockOnServer( position.x, position.y, position.z, blockId );
-		}
-
-		public void SetBlockOnServer( int x, int y, int z, byte blockId )
-		{
-			Host.AssertServer();
-
-			var position = new IntVector3( x, y, z );
-
-			if ( Map.Current.SetBlockAndUpdate( position, blockId ) )
-			{
-				SetBlockOnClient( x, y, z, blockId );
-			}
-		}
-
-		[ClientRpc]
-		public void SetBlockOnClient( int x, int y, int z, byte blockId )
-		{
-			Host.AssertClient();
-
-			Map.Current.SetBlockAndUpdate( new IntVector3( x, y, z ), blockId, true );
-		}
-
 		public virtual void PlayerRespawned( Player player )
 		{
 			StateSystem.Active?.OnPlayerRespawned( player );

@@ -44,7 +44,8 @@ namespace Facepunch.CoreWars.Voxel
 		public bool IsClient => Host.IsClient;
 
 		public ChunkLightMap LightMap { get; set; }
-		public byte[] BlockTypes;
+		public ChunkDataMap DataMap { get; set; }
+		public byte[] Blocks;
 		public IntVector3 Offset;
 		public int Index;
 		public Map Map;
@@ -70,11 +71,12 @@ namespace Facepunch.CoreWars.Voxel
 
 		public Chunk( Map map, int x, int y, int z )
 		{
-			BlockTypes = new byte[ChunkSize * ChunkSize * ChunkSize];
+			Blocks = new byte[ChunkSize * ChunkSize * ChunkSize];
 			Entities = new();
 			LightMap = new ChunkLightMap( this, map );
 			Offset = new IntVector3( x * ChunkSize, y * ChunkSize, z * ChunkSize );
 			Index = x + y * map.NumChunksX + z * map.NumChunksX * map.NumChunksY;
+			DataMap = new ChunkDataMap( this, map );
 			Map = map;
 		}
 
@@ -126,11 +128,11 @@ namespace Facepunch.CoreWars.Voxel
 
 				OpaqueSceneObject = new SceneObject( OpaqueModel, transform );
 				OpaqueSceneObject.SetValue( "VoxelSize", VoxelSize );
-				OpaqueSceneObject.SetValue( "LightMap", LightMap.LightTexture );
+				OpaqueSceneObject.SetValue( "LightMap", LightMap.Texture );
 
 				TranslucentSceneObject = new SceneObject( TranslucentModel, transform );
 				TranslucentSceneObject.SetValue( "VoxelSize", VoxelSize );
-				TranslucentSceneObject.SetValue( "LightMap", LightMap.LightTexture );
+				TranslucentSceneObject.SetValue( "LightMap", LightMap.Texture );
 			}
 
 			Event.Register( this );
@@ -174,8 +176,8 @@ namespace Facepunch.CoreWars.Voxel
 
 				if ( neighbour != null && neighbour.Initialized )
 				{
-					TranslucentSceneObject.SetValue( "LightMapWest", neighbour.LightMap.LightTexture );
-					OpaqueSceneObject.SetValue( "LightMapWest", neighbour.LightMap.LightTexture );
+					TranslucentSceneObject.SetValue( "LightMapWest", neighbour.LightMap.Texture );
+					OpaqueSceneObject.SetValue( "LightMapWest", neighbour.LightMap.Texture );
 					if ( recurseNeighbours ) neighbour.UpdateAdjacents();
 				}
 			}
@@ -186,8 +188,8 @@ namespace Facepunch.CoreWars.Voxel
 
 				if ( neighbour != null && neighbour.Initialized )
 				{
-					TranslucentSceneObject.SetValue( "LightMapSouth", neighbour.LightMap.LightTexture );
-					OpaqueSceneObject.SetValue( "LightMapSouth", neighbour.LightMap.LightTexture );
+					TranslucentSceneObject.SetValue( "LightMapSouth", neighbour.LightMap.Texture );
+					OpaqueSceneObject.SetValue( "LightMapSouth", neighbour.LightMap.Texture );
 					if ( recurseNeighbours ) neighbour.UpdateAdjacents();
 				}
 			}
@@ -198,8 +200,8 @@ namespace Facepunch.CoreWars.Voxel
 
 				if ( neighbour != null && neighbour.Initialized )
 				{
-					TranslucentSceneObject.SetValue( "LightMapEast", neighbour.LightMap.LightTexture );
-					OpaqueSceneObject.SetValue( "LightMapEast", neighbour.LightMap.LightTexture );
+					TranslucentSceneObject.SetValue( "LightMapEast", neighbour.LightMap.Texture );
+					OpaqueSceneObject.SetValue( "LightMapEast", neighbour.LightMap.Texture );
 					if ( recurseNeighbours ) neighbour.UpdateAdjacents();
 				}
 			}
@@ -210,8 +212,8 @@ namespace Facepunch.CoreWars.Voxel
 
 				if ( neighbour != null && neighbour.Initialized )
 				{
-					TranslucentSceneObject.SetValue( "LightMapNorth", neighbour.LightMap.LightTexture );
-					OpaqueSceneObject.SetValue( "LightMapNorth", neighbour.LightMap.LightTexture );
+					TranslucentSceneObject.SetValue( "LightMapNorth", neighbour.LightMap.Texture );
+					OpaqueSceneObject.SetValue( "LightMapNorth", neighbour.LightMap.Texture );
 					if ( recurseNeighbours ) neighbour.UpdateAdjacents();
 				}
 			}
@@ -244,22 +246,22 @@ namespace Facepunch.CoreWars.Voxel
 			var y = position.y % ChunkSize;
 			var z = position.z % ChunkSize;
 			var index = x + y * ChunkSize + z * ChunkSize * ChunkSize;
-			return BlockTypes[index];
+			return Blocks[index];
 		}
 
 		public byte GetLocalPositionBlock( int x, int y, int z )
 		{
-			return BlockTypes[GetLocalPositionIndex( x, y, z )];
+			return Blocks[GetLocalPositionIndex( x, y, z )];
 		}
 
 		public byte GetLocalPositionBlock( IntVector3 position )
 		{
-			return BlockTypes[GetLocalPositionIndex( position )];
+			return Blocks[GetLocalPositionIndex( position )];
 		}
 
 		public byte GetLocalIndexBlock( int index )
 		{
-			return BlockTypes[index];
+			return Blocks[index];
 		}
 
 		public IntVector3 ToMapPosition( IntVector3 position )
@@ -336,12 +338,12 @@ namespace Facepunch.CoreWars.Voxel
 
 		public void SetBlock( IntVector3 position, byte blockId )
 		{
-			BlockTypes[GetLocalPositionIndex( position )] = blockId;
+			Blocks[GetLocalPositionIndex( position )] = blockId;
 		}
 
 		public void SetBlock( int index, byte blockId )
 		{
-			BlockTypes[index] = blockId;
+			Blocks[index] = blockId;
 		}
 
 		public void Destroy()
@@ -914,10 +916,17 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
+		[Event.Tick.Server]
+		private void ServerTick()
+		{
+			DataMap.Update();
+		}
+
 		[Event.Tick.Client]
 		private void ClientTick()
 		{
 			LightMap.Update();
+			DataMap.Update();
 		}
 	}
 }

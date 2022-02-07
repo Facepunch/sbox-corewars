@@ -59,18 +59,19 @@ namespace Facepunch.CoreWars
 			ChunkViewer.LoadedChunks.Add( chunk.Index );
 
 			var offset = chunk.Offset;
-			var types = chunk.BlockTypes;
+			var blocks = chunk.Blocks;
 			var index = chunk.Index;
 
-			ReceiveChunk( To.Single( Client ), offset.x, offset.y, offset.z, index, types );
+			ReceiveChunk( To.Single( Client ), offset.x, offset.y, offset.z, index, blocks, chunk.DataMap.Data );
 		}
 
 		[ClientRpc]
-		public void ReceiveChunk( int x, int y, int z, int index, byte[] data )
+		public void ReceiveChunk( int x, int y, int z, int index, byte[] blocks, byte[] data )
 		{
-			Map.Current.ReceiveChunk( index, data );
+			Map.Current.ReceiveChunk( index, blocks, data );
 
-			Log.Info( $"(#{NetworkIdent}) Received all bytes for chunk{x},{y},{z} ({data.Length / 1024}kb)" );
+			var totalSize = (blocks.Length + data.Length) / 1024;
+			Log.Info( $"(#{NetworkIdent}) Received all bytes for chunk{x},{y},{z} ({totalSize}kb)" );
 		}
 
 		public void SetTeam( Team team )
@@ -140,9 +141,13 @@ namespace Facepunch.CoreWars
 			if ( IsServer )
 			{
 				if ( Input.Pressed( InputButton.Attack1 ) )
-					Game.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, CurrentBlockId );
+				{
+					Map.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, CurrentBlockId );
+				}
 				else if ( Input.Pressed( InputButton.Attack2 ) )
-					Game.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, 0 );
+				{
+					Map.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, 0 );
+				}
 			}
 
 			if ( IsClient && Prediction.FirstTime )
@@ -169,7 +174,7 @@ namespace Facepunch.CoreWars
 
 				if ( newBlockId != CurrentBlockId )
 				{
-					SetBlockId( (int)newBlockId );
+					SetBlockId( newBlockId );
 				}
 			}
 
@@ -191,7 +196,7 @@ namespace Facepunch.CoreWars
 					else
 						blockId = Map.Current.FindBlockId<BlueTorchBlock>();
 
-					Game.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, blockId );
+					Map.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, blockId );
 				}
 			}
 			else
