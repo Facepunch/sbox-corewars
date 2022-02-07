@@ -105,6 +105,7 @@ namespace Facepunch.CoreWars
 
 			var player = new Player( client );
 			client.Pawn = player;
+			player.CreateInventory();
 
 			StateSystem.Active?.OnPlayerJoined( player );
 

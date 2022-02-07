@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Facepunch.CoreWars.Inventory
 {
-	public static partial class Inventory
+	public static partial class InventorySystem
 	{
 		public enum NetworkEvent
 		{

@@ -1,8 +1,10 @@
 ﻿using Facepunch.CoreWars.Blocks;
+using Facepunch.CoreWars.Inventory;
 using Facepunch.CoreWars.Voxel;
 using Sandbox;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -15,6 +17,7 @@ namespace Facepunch.CoreWars
 		[Net] public byte CurrentBlockId { get; private set; }
 		[Net] public List<byte> HotbarBlocks { get; private set; }
 
+		public InventoryContainer MainInventory { get; private set; }
 		public DamageInfo LastDamageTaken { get; private set; }
 
 		public Player() : base()
@@ -76,6 +79,20 @@ namespace Facepunch.CoreWars
 
 			Team = team;
 			OnTeamChanged( team );
+		}
+
+		public void CreateInventory()
+		{
+			MainInventory = new InventoryContainer( this );
+			MainInventory.SetSlotLimit( 10 );
+			MainInventory.AddConnection( Client );
+
+			InventorySystem.Register( MainInventory );
+
+			MainInventory.Give( "test_item", 2 );
+			MainInventory.Give( "test_item", 6 );
+
+			SendInventoryToOwner();
 		}
 
 		public override void Spawn()
@@ -206,6 +223,38 @@ namespace Facepunch.CoreWars
 		protected virtual void OnTeamChanged( Team team )
 		{
 
+		}
+
+		private void SendInventoryToOwner()
+		{
+			using ( var stream = new MemoryStream() )
+			{
+				using ( var writer = new BinaryWriter( stream ) )
+				{
+					writer.WriteInventoryContainer( MainInventory );
+					ReceiveInventory( To.Single( Client ), stream.GetBuffer() );
+				}
+			}
+		}
+
+		[ClientRpc]
+		private void ReceiveInventory( byte[] data )
+		{
+			using ( var stream = new MemoryStream( data ) )
+			{
+				using ( var reader = new BinaryReader( stream ) )
+				{
+					MainInventory = reader.ReadInventoryContainer();
+
+					foreach ( var item in MainInventory.ItemList )
+					{
+						if ( item.IsValid() )
+						{
+							Log.Info( $"Received Initial Inventory Item {item.UniqueName} @ Slot #{item.SlotId}" );
+						}
+					}
+				}
+			}
 		}
 
 		private void ShuffleHotbarBlocks()

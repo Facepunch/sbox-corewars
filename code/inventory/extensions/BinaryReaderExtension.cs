@@ -20,7 +20,7 @@ namespace Facepunch.CoreWars.Inventory
 				var itemId = buffer.ReadUInt64();
 				var slotId = buffer.ReadUInt16();
 
-				var instance = Inventory.CreateItem( itemName, itemId );
+				var instance = InventorySystem.CreateItem( itemName, itemId );
 
 				if ( instance != null )
 				{
@@ -43,7 +43,7 @@ namespace Facepunch.CoreWars.Inventory
 			var slotLimit = buffer.ReadUInt16();
 			var entityId = buffer.ReadInt32();
 
-			var container = Inventory.Find( inventoryId );
+			var container = InventorySystem.Find( inventoryId );
 			var entity = Entity.FindByIndex( entityId );
 
 			if ( !entity.IsValid() )
@@ -56,7 +56,7 @@ namespace Facepunch.CoreWars.Inventory
 			{
 				container = new InventoryContainer( entity );
 				container.SetSlotLimit( slotLimit );
-				Inventory.Register( container, inventoryId );
+				InventorySystem.Register( container, inventoryId );
 			}
 			else
 			{

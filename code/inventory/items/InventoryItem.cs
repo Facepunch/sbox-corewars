@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Facepunch.CoreWars.Inventory
 {
-	public class InventoryItem
+	public class InventoryItem : IValid
 	{
 		public ItemSlot ItemSlot { get; set; } = ItemSlot.Everything;
 		public bool IsStackable { get; set; }
@@ -59,6 +59,7 @@ namespace Facepunch.CoreWars.Inventory
 			}
 		}
 
+		public bool IsValid => true;
 		public ulong ItemId { get; set; }
 		public ushort SlotId { get; set; }
 

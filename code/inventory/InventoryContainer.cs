@@ -39,7 +39,7 @@ namespace Facepunch.CoreWars.Inventory
 
 						if ( InternalIsDirty )
 						{
-							Inventory.AddToDirtyList( this );
+							InventorySystem.AddToDirtyList( this );
 						}
 					}
 				}
@@ -71,7 +71,7 @@ namespace Facepunch.CoreWars.Inventory
 		{
 			if ( IsServer )
 			{
-				Inventory.SendCloseInventoryEvent( To.Single( player ), this );
+				InventorySystem.SendCloseInventoryEvent( To.Single( player ), this );
 			}
 		}
 
@@ -81,12 +81,12 @@ namespace Facepunch.CoreWars.Inventory
 			{
 				if ( Connections.Count > 0 )
 				{
-					Inventory.SendCloseInventoryEvent( To.Multiple( Connections ), this );
+					InventorySystem.SendCloseInventoryEvent( To.Multiple( Connections ), this );
 				}
 			}
 			else
 			{
-				Inventory.SendCloseInventoryEvent( this );
+				InventorySystem.SendCloseInventoryEvent( this );
 			}
 		}
 
@@ -173,7 +173,7 @@ namespace Facepunch.CoreWars.Inventory
 		{
 			if ( Connections.Count > 0 )
 			{
-				Inventory.SendDirtyItemsEvent( To.Multiple( Connections ), this );
+				InventorySystem.SendDirtyItemsEvent( To.Multiple( Connections ), this );
 			}
 		}
 
@@ -203,7 +203,7 @@ namespace Facepunch.CoreWars.Inventory
 
 			if ( IsClient )
 			{
-				Inventory.SendMoveInventoryEvent( this, target, fromSlot, toSlot );
+				InventorySystem.SendMoveInventoryEvent( this, target, fromSlot, toSlot );
 
 				return true;
 			}
@@ -470,7 +470,7 @@ namespace Facepunch.CoreWars.Inventory
 				return null;
 			}
 
-			var instance = Inventory.CreateItem( itemName );
+			var instance = InventorySystem.CreateItem( itemName );
 
 			if ( instance == null )
 			{
@@ -500,7 +500,7 @@ namespace Facepunch.CoreWars.Inventory
 
 			if ( Connections.Count > 0 )
 			{
-				Inventory.SendGiveItemEvent( To.Multiple( Connections ), this, slot, instance );
+				InventorySystem.SendGiveItemEvent( To.Multiple( Connections ), this, slot, instance );
 			}
 
 			HandleSlotChanged( slot );
@@ -517,7 +517,7 @@ namespace Facepunch.CoreWars.Inventory
 
 			if ( Connections.Count > 0 )
 			{
-				Inventory.SendTakeItemEvent( To.Multiple( Connections ), this, slot );
+				InventorySystem.SendTakeItemEvent( To.Multiple( Connections ), this, slot );
 			}
 
 			HandleSlotChanged( slot );
