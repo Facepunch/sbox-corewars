@@ -1,8 +1,6 @@
 ﻿using Sandbox;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Facepunch.CoreWars.Voxel
@@ -51,7 +49,14 @@ namespace Facepunch.CoreWars.Voxel
 		public int Index;
 		public Map Map;
 
-		private static readonly BlockFaceData[] BlockFaceMask = new BlockFaceData[ChunkSize * ChunkSize * ChunkSize];
+		[ThreadStatic]
+		private static BlockFaceData[] ThreadStaticBlockFaceMask;
+
+		private static BlockFaceData[] GetBlockFaceMask()
+		{
+			return ThreadStaticBlockFaceMask ??= new BlockFaceData[ChunkSize * ChunkSize * ChunkSize];
+		}
+
 		private readonly ChunkSlice[] Slices = new ChunkSlice[ChunkSize * 6];
 		private Dictionary<int, BlockEntity> Entities { get; set; }
 		private SceneObject TranslucentSceneObject { get; set; }
@@ -73,17 +78,14 @@ namespace Facepunch.CoreWars.Voxel
 			Map = map;
 		}
 
-		public async void Init()
+		public async Task Init()
 		{
 			if ( Initialized )
 				return;
 
-			for ( int i = 0; i < Slices.Length; ++i )
-			{
-				Slices[i] = new ChunkSlice();
-			}
-
 			await GameTask.RunInThreadAsync( UpdateBlockSlices );
+
+			Initialized = true;
 
 			foreach ( var update in PendingSliceUpdates )
 			{
@@ -130,8 +132,6 @@ namespace Facepunch.CoreWars.Voxel
 				TranslucentSceneObject.SetValue( "VoxelSize", VoxelSize );
 				TranslucentSceneObject.SetValue( "LightMap", LightMap.LightTexture );
 			}
-
-			Initialized = true;
 
 			Event.Register( this );
 
@@ -619,6 +619,7 @@ namespace Facepunch.CoreWars.Voxel
 				return;
 			}
 
+			var blockFaceMask = GetBlockFaceMask();
 			int vertexOffset = 0;
 			int axis = BlockDirectionAxis[direction];
 			int sliceIndex = GetSliceIndex( position[axis], direction );
@@ -667,11 +668,11 @@ namespace Facepunch.CoreWars.Voxel
 
 					if ( !faceA.Culled && !faceB.Culled && faceA.Equals( faceB ) )
 					{
-						BlockFaceMask[n].Culled = true;
+						blockFaceMask[n].Culled = true;
 					}
 					else
 					{
-						BlockFaceMask[n] = faceA;
+						blockFaceMask[n] = faceA;
 
 						if ( !faceA.Culled )
 						{
@@ -691,7 +692,7 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				for ( int i = 0; i < ChunkSize; )
 				{
-					if ( BlockFaceMask[n].Culled )
+					if ( blockFaceMask[n].Culled )
 					{
 						i++;
 						n++;
@@ -704,7 +705,7 @@ namespace Facepunch.CoreWars.Voxel
 
 					if ( Map.GreedyMeshing )
 					{
-						for ( faceWidth = 1; i + faceWidth < ChunkSize && !BlockFaceMask[n + faceWidth].Culled && BlockFaceMask[n + faceWidth].Equals( BlockFaceMask[n] ); faceWidth++ )
+						for ( faceWidth = 1; i + faceWidth < ChunkSize && !blockFaceMask[n + faceWidth].Culled && blockFaceMask[n + faceWidth].Equals( blockFaceMask[n] ); faceWidth++ )
 						{
 
 						}
@@ -715,9 +716,9 @@ namespace Facepunch.CoreWars.Voxel
 						{
 							for ( int k = 0; k < faceWidth; k++ )
 							{
-								var maskFace = BlockFaceMask[n + k + faceHeight * ChunkSize];
+								var maskFace = blockFaceMask[n + k + faceHeight * ChunkSize];
 
-								if ( maskFace.Culled || !maskFace.Equals( BlockFaceMask[n] ) )
+								if ( maskFace.Culled || !maskFace.Equals( blockFaceMask[n] ) )
 								{
 									done = true;
 									break;
@@ -733,7 +734,7 @@ namespace Facepunch.CoreWars.Voxel
 						faceHeight = 1;
 					}
 
-					if ( !BlockFaceMask[n].Culled )
+					if ( !blockFaceMask[n].Culled )
 					{
 						blockPosition[uAxis] = i;
 						blockPosition[vAxis] = j;
@@ -741,7 +742,7 @@ namespace Facepunch.CoreWars.Voxel
 						AddQuad( slice,
 							blockPosition.x, blockPosition.y, blockPosition.z,
 							faceWidth, faceHeight, uAxis, vAxis,
-							BlockFaceMask[n].Side, BlockFaceMask[n].Type );
+							blockFaceMask[n].Side, blockFaceMask[n].Type );
 
 						vertexOffset += 6;
 					}
@@ -750,7 +751,7 @@ namespace Facepunch.CoreWars.Voxel
 					{
 						for ( int k = 0; k < faceWidth; ++k )
 						{
-							BlockFaceMask[n + k + l * ChunkSize].Culled = true;
+							blockFaceMask[n + k + l * ChunkSize].Culled = true;
 						}
 					}
 
@@ -762,7 +763,12 @@ namespace Facepunch.CoreWars.Voxel
 
 		public void UpdateBlockSlices()
 		{
-			Log.Info( "Update Block Slices" );
+			var blockFaceMask = GetBlockFaceMask();
+
+			for ( int i = 0; i < Slices.Length; ++i )
+			{
+				Slices[i] = new ChunkSlice();
+			}
 
 			IntVector3 blockPosition;
 			IntVector3 blockOffset;
@@ -773,7 +779,6 @@ namespace Facepunch.CoreWars.Voxel
 			for ( int faceSide = 0; faceSide < 6; faceSide++ )
 			{
 				int axis = BlockDirectionAxis[faceSide];
-
 				int uAxis = (axis + 1) % 3;
 				int vAxis = (axis + 2) % 3;
 
@@ -782,11 +787,11 @@ namespace Facepunch.CoreWars.Voxel
 
 				for ( blockPosition[axis] = 0; blockPosition[axis] < ChunkSize; blockPosition[axis]++ )
 				{
-					int n = 0;
-					bool maskEmpty = true;
-
-					int sliceIndex = GetSliceIndex( blockPosition[axis], faceSide );
+					var n = 0;
+					var maskEmpty = true;
+					var sliceIndex = GetSliceIndex( blockPosition[axis], faceSide );
 					var slice = Slices[sliceIndex];
+
 					slice.IsDirty = true;
 					slice.OpaqueVertices.Clear();
 					slice.TranslucentVertices.Clear();
@@ -813,11 +818,11 @@ namespace Facepunch.CoreWars.Voxel
 
 							if ( !faceA.Culled && !faceB.Culled && faceA.Equals( faceB ) )
 							{
-								BlockFaceMask[n].Culled = true;
+								blockFaceMask[n].Culled = true;
 							}
 							else
 							{
-								BlockFaceMask[n] = faceA;
+								blockFaceMask[n] = faceA;
 
 								if ( !faceA.Culled )
 								{
@@ -840,7 +845,7 @@ namespace Facepunch.CoreWars.Voxel
 					{
 						for ( int i = 0; i < ChunkSize; )
 						{
-							if ( BlockFaceMask[n].Culled )
+							if ( blockFaceMask[n].Culled )
 							{
 								i++;
 								n++;
@@ -853,7 +858,7 @@ namespace Facepunch.CoreWars.Voxel
 
 							if ( Map.GreedyMeshing )
 							{
-								for ( faceWidth = 1; i + faceWidth < ChunkSize && !BlockFaceMask[n + faceWidth].Culled && BlockFaceMask[n + faceWidth].Equals( BlockFaceMask[n] ); faceWidth++ )
+								for ( faceWidth = 1; i + faceWidth < ChunkSize && !blockFaceMask[n + faceWidth].Culled && blockFaceMask[n + faceWidth].Equals( blockFaceMask[n] ); faceWidth++ )
 								{
 
 								}
@@ -864,9 +869,9 @@ namespace Facepunch.CoreWars.Voxel
 								{
 									for ( int k = 0; k < faceWidth; k++ )
 									{
-										var maskFace = BlockFaceMask[n + k + faceHeight * ChunkSize];
+										var maskFace = blockFaceMask[n + k + faceHeight * ChunkSize];
 
-										if ( maskFace.Culled || !maskFace.Equals( BlockFaceMask[n] ) )
+										if ( maskFace.Culled || !maskFace.Equals( blockFaceMask[n] ) )
 										{
 											done = true;
 											break;
@@ -882,7 +887,7 @@ namespace Facepunch.CoreWars.Voxel
 								faceHeight = 1;
 							}
 
-							if ( !BlockFaceMask[n].Culled )
+							if ( !blockFaceMask[n].Culled )
 							{
 								blockPosition[uAxis] = i;
 								blockPosition[vAxis] = j;
@@ -890,14 +895,14 @@ namespace Facepunch.CoreWars.Voxel
 								AddQuad( slice,
 									blockPosition.x, blockPosition.y, blockPosition.z,
 									faceWidth, faceHeight, uAxis, vAxis,
-									BlockFaceMask[n].Side, BlockFaceMask[n].Type );
+									blockFaceMask[n].Side, blockFaceMask[n].Type );
 							}
 
 							for ( int l = 0; l < faceHeight; ++l )
 							{
 								for ( int k = 0; k < faceWidth; ++k )
 								{
-									BlockFaceMask[n + k + l * ChunkSize].Culled = true;
+									blockFaceMask[n + k + l * ChunkSize].Culled = true;
 								}
 							}
 

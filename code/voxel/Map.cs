@@ -152,11 +152,11 @@ namespace Facepunch.CoreWars.Voxel
 			NextAvailableBlockId++;
 		}
 
-		public void ReceiveChunk( int index, byte[] data )
+		public async void ReceiveChunk( int index, byte[] data )
 		{
 			var chunk = Chunks[index];
 			chunk.BlockTypes = data;
-			chunk.Init();
+			await chunk.Init();
 			chunk.PropagateSunlight();
 			chunk.CreateEntities();
 		}

@@ -110,7 +110,7 @@ namespace Facepunch.CoreWars
 
 			Map.Current.Send( client );
 
-			await Task.Delay( 500 );
+			await Task.Delay( 1000 );
 
 			// For now just load every chunk in the map.
 			foreach ( var chunk in Map.Current.Chunks )
