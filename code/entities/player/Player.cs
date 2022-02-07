@@ -232,32 +232,19 @@ namespace Facepunch.CoreWars
 
 		private void SendInventoryToOwner()
 		{
-			using ( var stream = new MemoryStream() )
-			{
-				using ( var writer = new BinaryWriter( stream ) )
-				{
-					writer.WriteInventoryContainer( MainInventory );
-					ReceiveInventory( To.Single( Client ), stream.GetBuffer() );
-				}
-			}
+			ReceiveInventory( To.Single( Client ), MainInventory.Serialize() );
 		}
 
 		[ClientRpc]
 		private void ReceiveInventory( byte[] data )
 		{
-			using ( var stream = new MemoryStream( data ) )
-			{
-				using ( var reader = new BinaryReader( stream ) )
-				{
-					MainInventory = reader.ReadInventoryContainer();
+			MainInventory = InventoryContainer.Deserialize( data );
 
-					foreach ( var item in MainInventory.ItemList )
-					{
-						if ( item.IsValid() )
-						{
-							Log.Info( $"Received Initial Inventory Item {item.UniqueName} @ Slot #{item.SlotId}" );
-						}
-					}
+			foreach ( var item in MainInventory.ItemList )
+			{
+				if ( item.IsValid() )
+				{
+					Log.Info( $"Received Initial Inventory Item {item.UniqueName} @ Slot #{item.SlotId}" );
 				}
 			}
 		}

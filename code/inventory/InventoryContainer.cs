@@ -52,6 +52,29 @@ namespace Facepunch.CoreWars.Inventory
 		public List<InventoryItem> ItemList { get; }
 		public ushort SlotLimit { get; private set; }
 
+		public static InventoryContainer Deserialize( byte[] data )
+		{
+			using ( var stream = new MemoryStream( data ) )
+			{
+				using ( var reader = new BinaryReader( stream ) )
+				{
+					return reader.ReadInventoryContainer();
+				}
+			}
+		}
+
+		public byte[] Serialize()
+		{
+			using ( var stream = new MemoryStream() )
+			{
+				using ( var writer = new BinaryWriter( stream ) )
+				{
+					writer.WriteInventoryContainer( this );
+					return stream.ToArray();
+				}
+			}
+		}
+
 		public void InvokeDataChanged( ushort slot )
 		{
 			OnDataChanged?.Invoke( slot );
