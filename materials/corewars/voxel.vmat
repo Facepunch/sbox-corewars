@@ -35,6 +35,7 @@ Layer0
 	//---- Voxel Atlas ----
 	TextureAtlasAmbientOcclusion "textures/hd/blocks_ao.png"
 	TextureAtlasColor "textures/hd/blocks_color.png"
+	TextureAtlasEmission "[0.000000 0.000000 0.000000 0.000000]"
 	TextureAtlasMetalness "materials/default/default_metal.tga"
 	TextureAtlasNormal "textures/hd/blocks_normal.png"
 	TextureAtlasRoughness "textures/hd/blocks_rough.png"
