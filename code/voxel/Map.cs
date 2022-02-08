@@ -514,6 +514,8 @@ namespace Facepunch.CoreWars.Voxel
 
 		public void GeneratePerlin( byte groundBlockId, byte[] undergroundBlocks )
 		{
+			byte undergroundBlock;
+
 			for ( int x = 0; x < SizeX; ++x )
 			{
 				for ( int y = 0; y < SizeY; ++y )
@@ -532,7 +534,7 @@ namespace Facepunch.CoreWars.Voxel
 
 							if ( z < height / 2 )
 							{
-								var undergroundBlock = undergroundBlocks[Rand.Int( undergroundBlocks.Length - 1 )];
+								undergroundBlock = undergroundBlocks[Rand.Int( undergroundBlocks.Length - 1 )];
 								SetBlockAtPosition( position, undergroundBlock );
 								GenerateCaves( x, y, z );
 							}
@@ -544,7 +546,8 @@ namespace Facepunch.CoreWars.Voxel
 					else
 						SuitableSpawnPositions.Add( ToSourcePosition( new IntVector3( x, y, height ) ) );
 
-					SetBlockAtPosition( new IntVector3( x, y, 0 ), groundBlockId );
+					undergroundBlock = undergroundBlocks[Rand.Int( undergroundBlocks.Length - 1 )];
+					SetBlockAtPosition( new IntVector3( x, y, 0 ), undergroundBlock );
 				}
 			}
 		}
