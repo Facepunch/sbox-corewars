@@ -1,4 +1,5 @@
 ﻿using Facepunch.CoreWars.Blocks;
+using Facepunch.CoreWars.Inventory;
 using Facepunch.CoreWars.Voxel;
 using Sandbox;
 using System.Linq;
@@ -26,35 +27,6 @@ namespace Facepunch.CoreWars
 			}
 
 			Current = this;
-		}
-
-		public void SetBlockInDirection( Vector3 origin, Vector3 direction, byte blockId )
-		{
-			var face = Map.Current.Trace( origin * (1.0f / Chunk.VoxelSize), direction.Normal, 10000f, out var endPosition, out _ );
-			if ( face == BlockFace.Invalid ) return;
-
-			var position = blockId != 0 ? Map.GetAdjacentPosition( endPosition, (int)face ) : endPosition;
-			SetBlockOnServer( position.x, position.y, position.z, blockId );
-		}
-
-		public void SetBlockOnServer( int x, int y, int z, byte blockId )
-		{
-			Host.AssertServer();
-
-			var position = new IntVector3( x, y, z );
-
-			if ( Map.Current.SetBlockAndUpdate( position, blockId ) )
-			{
-				SetBlockOnClient( x, y, z, blockId );
-			}
-		}
-
-		[ClientRpc]
-		public void SetBlockOnClient( int x, int y, int z, byte blockId )
-		{
-			Host.AssertClient();
-
-			Map.Current.SetBlockAndUpdate( new IntVector3( x, y, z ), blockId, true );
 		}
 
 		public virtual void PlayerRespawned( Player player )
@@ -95,6 +67,7 @@ namespace Facepunch.CoreWars
 
 		public override void ClientDisconnect( Client client, NetworkDisconnectionReason reason )
 		{
+			InventorySystem.ClientDisconnected( client );
 			StateSystem.Active?.OnPlayerDisconnected( client.Pawn as Player );
 			base.ClientDisconnect( client, reason );
 		}
@@ -103,19 +76,28 @@ namespace Facepunch.CoreWars
 		{
 			base.ClientJoined( client );
 
+			Map.Current.Send( client );
+
 			var player = new Player( client );
 			client.Pawn = player;
+			player.CreateInventory();
 
 			StateSystem.Active?.OnPlayerJoined( player );
 
-			Map.Current.Send( client );
-
 			await Task.Delay( 500 );
+			var totalChunksSent = 0;
 
 			// For now just load every chunk in the map.
 			foreach ( var chunk in Map.Current.Chunks )
 			{
-				await player.LoadChunkDelayed( chunk, 10 );
+				if ( totalChunksSent > 8 )
+				{
+					await GameTask.Delay( 1 );
+					totalChunksSent = 0;
+				}
+
+				player.LoadChunk( chunk );
+				totalChunksSent++;
 			}
 		}
 

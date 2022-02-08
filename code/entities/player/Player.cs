@@ -1,8 +1,10 @@
 ﻿using Facepunch.CoreWars.Blocks;
+using Facepunch.CoreWars.Inventory;
 using Facepunch.CoreWars.Voxel;
 using Sandbox;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,7 +16,7 @@ namespace Facepunch.CoreWars
 		[BindComponent] public ChunkViewer ChunkViewer { get; }
 		[Net] public byte CurrentBlockId { get; private set; }
 		[Net] public List<byte> HotbarBlocks { get; private set; }
-
+		[Net] public NetInventory MainInventory { get; private set; }
 		public DamageInfo LastDamageTaken { get; private set; }
 
 		public Player() : base()
@@ -56,18 +58,19 @@ namespace Facepunch.CoreWars
 			ChunkViewer.LoadedChunks.Add( chunk.Index );
 
 			var offset = chunk.Offset;
-			var types = chunk.BlockTypes;
+			var blocks = chunk.Blocks;
 			var index = chunk.Index;
 
-			ReceiveChunk( To.Single( Client ), offset.x, offset.y, offset.z, index, types );
+			ReceiveChunk( To.Single( Client ), offset.x, offset.y, offset.z, index, blocks, chunk.DataMap.Data );
 		}
 
 		[ClientRpc]
-		public void ReceiveChunk( int x, int y, int z, int index, byte[] data )
+		public void ReceiveChunk( int x, int y, int z, int index, byte[] blocks, byte[] data )
 		{
-			Map.Current.ReceiveChunk( index, data );
+			Map.Current.ReceiveChunk( index, blocks, data );
 
-			Log.Info( $"(#{NetworkIdent}) Received all bytes for chunk{x},{y},{z} ({data.Length / 1024}kb)" );
+			var totalSize = (blocks.Length + data.Length) / 1024;
+			Log.Info( $"(#{NetworkIdent}) Received all bytes for chunk{x},{y},{z} ({totalSize}kb)" );
 		}
 
 		public void SetTeam( Team team )
@@ -76,6 +79,37 @@ namespace Facepunch.CoreWars
 
 			Team = team;
 			OnTeamChanged( team );
+		}
+
+		public void CreateInventory()
+		{
+			var container = new InventoryContainer( this );
+			container.SetSlotLimit( 10 );
+			container.AddConnection( Client );
+
+			InventorySystem.Register( container );
+
+			var grassBlocks = InventorySystem.CreateItem<BlockItem>();
+			grassBlocks.MaxStackSize = 64;
+			grassBlocks.StackSize = 64;
+			grassBlocks.BlockId = Map.Current.FindBlockId<GrassBlock>();
+
+			var stoneBlocks = InventorySystem.CreateItem<BlockItem>();
+			stoneBlocks.MaxStackSize = 40;
+			stoneBlocks.StackSize = 32;
+			stoneBlocks.BlockId = Map.Current.FindBlockId<StoneBlock>();
+
+			container.Give( grassBlocks, 2 );
+			container.Give( stoneBlocks, 6 );
+
+			var moreStoneBlocks = InventorySystem.CreateItem<BlockItem>();
+			moreStoneBlocks.MaxStackSize = 40;
+			moreStoneBlocks.StackSize = 16;
+			moreStoneBlocks.BlockId = Map.Current.FindBlockId<StoneBlock>();
+
+			container.Stack( moreStoneBlocks );
+
+			MainInventory = new NetInventory( container );
 		}
 
 		public override void Spawn()
@@ -101,6 +135,19 @@ namespace Facepunch.CoreWars
 			base.Spawn();
 		}
 
+		public override void ClientSpawn()
+		{
+			foreach ( var item in MainInventory.Container.ItemList )
+			{
+				if ( item.IsValid() )
+				{
+					Log.Info( $"Received Initial Inventory Item {item.GetName()} @ Slot #{item.SlotId} (Stack: {item.StackSize})" );
+				}
+			}
+
+			base.ClientSpawn();
+		}
+
 		public override void Respawn()
 		{
 			Game.Current?.PlayerRespawned( this );
@@ -123,9 +170,13 @@ namespace Facepunch.CoreWars
 			if ( IsServer )
 			{
 				if ( Input.Pressed( InputButton.Attack1 ) )
-					Game.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, CurrentBlockId );
+				{
+					Map.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, CurrentBlockId );
+				}
 				else if ( Input.Pressed( InputButton.Attack2 ) )
-					Game.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, 0 );
+				{
+					Map.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, 0 );
+				}
 			}
 
 			if ( IsClient && Prediction.FirstTime )
@@ -152,7 +203,7 @@ namespace Facepunch.CoreWars
 
 				if ( newBlockId != CurrentBlockId )
 				{
-					SetBlockId( (int)newBlockId );
+					SetBlockId( newBlockId );
 				}
 			}
 
@@ -174,7 +225,7 @@ namespace Facepunch.CoreWars
 					else
 						blockId = Map.Current.FindBlockId<BlueTorchBlock>();
 
-					Game.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, blockId );
+					Map.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, blockId );
 				}
 			}
 			else

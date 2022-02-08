@@ -1,8 +1,6 @@
 ﻿using Sandbox;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Facepunch.CoreWars.Voxel
@@ -46,12 +44,20 @@ namespace Facepunch.CoreWars.Voxel
 		public bool IsClient => Host.IsClient;
 
 		public ChunkLightMap LightMap { get; set; }
-		public byte[] BlockTypes;
+		public ChunkDataMap DataMap { get; set; }
+		public byte[] Blocks;
 		public IntVector3 Offset;
 		public int Index;
 		public Map Map;
 
-		private static readonly BlockFaceData[] BlockFaceMask = new BlockFaceData[ChunkSize * ChunkSize * ChunkSize];
+		[ThreadStatic]
+		private static BlockFaceData[] ThreadStaticBlockFaceMask;
+
+		private static BlockFaceData[] GetBlockFaceMask()
+		{
+			return ThreadStaticBlockFaceMask ??= new BlockFaceData[ChunkSize * ChunkSize * ChunkSize];
+		}
+
 		private readonly ChunkSlice[] Slices = new ChunkSlice[ChunkSize * 6];
 		private Dictionary<int, BlockEntity> Entities { get; set; }
 		private SceneObject TranslucentSceneObject { get; set; }
@@ -65,25 +71,23 @@ namespace Facepunch.CoreWars.Voxel
 
 		public Chunk( Map map, int x, int y, int z )
 		{
-			BlockTypes = new byte[ChunkSize * ChunkSize * ChunkSize];
+			Blocks = new byte[ChunkSize * ChunkSize * ChunkSize];
 			Entities = new();
 			LightMap = new ChunkLightMap( this, map );
 			Offset = new IntVector3( x * ChunkSize, y * ChunkSize, z * ChunkSize );
 			Index = x + y * map.NumChunksX + z * map.NumChunksX * map.NumChunksY;
+			DataMap = new ChunkDataMap( this, map );
 			Map = map;
 		}
 
-		public async void Init()
+		public async Task Init()
 		{
 			if ( Initialized )
 				return;
 
-			for ( int i = 0; i < Slices.Length; ++i )
-			{
-				Slices[i] = new ChunkSlice();
-			}
+			await GameTask.RunInThreadAsync( UpdateBlockSlices );
 
-			await UpdateBlockSlices();
+			Initialized = true;
 
 			foreach ( var update in PendingSliceUpdates )
 			{
@@ -124,14 +128,12 @@ namespace Facepunch.CoreWars.Voxel
 
 				OpaqueSceneObject = new SceneObject( OpaqueModel, transform );
 				OpaqueSceneObject.SetValue( "VoxelSize", VoxelSize );
-				OpaqueSceneObject.SetValue( "LightMap", LightMap.LightTexture );
+				OpaqueSceneObject.SetValue( "LightMap", LightMap.Texture );
 
 				TranslucentSceneObject = new SceneObject( TranslucentModel, transform );
 				TranslucentSceneObject.SetValue( "VoxelSize", VoxelSize );
-				TranslucentSceneObject.SetValue( "LightMap", LightMap.LightTexture );
+				TranslucentSceneObject.SetValue( "LightMap", LightMap.Texture );
 			}
-
-			Initialized = true;
 
 			Event.Register( this );
 
@@ -143,7 +145,7 @@ namespace Facepunch.CoreWars.Voxel
 
 		public async void FullUpdate()
 		{
-			await UpdateBlockSlices();
+			await GameTask.RunInThreadAsync( UpdateBlockSlices );
 			Build();
 		}
 
@@ -174,8 +176,8 @@ namespace Facepunch.CoreWars.Voxel
 
 				if ( neighbour != null && neighbour.Initialized )
 				{
-					TranslucentSceneObject.SetValue( "LightMapWest", neighbour.LightMap.LightTexture );
-					OpaqueSceneObject.SetValue( "LightMapWest", neighbour.LightMap.LightTexture );
+					TranslucentSceneObject.SetValue( "LightMapWest", neighbour.LightMap.Texture );
+					OpaqueSceneObject.SetValue( "LightMapWest", neighbour.LightMap.Texture );
 					if ( recurseNeighbours ) neighbour.UpdateAdjacents();
 				}
 			}
@@ -186,8 +188,8 @@ namespace Facepunch.CoreWars.Voxel
 
 				if ( neighbour != null && neighbour.Initialized )
 				{
-					TranslucentSceneObject.SetValue( "LightMapSouth", neighbour.LightMap.LightTexture );
-					OpaqueSceneObject.SetValue( "LightMapSouth", neighbour.LightMap.LightTexture );
+					TranslucentSceneObject.SetValue( "LightMapSouth", neighbour.LightMap.Texture );
+					OpaqueSceneObject.SetValue( "LightMapSouth", neighbour.LightMap.Texture );
 					if ( recurseNeighbours ) neighbour.UpdateAdjacents();
 				}
 			}
@@ -198,8 +200,8 @@ namespace Facepunch.CoreWars.Voxel
 
 				if ( neighbour != null && neighbour.Initialized )
 				{
-					TranslucentSceneObject.SetValue( "LightMapEast", neighbour.LightMap.LightTexture );
-					OpaqueSceneObject.SetValue( "LightMapEast", neighbour.LightMap.LightTexture );
+					TranslucentSceneObject.SetValue( "LightMapEast", neighbour.LightMap.Texture );
+					OpaqueSceneObject.SetValue( "LightMapEast", neighbour.LightMap.Texture );
 					if ( recurseNeighbours ) neighbour.UpdateAdjacents();
 				}
 			}
@@ -210,8 +212,8 @@ namespace Facepunch.CoreWars.Voxel
 
 				if ( neighbour != null && neighbour.Initialized )
 				{
-					TranslucentSceneObject.SetValue( "LightMapNorth", neighbour.LightMap.LightTexture );
-					OpaqueSceneObject.SetValue( "LightMapNorth", neighbour.LightMap.LightTexture );
+					TranslucentSceneObject.SetValue( "LightMapNorth", neighbour.LightMap.Texture );
+					OpaqueSceneObject.SetValue( "LightMapNorth", neighbour.LightMap.Texture );
 					if ( recurseNeighbours ) neighbour.UpdateAdjacents();
 				}
 			}
@@ -244,22 +246,22 @@ namespace Facepunch.CoreWars.Voxel
 			var y = position.y % ChunkSize;
 			var z = position.z % ChunkSize;
 			var index = x + y * ChunkSize + z * ChunkSize * ChunkSize;
-			return BlockTypes[index];
+			return Blocks[index];
 		}
 
 		public byte GetLocalPositionBlock( int x, int y, int z )
 		{
-			return BlockTypes[GetLocalPositionIndex( x, y, z )];
+			return Blocks[GetLocalPositionIndex( x, y, z )];
 		}
 
 		public byte GetLocalPositionBlock( IntVector3 position )
 		{
-			return BlockTypes[GetLocalPositionIndex( position )];
+			return Blocks[GetLocalPositionIndex( position )];
 		}
 
 		public byte GetLocalIndexBlock( int index )
 		{
-			return BlockTypes[index];
+			return Blocks[index];
 		}
 
 		public IntVector3 ToMapPosition( IntVector3 position )
@@ -336,12 +338,12 @@ namespace Facepunch.CoreWars.Voxel
 
 		public void SetBlock( IntVector3 position, byte blockId )
 		{
-			BlockTypes[GetLocalPositionIndex( position )] = blockId;
+			Blocks[GetLocalPositionIndex( position )] = blockId;
 		}
 
 		public void SetBlock( int index, byte blockId )
 		{
-			BlockTypes[index] = blockId;
+			Blocks[index] = blockId;
 		}
 
 		public void Destroy()
@@ -619,6 +621,7 @@ namespace Facepunch.CoreWars.Voxel
 				return;
 			}
 
+			var blockFaceMask = GetBlockFaceMask();
 			int vertexOffset = 0;
 			int axis = BlockDirectionAxis[direction];
 			int sliceIndex = GetSliceIndex( position[axis], direction );
@@ -667,11 +670,11 @@ namespace Facepunch.CoreWars.Voxel
 
 					if ( !faceA.Culled && !faceB.Culled && faceA.Equals( faceB ) )
 					{
-						BlockFaceMask[n].Culled = true;
+						blockFaceMask[n].Culled = true;
 					}
 					else
 					{
-						BlockFaceMask[n] = faceA;
+						blockFaceMask[n] = faceA;
 
 						if ( !faceA.Culled )
 						{
@@ -691,7 +694,7 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				for ( int i = 0; i < ChunkSize; )
 				{
-					if ( BlockFaceMask[n].Culled )
+					if ( blockFaceMask[n].Culled )
 					{
 						i++;
 						n++;
@@ -704,7 +707,7 @@ namespace Facepunch.CoreWars.Voxel
 
 					if ( Map.GreedyMeshing )
 					{
-						for ( faceWidth = 1; i + faceWidth < ChunkSize && !BlockFaceMask[n + faceWidth].Culled && BlockFaceMask[n + faceWidth].Equals( BlockFaceMask[n] ); faceWidth++ )
+						for ( faceWidth = 1; i + faceWidth < ChunkSize && !blockFaceMask[n + faceWidth].Culled && blockFaceMask[n + faceWidth].Equals( blockFaceMask[n] ); faceWidth++ )
 						{
 
 						}
@@ -715,9 +718,9 @@ namespace Facepunch.CoreWars.Voxel
 						{
 							for ( int k = 0; k < faceWidth; k++ )
 							{
-								var maskFace = BlockFaceMask[n + k + faceHeight * ChunkSize];
+								var maskFace = blockFaceMask[n + k + faceHeight * ChunkSize];
 
-								if ( maskFace.Culled || !maskFace.Equals( BlockFaceMask[n] ) )
+								if ( maskFace.Culled || !maskFace.Equals( blockFaceMask[n] ) )
 								{
 									done = true;
 									break;
@@ -733,7 +736,7 @@ namespace Facepunch.CoreWars.Voxel
 						faceHeight = 1;
 					}
 
-					if ( !BlockFaceMask[n].Culled )
+					if ( !blockFaceMask[n].Culled )
 					{
 						blockPosition[uAxis] = i;
 						blockPosition[vAxis] = j;
@@ -741,7 +744,7 @@ namespace Facepunch.CoreWars.Voxel
 						AddQuad( slice,
 							blockPosition.x, blockPosition.y, blockPosition.z,
 							faceWidth, faceHeight, uAxis, vAxis,
-							BlockFaceMask[n].Side, BlockFaceMask[n].Type );
+							blockFaceMask[n].Side, blockFaceMask[n].Type );
 
 						vertexOffset += 6;
 					}
@@ -750,7 +753,7 @@ namespace Facepunch.CoreWars.Voxel
 					{
 						for ( int k = 0; k < faceWidth; ++k )
 						{
-							BlockFaceMask[n + k + l * ChunkSize].Culled = true;
+							blockFaceMask[n + k + l * ChunkSize].Culled = true;
 						}
 					}
 
@@ -760,8 +763,15 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
-		public async Task UpdateBlockSlices()
+		public void UpdateBlockSlices()
 		{
+			var blockFaceMask = GetBlockFaceMask();
+
+			for ( int i = 0; i < Slices.Length; ++i )
+			{
+				Slices[i] = new ChunkSlice();
+			}
+
 			IntVector3 blockPosition;
 			IntVector3 blockOffset;
 
@@ -770,10 +780,7 @@ namespace Facepunch.CoreWars.Voxel
 
 			for ( int faceSide = 0; faceSide < 6; faceSide++ )
 			{
-				await GameTask.Delay( 20 );
-
 				int axis = BlockDirectionAxis[faceSide];
-
 				int uAxis = (axis + 1) % 3;
 				int vAxis = (axis + 2) % 3;
 
@@ -782,11 +789,11 @@ namespace Facepunch.CoreWars.Voxel
 
 				for ( blockPosition[axis] = 0; blockPosition[axis] < ChunkSize; blockPosition[axis]++ )
 				{
-					int n = 0;
-					bool maskEmpty = true;
-
-					int sliceIndex = GetSliceIndex( blockPosition[axis], faceSide );
+					var n = 0;
+					var maskEmpty = true;
+					var sliceIndex = GetSliceIndex( blockPosition[axis], faceSide );
 					var slice = Slices[sliceIndex];
+
 					slice.IsDirty = true;
 					slice.OpaqueVertices.Clear();
 					slice.TranslucentVertices.Clear();
@@ -813,11 +820,11 @@ namespace Facepunch.CoreWars.Voxel
 
 							if ( !faceA.Culled && !faceB.Culled && faceA.Equals( faceB ) )
 							{
-								BlockFaceMask[n].Culled = true;
+								blockFaceMask[n].Culled = true;
 							}
 							else
 							{
-								BlockFaceMask[n] = faceA;
+								blockFaceMask[n] = faceA;
 
 								if ( !faceA.Culled )
 								{
@@ -840,7 +847,7 @@ namespace Facepunch.CoreWars.Voxel
 					{
 						for ( int i = 0; i < ChunkSize; )
 						{
-							if ( BlockFaceMask[n].Culled )
+							if ( blockFaceMask[n].Culled )
 							{
 								i++;
 								n++;
@@ -853,7 +860,7 @@ namespace Facepunch.CoreWars.Voxel
 
 							if ( Map.GreedyMeshing )
 							{
-								for ( faceWidth = 1; i + faceWidth < ChunkSize && !BlockFaceMask[n + faceWidth].Culled && BlockFaceMask[n + faceWidth].Equals( BlockFaceMask[n] ); faceWidth++ )
+								for ( faceWidth = 1; i + faceWidth < ChunkSize && !blockFaceMask[n + faceWidth].Culled && blockFaceMask[n + faceWidth].Equals( blockFaceMask[n] ); faceWidth++ )
 								{
 
 								}
@@ -864,9 +871,9 @@ namespace Facepunch.CoreWars.Voxel
 								{
 									for ( int k = 0; k < faceWidth; k++ )
 									{
-										var maskFace = BlockFaceMask[n + k + faceHeight * ChunkSize];
+										var maskFace = blockFaceMask[n + k + faceHeight * ChunkSize];
 
-										if ( maskFace.Culled || !maskFace.Equals( BlockFaceMask[n] ) )
+										if ( maskFace.Culled || !maskFace.Equals( blockFaceMask[n] ) )
 										{
 											done = true;
 											break;
@@ -882,7 +889,7 @@ namespace Facepunch.CoreWars.Voxel
 								faceHeight = 1;
 							}
 
-							if ( !BlockFaceMask[n].Culled )
+							if ( !blockFaceMask[n].Culled )
 							{
 								blockPosition[uAxis] = i;
 								blockPosition[vAxis] = j;
@@ -890,14 +897,14 @@ namespace Facepunch.CoreWars.Voxel
 								AddQuad( slice,
 									blockPosition.x, blockPosition.y, blockPosition.z,
 									faceWidth, faceHeight, uAxis, vAxis,
-									BlockFaceMask[n].Side, BlockFaceMask[n].Type );
+									blockFaceMask[n].Side, blockFaceMask[n].Type );
 							}
 
 							for ( int l = 0; l < faceHeight; ++l )
 							{
 								for ( int k = 0; k < faceWidth; ++k )
 								{
-									BlockFaceMask[n + k + l * ChunkSize].Culled = true;
+									blockFaceMask[n + k + l * ChunkSize].Culled = true;
 								}
 							}
 
@@ -909,10 +916,17 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
+		[Event.Tick.Server]
+		private void ServerTick()
+		{
+			DataMap.Update();
+		}
+
 		[Event.Tick.Client]
 		private void ClientTick()
 		{
 			LightMap.Update();
+			DataMap.Update();
 		}
 	}
 }

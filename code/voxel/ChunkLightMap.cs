@@ -6,10 +6,10 @@ namespace Facepunch.CoreWars.Voxel
 {
 	public class ChunkLightMap
 	{
-		public Texture LightTexture { get; private set; }
+		public Texture Texture { get; private set; }
 		public Chunk Chunk { get; private set; }
 		public Map Map { get; private set; }
-		public byte[] LightData;
+		public byte[] Data;
 		public int ChunkSize;
 
 		public Queue<LightRemoveNode>[] TorchLightRemoveQueue { get; private set; }
@@ -17,7 +17,7 @@ namespace Facepunch.CoreWars.Voxel
 		public Queue<LightRemoveNode> SunLightRemoveQueue { get; private set; } = new();
 		public Queue<IntVector3> SunLightAddQueue { get; private set; } = new();
 
-		private bool IsLightDirty { get; set; }
+		private bool IsDirty { get; set; }
 
 		public ChunkLightMap( Chunk chunk, Map map )
 		{
@@ -34,10 +34,10 @@ namespace Facepunch.CoreWars.Voxel
 			Chunk = chunk;
 			Map = map;
 
-			LightData = new byte[ChunkSize * ChunkSize * ChunkSize * 4];
-			LightTexture = Texture.CreateVolume( ChunkSize, ChunkSize, ChunkSize )
+			Data = new byte[ChunkSize * ChunkSize * ChunkSize * 4];
+			Texture = Texture.CreateVolume( ChunkSize, ChunkSize, ChunkSize )
 				.WithFormat( ImageFormat.R32F )
-				.WithData( LightData )
+				.WithData( Data )
 				.Finish();
 		}
 
@@ -49,16 +49,16 @@ namespace Facepunch.CoreWars.Voxel
 		public byte GetSunLight( IntVector3 position )
 		{
 			var index = ToIndex( position, 1 );
-			return (byte)((LightData[index] >> 4) & 0xF);
+			return (byte)((Data[index] >> 4) & 0xF);
 		}
 
 		public bool SetSunLight( IntVector3 position, byte value )
 		{
 			var index = ToIndex( position, 1 );
 			if ( GetSunLight( position ) == value ) return false;
-			IsLightDirty = true;
-			LightData[index] = (byte)((LightData[index] & 0x0F) | ((value & 0xf) << 4));
-			LightData[ToIndex( position, 3 )] |= 0x40;
+			IsDirty = true;
+			Data[index] = (byte)((Data[index] & 0x0F) | ((value & 0xf) << 4));
+			Data[ToIndex( position, 3 )] |= 0x40;
 			return true;
 		}
 
@@ -273,10 +273,10 @@ namespace Facepunch.CoreWars.Voxel
 			UpdateTorchLight();
 			UpdateSunLight();
 
-			if ( IsLightDirty )
+			if ( IsDirty )
 			{
-				IsLightDirty = false;
-				LightTexture.Update( LightData );
+				IsDirty = false;
+				Texture.Update( Data );
 			}
 		}
 
@@ -338,48 +338,48 @@ namespace Facepunch.CoreWars.Voxel
 		public byte GetRedTorchLight( IntVector3 position )
 		{
 			var index = ToIndex( position, 0 );
-			return (byte)(LightData[index] & 0xF);
+			return (byte)(Data[index] & 0xF);
 		}
 
 		public bool SetRedTorchLight( IntVector3 position, byte value )
 		{
 			var index = ToIndex( position, 0 );
 			if ( GetRedTorchLight( position ) == value ) return false;
-			IsLightDirty = true;
-			LightData[index] = (byte)((LightData[index] & 0xF0) | (value & 0xF));
-			LightData[ToIndex( position, 3 )] |= 0x40;
+			IsDirty = true;
+			Data[index] = (byte)((Data[index] & 0xF0) | (value & 0xF));
+			Data[ToIndex( position, 3 )] |= 0x40;
 			return true;
 		}
 
 		public byte GetGreenTorchLight( IntVector3 position )
 		{
 			var index = ToIndex( position, 0 );
-			return (byte)((LightData[index] >> 4) & 0xF);
+			return (byte)((Data[index] >> 4) & 0xF);
 		}
 
 		public bool SetGreenTorchLight( IntVector3 position, byte value )
 		{
 			var index = ToIndex( position, 0 );
 			if ( GetGreenTorchLight( position ) == value ) return false;
-			IsLightDirty = true;
-			LightData[index] = (byte)((LightData[index] & 0x0F) | (value << 4));
-			LightData[ToIndex( position, 3 )] |= 0x40;
+			IsDirty = true;
+			Data[index] = (byte)((Data[index] & 0x0F) | (value << 4));
+			Data[ToIndex( position, 3 )] |= 0x40;
 			return true;
 		}
 
 		public byte GetBlueTorchLight( IntVector3 position )
 		{
 			var index = ToIndex( position, 1 );
-			return (byte)(LightData[index] & 0xF);
+			return (byte)(Data[index] & 0xF);
 		}
 
 		public bool SetBlueTorchLight( IntVector3 position, byte value )
 		{
 			var index = ToIndex( position, 1 );
 			if ( GetBlueTorchLight( position ) == value ) return false;
-			IsLightDirty = true;
-			LightData[index] = (byte)((LightData[index] & 0xF0) | (value & 0xF));
-			LightData[ToIndex( position, 3 )] |= 0x40;
+			IsDirty = true;
+			Data[index] = (byte)((Data[index] & 0xF0) | (value & 0xF));
+			Data[ToIndex( position, 3 )] |= 0x40;
 			return true;
 		}
 	}
