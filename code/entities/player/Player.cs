@@ -255,7 +255,7 @@ namespace Facepunch.CoreWars
 					Map.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, blockId );
 				}
 			}
-			else
+			else if ( Map.Current.IsValid() )
 			{
 				Vector3 fPosition = Input.Position * (1.0f / Chunk.VoxelSize);
 				IntVector3 intPosition = new IntVector3( (int)fPosition.x, (int)fPosition.y, (int)fPosition.z );
