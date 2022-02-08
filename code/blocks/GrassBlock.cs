@@ -12,7 +12,7 @@ namespace Facepunch.CoreWars.Blocks
 		public override byte GetTextureId( BlockFace face, Chunk chunk, int x, int y, int z )
 		{
 			var position = new IntVector3( x, y, z );
-			var sunlightLevel = chunk.LightMap.GetSunLight( position + Chunk.BlockDirections[0] ) ;
+			var sunlightLevel = chunk.LightMap.GetSunLight( position ) ;
 
 			if ( sunlightLevel < 5 )
 				return Map.BlockAtlas.GetTextureId( "dirt" );

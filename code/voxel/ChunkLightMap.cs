@@ -46,15 +46,22 @@ namespace Facepunch.CoreWars.Voxel
 			return (((position.z * ChunkSize * ChunkSize) + (position.y * ChunkSize) + position.x) * 4) + component;
 		}
 
+		public bool IsInBounds( int index )
+		{
+			return (index >= 0 && index < Data.Length);
+		}
+
 		public byte GetSunLight( IntVector3 position )
 		{
 			var index = ToIndex( position, 1 );
+			if ( !IsInBounds( index ) ) return 0;
 			return (byte)((Data[index] >> 4) & 0xF);
 		}
 
 		public bool SetSunLight( IntVector3 position, byte value )
 		{
 			var index = ToIndex( position, 1 );
+			if ( !IsInBounds( index ) ) return false;
 			if ( GetSunLight( position ) == value ) return false;
 			IsDirty = true;
 			Data[index] = (byte)((Data[index] & 0x0F) | ((value & 0xf) << 4));
@@ -338,12 +345,14 @@ namespace Facepunch.CoreWars.Voxel
 		public byte GetRedTorchLight( IntVector3 position )
 		{
 			var index = ToIndex( position, 0 );
+			if ( !IsInBounds( index ) ) return 0;
 			return (byte)(Data[index] & 0xF);
 		}
 
 		public bool SetRedTorchLight( IntVector3 position, byte value )
 		{
 			var index = ToIndex( position, 0 );
+			if ( !IsInBounds( index ) ) return false;
 			if ( GetRedTorchLight( position ) == value ) return false;
 			IsDirty = true;
 			Data[index] = (byte)((Data[index] & 0xF0) | (value & 0xF));
@@ -354,12 +363,14 @@ namespace Facepunch.CoreWars.Voxel
 		public byte GetGreenTorchLight( IntVector3 position )
 		{
 			var index = ToIndex( position, 0 );
+			if ( !IsInBounds( index ) ) return 0;
 			return (byte)((Data[index] >> 4) & 0xF);
 		}
 
 		public bool SetGreenTorchLight( IntVector3 position, byte value )
 		{
 			var index = ToIndex( position, 0 );
+			if ( !IsInBounds( index ) ) return false;
 			if ( GetGreenTorchLight( position ) == value ) return false;
 			IsDirty = true;
 			Data[index] = (byte)((Data[index] & 0x0F) | (value << 4));
@@ -370,12 +381,14 @@ namespace Facepunch.CoreWars.Voxel
 		public byte GetBlueTorchLight( IntVector3 position )
 		{
 			var index = ToIndex( position, 1 );
+			if ( !IsInBounds( index ) ) return 0;
 			return (byte)(Data[index] & 0xF);
 		}
 
 		public bool SetBlueTorchLight( IntVector3 position, byte value )
 		{
 			var index = ToIndex( position, 1 );
+			if ( !IsInBounds( index ) ) return false;
 			if ( GetBlueTorchLight( position ) == value ) return false;
 			IsDirty = true;
 			Data[index] = (byte)((Data[index] & 0xF0) | (value & 0xF));
