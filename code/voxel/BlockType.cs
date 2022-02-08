@@ -27,7 +27,7 @@ namespace Facepunch.CoreWars.Voxel
 
 		public virtual BlockData CreateDataInstance() => new BlockData();
 
-		public virtual void OnBlockAdded( Chunk chunk, int x, int y, int z )
+		public virtual void OnBlockAdded( Chunk chunk, int x, int y, int z, int direction )
 		{
 			
 		}

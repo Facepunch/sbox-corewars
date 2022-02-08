@@ -1,5 +1,6 @@
 ﻿using Facepunch.CoreWars.Voxel;
 using Sandbox;
+using System;
 
 namespace Facepunch.CoreWars.Blocks
 {
@@ -11,6 +12,18 @@ namespace Facepunch.CoreWars.Blocks
 			SetModel( "models/citizen_props/sodacan01.vmdl" );
 
 			base.Spawn();
+		}
+
+		public override void Initialize()
+		{
+			var data = Map.GetData<TorchBlockData>( BlockPosition );
+
+			if ( data.IsValid() )
+			{
+				CenterOnSide( Map.GetOppositeDirection( data.Direction ) );
+			}
+
+			base.Initialize();
 		}
 	}
 }

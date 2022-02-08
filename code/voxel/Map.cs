@@ -68,10 +68,10 @@ namespace Facepunch.CoreWars.Voxel
 		}
 
 		[ClientRpc]
-		public static void SetBlockOnClient( int x, int y, int z, byte blockId )
+		public static void SetBlockOnClient( int x, int y, int z, byte blockId, int direction )
 		{
 			Host.AssertClient();
-			Current?.SetBlockAndUpdate( new IntVector3( x, y, z ), blockId, true );
+			Current?.SetBlockAndUpdate( new IntVector3( x, y, z ), blockId, direction, true );
 		}
 
 		public Dictionary<byte, BlockType> BlockData { get; private set; } = new();
@@ -135,7 +135,7 @@ namespace Facepunch.CoreWars.Voxel
 			if ( face == BlockFace.Invalid ) return;
 
 			var position = blockId != 0 ? GetAdjacentPosition( endPosition, (int)face ) : endPosition;
-			SetBlockOnServer( position.x, position.y, position.z, blockId );
+			SetBlockOnServer( position.x, position.y, position.z, blockId, (int)face );
 		}
 
 		public bool GetBlockInDirection( Vector3 origin, Vector3 direction, out IntVector3 position )
@@ -144,15 +144,15 @@ namespace Facepunch.CoreWars.Voxel
 			return (face != BlockFace.Invalid);
 		}
 
-		public void SetBlockOnServer( int x, int y, int z, byte blockId )
+		public void SetBlockOnServer( int x, int y, int z, byte blockId, int direction )
 		{
 			Host.AssertServer();
 
 			var position = new IntVector3( x, y, z );
 
-			if ( SetBlockAndUpdate( position, blockId ) )
+			if ( SetBlockAndUpdate( position, blockId, direction ) )
 			{
-				SetBlockOnClient( x, y, z, blockId );
+				SetBlockOnClient( x, y, z, blockId, direction );
 			}
 		}
 
@@ -448,13 +448,13 @@ namespace Facepunch.CoreWars.Voxel
 			Event.Register( this );
 		}
 
-		public bool SetBlockAndUpdate( IntVector3 position, byte blockId, bool forceUpdate = false )
+		public bool SetBlockAndUpdate( IntVector3 position, byte blockId, int direction, bool forceUpdate = false )
 		{
 			var chunkIndex = GetChunkIndex( position );
 			var shouldBuild = false;
 			var chunkIds = new HashSet<int>();
 
-			if ( SetBlock( position, blockId ) || forceUpdate )
+			if ( SetBlock( position, blockId, direction ) || forceUpdate )
 			{
 				shouldBuild = true;
 				chunkIds.Add( chunkIndex );
@@ -493,6 +493,11 @@ namespace Facepunch.CoreWars.Voxel
 		public static IntVector3 ToLocalPosition( IntVector3 position )
 		{
 			return new IntVector3( position.x % Chunk.ChunkSize, position.y % Chunk.ChunkSize, position.z % Chunk.ChunkSize );
+		}
+
+		public static BlockFace GetOppositeDirection( BlockFace direction )
+		{
+			return (BlockFace)GetOppositeDirection( (int)direction );
 		}
 
 		public static int GetOppositeDirection( int direction )
@@ -537,7 +542,7 @@ namespace Facepunch.CoreWars.Voxel
 			return true;
 		}
 
-		public bool SetBlock( IntVector3 position, byte blockId )
+		public bool SetBlock( IntVector3 position, byte blockId, int direction )
 		{
 			if ( !IsInside( position ) ) return false;
 
@@ -572,7 +577,7 @@ namespace Facepunch.CoreWars.Voxel
 				currentBlock.OnBlockRemoved( chunk, position.x, position.y, position.z );
 
 				chunk.SetBlock( blockIndex, blockId );
-				block.OnBlockAdded( chunk, position.x, position.y, position.z );
+				block.OnBlockAdded( chunk, position.x, position.y, position.z, direction );
 
 				var entityName = IsServer ? block.ServerEntity : block.ClientEntity;
 
@@ -785,7 +790,7 @@ namespace Facepunch.CoreWars.Voxel
 			var block = GetBlockType( blockId );
 
 			chunk.SetBlock( localPosition, blockId );
-			block.OnBlockAdded( chunk, position.x, position.y, position.z );
+			block.OnBlockAdded( chunk, position.x, position.y, position.z, (int)BlockFace.Top );
 
 			var entityName = IsServer ? block.ServerEntity : block.ClientEntity;
 
