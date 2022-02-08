@@ -110,7 +110,11 @@ namespace Facepunch.CoreWars
 			map.SetSize( 256, 256, 128 );
 			map.LoadBlockAtlas( "textures/blocks.json" );
 			map.AddAllBlockTypes();
-			map.GeneratePerlin( map.FindBlockId<GrassBlock>() );
+			map.GeneratePerlin( map.FindBlockId<GrassBlock>(), new byte[]
+			{
+				map.FindBlockId<StoneBlock>(),
+				map.FindBlockId<GrassBlock>()
+			} );;
 			map.Init();
 
 			Log.Info( $"[Server] Creating perlin ground with id #{map.FindBlockId<GrassBlock>()}" );

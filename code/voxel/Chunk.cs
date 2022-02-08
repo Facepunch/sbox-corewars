@@ -88,9 +88,12 @@ namespace Facepunch.CoreWars.Voxel
 			if ( Initialized )
 				return;
 
-			await GameTask.RunInThreadAsync( UpdateBlockSlices );
-			await GameTask.RunInThreadAsync( PerformFullTorchUpdate );
 			await GameTask.RunInThreadAsync( PropagateSunlight );
+			await GameTask.RunInThreadAsync( PerformFullTorchUpdate );
+
+			LightMap.Update();
+
+			await GameTask.RunInThreadAsync( UpdateBlockSlices );
 
 			CreateEntities();
 

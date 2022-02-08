@@ -511,7 +511,7 @@ namespace Facepunch.CoreWars.Voxel
 			return direction + ((direction % 2 != 0) ? -1 : 1);
 		}
 
-		public void GeneratePerlin( byte groundBlockId )
+		public void GeneratePerlin( byte groundBlockId, byte[] undergroundBlocks )
 		{
 			for ( int x = 0; x < SizeX; ++x )
 			{
@@ -531,6 +531,8 @@ namespace Facepunch.CoreWars.Voxel
 
 							if ( z < height / 2 )
 							{
+								var undergroundBlock = undergroundBlocks[Rand.Int( undergroundBlocks.Length - 1 )];
+								SetBlockAtPosition( position, undergroundBlock );
 								GenerateCaves( x, y, z );
 							}
 						}
@@ -686,8 +688,9 @@ namespace Facepunch.CoreWars.Voxel
 				currentBlock.OnBlockRemoved( chunk, position.x, position.y, position.z );
 
 				chunk.Data.Remove( localPosition );
-
 				chunk.SetBlock( blockIndex, blockId );
+				chunk.LightMap.Update();
+
 				block.OnBlockAdded( chunk, position.x, position.y, position.z, direction );
 
 				var entityName = IsServer ? block.ServerEntity : block.ClientEntity;
