@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Facepunch.CoreWars.Voxel
 {
-	public partial class Chunk
+	public partial class Chunk : IValid
 	{
 		public struct SliceUpdate : IEquatable<SliceUpdate>
 		{
@@ -68,6 +68,8 @@ namespace Facepunch.CoreWars.Voxel
 		private Model OpaqueModel { get; set; }
 		private Mesh TranslucentMesh { get; set; }
 		private Mesh OpaqueMesh { get; set; }
+
+		public bool IsValid => true;
 
 		public Chunk() { }
 
@@ -382,6 +384,7 @@ namespace Facepunch.CoreWars.Voxel
 			}
 
 			var chunkAbove = GetNeighbour( BlockFace.Top );
+			if ( !chunkAbove.IsValid() ) return;
 			if ( !chunkAbove.Initialized ) return;
 
 			for ( var x = 0; x < ChunkSize; x++ )
