@@ -512,7 +512,14 @@ namespace Facepunch.CoreWars.Voxel
 			return direction + ((direction % 2 != 0) ? -1 : 1);
 		}
 
-		public void GeneratePerlin( byte groundBlockId, byte[] undergroundBlocks )
+		public struct PerlinGenerationConfig
+		{
+			public byte GroundBlockId;
+			public byte[] UndergroundBlockIds;
+			public byte BedrockId;
+		}
+
+		public void GeneratePerlin( PerlinGenerationConfig config )
 		{
 			byte undergroundBlock;
 
@@ -530,11 +537,11 @@ namespace Facepunch.CoreWars.Voxel
 
 						if ( IsEmpty( position ) )
 						{
-							SetBlockAtPosition( position, (byte)(z < height ? groundBlockId : 0) );
+							SetBlockAtPosition( position, (byte)(z < height ? config.GroundBlockId : 0) );
 
 							if ( z < height / 2 )
 							{
-								undergroundBlock = undergroundBlocks[Rand.Int( undergroundBlocks.Length - 1 )];
+								undergroundBlock = config.UndergroundBlockIds[Rand.Int( config.UndergroundBlockIds.Length - 1 )];
 								SetBlockAtPosition( position, undergroundBlock );
 								GenerateCaves( x, y, z );
 							}
@@ -546,8 +553,7 @@ namespace Facepunch.CoreWars.Voxel
 					else
 						SuitableSpawnPositions.Add( ToSourcePosition( new IntVector3( x, y, height ) ) );
 
-					undergroundBlock = undergroundBlocks[Rand.Int( undergroundBlocks.Length - 1 )];
-					SetBlockAtPosition( new IntVector3( x, y, 0 ), undergroundBlock );
+					SetBlockAtPosition( new IntVector3( x, y, 0 ), config.BedrockId );
 				}
 			}
 		}
