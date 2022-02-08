@@ -1,4 +1,5 @@
-﻿using Sandbox;
+﻿using Facepunch.CoreWars.Blocks;
+using Sandbox;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -92,6 +93,7 @@ namespace Facepunch.CoreWars.Voxel
 
 		private string BlockAtlasFileName { get; set; }
 		private byte NextAvailableBlockId { get; set; }
+		private FastNoiseLite CaveNoise { get; set; }
 
 		public bool IsValid => true;
 
@@ -99,6 +101,13 @@ namespace Facepunch.CoreWars.Voxel
 		{
 			BlockTypes[typeof( AirBlock ).Name] = NextAvailableBlockId;
 			BlockData[NextAvailableBlockId] = new AirBlock( this );
+
+			CaveNoise = new();
+			CaveNoise.SetNoiseType( FastNoiseLite.NoiseType.OpenSimplex2 );
+			CaveNoise.SetFractalType( FastNoiseLite.FractalType.FBm );
+			CaveNoise.SetFractalOctaves( 2 );
+			CaveNoise.SetFrequency( 1f / 128f );
+
 			NextAvailableBlockId++;
 			Current = this;
 		}
@@ -508,13 +517,108 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				for ( int y = 0; y < SizeY; ++y )
 				{
-					int height = (int)((SizeZ / 2) * (Noise.Perlin( (x * 32) * 0.001f, (y * 32) * 0.001f, 0 ) + 0.5f) * 0.5f);
+					int height = (int)((SizeZ * 0.7f) * (Noise.Perlin( (x * 32) * 0.001f, (y * 32) * 0.001f, 0 ) + 0.5f) * 0.5f);
 					if ( height <= 0 ) height = 1;
 					if ( height > SizeZ ) height = SizeZ;
 
 					for ( int z = 0; z < SizeZ; ++z )
 					{
-						SetBlockAtPosition( new IntVector3( x, y, z ), (byte)(z < height ? groundBlockId : 0) );
+						var position = new IntVector3( x, y, z );
+
+						if ( IsEmpty( position ) )
+						{
+							SetBlockAtPosition( position, (byte)(z < height ? groundBlockId : 0) );
+
+							if ( z < height )
+							{
+								GenerateCaves( x, y, z );
+							}
+						}
+					}
+
+					if ( Rand.Float( 100f ) <= 1f )
+						GenerateTree( x, y, height - 1 );
+				}
+			}
+		}
+
+		public bool GenerateCaves( int x, int y, int z )
+		{
+			if ( !IsInside( x, y, z ) ) return false;
+
+			var position = new IntVector3( x, y, z );
+			var chunkIndex = GetChunkIndex( position );
+			var chunk = Chunks[chunkIndex];
+			var localPosition = ToLocalPosition( position );
+			int rx = localPosition.x + chunk.Offset.x * Chunk.ChunkSize;
+			int ry = localPosition.y + chunk.Offset.y * Chunk.ChunkSize;
+			int rz = localPosition.z + chunk.Offset.z * Chunk.ChunkSize;
+
+			double n1 = CaveNoise.GetNoise( rx, ry, rz );
+			double n2 = CaveNoise.GetNoise( rx, ry + 88f, rz );
+			double finalNoise = n1 * n1 + n2 * n2;
+
+			if ( finalNoise < 0.04f )
+			{
+				SetBlockAtPosition( position, 0 );
+				return true;
+			}
+
+			return false;
+		}
+
+		public void GenerateTree( int x, int y, int z )
+		{
+			var minTrunkHeight = 3;
+			var maxTrunkHeight = 6;
+			var minLeavesRadius = 1;
+			var maxLeavesRadius = 2;
+			int trunkHeight = Rand.Int( minTrunkHeight, maxTrunkHeight );
+			int trunkTop = z + trunkHeight;
+			int leavesRadius = Rand.Int( minLeavesRadius, maxLeavesRadius );
+
+			for ( int trunkZ = z + 1; trunkZ < trunkTop; trunkZ++ )
+			{
+				if ( IsInside( x, y, trunkZ ) )
+				{
+					SetBlockAtPosition( new IntVector3( x, y, trunkZ ), FindBlockId<WoodBlock>() );
+				}
+			}
+
+			for ( int leavesX = x - leavesRadius; leavesX <= x + leavesRadius; leavesX++ )
+			{
+				for ( int leavesY = y - leavesRadius; leavesY <= y + leavesRadius; leavesY++ )
+				{
+					for ( int leavesZ = trunkTop; leavesZ <= trunkTop + leavesRadius; leavesZ++ )
+					{
+						if ( IsInside( leavesX, leavesY, leavesZ  ) )
+						{
+							var position = new IntVector3( leavesX, leavesY, leavesZ );
+
+							if (
+								IsEmpty( position ) &&
+								(leavesX != x - leavesRadius || leavesY != y - leavesRadius) &&
+								(leavesX != x + leavesRadius || leavesY != y + leavesRadius) &&
+								(leavesX != x + leavesRadius || leavesY != y - leavesRadius) &&
+								(leavesX != x - leavesRadius || leavesY != y + leavesRadius)
+							)
+							{
+								SetBlockAtPosition( position, FindBlockId<LeafBlock>() );
+							}
+						}
+					}
+				}
+			}
+
+			for ( int leavesX = x - (leavesRadius - 1); leavesX <= x + (leavesRadius - 1); leavesX++ )
+			{
+				for ( int leavesY = y - (leavesRadius - 1); leavesY <= y + (leavesRadius - 1); leavesY++ )
+				{
+					var position = new IntVector3( leavesX, leavesY, trunkTop + leavesRadius + 1 );
+
+					if ( IsInside( position ) && IsEmpty( position ) )
+					{
+						SetBlockAtPosition( position, FindBlockId<LeafBlock>() );
 					}
 				}
 			}
@@ -530,13 +634,19 @@ namespace Facepunch.CoreWars.Voxel
 			return chunk.GetMapPositionBlock( position );
 		}
 
-		public bool IsInside( IntVector3 position )
+		public bool IsInside( int x, int y, int z )
 		{
-			if ( position.x < 0 || position.x >= SizeX ) return false;
-			if ( position.y < 0 || position.y >= SizeY ) return false;
-			if ( position.z < 0 || position.z >= SizeZ ) return false;
+			if ( x < 0 || x >= SizeX ) return false;
+			if ( y < 0 || y >= SizeY ) return false;
+			if ( z < 0 || z >= SizeZ ) return false;
 
 			return true;
+		}
+
+
+		public bool IsInside( IntVector3 position )
+		{
+			return IsInside( position.x, position.y, position.z );
 		}
 
 		public bool SetBlock( IntVector3 position, byte blockId, int direction )
