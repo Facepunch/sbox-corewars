@@ -209,9 +209,6 @@ namespace Facepunch.CoreWars.Voxel
 			chunk.DeserializeData( data );
 
 			await chunk.Init();
-
-			chunk.PropagateSunlight();
-			chunk.CreateEntities();
 		}
 
 		public void AddAllBlockTypes()
@@ -576,6 +573,8 @@ namespace Facepunch.CoreWars.Voxel
 				var currentBlock = GetBlockType( currentBlockId );
 				currentBlock.OnBlockRemoved( chunk, position.x, position.y, position.z );
 
+				chunk.Data.Remove( localPosition );
+
 				chunk.SetBlock( blockIndex, blockId );
 				block.OnBlockAdded( chunk, position.x, position.y, position.z, direction );
 
@@ -591,8 +590,6 @@ namespace Facepunch.CoreWars.Voxel
 				{
 					chunk.RemoveEntity( localPosition );
 				}
-
-				chunk.Data.Remove( localPosition );
 
 				return true;
 
