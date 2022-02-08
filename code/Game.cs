@@ -1,4 +1,5 @@
 ﻿using Facepunch.CoreWars.Blocks;
+using Facepunch.CoreWars.Inventory;
 using Facepunch.CoreWars.Voxel;
 using Sandbox;
 using System.Linq;
@@ -66,6 +67,7 @@ namespace Facepunch.CoreWars
 
 		public override void ClientDisconnect( Client client, NetworkDisconnectionReason reason )
 		{
+			InventorySystem.ClientDisconnected( client );
 			StateSystem.Active?.OnPlayerDisconnected( client.Pawn as Player );
 			base.ClientDisconnect( client, reason );
 		}
