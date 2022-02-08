@@ -12,7 +12,6 @@ namespace Facepunch.CoreWars
 				foreach ( var player in Entity.All.OfType<Player>() )
 				{
 					player.Respawn();
-					player.Position = new Vector3( 1000f, 1000f, 1000f );
 				}
 			}
 		}

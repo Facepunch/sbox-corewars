@@ -45,6 +45,13 @@ namespace Facepunch.CoreWars
 		{
 			if ( pawn is not Player player ) return;
 
+			if ( Map.Current.IsValid() )
+			{
+				var spawnpoint = Rand.FromList( Map.Current.SuitableSpawnPositions );
+				player.Position = spawnpoint;
+				return;
+			}
+
 			var spawnpoints = All.OfType<PlayerSpawnpoint>()
 				.Where( e => e.Team == player.Team )
 				.ToList();

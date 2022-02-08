@@ -75,6 +75,7 @@ namespace Facepunch.CoreWars.Voxel
 			Current?.SetBlockAndUpdate( new IntVector3( x, y, z ), blockId, direction, true );
 		}
 
+		public List<Vector3> SuitableSpawnPositions { get; private set; } = new();
 		public Dictionary<byte, BlockType> BlockData { get; private set; } = new();
 		public Dictionary<string, byte> BlockTypes { get; private set; } = new();
 		public BlockAtlas BlockAtlas { get; private set; }
@@ -540,6 +541,8 @@ namespace Facepunch.CoreWars.Voxel
 
 					if ( Rand.Float( 100f ) <= 1f )
 						GenerateTree( x, y, height - 1 );
+					else
+						SuitableSpawnPositions.Add( ToSourcePosition( new IntVector3( x, y, height ) ) );
 
 					SetBlockAtPosition( new IntVector3( x, y, 0 ), groundBlockId );
 				}
