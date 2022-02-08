@@ -195,56 +195,21 @@ namespace Facepunch.CoreWars.Voxel
 			currentOffset.x += ChunkSize + 1;
 
 			var eastChunk = Map.GetChunkIndex( currentOffset );
+			currentOffset.x -= ChunkSize + 1;
+			currentOffset.z += ChunkSize + 1;
 
-			int maxChunkSize = Map.Chunks.Length;
+			var topChunk = Map.GetChunkIndex( currentOffset );
+			currentOffset.z -= ChunkSize + 1;
+			currentOffset.z--;
 
-			if ( westChunk >= 0 && westChunk < maxChunkSize )
-			{
-				var neighbour = Map.Chunks[westChunk];
+			var bottomChunk = Map.GetChunkIndex( currentOffset );
 
-				if ( neighbour != null && neighbour.Initialized )
-				{
-					TranslucentSceneObject.SetValue( "LightMapWest", neighbour.LightMap.Texture );
-					OpaqueSceneObject.SetValue( "LightMapWest", neighbour.LightMap.Texture );
-					if ( recurseNeighbours ) neighbour.UpdateAdjacents();
-				}
-			}
-
-			if ( southChunk >= 0 && southChunk < maxChunkSize )
-			{
-				var neighbour = Map.Chunks[southChunk];
-
-				if ( neighbour != null && neighbour.Initialized )
-				{
-					TranslucentSceneObject.SetValue( "LightMapSouth", neighbour.LightMap.Texture );
-					OpaqueSceneObject.SetValue( "LightMapSouth", neighbour.LightMap.Texture );
-					if ( recurseNeighbours ) neighbour.UpdateAdjacents();
-				}
-			}
-
-			if ( eastChunk >= 0 && eastChunk < maxChunkSize )
-			{
-				var neighbour = Map.Chunks[eastChunk];
-
-				if ( neighbour != null && neighbour.Initialized )
-				{
-					TranslucentSceneObject.SetValue( "LightMapEast", neighbour.LightMap.Texture );
-					OpaqueSceneObject.SetValue( "LightMapEast", neighbour.LightMap.Texture );
-					if ( recurseNeighbours ) neighbour.UpdateAdjacents();
-				}
-			}
-
-			if ( northChunk >= 0 && northChunk < maxChunkSize )
-			{
-				var neighbour = Map.Chunks[northChunk];
-
-				if ( neighbour != null && neighbour.Initialized )
-				{
-					TranslucentSceneObject.SetValue( "LightMapNorth", neighbour.LightMap.Texture );
-					OpaqueSceneObject.SetValue( "LightMapNorth", neighbour.LightMap.Texture );
-					if ( recurseNeighbours ) neighbour.UpdateAdjacents();
-				}
-			}
+			UpdateNeighbourLightMap( "LightMapWest", westChunk, recurseNeighbours );
+			UpdateNeighbourLightMap( "LightMapEast", eastChunk, recurseNeighbours );
+			UpdateNeighbourLightMap( "LightMapNorth", northChunk, recurseNeighbours );
+			UpdateNeighbourLightMap( "LightMapSouth", southChunk, recurseNeighbours );
+			UpdateNeighbourLightMap( "LightMapTop", topChunk, recurseNeighbours );
+			UpdateNeighbourLightMap( "LightMapBottom", bottomChunk, recurseNeighbours );
 		}
 
 		public void Build()
@@ -399,45 +364,54 @@ namespace Facepunch.CoreWars.Voxel
 
 		public void PropagateSunlight()
 		{
-			var positionAbove = Offset + (BlockDirections[0] * ChunkSize);
+			var z = ChunkSize - 1;
 
-			if ( Map.IsInside( positionAbove ) )
+			for ( var x = 0; x < ChunkSize; x++ )
 			{
-				var chunkAboveIndex = Map.GetChunkIndex( positionAbove );
-				var chunkAbove = Map.Chunks[chunkAboveIndex];
-
-				for ( var x = 0; x < ChunkSize; x++ )
+				for ( var y = 0; y < ChunkSize; y++ )
 				{
-					for ( var y = 0; y < ChunkSize; y++ )
-					{
-						var lightLevel = Map.GetSunLight( chunkAbove.Offset + new IntVector3( x, y, 0 ) );
+					var position = new IntVector3( x, y, z );
+					var blockId = GetLocalPositionBlock( position );
+					var block = Map.GetBlockType( blockId );
 
-						if ( lightLevel > 0 )
-						{
-							LightMap.AddSunLight( new IntVector3( x, y, ChunkSize - 1 ), lightLevel );
-						}
+					if ( block.IsTranslucent )
+					{
+						LightMap.AddSunLight( position, 15 );
 					}
 				}
 			}
-			else
+
+			var chunkAbove = GetNeighbour( BlockFace.Top );
+			if ( !chunkAbove.Initialized ) return;
+
+			for ( var x = 0; x < ChunkSize; x++ )
 			{
-				var z = ChunkSize - 1;
-
-				for ( var x = 0; x < ChunkSize; x++ )
+				for ( var y = 0; y < ChunkSize; y++ )
 				{
-					for ( var y = 0; y < ChunkSize; y++ )
-					{
-						var position = new IntVector3( x, y, z );
-						var blockId = GetLocalPositionBlock( position );
-						var block = Map.GetBlockType( blockId );
+					var lightLevel = Map.GetSunLight( chunkAbove.Offset + new IntVector3( x, y, 0 ) );
 
-						if ( block.IsTranslucent )
-						{
-							LightMap.AddSunLight( position, 15 );
-						}
+					if ( lightLevel > 0 )
+					{
+						LightMap.AddSunLight( new IntVector3( x, y, ChunkSize - 1 ), lightLevel );
 					}
 				}
 			}
+		}
+
+		public Chunk GetNeighbour( BlockFace direction )
+		{
+			var directionIndex = (int)direction;
+			var neighbourPosition = Offset + (BlockDirections[directionIndex] * ChunkSize);
+
+			if ( Map.IsInside( neighbourPosition ) )
+			{
+				var neighbourIndex = Map.GetChunkIndex( neighbourPosition );
+				var neighbour = Map.Chunks[neighbourIndex];
+
+				return neighbour;
+			}
+
+			return null;
 		}
 
 		public void SetBlock( IntVector3 position, byte blockId )
@@ -577,6 +551,21 @@ namespace Facepunch.CoreWars.Voxel
 
 			OpaqueMesh.SetVertexRange( 0, opaqueVertexCount );
 			TranslucentMesh.SetVertexRange( 0, translucentVertexCount );
+		}
+
+		private void UpdateNeighbourLightMap( string name, int chunkIndex, bool recurseNeighbours = false )
+		{
+			if ( chunkIndex >= 0 && chunkIndex < Map.Chunks.Length )
+			{
+				var neighbour = Map.Chunks[chunkIndex];
+
+				if ( neighbour != null && neighbour.Initialized )
+				{
+					TranslucentSceneObject.SetValue( name, neighbour.LightMap.Texture );
+					OpaqueSceneObject.SetValue( name, neighbour.LightMap.Texture );
+					if ( recurseNeighbours ) neighbour.UpdateAdjacents();
+				}
+			}
 		}
 
 		private void BuildCollision()

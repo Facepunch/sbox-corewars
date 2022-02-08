@@ -107,7 +107,7 @@ namespace Facepunch.CoreWars
 				return;
 
 			var map = Map.Create();
-			map.SetSize( 256, 256, 64 );
+			map.SetSize( 256, 256, 128 );
 			map.LoadBlockAtlas( "textures/blocks.json" );
 			map.AddAllBlockTypes();
 			map.GeneratePerlin( map.FindBlockId<GrassBlock>() );

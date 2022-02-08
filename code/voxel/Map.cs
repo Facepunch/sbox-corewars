@@ -517,8 +517,8 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				for ( int y = 0; y < SizeY; ++y )
 				{
-					int height = (int)((SizeZ * 0.7f) * (Noise.Perlin( (x * 32) * 0.001f, (y * 32) * 0.001f, 0 ) + 0.5f) * 0.5f);
-					if ( height <= 0 ) height = 1;
+					int height = (int)((SizeZ * 0.5f) * (Noise.Perlin( (x * 64) * 0.001f, (y * 64) * 0.001f, 0 ) + 1f) * 0.5f);
+					if ( height <= 0 ) height = 0;
 					if ( height > SizeZ ) height = SizeZ;
 
 					for ( int z = 0; z < SizeZ; ++z )
@@ -529,7 +529,7 @@ namespace Facepunch.CoreWars.Voxel
 						{
 							SetBlockAtPosition( position, (byte)(z < height ? groundBlockId : 0) );
 
-							if ( z < height )
+							if ( z < height / 2 )
 							{
 								GenerateCaves( x, y, z );
 							}
@@ -538,6 +538,8 @@ namespace Facepunch.CoreWars.Voxel
 
 					if ( Rand.Float( 100f ) <= 1f )
 						GenerateTree( x, y, height - 1 );
+
+					SetBlockAtPosition( new IntVector3( x, y, 0 ), groundBlockId );
 				}
 			}
 		}
@@ -558,7 +560,7 @@ namespace Facepunch.CoreWars.Voxel
 			double n2 = CaveNoise.GetNoise( rx, ry + 88f, rz );
 			double finalNoise = n1 * n1 + n2 * n2;
 
-			if ( finalNoise < 0.04f )
+			if ( finalNoise < 0.02f )
 			{
 				SetBlockAtPosition( position, 0 );
 				return true;
