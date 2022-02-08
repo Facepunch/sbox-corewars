@@ -87,6 +87,10 @@ namespace Facepunch.CoreWars.Voxel
 				return;
 
 			await GameTask.RunInThreadAsync( UpdateBlockSlices );
+			await GameTask.RunInThreadAsync( PerformFullTorchUpdate );
+			await GameTask.RunInThreadAsync( PropagateSunlight );
+
+			CreateEntities();
 
 			Initialized = true;
 
@@ -141,6 +145,29 @@ namespace Facepunch.CoreWars.Voxel
 			if ( IsClient )
 			{
 				UpdateAdjacents( true );
+			}
+		}
+
+		public void PerformFullTorchUpdate()
+		{
+			for ( var x = 0; x < ChunkSize; x++ )
+			{
+				for ( var y = 0; y < ChunkSize; y++ )
+				{
+					for ( var z = 0; z < ChunkSize; z++ )
+					{
+						var position = new IntVector3( x, y, z );
+						var blockIndex = GetLocalPositionIndex( position );
+						var block = Map.GetBlockType( Blocks[blockIndex] );
+
+						if ( block.LightLevel.x > 0 || block.LightLevel.y > 0 || block.LightLevel.z > 0 )
+						{
+							LightMap.AddRedTorchLight( position, (byte)block.LightLevel.x );
+							LightMap.AddGreenTorchLight( position, (byte)block.LightLevel.y );
+							LightMap.AddBlueTorchLight( position, (byte)block.LightLevel.z );
+						}
+					}
+				}
 			}
 		}
 

@@ -84,7 +84,7 @@ namespace Facepunch.CoreWars
 
 			StateSystem.Active?.OnPlayerJoined( player );
 
-			await Task.Delay( 500 );
+			await Task.Delay( 2000 );
 			var totalChunksSent = 0;
 
 			// For now just load every chunk in the map.
