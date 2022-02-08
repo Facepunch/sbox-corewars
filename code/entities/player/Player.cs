@@ -16,8 +16,7 @@ namespace Facepunch.CoreWars
 		[BindComponent] public ChunkViewer ChunkViewer { get; }
 		[Net] public byte CurrentBlockId { get; private set; }
 		[Net] public List<byte> HotbarBlocks { get; private set; }
-
-		public InventoryContainer MainInventory { get; private set; }
+		[Net] public NetInventory MainInventory { get; private set; }
 		public DamageInfo LastDamageTaken { get; private set; }
 
 		public Player() : base()
@@ -84,16 +83,16 @@ namespace Facepunch.CoreWars
 
 		public void CreateInventory()
 		{
-			MainInventory = new InventoryContainer( this );
-			MainInventory.SetSlotLimit( 10 );
-			MainInventory.AddConnection( Client );
+			var container = new InventoryContainer( this );
+			container.SetSlotLimit( 10 );
+			container.AddConnection( Client );
 
-			InventorySystem.Register( MainInventory );
+			InventorySystem.Register( container );
 
-			MainInventory.Give( "test_item", 2 );
-			MainInventory.Give( "test_item", 6 );
+			container.Give( "test_item", 2 );
+			container.Give( "test_item", 6 );
 
-			SendInventoryToOwner();
+			MainInventory = new NetInventory( container );
 		}
 
 		public override void Spawn()
@@ -117,6 +116,19 @@ namespace Facepunch.CoreWars
 			SetModel( "models/citizen/citizen.vmdl" );
 
 			base.Spawn();
+		}
+
+		public override void ClientSpawn()
+		{
+			foreach ( var item in MainInventory.Container.ItemList )
+			{
+				if ( item.IsValid() )
+				{
+					Log.Info( $"Received Initial Inventory Item {item.UniqueName} @ Slot #{item.SlotId}" );
+				}
+			}
+
+			base.ClientSpawn();
 		}
 
 		public override void Respawn()
@@ -228,25 +240,6 @@ namespace Facepunch.CoreWars
 		protected virtual void OnTeamChanged( Team team )
 		{
 
-		}
-
-		private void SendInventoryToOwner()
-		{
-			ReceiveInventory( To.Single( Client ), MainInventory.Serialize() );
-		}
-
-		[ClientRpc]
-		private void ReceiveInventory( byte[] data )
-		{
-			MainInventory = InventoryContainer.Deserialize( data );
-
-			foreach ( var item in MainInventory.ItemList )
-			{
-				if ( item.IsValid() )
-				{
-					Log.Info( $"Received Initial Inventory Item {item.UniqueName} @ Slot #{item.SlotId}" );
-				}
-			}
 		}
 
 		private void ShuffleHotbarBlocks()
