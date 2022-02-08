@@ -89,8 +89,22 @@ namespace Facepunch.CoreWars
 
 			InventorySystem.Register( container );
 
-			container.Give( "test_item", 2 );
-			container.Give( "test_item", 6 );
+			var grassBlocks = InventorySystem.CreateItem<BlockItem>();
+			grassBlocks.StackSize = 64;
+			grassBlocks.BlockId = Map.Current.FindBlockId<GrassBlock>();
+
+			var stoneBlocks = InventorySystem.CreateItem<BlockItem>();
+			stoneBlocks.StackSize = 32;
+			stoneBlocks.BlockId = Map.Current.FindBlockId<StoneBlock>();
+
+			container.Give( grassBlocks, 2 );
+			container.Give( stoneBlocks, 6 );
+
+			var moreStoneBlocks = InventorySystem.CreateItem<BlockItem>();
+			moreStoneBlocks.StackSize = 16;
+			moreStoneBlocks.BlockId = Map.Current.FindBlockId<StoneBlock>();
+
+			container.Stack( moreStoneBlocks );
 
 			MainInventory = new NetInventory( container );
 		}
@@ -124,7 +138,7 @@ namespace Facepunch.CoreWars
 			{
 				if ( item.IsValid() )
 				{
-					Log.Info( $"Received Initial Inventory Item {item.UniqueName} @ Slot #{item.SlotId}" );
+					Log.Info( $"Received Initial Inventory Item {item.GetName()} @ Slot #{item.SlotId} (Stack: {item.StackSize})" );
 				}
 			}
 

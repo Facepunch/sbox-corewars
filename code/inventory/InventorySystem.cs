@@ -105,6 +105,11 @@ namespace Facepunch.CoreWars.Inventory
 			}
 		}
 
+		public static T CreateItem<T>( ulong itemId = 0 ) where T : InventoryItem
+		{
+			return (CreateItem( typeof( T ).FullName, itemId ) as T);
+		}
+
 		public static InventoryItem CreateItem( string itemName, ulong itemId = 0 )
 		{
 			if ( itemId > 0 && Items.TryGetValue( itemId, out var instance ) )

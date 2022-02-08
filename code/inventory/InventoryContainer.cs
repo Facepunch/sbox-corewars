@@ -410,57 +410,40 @@ namespace Facepunch.CoreWars.Inventory
 			return ItemList[slot];
 		}
 
-		public bool Split( InventoryItem instance, ushort amount )
+		public ushort Stack( InventoryItem instance )
 		{
-			var splitStack = Give( instance.UniqueName );
+			var amount = instance.StackSize;
 
-			if ( splitStack != null )
-			{
-				splitStack.StackSize = amount;
-				instance.StackSize -= amount;
-
-				return true;
-			}
-
-			return false;
-		}
-
-		public ushort Stack( string itemName, ushort amount )
-		{
 			for ( int i = 0; i < ItemList.Count; i++ )
 			{
-				var instance = ItemList[i];
+				var item = ItemList[i];
 
-				if ( instance != null && instance.IsSameType( itemName ) && instance.CanStack( amount ) )
+				if ( item != null && item.IsSameType( instance ) && item.CanStackWith( instance ) && item.CanStack( amount ) )
 				{
-					var amountCanStack = (ushort)(instance.MaxStackSize - instance.StackSize);
+					var amountCanStack = (ushort)(item.MaxStackSize - item.StackSize);
 
 					if ( amountCanStack >= amount )
 					{
-						instance.StackSize += amount;
+						item.StackSize += amount;
 						amount = 0;
 					}
 					else
 					{
-						instance.StackSize += amountCanStack;
+						item.StackSize += amountCanStack;
 						amount = (ushort)Math.Max( amount - amountCanStack, 0 );
 					}
 
-					if ( amount == 0 )
-					{
-						return 0;
-					}
+					if ( amount == 0 ) return 0;
 				}
 			}
 
 			if ( amount > 0 )
 			{
-				var instance = Give( itemName );
+				var item = Give( instance );
 
-				if ( instance != null )
+				if ( item != null )
 				{
-					instance.StackSize = amount;
-
+					item.StackSize = amount;
 					return 0;
 				}
 			}
@@ -483,34 +466,6 @@ namespace Facepunch.CoreWars.Inventory
 			}
 
 			return output;
-		}
-
-		public InventoryItem Give( string itemName, ushort slot )
-		{
-			if ( IsClient )
-			{
-				return null;
-			}
-
-			var instance = InventorySystem.CreateItem( itemName );
-
-			if ( instance == null )
-			{
-				return null;
-			}
-
-			return Give( instance, slot );
-		}
-
-		public InventoryItem Give( string itemName )
-		{
-			if ( !FindFreeSlot( out var slot ) )
-			{
-				Log.Error( "Unable to give an item to this inventory because there is no space!" );
-				return null;
-			}
-
-			return Give( itemName, slot );
 		}
 
 		private void SendGiveEvent( ushort slot, InventoryItem instance )

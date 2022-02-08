@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Facepunch.CoreWars.Voxel
 {
-	public partial class Map
+	public partial class Map : IValid
 	{
 		public static Map Current { get; private set; }
 
@@ -90,6 +90,8 @@ namespace Facepunch.CoreWars.Voxel
 
 		private string BlockAtlasFileName { get; set; }
 		private byte NextAvailableBlockId { get; set; }
+
+		public bool IsValid => true;
 
 		private Map()
 		{

@@ -76,13 +76,13 @@ namespace Facepunch.CoreWars
 		{
 			base.ClientJoined( client );
 
+			Map.Current.Send( client );
+
 			var player = new Player( client );
 			client.Pawn = player;
 			player.CreateInventory();
 
 			StateSystem.Active?.OnPlayerJoined( player );
-
-			Map.Current.Send( client );
 
 			await Task.Delay( 500 );
 			var totalChunksSent = 0;

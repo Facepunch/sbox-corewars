@@ -83,6 +83,11 @@ namespace Facepunch.CoreWars.Inventory
 			return true;
 		}
 
+		public virtual string GetName()
+		{
+			return string.Empty;
+		}
+
 		public virtual void Write( BinaryWriter writer )
 		{
 
