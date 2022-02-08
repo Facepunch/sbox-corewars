@@ -45,6 +45,8 @@ namespace Facepunch.CoreWars.Voxel
 						var name = reader.ReadString();
 						var type = Library.Create<BlockType>( name );
 
+						type.Initialize();
+
 						Log.Info( $"[Client] Initializing block type {name} with id #{id}" );
 
 						Current.BlockTypes.Add( name, id );
@@ -57,12 +59,12 @@ namespace Facepunch.CoreWars.Voxel
 		}
 
 		[ClientRpc]
-		public static void ReceiveDataUpdate( IntVector3 position, byte value )
+		public static void ReceiveDataUpdate( int chunkIndex, byte[] data )
 		{
 			if ( Current == null ) return;
 
-			Current.SetHealth( position, value );
-			Log.Info( "Received Health Update: " + value );
+			Current.Chunks[chunkIndex].DeserializeData( data );
+			Log.Info( "Received Data Update" );
 		}
 
 		[ClientRpc]
@@ -190,7 +192,9 @@ namespace Facepunch.CoreWars.Voxel
 			if ( BlockAtlas == null )
 				throw new Exception( "Unable to add any block types with no loaded block atlas!" );
 
-			Log.Info( $"[Client] Initializing block type {type.GetType().Name} with id #{NextAvailableBlockId}" );
+			Log.Info( $"[Server] Initializing block type {type.GetType().Name} with id #{NextAvailableBlockId}" );
+
+			type.Initialize();
 
 			BlockTypes[type.GetType().Name] = NextAvailableBlockId;
 			BlockData[NextAvailableBlockId] = type;
@@ -202,7 +206,7 @@ namespace Facepunch.CoreWars.Voxel
 			var chunk = Chunks[index];
 
 			chunk.Blocks = blocks;
-			chunk.DataMap.Copy( data );
+			chunk.DeserializeData( data );
 
 			await chunk.Init();
 
@@ -236,20 +240,20 @@ namespace Facepunch.CoreWars.Voxel
 			SetupChunks();
 		}
 
-		public byte GetHealth( IntVector3 position )
+		public T GetOrCreateData<T>( IntVector3 position ) where T : BlockData
 		{
-			if ( !IsInside( position ) ) return 0;
+			if ( !IsInside( position ) ) return null;
 			var chunkIndex = GetChunkIndex( position );
 			var localPosition = ToLocalPosition( position );
-			return Chunks[chunkIndex].DataMap.GetHealth( localPosition );
+			return Chunks[chunkIndex].GetOrCreateData<T>( localPosition );
 		}
 
-		public bool SetHealth( IntVector3 position, byte value )
+		public T GetData<T>( IntVector3 position ) where T : BlockData
 		{
-			if ( !IsInside( position ) ) return false;
+			if ( !IsInside( position ) ) return null;
 			var chunkIndex = GetChunkIndex( position );
 			var localPosition = ToLocalPosition( position );
-			return Chunks[chunkIndex].DataMap.SetHealth( localPosition, value );
+			return Chunks[chunkIndex].GetData<T>( localPosition );
 		}
 
 		public byte GetSunLight( IntVector3 position )
@@ -437,7 +441,7 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				foreach ( var chunk in Chunks )
 				{
-					chunk.Init();
+					_ = chunk.Init();
 				}
 			}
 
@@ -583,7 +587,7 @@ namespace Facepunch.CoreWars.Voxel
 					chunk.RemoveEntity( localPosition );
 				}
 
-				SetHealth( position, 100 );
+				chunk.Data.Remove( localPosition );
 
 				return true;
 

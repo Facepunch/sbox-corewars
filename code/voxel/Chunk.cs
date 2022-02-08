@@ -1,6 +1,7 @@
 ﻿using Sandbox;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Facepunch.CoreWars.Voxel
@@ -37,14 +38,15 @@ namespace Facepunch.CoreWars.Voxel
 		public static readonly int ChunkSize = 32;
 		public static readonly int VoxelSize = 48;
 
+		public Dictionary<IntVector3, BlockData> Data { get; set; } = new();
 		public HashSet<SliceUpdate> PendingSliceUpdates { get; set; } = new();
+		public HashSet<IntVector3> DirtyData { get; set; } = new();
 		public bool Initialized { get; private set; }
 
 		public bool IsServer => Host.IsServer;
 		public bool IsClient => Host.IsClient;
 
 		public ChunkLightMap LightMap { get; set; }
-		public ChunkDataMap DataMap { get; set; }
 		public byte[] Blocks;
 		public IntVector3 Offset;
 		public int Index;
@@ -76,7 +78,6 @@ namespace Facepunch.CoreWars.Voxel
 			LightMap = new ChunkLightMap( this, map );
 			Offset = new IntVector3( x * ChunkSize, y * ChunkSize, z * ChunkSize );
 			Index = x + y * map.NumChunksX + z * map.NumChunksX * map.NumChunksY;
-			DataMap = new ChunkDataMap( this, map );
 			Map = map;
 		}
 
@@ -228,6 +229,82 @@ namespace Facepunch.CoreWars.Voxel
 			}
 
 			BuildMeshAndCollision();
+		}
+
+		public void DeserializeData( byte[] data )
+		{
+			using ( var stream = new MemoryStream( data ) )
+			{
+				using ( var reader = new BinaryReader( stream ) )
+				{
+					while ( stream.Position < stream.Length )
+					{
+						var x = reader.ReadByte();
+						var y = reader.ReadByte();
+						var z = reader.ReadByte();
+						var blockIndex = GetLocalPositionIndex( x, y, z );
+						var blockId = Blocks[blockIndex];
+						var block = Map.GetBlockType( blockId );
+						var position = new IntVector3( x, y, z );
+
+						if ( !Data.TryGetValue( position, out var blockData ) )
+						{
+							blockData = block.CreateDataInstance();
+							blockData.Chunk = this;
+							blockData.LocalPosition = position;
+							Data.Add( position, blockData );
+						}
+
+						blockData.Deserialize( reader );
+					}
+				}
+			}
+		}
+
+		public byte[] SerializeData()
+		{
+			using ( var stream = new MemoryStream() )
+			{
+				using ( var writer = new BinaryWriter( stream ) )
+				{
+					foreach ( var kv in Data )
+					{
+						var position = kv.Key;
+						writer.Write( (byte)position.x );
+						writer.Write( (byte)position.y );
+						writer.Write( (byte)position.z );
+						kv.Value.Serialize( writer );
+					}
+
+					return stream.ToArray();
+				}
+			}
+		}
+
+		public T GetOrCreateData<T>( IntVector3 position ) where T : BlockData
+		{
+			if ( Data.TryGetValue( position, out var data ) )
+				return data as T;
+
+			var blockId = GetLocalPositionBlock( position );
+			var block = Map.Current.GetBlockType( blockId );
+
+			data = block.CreateDataInstance();
+			data.Chunk = this;
+			data.LocalPosition = position;
+			Data.Add( position, data );
+
+			data.IsDirty = true;
+
+			return data as T;
+		}
+
+		public T GetData<T>( IntVector3 position ) where T : BlockData
+		{
+			if ( Data.TryGetValue( position, out var data ) )
+				return data as T;
+			else
+				return null;
 		}
 
 		public int GetLocalPositionIndex( int x, int y, int z )
@@ -919,14 +996,35 @@ namespace Facepunch.CoreWars.Voxel
 		[Event.Tick.Server]
 		private void ServerTick()
 		{
-			DataMap.Update();
+			if ( DirtyData.Count > 0 )
+			{
+				using ( var stream = new MemoryStream() )
+				{
+					using ( var writer = new BinaryWriter( stream ) )
+					{
+						foreach ( var position in DirtyData )
+						{
+							var data = GetData<BlockData>( position );
+							if ( data == null ) continue;
+							writer.Write( (byte)position.x );
+							writer.Write( (byte)position.y );
+							writer.Write( (byte)position.z );
+							data.Serialize( writer );
+							data.IsDirty = false;
+						}
+
+						Map.ReceiveDataUpdate( To.Everyone, Index, stream.ToArray() );
+					}
+				}
+			}
+
+			DirtyData.Clear();
 		}
 
 		[Event.Tick.Client]
 		private void ClientTick()
 		{
 			LightMap.Update();
-			DataMap.Update();
 		}
 	}
 }

@@ -25,12 +25,19 @@ namespace Facepunch.CoreWars.Voxel
 			return Map.BlockAtlas.GetTextureId( DefaultTexture );
 		}
 
+		public virtual BlockData CreateDataInstance() => new BlockData();
+
 		public virtual void OnBlockAdded( Chunk chunk, int x, int y, int z )
 		{
 			
 		}
 
 		public virtual void OnBlockRemoved( Chunk chunk, int x, int y, int z )
+		{
+
+		}
+
+		public virtual void Initialize()
 		{
 
 		}

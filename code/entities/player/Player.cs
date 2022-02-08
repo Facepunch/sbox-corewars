@@ -61,7 +61,7 @@ namespace Facepunch.CoreWars
 			var blocks = chunk.Blocks;
 			var index = chunk.Index;
 
-			ReceiveChunk( To.Single( Client ), offset.x, offset.y, offset.z, index, blocks, chunk.DataMap.Data );
+			ReceiveChunk( To.Single( Client ), offset.x, offset.y, offset.z, index, blocks, chunk.SerializeData() );
 		}
 
 		[ClientRpc]
@@ -177,6 +177,33 @@ namespace Facepunch.CoreWars
 				{
 					Map.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, 0 );
 				}
+				else if ( Input.Pressed( InputButton.Flashlight ) )
+				{
+					Map.Current.GetBlockInDirection( Input.Position, Input.Rotation.Forward, out var position );
+
+					var data = Map.Current.GetOrCreateData<BlockData>( position );
+
+					if ( data.Health == 0 )
+						data.Health = 100;
+					else
+						data.Health--;
+
+					data.IsDirty = true;
+				}
+			}
+			else
+			{
+				if ( Input.Pressed( InputButton.Drop ) )
+				{
+					Map.Current.GetBlockInDirection( Input.Position, Input.Rotation.Forward, out var position );
+
+					var data = Map.Current.GetData<BlockData>( position );
+
+					if ( data.IsValid() )
+					{
+						Log.Info( data.Health );
+					}
+				}
 			}
 
 			if ( IsClient && Prediction.FirstTime )
@@ -207,7 +234,7 @@ namespace Facepunch.CoreWars
 				}
 			}
 
-			if ( IsServer && Prediction.FirstTime )
+			if ( IsServer )
 			{
 				if ( Input.Released( InputButton.Reload ) )
 				{
