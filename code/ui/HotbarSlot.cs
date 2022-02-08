@@ -22,7 +22,7 @@ namespace Facepunch.CoreWars
 			var block = Map.Current.GetBlockType( blockId );
 			if ( string.IsNullOrEmpty( block.DefaultTexture ) ) return;
 
-			var texture = Texture.Load( FileSystem.Mounted, $"textures/blocks/{ block.DefaultTexture }.png" );
+			var texture = Texture.Load( FileSystem.Mounted, $"textures/blocks/{ block.DefaultTexture }_color.png" );
 			Style.SetBackgroundImage( texture );
 		}
 
