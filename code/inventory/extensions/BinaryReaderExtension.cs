@@ -12,15 +12,15 @@ namespace Facepunch.CoreWars.Inventory
 	{
 		public static InventoryItem ReadInventoryItem( this BinaryReader buffer )
 		{
-			var itemName = buffer.ReadString();
+			var libraryId = buffer.ReadInt32();
 
-			if ( !string.IsNullOrEmpty( itemName ) )
+			if ( libraryId != -1 )
 			{
 				var stackSize = buffer.ReadUInt16();
 				var itemId = buffer.ReadUInt64();
 				var slotId = buffer.ReadUInt16();
 
-				var instance = InventorySystem.CreateItem( itemName, itemId );
+				var instance = InventorySystem.CreateItem( libraryId, itemId );
 
 				if ( instance != null )
 				{

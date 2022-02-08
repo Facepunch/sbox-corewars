@@ -90,10 +90,12 @@ namespace Facepunch.CoreWars
 			InventorySystem.Register( container );
 
 			var grassBlocks = InventorySystem.CreateItem<BlockItem>();
+			grassBlocks.MaxStackSize = 64;
 			grassBlocks.StackSize = 64;
 			grassBlocks.BlockId = Map.Current.FindBlockId<GrassBlock>();
 
 			var stoneBlocks = InventorySystem.CreateItem<BlockItem>();
+			stoneBlocks.MaxStackSize = 40;
 			stoneBlocks.StackSize = 32;
 			stoneBlocks.BlockId = Map.Current.FindBlockId<StoneBlock>();
 
@@ -101,6 +103,7 @@ namespace Facepunch.CoreWars
 			container.Give( stoneBlocks, 6 );
 
 			var moreStoneBlocks = InventorySystem.CreateItem<BlockItem>();
+			moreStoneBlocks.MaxStackSize = 40;
 			moreStoneBlocks.StackSize = 16;
 			moreStoneBlocks.BlockId = Map.Current.FindBlockId<StoneBlock>();
 

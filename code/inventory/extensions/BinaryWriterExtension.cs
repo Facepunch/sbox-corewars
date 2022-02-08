@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sandbox;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace Facepunch.CoreWars.Inventory
 		{
 			if ( item != null )
 			{
-				writer.Write( item.UniqueName );
+				writer.Write( item.LibraryId );
 				writer.Write( item.StackSize );
 				writer.Write( item.ItemId );
 				writer.Write( item.SlotId );
@@ -22,7 +23,7 @@ namespace Facepunch.CoreWars.Inventory
 			}
 			else
 			{
-				writer.Write( string.Empty );
+				writer.Write( -1 );
 			}
 		}
 

@@ -107,10 +107,11 @@ namespace Facepunch.CoreWars.Inventory
 
 		public static T CreateItem<T>( ulong itemId = 0 ) where T : InventoryItem
 		{
-			return (CreateItem( typeof( T ).FullName, itemId ) as T);
+			var attribute = Library.GetAttribute( typeof( T ) );
+			return (CreateItem( attribute.Identifier, itemId ) as T);
 		}
 
-		public static InventoryItem CreateItem( string itemName, ulong itemId = 0 )
+		public static InventoryItem CreateItem( int libraryId, ulong itemId = 0 )
 		{
 			if ( itemId > 0 && Items.TryGetValue( itemId, out var instance ) )
 			{
@@ -122,10 +123,10 @@ namespace Facepunch.CoreWars.Inventory
 				itemId = NextItemId++;
 			}
 
-			instance = Library.Create<InventoryItem>( itemName );
+			instance = Library.TryCreate<InventoryItem>( libraryId );
 			instance.ItemId = itemId;
 			instance.StackSize = instance.DefaultStackSize;
-			instance.UniqueName = itemName;
+			instance.LibraryId = libraryId;
 			instance.OnCreated();
 
 			Items[itemId] = instance;

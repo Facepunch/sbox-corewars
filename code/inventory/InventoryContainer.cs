@@ -418,9 +418,9 @@ namespace Facepunch.CoreWars.Inventory
 			{
 				var item = ItemList[i];
 
-				if ( item != null && item.IsSameType( instance ) && item.CanStackWith( instance ) && item.CanStack( amount ) )
+				if ( item != null && item.IsSameType( instance ) && item.CanStackWith( instance ) )
 				{
-					var amountCanStack = (ushort)(item.MaxStackSize - item.StackSize);
+					var amountCanStack = (ushort)Math.Max( item.MaxStackSize - item.StackSize, 0 );
 
 					if ( amountCanStack >= amount )
 					{

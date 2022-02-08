@@ -7,13 +7,14 @@ namespace Facepunch.CoreWars.Inventory
 	{
 		public ItemSlot ItemSlot { get; set; } = ItemSlot.Everything;
 		public bool IsStackable { get; set; }
-		public ushort DefaultStackSize { get; set; } = 1;
 		public ushort MaxStackSize { get; set; } = 1;
+		public ushort DefaultStackSize { get; set; } = 1;
+		public InventoryContainer Container { get; set; }
+		public string LibraryName { get; set; }
+		public int LibraryId { get; set; }
 
 		private ushort InternalStackSize;
 		private bool InternalIsDirty;
-
-		public InventoryContainer Container { get; set; }
 
 		public ushort StackSize
 		{
@@ -33,7 +34,7 @@ namespace Facepunch.CoreWars.Inventory
 		public bool IsClient => Host.IsClient;
 		public bool IsInstance => ItemId > 0;
 
-		public string UniqueName { get; set; }
+		public LibraryAttribute Attribute { get; set; }
 
 		public bool IsDirty
 		{
@@ -65,20 +66,10 @@ namespace Facepunch.CoreWars.Inventory
 
 		public virtual bool IsSameType( InventoryItem other )
 		{
-			return (UniqueName == other.UniqueName);
-		}
-
-		public virtual bool IsSameType( string other )
-		{
-			return (UniqueName == other);
+			return (GetType() == other.GetType());
 		}
 
 		public virtual bool CanStackWith( InventoryItem other )
-		{
-			return true;
-		}
-
-		public virtual bool CanStack( int amount )
 		{
 			return true;
 		}
