@@ -13,6 +13,7 @@
 
 		public BlockData GetData<T>() where T : BlockData => Chunk.GetData<T>( LocalPosition );
 		public BlockData GetOrCreateData<T>() where T : BlockData => Chunk.GetOrCreateData<T>( LocalPosition );
+		public BlockType GetBlockType() => Map.Current.GetBlockType( BlockId );
 
 		public byte GetSunLight() => Chunk.LightMap.GetSunLight( LocalPosition );
 		public byte GetRedTorchLight() => Chunk.LightMap.GetRedTorchLight( LocalPosition );
