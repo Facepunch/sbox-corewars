@@ -75,6 +75,17 @@ namespace Facepunch.CoreWars.Voxel
 			Current?.SetBlockAndUpdate( new IntVector3( x, y, z ), blockId, direction, true );
 		}
 
+		public static Vector3 ToSourcePosition( IntVector3 position )
+		{
+			return new Vector3( position.x * Chunk.VoxelSize, position.y * Chunk.VoxelSize, position.z * Chunk.VoxelSize );
+		}
+
+		public static IntVector3 ToVoxelPosition( Vector3 position )
+		{
+			var fPosition = position * (1.0f / Chunk.VoxelSize);
+			return new IntVector3( (int)fPosition.x, (int)fPosition.y, (int)fPosition.z );
+		}
+
 		public List<Vector3> SuitableSpawnPositions { get; private set; } = new();
 		public Dictionary<byte, BlockType> BlockData { get; private set; } = new();
 		public Dictionary<string, byte> BlockTypes { get; private set; } = new();
@@ -182,17 +193,6 @@ namespace Facepunch.CoreWars.Voxel
 			BlockAtlasFileName = fileName;
 			BlockAtlas = FileSystem.Mounted.ReadJsonOrDefault<BlockAtlas>( fileName );
 			BlockAtlas.Initialize();
-		}
-
-		public Vector3 ToSourcePosition( IntVector3 position )
-		{
-			return new Vector3( position.x * Chunk.VoxelSize, position.y * Chunk.VoxelSize, position.z * Chunk.VoxelSize );
-		}
-
-		public IntVector3 ToVoxelPosition( Vector3 position )
-		{
-			var fPosition = position * (1.0f / Chunk.VoxelSize);
-			return new IntVector3( (int)fPosition.x, (int)fPosition.y, (int)fPosition.z );
 		}
 
 		public void AddBlockType( BlockType type )

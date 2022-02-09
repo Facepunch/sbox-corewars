@@ -257,7 +257,7 @@ namespace Facepunch.CoreWars
 			}
 			else if ( Map.Current.IsValid() )
 			{
-				var position = Map.Current.ToVoxelPosition( Input.Position );
+				var position = Map.ToVoxelPosition( Input.Position );
 				var voxel = Map.Current.GetVoxel( position );
 
 				DebugOverlay.ScreenText( 2, $"Sunlight Level: {voxel.GetSunLight()}", 0.1f );
