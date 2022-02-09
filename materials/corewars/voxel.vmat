@@ -40,18 +40,22 @@ Layer0
 	TextureAtlasNormal "textures/blocks_normal.png"
 	TextureAtlasRoughness "textures/blocks_rough.png"
 	TextureLightmap "materials/default/default_lightmap.tga"
+	TextureLightmapBottom "materials/default/default_lightmap.tga"
 	TextureLightmapEast "materials/default/default_lightmap.tga"
 	TextureLightmapNorth "materials/default/default_lightmap.tga"
 	TextureLightmapSouth "materials/default/default_lightmap.tga"
+	TextureLightmapTop "materials/default/default_lightmap.tga"
 	TextureLightmapWest "materials/default/default_lightmap.tga"
 
 	DynamicParams
 	{
 		g_flVoxelSize "VoxelSize"
 		TextureLightmap "Lightmap"
+		TextureLightmapBottom "LightMapBottom"
 		TextureLightmapEast "LightMapEast"
 		TextureLightmapNorth "LightMapNorth"
 		TextureLightmapSouth "LightMapSouth"
+		TextureLightmapTop "LightMapTop"
 		TextureLightmapWest "LightMapWest"
 	}
 }

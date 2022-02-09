@@ -15,6 +15,7 @@ HEADER
 FEATURES
 {
 	#include "common/features.hlsl"
+	Feature( F_ADDITIVE_BLEND, 0..1 );
 }
 
 //=========================================================================================================================
@@ -146,6 +147,8 @@ PS
 	CreateInputTexture3D( TextureLightmapSouth, Linear, 32, "", "_lightmap", "Voxel Atlas,10/90", Default3( 1.0, 1.0, 1.0 ) );
 	CreateInputTexture3D( TextureLightmapEast, Linear, 32, "", "_lightmap", "Voxel Atlas,10/100", Default3( 1.0, 1.0, 1.0 ) );
 	CreateInputTexture3D( TextureLightmapNorth, Linear, 32, "", "_lightmap", "Voxel Atlas,10/110", Default3( 1.0, 1.0, 1.0 ) );
+	CreateInputTexture3D( TextureLightmapTop, Linear, 32, "", "_lightmap", "Voxel Atlas,10/120", Default3( 1.0, 1.0, 1.0 ) );
+	CreateInputTexture3D( TextureLightmapBottom, Linear, 32, "", "_lightmap", "Voxel Atlas,10/130", Default3( 1.0, 1.0, 1.0 ) );
 
 	CreateTexture3DWithoutSampler( g_tLightmap ) < Channel( R, None( TextureLightmap ), Linear ); SrgbRead( false ); Filter( POINT ); OutputFormat( R32F ); AddressU( CLAMP ); AddressV( CLAMP ); AddressW( CLAMP ); > ;
 	
@@ -155,6 +158,8 @@ PS
 	CreateTexture3DWithoutSampler( g_tLightmapAdjacent1 ) < Channel( R, None( TextureLightmapSouth ), Linear ); OutputFormat( R32F ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
 	CreateTexture3DWithoutSampler( g_tLightmapAdjacent2 ) < Channel( R, None( TextureLightmapEast ), Linear ); OutputFormat( R32F ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
 	CreateTexture3DWithoutSampler( g_tLightmapAdjacent3 ) < Channel( R, None( TextureLightmapNorth ), Linear ); OutputFormat( R32F ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
+	CreateTexture3DWithoutSampler( g_tLightmapAdjacent4 ) < Channel( R, None( TextureLightmapTop ), Linear ); OutputFormat( R32F ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
+	CreateTexture3DWithoutSampler( g_tLightmapAdjacent5 ) < Channel( R, None( TextureLightmapBottom ), Linear ); OutputFormat( R32F ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
 
 	struct LightmapData
 	{
@@ -192,6 +197,10 @@ PS
 			// y - 1
 			return UnpackLightmap( g_tLightmapAdjacent1, int3(vPositionOs.x, vLightmapDim.y - 1, vPositionOs.z) );
 		}
+		else if( vPositionOs.z < 0 )
+		{
+			return UnpackLightmap( g_tLightmapAdjacent5, int3(vPositionOs.xy, vLightmapDim.z - 1) );
+		}
 		else if( vPositionOs.x >= vLightmapDim.x )
 		{
 			return UnpackLightmap( g_tLightmapAdjacent2, int3(0, vPositionOs.yz) );
@@ -199,6 +208,10 @@ PS
 		else if( vPositionOs.y >= vLightmapDim.y )
 		{
 			return UnpackLightmap( g_tLightmapAdjacent3, int3(vPositionOs.x, 0, vPositionOs.z) );
+		}
+		else if( vPositionOs.z >= vLightmapDim.z )
+		{
+			return UnpackLightmap( g_tLightmapAdjacent4, int3(vPositionOs.xy, 0) );
 		}
 		else
 		{
