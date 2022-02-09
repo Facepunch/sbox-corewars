@@ -32,9 +32,9 @@
         <key>dpi</key>
         <uint>72</uint>
         <key>dataFormat</key>
-        <string>spritesheet-only</string>
+        <string>json-array</string>
         <key>textureFileName</key>
-        <filename>blocks_color.png</filename>
+        <filename>blocks.png</filename>
         <key>flipPVR</key>
         <false/>
         <key>pvrQualityLevel</key>
@@ -60,7 +60,7 @@
         <key>jxrCompressionLevel</key>
         <uint>0</uint>
         <key>ditherType</key>
-        <enum type="SettingsBase::DitherType">NearestNeighbour</enum>
+        <enum type="SettingsBase::DitherType">PngQuantLow</enum>
         <key>backgroundColor</key>
         <uint>0</uint>
         <key>libGdx</key>
@@ -78,7 +78,7 @@
         <key>jpgQuality</key>
         <uint>80</uint>
         <key>pngOptimizationLevel</key>
-        <uint>1</uint>
+        <uint>0</uint>
         <key>webpQualityLevel</key>
         <uint>101</uint>
         <key>textureSubPath</key>
@@ -106,7 +106,7 @@
         <key>algorithmSettings</key>
         <struct type="AlgorithmSettings">
             <key>algorithm</key>
-            <enum type="AlgorithmSettings::AlgorithmId">MaxRects</enum>
+            <enum type="AlgorithmSettings::AlgorithmId">Basic</enum>
             <key>freeSizeMode</key>
             <enum type="AlgorithmSettings::AlgorithmFreeSizeMode">Best</enum>
             <key>sizeConstraints</key>
@@ -132,7 +132,13 @@
             </struct>
         </struct>
         <key>dataFileNames</key>
-        <map type="GFileNameMap"/>
+        <map type="GFileNameMap">
+            <key>data</key>
+            <struct type="DataFile">
+                <key>name</key>
+                <filename>blocks.json</filename>
+            </struct>
+        </map>
         <key>multiPack</key>
         <false/>
         <key>forceIdenticalLayout</key>
@@ -149,7 +155,7 @@
         <key>autoAliasEnabled</key>
         <false/>
         <key>trimSpriteNames</key>
-        <false/>
+        <true/>
         <key>prependSmartFolderName</key>
         <false/>
         <key>autodetectAnimations</key>
@@ -167,7 +173,7 @@
             <key>trimMargin</key>
             <uint>1</uint>
             <key>trimMode</key>
-            <enum type="SpriteSettings::TrimMode">Trim</enum>
+            <enum type="SpriteSettings::TrimMode">None</enum>
             <key>tracerTolerance</key>
             <int>200</int>
             <key>heuristicMask</key>
@@ -179,17 +185,51 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
+            <key type="filename">blocks/NormalMap (17).png</key>
+            <key type="filename">blocks/dirt_ao.png</key>
             <key type="filename">blocks/dirt_color.png</key>
+            <key type="filename">blocks/dirt_grass_ao.png</key>
             <key type="filename">blocks/dirt_grass_color.png</key>
+            <key type="filename">blocks/dirt_grass_normal.png</key>
+            <key type="filename">blocks/dirt_grass_rough.png</key>
+            <key type="filename">blocks/dirt_normal.png</key>
+            <key type="filename">blocks/dirt_rough.png</key>
+            <key type="filename">blocks/grass_ao.png</key>
             <key type="filename">blocks/grass_color.png</key>
+            <key type="filename">blocks/grass_normal.png</key>
+            <key type="filename">blocks/grass_rough.png</key>
+            <key type="filename">blocks/leaf_ao.png</key>
             <key type="filename">blocks/leaf_color.png</key>
+            <key type="filename">blocks/leaf_normal.png</key>
+            <key type="filename">blocks/leaf_rough.png</key>
+            <key type="filename">blocks/log_side_ao.png</key>
             <key type="filename">blocks/log_side_color.png</key>
+            <key type="filename">blocks/log_side_normal.png</key>
+            <key type="filename">blocks/log_side_rough.png</key>
+            <key type="filename">blocks/log_top_ao.png</key>
             <key type="filename">blocks/log_top_color.png</key>
+            <key type="filename">blocks/log_top_normal.png</key>
+            <key type="filename">blocks/log_top_rough.png</key>
+            <key type="filename">blocks/metalgrate_ao.png</key>
             <key type="filename">blocks/metalgrate_color.png</key>
+            <key type="filename">blocks/metalgrate_normal.png</key>
+            <key type="filename">blocks/metalgrate_rough.png</key>
+            <key type="filename">blocks/sand_ao.png</key>
             <key type="filename">blocks/sand_color.png</key>
+            <key type="filename">blocks/sand_normal.png</key>
+            <key type="filename">blocks/sand_rough.png</key>
+            <key type="filename">blocks/stone_ao.png</key>
             <key type="filename">blocks/stone_color.png</key>
+            <key type="filename">blocks/stone_normal.png</key>
+            <key type="filename">blocks/stone_rough.png</key>
+            <key type="filename">blocks/window_ao.png</key>
             <key type="filename">blocks/window_color.png</key>
+            <key type="filename">blocks/window_normal.png</key>
+            <key type="filename">blocks/window_rough.png</key>
+            <key type="filename">blocks/woodplanks_ao.png</key>
             <key type="filename">blocks/woodplanks_color.png</key>
+            <key type="filename">blocks/woodplanks_normal.png</key>
+            <key type="filename">blocks/woodplanks_rough.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -207,17 +247,7 @@
         </map>
         <key>fileList</key>
         <array>
-            <filename>blocks/dirt_color.png</filename>
-            <filename>blocks/dirt_grass_color.png</filename>
-            <filename>blocks/grass_color.png</filename>
-            <filename>blocks/leaf_color.png</filename>
-            <filename>blocks/log_side_color.png</filename>
-            <filename>blocks/log_top_color.png</filename>
-            <filename>blocks/metalgrate_color.png</filename>
-            <filename>blocks/sand_color.png</filename>
-            <filename>blocks/stone_color.png</filename>
-            <filename>blocks/window_color.png</filename>
-            <filename>blocks/woodplanks_color.png</filename>
+            <filename>blocks</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>
@@ -240,6 +270,17 @@
         <key>normalMapSheetFileName</key>
         <filename></filename>
         <key>exporterProperties</key>
-        <map type="ExporterProperties"/>
+        <map type="ExporterProperties">
+            <key>plain::bool-property</key>
+            <struct type="ExporterProperty">
+                <key>value</key>
+                <string>false</string>
+            </struct>
+            <key>plain::string-property</key>
+            <struct type="ExporterProperty">
+                <key>value</key>
+                <string>hello world</string>
+            </struct>
+        </map>
     </struct>
 </data>
