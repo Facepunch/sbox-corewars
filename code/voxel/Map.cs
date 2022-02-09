@@ -468,12 +468,8 @@ namespace Facepunch.CoreWars.Voxel
 
 				for ( int i = 0; i < 6; i++ )
 				{
-					if ( IsAdjacentEmpty( position, i ) )
-					{
-						var posInChunk = ToLocalPosition( position );
-						Chunks[chunkIndex].UpdateBlockSlice( posInChunk, i );
-						continue;
-					}
+					var posInChunk = ToLocalPosition( position );
+					Chunks[chunkIndex].UpdateBlockSlice( posInChunk, i );
 
 					var adjacentPos = GetAdjacentPosition( position, i );
 					var adjadentChunkIndex = GetChunkIndex( adjacentPos );
