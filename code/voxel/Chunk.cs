@@ -153,6 +153,23 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
+		public Voxel GetVoxel( IntVector3 position )
+		{
+			return GetVoxel( position.x, position.y, position.z );
+		}
+
+		public Voxel GetVoxel( int x, int y, int z )
+		{
+			var voxel = new Voxel();
+			voxel.LocalPosition = new IntVector3( x, y, z );
+			voxel.Position = Offset + voxel.LocalPosition;
+			voxel.BlockIndex = GetLocalPositionIndex( x, y, z );
+			voxel.ChunkIndex = Index;
+			voxel.BlockId = GetLocalIndexBlock( voxel.BlockIndex );
+			voxel.IsValid = true;
+			return voxel;
+		}
+
 		public void PerformFullTorchUpdate()
 		{
 			for ( var x = 0; x < ChunkSize; x++ )

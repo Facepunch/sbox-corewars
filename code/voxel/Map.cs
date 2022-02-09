@@ -247,6 +247,18 @@ namespace Facepunch.CoreWars.Voxel
 			SetupChunks();
 		}
 
+		public Voxel GetVoxel( IntVector3 position )
+		{
+			return GetVoxel( position.x, position.y, position.z );
+		}
+
+		public Voxel GetVoxel( int x, int y, int z )
+		{
+			if ( !IsInside( x, y, z ) ) return new Voxel();
+			var chunkIndex = GetChunkIndex( x, y, z );
+			return Chunks[chunkIndex].GetVoxel( x % Chunk.ChunkSize, y % Chunk.ChunkSize, z % Chunk.ChunkSize );
+		}
+
 		public T GetOrCreateData<T>( IntVector3 position ) where T : BlockData
 		{
 			if ( !IsInside( position ) ) return null;
@@ -488,9 +500,14 @@ namespace Facepunch.CoreWars.Voxel
 			return shouldBuild;
 		}
 
+		public int GetChunkIndex( int x, int y, int z )
+		{
+			return (x / Chunk.ChunkSize) + (y / Chunk.ChunkSize) * NumChunksX + (z / Chunk.ChunkSize) * NumChunksX * NumChunksY;
+		}
+
 		public int GetChunkIndex( IntVector3 position )
 		{
-			return (position.x / Chunk.ChunkSize) + (position.y / Chunk.ChunkSize) * NumChunksX + (position.z / Chunk.ChunkSize) * NumChunksX * NumChunksY;
+			return GetChunkIndex( position.x, position.y, position.z );
 		}
 
 		public static IntVector3 ToLocalPosition( IntVector3 position )
