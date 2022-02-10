@@ -496,6 +496,8 @@ namespace Facepunch.CoreWars.Voxel
 			OnInitialized?.Invoke();
 
 			Event.Register( this );
+
+			GameTask.RunInThreadAsync( ChunkFullUpdateTask );
 		}
 
 		public bool SetBlockAndUpdate( IntVector3 position, byte blockId, int direction, bool forceUpdate = false )
@@ -974,6 +976,31 @@ namespace Facepunch.CoreWars.Voxel
 				var entity = Library.Create<BlockEntity>( entityName );
 				entity.BlockType = block;
 				chunk.SetEntity( localPosition, entity );
+			}
+		}
+
+		private async void ChunkFullUpdateTask()
+		{
+			while ( true )
+			{
+				try
+				{
+					await GameTask.Delay( 100 );
+
+					foreach ( var chunk in Chunks )
+					{
+						if ( chunk.QueueUpdateBlockSlices )
+						{
+							chunk.UpdateBlockSlices();
+							chunk.QueueUpdateBlockSlices = false;
+							chunk.QueueRebuild = true;
+						}
+					}
+				}
+				catch ( TaskCanceledException e )
+				{
+					break;
+				}
 			}
 		}
 	}

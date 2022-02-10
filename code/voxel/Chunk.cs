@@ -41,6 +41,8 @@ namespace Facepunch.CoreWars.Voxel
 		public Dictionary<IntVector3, BlockData> Data { get; set; } = new();
 		public HashSet<SliceUpdate> PendingSliceUpdates { get; set; } = new();
 		public HashSet<IntVector3> DirtyData { get; set; } = new();
+		public bool QueueUpdateBlockSlices { get; set; }
+		public bool QueueRebuild { get; set; }
 		public bool Initialized { get; private set; }
 
 		public bool IsServer => Host.IsServer;
@@ -152,6 +154,7 @@ namespace Facepunch.CoreWars.Voxel
 			if ( IsClient )
 			{
 				UpdateAdjacents( true );
+				BuildNeighbourEdges();
 			}
 		}
 
@@ -195,9 +198,9 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
-		public async void FullUpdate()
+		public void FullUpdate()
 		{
-			await GameTask.RunInThreadAsync( UpdateBlockSlices );
+			UpdateBlockSlices();
 			Build();
 		}
 
@@ -234,6 +237,46 @@ namespace Facepunch.CoreWars.Voxel
 			UpdateNeighbourLightMap( "LightMapSouth", southChunk, recurseNeighbours );
 			UpdateNeighbourLightMap( "LightMapTop", topChunk, recurseNeighbours );
 			UpdateNeighbourLightMap( "LightMapBottom", bottomChunk, recurseNeighbours );
+		}
+
+		public void BuildNeighbourEdges()
+		{
+			BuildNeighbourEdge( BlockFace.Top );
+			BuildNeighbourEdge( BlockFace.Bottom );
+			BuildNeighbourEdge( BlockFace.North );
+			BuildNeighbourEdge( BlockFace.East );
+			BuildNeighbourEdge( BlockFace.South );
+			BuildNeighbourEdge( BlockFace.West );
+		}
+
+		public IntVector3 GetAdjacentChunkCenter( BlockFace direction )
+		{
+			IntVector3 position;
+
+			if ( direction == BlockFace.Top )
+				position = new IntVector3( ChunkSize / 2, ChunkSize / 2, ChunkSize + 1 );
+			else if ( direction == BlockFace.Bottom )
+				position = new IntVector3( ChunkSize / 2, ChunkSize / 2, -1 );
+			else if ( direction == BlockFace.North )
+				position = new IntVector3( ChunkSize / 2, ChunkSize + 1, ChunkSize / 2 );
+			else if ( direction == BlockFace.South )
+				position = new IntVector3( ChunkSize / 2, -1, ChunkSize / 2 );
+			else if ( direction == BlockFace.East )
+				position = new IntVector3( ChunkSize + 1, ChunkSize / 2, ChunkSize / 2 );
+			else
+				position = new IntVector3( -1, ChunkSize / 2, ChunkSize / 2 );
+
+			return Offset + position;
+		}
+
+		public void BuildNeighbourEdge( BlockFace direction )
+		{
+			var neighbour = GetNeighbour( direction );
+
+			if ( neighbour.IsValid() && neighbour.Initialized )
+			{
+				neighbour.QueueUpdateBlockSlices = true;
+			}
 		}
 
 		public void Build()
@@ -887,7 +930,7 @@ namespace Facepunch.CoreWars.Voxel
 
 			for ( int i = 0; i < Slices.Length; ++i )
 			{
-				Slices[i] = new ChunkSlice();
+				Slices[i] ??= new ChunkSlice();
 			}
 
 			IntVector3 blockPosition;
@@ -1066,6 +1109,16 @@ namespace Facepunch.CoreWars.Voxel
 		private void ClientTick()
 		{
 			LightMap.Update();
+		}
+
+		[Event.Tick]
+		private void Tick()
+		{
+			if ( QueueRebuild )
+			{
+				Build();
+				QueueRebuild = false;
+			}
 		}
 	}
 }

@@ -195,6 +195,21 @@ namespace Facepunch.CoreWars
 
 					data.IsDirty = true;
 				}
+				else if ( Input.Pressed( InputButton.Score ) )
+				{
+					if ( Controller is MoveController )
+					{
+						Controller = new FlyingController();
+					}
+					else
+					{
+						Controller = new MoveController
+						{
+							WalkSpeed = 195f,
+							SprintSpeed = 375f
+						};
+					}
+				}
 			}
 			else
 			{

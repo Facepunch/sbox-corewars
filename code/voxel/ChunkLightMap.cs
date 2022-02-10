@@ -275,7 +275,7 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
-		public void Update()
+		public bool Update()
 		{
 			UpdateTorchLight();
 			UpdateSunLight();
@@ -284,7 +284,10 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				IsDirty = false;
 				Texture.Update( Data );
+				return true;
 			}
+
+			return false;
 		}
 
 		public void UpdateTorchLight()
