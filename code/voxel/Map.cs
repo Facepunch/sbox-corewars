@@ -79,6 +79,15 @@ namespace Facepunch.CoreWars.Voxel
 			Current?.SetBlockAndUpdate( new IntVector3( x, y, z ), blockId, direction, true );
 		}
 
+		public static BBox ToSourceBBox( IntVector3 position )
+		{
+			var sourcePosition = ToSourcePosition( position );
+			var sourceMins = sourcePosition;
+			var sourceMaxs = sourcePosition + Vector3.One * Chunk.VoxelSize;
+
+			return new BBox( sourceMins, sourceMaxs );
+		}
+
 		public static Vector3 ToSourcePosition( IntVector3 position )
 		{
 			return new Vector3( position.x * Chunk.VoxelSize, position.y * Chunk.VoxelSize, position.z * Chunk.VoxelSize );
@@ -155,13 +164,25 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
-		public void SetBlockInDirection( Vector3 origin, Vector3 direction, byte blockId )
+		public bool SetBlockInDirection( Vector3 origin, Vector3 direction, byte blockId, bool checkSourceCollision = false )
 		{
 			var face = Trace( origin * (1.0f / Chunk.VoxelSize), direction.Normal, 10000f, out var endPosition, out _ );
-			if ( face == BlockFace.Invalid ) return;
+
+			if ( face == BlockFace.Invalid )
+				return false;
 
 			var position = blockId != 0 ? GetAdjacentPosition( endPosition, (int)face ) : endPosition;
+
+			if ( checkSourceCollision )
+			{
+				var bbox = ToSourceBBox( position );
+
+				if ( Physics.GetEntitiesInBox( bbox ).Any() )
+					return false;
+			}
+
 			SetBlockOnServer( position.x, position.y, position.z, blockId, (int)face );
+			return true;
 		}
 
 		public bool GetBlockInDirection( Vector3 origin, Vector3 direction, out IntVector3 position )
@@ -580,7 +601,7 @@ namespace Facepunch.CoreWars.Voxel
 
 					if ( IsInside( topPosition ) && IsEmpty( topPosition ) )
 					{
-						SuitableSpawnPositions.Add( ToSourcePosition( new IntVector3( x, y, height ) ) );
+						SuitableSpawnPositions.Add( ToSourcePosition( new IntVector3( x, y, height + 1 ) ) );
 					}
 
 					SetBlockAtPosition( new IntVector3( x, y, 0 ), config.BedrockId );

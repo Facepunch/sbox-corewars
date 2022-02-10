@@ -176,7 +176,7 @@ namespace Facepunch.CoreWars
 			{
 				if ( Input.Pressed( InputButton.Attack1 ) )
 				{
-					Map.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, CurrentBlockId );
+					Map.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, CurrentBlockId, true );
 				}
 				else if ( Input.Pressed( InputButton.Attack2 ) )
 				{
