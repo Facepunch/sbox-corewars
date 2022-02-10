@@ -1,4 +1,5 @@
-﻿using Sandbox;
+﻿using Facepunch.CoreWars.Voxel;
+using Sandbox;
 using System;
 
 namespace Facepunch.CoreWars
@@ -7,6 +8,7 @@ namespace Facepunch.CoreWars
 	{
 		[Net] public float WalkSpeed { get; set; }
 		[Net] public float SprintSpeed { get; set; }
+		[Net, Predicted] public IntVector3 BlockPosition { get; set; }
 
 		public float FallDamageThreshold { get; set; } = 600f;
 		public float MinUpSlopeAngle { get; set; } = 100f;
@@ -31,6 +33,7 @@ namespace Facepunch.CoreWars
 		protected Unstuck Unstuck { get; private set; }
 
 		protected float SurfaceFriction { get; set; }
+		protected bool IsSneakingOnBlock { get; set; }
 		protected Vector3 PreVelocity { get; set; }
 		protected Vector3 Mins { get; set; }
 		protected Vector3 Maxs { get; set; }
@@ -137,6 +140,32 @@ namespace Facepunch.CoreWars
 
 			Duck.PreTick();
 
+			var currentBlockBelow = Map.Current.GetVoxel( Map.ToVoxelPosition( Position ) + Chunk.BlockDirections[(int)BlockFace.Bottom] );
+
+			if ( currentBlockBelow.IsValid && !currentBlockBelow.GetBlockType().IsPassable )
+				BlockPosition = currentBlockBelow.Position;
+
+			var lastValidBlockBelow = Map.Current.GetVoxel( BlockPosition );
+			IsSneakingOnBlock = false;
+
+			if ( Input.Down( InputButton.Run ) )
+			{
+				var halfVoxelSize = Chunk.VoxelSize * 0.5f;
+				var blockBelowSource = Map.ToSourcePosition( BlockPosition ) + new Vector3( halfVoxelSize, halfVoxelSize, 0f );
+				var targetPositionX = Position + WishVelocity.Normal.WithY( 0f ) * halfVoxelSize;
+				var targetPositionY = Position + WishVelocity.Normal.WithX( 0f ) * halfVoxelSize;
+				var currentDistanceX = Math.Abs( targetPositionX.x - blockBelowSource.x );
+				var currentDistanceY = Math.Abs( targetPositionY.y - blockBelowSource.y );
+
+				if ( currentDistanceX > Chunk.VoxelSize )
+					WishVelocity = WishVelocity.WithX( 0f );
+
+				if ( currentDistanceY > Chunk.VoxelSize )
+					WishVelocity = WishVelocity.WithY( 0f );
+
+				IsSneakingOnBlock = lastValidBlockBelow.IsValid;
+			}
+
 			var stayOnGround = false;
 
 			if ( Swimming )
@@ -155,7 +184,6 @@ namespace Facepunch.CoreWars
 			}
 			else
 			{
-				Velocity -= Velocity * 0.05f * Time.Delta;
 				AirMove();
 			}
 
@@ -166,6 +194,20 @@ namespace Facepunch.CoreWars
 				Velocity -= new Vector3( 0, 0, Gravity * 0.5f ) * Time.Delta;
 			}
 
+			if ( IsSneakingOnBlock )
+			{
+				var blockSourceBoundsMin = Map.ToSourcePosition( lastValidBlockBelow.Position );
+				var blockSourceBoundsMax = blockSourceBoundsMin + new Vector3( Chunk.VoxelSize, Chunk.VoxelSize );
+
+				blockSourceBoundsMin -= new Vector3( Chunk.VoxelSize * 0.25f, Chunk.VoxelSize * 0.25f );
+				blockSourceBoundsMax += new Vector3( Chunk.VoxelSize * 0.25f, Chunk.VoxelSize * 0.25f );
+
+				var position = Position;
+				position.x = Math.Clamp( position.x, blockSourceBoundsMin.x, blockSourceBoundsMax.x );
+				position.y = Math.Clamp( position.y, blockSourceBoundsMin.y, blockSourceBoundsMax.y );
+				Position = position;
+			}
+
 			if ( GroundEntity != null )
 			{
 				Velocity = Velocity.WithZ( 0 );
@@ -174,16 +216,13 @@ namespace Facepunch.CoreWars
 
 		private float GetWishSpeed()
 		{
-			var speed = 0f;
 			var wishSpeed = Duck.GetWishSpeed();
 			if ( wishSpeed >= 0f ) return wishSpeed;
 
 			if ( Input.Down( InputButton.Duck ) )
-				speed = Scale( SprintSpeed * MoveSpeedScale );
+				return Scale( SprintSpeed * MoveSpeedScale );
 			else
-				speed = Scale( WalkSpeed * MoveSpeedScale );
-
-			return speed;
+				return Scale( WalkSpeed * MoveSpeedScale );
 		}
 
 		private void WalkMove()
