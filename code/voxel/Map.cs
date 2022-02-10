@@ -4,11 +4,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Facepunch.CoreWars.Voxel
 {
 	public partial class Map : IValid
 	{
+		public delegate void OnInitializedCallback();
+		public event OnInitializedCallback OnInitialized;
+
 		public static Map Current { get; private set; }
 
 		public static Map Create()
@@ -91,6 +95,7 @@ namespace Facepunch.CoreWars.Voxel
 		public Dictionary<string, byte> BlockTypes { get; private set; } = new();
 		public BlockAtlas BlockAtlas { get; private set; }
 		public bool GreedyMeshing { get; private set; }
+		public bool Initialized { get; private set; }
 
 		public bool IsServer => Host.IsServer;
 		public bool IsClient => Host.IsClient;
@@ -447,6 +452,8 @@ namespace Facepunch.CoreWars.Voxel
 
 		public void Init()
 		{
+			if ( Initialized ) return;
+
 			NumChunksX = SizeX / Chunk.ChunkSize;
 			NumChunksY = SizeY / Chunk.ChunkSize;
 			NumChunksZ = SizeZ / Chunk.ChunkSize;
@@ -463,6 +470,9 @@ namespace Facepunch.CoreWars.Voxel
 					_ = chunk.Init();
 				}
 			}
+
+			Initialized = true;
+			OnInitialized?.Invoke();
 
 			Event.Register( this );
 		}
@@ -532,19 +542,21 @@ namespace Facepunch.CoreWars.Voxel
 			public byte BedrockId;
 		}
 
-		public void GeneratePerlin( PerlinGenerationConfig config )
+		public async Task GeneratePerlin( PerlinGenerationConfig config )
 		{
 			byte undergroundBlock;
 
-			for ( int x = 0; x < SizeX; ++x )
+			for ( int x = 0; x < SizeX; x++ )
 			{
-				for ( int y = 0; y < SizeY; ++y )
+				await GameTask.Delay( 1 );
+
+				for ( int y = 0; y < SizeY; y++ )
 				{
 					int height = (int)((SizeZ * 0.5f) * (Noise.Perlin( (x * 64) * 0.001f, (y * 64) * 0.001f, 0 ) + 1f) * 0.5f);
 					if ( height <= 0 ) height = 0;
 					if ( height > SizeZ ) height = SizeZ;
 
-					for ( int z = 0; z < SizeZ; ++z )
+					for ( int z = 0; z < SizeZ; z++ )
 					{
 						var position = new IntVector3( x, y, z );
 
@@ -563,8 +575,13 @@ namespace Facepunch.CoreWars.Voxel
 
 					if ( Rand.Float( 100f ) <= 1f )
 						GenerateTree( x, y, height - 1 );
-					else
+
+					var topPosition = new IntVector3( x, y, height );
+
+					if ( IsInside( topPosition ) && IsEmpty( topPosition ) )
+					{
 						SuitableSpawnPositions.Add( ToSourcePosition( new IntVector3( x, y, height ) ) );
+					}
 
 					SetBlockAtPosition( new IntVector3( x, y, 0 ), config.BedrockId );
 				}

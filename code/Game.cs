@@ -83,37 +83,23 @@ namespace Facepunch.CoreWars
 		{
 			base.ClientJoined( client );
 
-			Map.Current.Send( client );
-
 			var player = new Player( client );
 			client.Pawn = player;
 			player.CreateInventory();
 
-			StateSystem.Active?.OnPlayerJoined( player );
-
-			await Task.Delay( 2000 );
-			var totalChunksSent = 0;
-
-			// For now just load every chunk in the map.
-			foreach ( var chunk in Map.Current.Chunks )
+			if ( Map.Current.Initialized )
 			{
-				if ( totalChunksSent > 8 )
-				{
-					await GameTask.Delay( 1 );
-					totalChunksSent = 0;
-				}
-
-				player.LoadChunk( chunk );
-				totalChunksSent++;
+				SendMapToPlayer( player );
 			}
 		}
 
-		public override void PostLevelLoaded()
+		public override async void PostLevelLoaded()
 		{
 			if ( !IsServer )
 				return;
 
 			var map = Map.Create();
+			map.OnInitialized += OnMapInitialized;
 			map.SetSize( 256, 256, 128 );
 			map.LoadBlockAtlas( "textures/blocks.json" );
 			map.AddAllBlockTypes();
@@ -129,10 +115,42 @@ namespace Facepunch.CoreWars
 				BedrockId = map.FindBlockId<StoneBlock>()
 			};
 
-			map.GeneratePerlin( config );
-			map.Init();
+			Log.Info( $"[Server] Creating perlin map with id #{map.FindBlockId<GrassBlock>()}" );
+			await map.GeneratePerlin( config );
+			Log.Info( $"[Server] Perlin map has been created successfully." );
 
-			Log.Info( $"[Server] Creating perlin ground with id #{map.FindBlockId<GrassBlock>()}" );
+			map.Init();
+		}
+
+		private void OnMapInitialized()
+		{
+			foreach ( var player in All.OfType<Player>() )
+			{
+				SendMapToPlayer( player );
+			}
+		}
+
+		private async void SendMapToPlayer( Player player )
+		{
+			Map.Current.Send( player.Client );
+
+			var totalChunksSent = 0;
+
+			// For now just load every chunk in the map.
+			foreach ( var chunk in Map.Current.Chunks )
+			{
+				if ( totalChunksSent > 8 )
+				{
+					await GameTask.Delay( 1 );
+					totalChunksSent = 0;
+				}
+
+				player.LoadChunk( chunk );
+				totalChunksSent++;
+			}
+
+			StateSystem.Active?.OnPlayerJoined( player );
+			player.OnMapLoaded();
 		}
 	}
 }

@@ -112,10 +112,8 @@ namespace Facepunch.CoreWars
 			MainInventory = new NetInventory( container );
 		}
 
-		public override void Spawn()
+		public virtual void OnMapLoaded()
 		{
-			Components.Create<ChunkViewer>();
-
 			EnableHideInFirstPerson = true;
 			EnableAllCollisions = true;
 			EnableDrawing = true;
@@ -131,7 +129,12 @@ namespace Facepunch.CoreWars
 			Animator = new PlayerAnimator();
 
 			SetModel( "models/citizen/citizen.vmdl" );
+		}
 
+		public override void Spawn()
+		{
+			Components.Create<ChunkViewer>();
+			EnableDrawing = false;
 			base.Spawn();
 		}
 
@@ -167,6 +170,8 @@ namespace Facepunch.CoreWars
 
 		public override void Simulate( Client client )
 		{
+			if ( !Map.Current.IsValid() ) return;
+
 			if ( IsServer )
 			{
 				if ( Input.Pressed( InputButton.Attack1 ) )
