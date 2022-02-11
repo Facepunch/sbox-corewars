@@ -2,10 +2,12 @@
 
 namespace Facepunch.CoreWars.Inventory
 {
-	public class NetInventory : BaseNetworkable, INetworkSerializer
+	public class NetInventory : BaseNetworkable, INetworkSerializer, IValid
 	{
 		public InventoryContainer Container { get; private set; }
 		public bool Initialized { get; private set; }
+
+		public bool IsValid => Container.IsValid();
 
 		public NetInventory()
 		{

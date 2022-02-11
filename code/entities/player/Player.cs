@@ -14,9 +14,8 @@ namespace Facepunch.CoreWars
 	{
 		[Net, Change( nameof( OnTeamChanged ) )] public Team Team { get; private set; }
 		[BindComponent] public ChunkViewer ChunkViewer { get; }
-		[Net] public byte CurrentBlockId { get; private set; }
-		[Net] public List<byte> HotbarBlocks { get; private set; }
-		[Net] public NetInventory MainInventory { get; private set; }
+		[Net, Predicted] public ushort CurrentHotbarIndex { get; private set; }
+		[Net] public NetInventory HotbarInventory { get; private set; }
 		public DamageInfo LastDamageTaken { get; private set; }
 
 		public Player() : base()
@@ -26,22 +25,7 @@ namespace Facepunch.CoreWars
 
 		public Player( Client client ) : this()
 		{
-			CurrentBlockId = 1;
-			HotbarBlocks = new List<byte>();
-
-			for ( var i = 0; i < 8; i++ )
-			{
-				HotbarBlocks.Add( (byte)(i + 1) );
-			}
-		}
-
-		[ServerCmd]
-		public static void SetBlockId( int blockId )
-		{
-			if ( ConsoleSystem.Caller.Pawn is Player player )
-			{
-				player.CurrentBlockId = (byte)blockId;
-			}
+			CurrentHotbarIndex = 0;
 		}
 
 		public async Task LoadChunkDelayed( Chunk chunk, int delayMs )
@@ -84,7 +68,7 @@ namespace Facepunch.CoreWars
 		public void CreateInventory()
 		{
 			var container = new InventoryContainer( this );
-			container.SetSlotLimit( 10 );
+			container.SetSlotLimit( 8 );
 			container.AddConnection( Client );
 
 			InventorySystem.Register( container );
@@ -109,7 +93,7 @@ namespace Facepunch.CoreWars
 
 			container.Stack( moreStoneBlocks );
 
-			MainInventory = new NetInventory( container );
+			HotbarInventory = new NetInventory( container );
 		}
 
 		public virtual void OnMapLoaded()
@@ -140,12 +124,9 @@ namespace Facepunch.CoreWars
 
 		public override void ClientSpawn()
 		{
-			foreach ( var item in MainInventory.Container.ItemList )
+			if ( IsLocalPawn )
 			{
-				if ( item.IsValid() )
-				{
-					Log.Info( $"Received Initial Inventory Item {item.GetName()} @ Slot #{item.SlotId} (Stack: {item.StackSize})" );
-				}
+				Hotbar.Current?.SetContainer( HotbarInventory.Container );
 			}
 
 			base.ClientSpawn();
@@ -176,7 +157,23 @@ namespace Facepunch.CoreWars
 			{
 				if ( Input.Pressed( InputButton.Attack1 ) )
 				{
-					Map.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, CurrentBlockId, true );
+					var container = HotbarInventory.Container;
+					var item = container.GetFromSlot( CurrentHotbarIndex );
+
+					if ( item.IsValid() && item is BlockItem blockItem )
+					{
+						var success = Map.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, blockItem.BlockId, true );
+
+						if ( success )
+						{
+							item.StackSize--;
+
+							if ( item.StackSize <= 0 )
+							{
+								InventorySystem.RemoveItem( item );
+							}
+						}
+					}
 				}
 				else if ( Input.Pressed( InputButton.Attack2 ) )
 				{
@@ -226,41 +223,21 @@ namespace Facepunch.CoreWars
 				}
 			}
 
-			if ( IsClient && Prediction.FirstTime )
+			if ( Prediction.FirstTime )
 			{
-				var currentSlotIndex = 0;
-
-				for ( var i = 0; i < Hotbar.Current.Slots.Count; i++ )
-				{
-					if ( CurrentBlockId == Hotbar.Current.Slots[i].BlockId )
-					{
-						currentSlotIndex = i;
-						break;
-					}
-				}
+				var currentSlotIndex = CurrentHotbarIndex;
 
 				if ( Input.MouseWheel > 0 )
 					currentSlotIndex++;
 				else if ( Input.MouseWheel < 0 )
 					currentSlotIndex--;
 
-				currentSlotIndex = Math.Clamp( currentSlotIndex, 0, Hotbar.Current.Slots.Count - 1 );
-
-				var newBlockId = Hotbar.Current.Slots[currentSlotIndex].BlockId;
-
-				if ( newBlockId != CurrentBlockId )
-				{
-					SetBlockId( newBlockId );
-				}
+				CurrentHotbarIndex = (ushort)Math.Clamp( currentSlotIndex, 0, HotbarInventory.Container.SlotLimit - 1 );
 			}
 
 			if ( IsServer )
 			{
-				if ( Input.Released( InputButton.Reload ) )
-				{
-					ShuffleHotbarBlocks();
-				}
-				else if ( Input.Released( InputButton.Use) )
+				if ( Input.Released( InputButton.Use) )
 				{
 					var random = Rand.Float();
 
@@ -305,28 +282,6 @@ namespace Facepunch.CoreWars
 		protected virtual void OnTeamChanged( Team team )
 		{
 
-		}
-
-		private void ShuffleHotbarBlocks()
-		{
-			var oldSlotIndex = 0;
-
-			for ( var i = 0; i < HotbarBlocks.Count; i++ )
-			{
-				if ( CurrentBlockId == HotbarBlocks[i] )
-				{
-					oldSlotIndex = i;
-					break;
-				}
-			}
-
-			for ( var i = 0; i < HotbarBlocks.Count; i++ )
-			{
-				var randomBlock = Map.Current.BlockData.ElementAt( Rand.Int( 1, Map.Current.BlockData.Count - 1 ) ).Key;
-				HotbarBlocks[i] = randomBlock;
-			}
-
-			CurrentBlockId = HotbarBlocks[oldSlotIndex];
 		}
 	}
 }

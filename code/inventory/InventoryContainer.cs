@@ -5,7 +5,7 @@ using System.IO;
 
 namespace Facepunch.CoreWars.Inventory
 {
-	public class InventoryContainer
+	public class InventoryContainer : IValid
 	{
 		public delegate void ItemTakenCallback( ushort slot, InventoryItem instance );
 		public delegate void ItemGivenCallback( ushort slot, InventoryItem instance );
@@ -51,6 +51,8 @@ namespace Facepunch.CoreWars.Inventory
 		public List<Client> Connections { get; }
 		public List<InventoryItem> ItemList { get; }
 		public ushort SlotLimit { get; private set; }
+
+		public bool IsValid => true;
 
 		public static InventoryContainer Deserialize( byte[] data )
 		{
@@ -512,6 +514,18 @@ namespace Facepunch.CoreWars.Inventory
 
 		public void ProcessGiveItemEvent( BinaryReader reader )
 		{
+			Log.Info( "Processing Give Event" );
+
+			for ( ushort i = 0; i < SlotLimit; i++ )
+			{
+				var item = GetFromSlot( i );
+
+				if ( item.IsValid() )
+				{
+					Log.Info( i + " Before = " + item.ItemId );
+				}
+			}
+
 			var instance = reader.ReadInventoryItem();
 			var slot = reader.ReadUInt16();
 
@@ -521,6 +535,16 @@ namespace Facepunch.CoreWars.Inventory
 			ItemList[slot] = instance;
 			HandleSlotChanged( slot );
 			OnItemGiven?.Invoke( slot, instance );
+
+			for ( ushort i = 0; i < SlotLimit; i++ )
+			{
+				var item = GetFromSlot( i );
+
+				if ( item.IsValid() )
+				{
+					Log.Info( i + " Before = " + item.ItemId );
+				}
+			}
 		}
 
 		public void ProcessTakeItemEvent( BinaryReader reader )

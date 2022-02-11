@@ -64,6 +64,11 @@ namespace Facepunch.CoreWars.Inventory
 		public ulong ItemId { get; set; }
 		public ushort SlotId { get; set; }
 
+		public virtual string GetIcon()
+		{
+			return string.Empty;
+		}
+
 		public virtual bool IsSameType( InventoryItem other )
 		{
 			return (GetType() == other.GetType());

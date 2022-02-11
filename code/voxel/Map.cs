@@ -985,7 +985,7 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				try
 				{
-					await GameTask.Delay( 100 );
+					await GameTask.Delay( 10 );
 
 					foreach ( var chunk in Chunks )
 					{

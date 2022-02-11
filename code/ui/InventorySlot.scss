@@ -1,11 +1,19 @@
-﻿HotbarSlot {
+﻿InventorySlot {
     transition: all 0.2s ease-in;
     background-color: #f5deb363;
     border-color: wheat;
-    border-width: 2px;
+    border-width: 4px;
     width: 80px;
     height: 80px;
     opacity: 0.8;
+
+    .stacksize {
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+        font-size: 16px;
+        color: white;
+    }
 
     &.selected {
         transition: all 0.2s ease-out;

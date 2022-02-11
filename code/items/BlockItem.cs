@@ -22,6 +22,16 @@ namespace Facepunch.CoreWars.Voxel
 			return (other is BlockItem item && item.BlockId == BlockId);
 		}
 
+		public override string GetIcon()
+		{
+			if ( Map.Current == null ) return string.Empty;
+
+			var block = Map.Current.GetBlockType( BlockId );
+			if ( string.IsNullOrEmpty( block.DefaultTexture ) ) return string.Empty;
+
+			return $"textures/blocks/{ block.DefaultTexture }_color.png";
+		}
+
 		public override void Write( BinaryWriter writer )
 		{
 			writer.Write( BlockId );

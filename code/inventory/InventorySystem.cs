@@ -96,11 +96,7 @@ namespace Facepunch.CoreWars.Inventory
 
 			if ( Items.Remove( itemId ) )
 			{
-				if ( instance.Container != null )
-				{
-					instance.Container.Remove( itemId );
-				}
-
+				instance.Container?.Remove( itemId );
 				instance.OnRemoved();
 			}
 		}
@@ -120,7 +116,7 @@ namespace Facepunch.CoreWars.Inventory
 
 			if ( itemId == 0 )
 			{
-				itemId = NextItemId++;
+				itemId = ++NextItemId;
 			}
 
 			instance = Library.TryCreate<InventoryItem>( libraryId );
@@ -152,7 +148,7 @@ namespace Facepunch.CoreWars.Inventory
 				using ( var writer = new BinaryWriter( stream ) )
 				{
 					writer.Write( container.InventoryId );
-					SendEventDataToClient( to, NetworkEvent.OpenInventory, stream.GetBuffer() );
+					SendEventDataToClient( to, NetworkEvent.OpenInventory, stream.ToArray() );
 				}
 			}
 		}
@@ -164,7 +160,7 @@ namespace Facepunch.CoreWars.Inventory
 				using ( var writer = new BinaryWriter( stream ) )
 				{
 					writer.Write( container.InventoryId );
-					SendEventDataToClient( to, NetworkEvent.CloseInventory, stream.GetBuffer() );
+					SendEventDataToClient( to, NetworkEvent.CloseInventory, stream.ToArray() );
 				}
 			}
 		}
@@ -179,7 +175,7 @@ namespace Facepunch.CoreWars.Inventory
 					writer.Write( from.InventoryId );
 					writer.Write( toSlot );
 					writer.Write( to.InventoryId );
-					SendEventDataToServer( NetworkEvent.MoveInventory, Encoding.UTF8.GetString( stream.GetBuffer() ) );
+					SendEventDataToServer( NetworkEvent.MoveInventory, Encoding.UTF8.GetString( stream.ToArray() ) );
 				}
 			}
 		}
@@ -191,7 +187,7 @@ namespace Facepunch.CoreWars.Inventory
 				using ( var writer = new BinaryWriter( stream ) )
 				{
 					writer.Write( container.InventoryId );
-					SendEventDataToServer( NetworkEvent.CloseInventory, Encoding.UTF8.GetString( stream.GetBuffer() ) );
+					SendEventDataToServer( NetworkEvent.CloseInventory, Encoding.UTF8.GetString( stream.ToArray() ) );
 				}
 			}
 		}
@@ -205,7 +201,7 @@ namespace Facepunch.CoreWars.Inventory
 					writer.Write( container.InventoryId );
 					writer.WriteInventoryItem( instance );
 					writer.Write( slotId );
-					SendEventDataToClient( to, NetworkEvent.GiveItem, stream.GetBuffer() );
+					SendEventDataToClient( to, NetworkEvent.GiveItem, stream.ToArray() );
 				}
 			}
 		}
@@ -218,7 +214,7 @@ namespace Facepunch.CoreWars.Inventory
 				{
 					writer.Write( container.InventoryId );
 					writer.Write( slotId );
-					SendEventDataToClient( to, NetworkEvent.TakeItem, stream.GetBuffer() );
+					SendEventDataToClient( to, NetworkEvent.TakeItem, stream.ToArray() );
 				}
 			}
 		}
@@ -257,7 +253,7 @@ namespace Facepunch.CoreWars.Inventory
 						}
 					}
 
-					SendEventDataToClient( to, NetworkEvent.SendDirtyItems, stream.GetBuffer() );
+					SendEventDataToClient( to, NetworkEvent.SendDirtyItems, stream.ToArray() );
 				}
 			}
 		}

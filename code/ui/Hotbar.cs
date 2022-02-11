@@ -1,4 +1,5 @@
-﻿using Facepunch.CoreWars.Voxel;
+﻿using Facepunch.CoreWars.Inventory;
+using Facepunch.CoreWars.Voxel;
 using Sandbox;
 using Sandbox.UI;
 using System.Collections.Generic;
@@ -11,7 +12,8 @@ namespace Facepunch.CoreWars
 	{
 		public static Hotbar Current { get; private set; }
 
-		public List<HotbarSlot> Slots { get; private set; }
+		public InventoryContainer Container { get; private set; }
+		public List<InventorySlot> Slots { get; private set; }
 
 		public Hotbar()
 		{
@@ -19,18 +21,36 @@ namespace Facepunch.CoreWars
 			Current = this;
 		}
 
+		public void SetContainer( InventoryContainer container )
+		{
+			Container = container;
+
+			foreach ( var slot in Slots )
+			{
+				slot.Delete();
+			}
+
+			Slots.Clear();
+
+			for ( ushort i = 0; i < container.SlotLimit; i++ )
+			{
+				var slot = AddChild<InventorySlot>();
+				slot.Container = container;
+				slot.Slot = i;
+				Slots.Add( slot );
+			}
+		}
+
 		public override void Tick()
 		{
 			if ( Local.Pawn is Player player )
 			{
-				for ( var i = 0; i < Slots.Count; i++)
+				for ( ushort i = 0; i < Slots.Count; i++)
 				{
-					if ( player.HotbarBlocks.Count > i )
-						Slots[i].SetBlockId( player.HotbarBlocks[i] );
-					else
-						Slots[i].SetBlockId( 0 );
+					var item = Container.GetFromSlot( i );
 
-					Slots[i].IsSelected = player.CurrentBlockId == Slots[i].BlockId;
+					Slots[i].SetItem( item );
+					Slots[i].IsSelected = player.CurrentHotbarIndex == i;
 				}
 			}
 
@@ -39,17 +59,9 @@ namespace Facepunch.CoreWars
 
 		protected override void PostTemplateApplied()
 		{
-			foreach ( var slot in Slots )
+			if ( Local.Pawn is Player player && player.HotbarInventory.IsValid() )
 			{
-				slot.Delete();
-			}
-
-			Slots.Clear();
-
-			for ( var i = 0; i < 8; i++ )
-			{
-				var slot = AddChild<HotbarSlot>();
-				Slots.Add( slot );
+				SetContainer( player.HotbarInventory.Container );
 			}
 
 			base.PostTemplateApplied();
