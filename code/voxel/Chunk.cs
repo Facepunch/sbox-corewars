@@ -24,6 +24,7 @@ namespace Facepunch.CoreWars.Voxel
 
 		private struct BlockFaceData
 		{
+			public bool IsTranslucent;
 			public int BlockIndex;
 			public bool Culled;
 			public byte Type;
@@ -658,6 +659,16 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
+		static readonly int[] BackFaceBlockIndices = new[]
+		{
+			0, 1, 2, 2, 3, 0,
+			7, 6, 5, 5, 4, 7,
+			3, 7, 4, 4, 0, 3,
+			1, 5, 6, 6, 2, 1,
+			0, 4, 5, 5, 1, 0,
+			2, 6, 7, 7, 3, 2,
+		};
+
 		static readonly IntVector3[] BlockVertices = new[]
 		{
 			new IntVector3( 0, 0, 1 ),
@@ -728,6 +739,25 @@ namespace Facepunch.CoreWars.Voxel
 					slice.CollisionIndices.Add( collisionIndex + i );
 				}
 			}
+
+			if ( !block.CullBackFaces )
+			{
+				for ( int i = 0; i < 6; ++i )
+				{
+					int vi = BackFaceBlockIndices[(face * 6) + i];
+					var vOffset = BlockVertices[vi];
+
+					vOffset[widthAxis] *= width;
+					vOffset[heightAxis] *= height;
+
+					var vertex = new BlockVertex( (uint)(x + vOffset.x), (uint)(y + vOffset.y), (uint)(z + vOffset.z), (uint)x, (uint)y, (uint)z, faceData );
+
+					if ( block.IsTranslucent )
+						slice.TranslucentVertices.Add( vertex );
+					else
+						slice.OpaqueVertices.Add( vertex );
+				}
+			}
 		}
 
 		BlockFaceData GetBlockFace( IntVector3 position, int side )
@@ -740,6 +770,7 @@ namespace Facepunch.CoreWars.Voxel
 			var face = new BlockFaceData
 			{
 				BlockIndex = GetLocalPositionIndex( position ),
+				IsTranslucent = block.IsTranslucent,
 				Side = (byte)side,
 				Culled = !block.HasTexture,
 				Type = blockId,
@@ -749,7 +780,7 @@ namespace Facepunch.CoreWars.Voxel
 			var adjacentBlockId = Map.GetBlock( adjacentBlockPosition );
 			var adjacentBlock = Map.GetBlockType( adjacentBlockId );
 
-			if ( !block.IsTranslucent && !face.Culled && (adjacentBlock != null && !adjacentBlock.IsTranslucent) )
+			if ( !face.Culled && !adjacentBlock.IsTranslucent )
 				face.Culled = true;
 
 			return face;
@@ -817,6 +848,7 @@ namespace Facepunch.CoreWars.Voxel
 				{
 					faceB = new()
 					{
+						IsTranslucent = false,
 						Culled = true,
 						Side = (byte)faceSide,
 						Type = 0,
@@ -829,7 +861,7 @@ namespace Facepunch.CoreWars.Voxel
 						faceB = GetBlockFace( blockPosition + blockOffset, faceSide );
 					}
 
-					if ( !faceA.Culled && !faceB.Culled && faceA.Equals( faceB ) )
+					if ( !faceA.Culled && !faceB.Culled && faceA.Equals( faceB ) && !faceA.IsTranslucent )
 					{
 						blockFaceMask[n].Culled = true;
 					}
@@ -967,6 +999,7 @@ namespace Facepunch.CoreWars.Voxel
 						{
 							faceB = new()
 							{
+								IsTranslucent = false,
 								Culled = true,
 								Side = (byte)faceSide,
 								Type = 0,
@@ -979,7 +1012,7 @@ namespace Facepunch.CoreWars.Voxel
 								faceB = GetBlockFace( blockPosition + blockOffset, faceSide );
 							}
 
-							if ( !faceA.Culled && !faceB.Culled && faceA.Equals( faceB ) )
+							if ( !faceA.Culled && !faceB.Culled && faceA.Equals( faceB ) && !faceA.IsTranslucent )
 							{
 								blockFaceMask[n].Culled = true;
 							}
