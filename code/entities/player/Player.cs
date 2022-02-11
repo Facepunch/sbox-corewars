@@ -57,6 +57,15 @@ namespace Facepunch.CoreWars
 			Log.Info( $"(#{NetworkIdent}) Received all bytes for chunk{x},{y},{z} ({totalSize}kb)" );
 		}
 
+		public void TryGiveBlock( byte blockId, ushort amount )
+		{
+			var item = InventorySystem.CreateItem<BlockItem>();
+			item.BlockId = blockId;
+			item.StackSize = amount;
+			item.MaxStackSize = 48;
+			HotbarInventory.Container.Stack( item );
+		}
+
 		public void SetTeam( Team team )
 		{
 			Host.AssertServer();
@@ -73,27 +82,11 @@ namespace Facepunch.CoreWars
 
 			InventorySystem.Register( container );
 
-			var grassBlocks = InventorySystem.CreateItem<BlockItem>();
-			grassBlocks.MaxStackSize = 64;
-			grassBlocks.StackSize = 64;
-			grassBlocks.BlockId = Map.Current.FindBlockId<GrassBlock>();
-
-			var stoneBlocks = InventorySystem.CreateItem<BlockItem>();
-			stoneBlocks.MaxStackSize = 40;
-			stoneBlocks.StackSize = 32;
-			stoneBlocks.BlockId = Map.Current.FindBlockId<StoneBlock>();
-
-			container.Give( grassBlocks, 2 );
-			container.Give( stoneBlocks, 6 );
-
-			var moreStoneBlocks = InventorySystem.CreateItem<BlockItem>();
-			moreStoneBlocks.MaxStackSize = 40;
-			moreStoneBlocks.StackSize = 16;
-			moreStoneBlocks.BlockId = Map.Current.FindBlockId<StoneBlock>();
-
-			container.Stack( moreStoneBlocks );
-
 			HotbarInventory = new NetInventory( container );
+
+			TryGiveBlock( Map.Current.FindBlockId<GrassBlock>(), 32 );
+			TryGiveBlock( Map.Current.FindBlockId<StoneBlock>(), 32 );
+			TryGiveBlock( Map.Current.FindBlockId<StoneBlock>(), 48 );
 		}
 
 		public virtual void OnMapLoaded()
@@ -177,7 +170,18 @@ namespace Facepunch.CoreWars
 				}
 				else if ( Input.Pressed( InputButton.Attack2 ) )
 				{
-					Map.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, 0 );
+					if ( Map.Current.GetBlockInDirection( Input.Position, Input.Rotation.Forward, out var blockPosition ) )
+					{
+						var voxel = Map.Current.GetVoxel( blockPosition );
+
+						if ( voxel.IsValid )
+						{
+							if ( Map.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, 0 ) )
+							{
+								TryGiveBlock( voxel.BlockId, 1 );
+							}
+						}
+					}
 				}
 				else if ( Input.Pressed( InputButton.Flashlight ) )
 				{
@@ -232,7 +236,14 @@ namespace Facepunch.CoreWars
 				else if ( Input.MouseWheel < 0 )
 					currentSlotIndex--;
 
-				CurrentHotbarIndex = (ushort)Math.Clamp( currentSlotIndex, 0, HotbarInventory.Container.SlotLimit - 1 );
+				var maxSlotIndex = HotbarInventory.Container.SlotLimit - 1;
+
+				if ( currentSlotIndex < 0 )
+					currentSlotIndex = (ushort)maxSlotIndex;
+				else if ( currentSlotIndex > maxSlotIndex )
+					currentSlotIndex = 0;
+
+				CurrentHotbarIndex = currentSlotIndex;
 			}
 
 			if ( IsServer )

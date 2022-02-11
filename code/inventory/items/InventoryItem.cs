@@ -60,7 +60,7 @@ namespace Facepunch.CoreWars.Inventory
 			}
 		}
 
-		public bool IsValid => true;
+		public bool IsValid { get; set; }
 		public ulong ItemId { get; set; }
 		public ushort SlotId { get; set; }
 

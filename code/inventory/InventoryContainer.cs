@@ -514,18 +514,6 @@ namespace Facepunch.CoreWars.Inventory
 
 		public void ProcessGiveItemEvent( BinaryReader reader )
 		{
-			Log.Info( "Processing Give Event" );
-
-			for ( ushort i = 0; i < SlotLimit; i++ )
-			{
-				var item = GetFromSlot( i );
-
-				if ( item.IsValid() )
-				{
-					Log.Info( i + " Before = " + item.ItemId );
-				}
-			}
-
 			var instance = reader.ReadInventoryItem();
 			var slot = reader.ReadUInt16();
 
@@ -535,16 +523,6 @@ namespace Facepunch.CoreWars.Inventory
 			ItemList[slot] = instance;
 			HandleSlotChanged( slot );
 			OnItemGiven?.Invoke( slot, instance );
-
-			for ( ushort i = 0; i < SlotLimit; i++ )
-			{
-				var item = GetFromSlot( i );
-
-				if ( item.IsValid() )
-				{
-					Log.Info( i + " Before = " + item.ItemId );
-				}
-			}
 		}
 
 		public void ProcessTakeItemEvent( BinaryReader reader )

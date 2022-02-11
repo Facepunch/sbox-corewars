@@ -20,6 +20,7 @@ namespace Facepunch.CoreWars.Inventory
 		private static Dictionary<ulong, InventoryContainer> Containers { get; set; } = new();
 		private static Dictionary<ulong, InventoryItem> Items { get; set; } = new();
 		private static List<InventoryContainer> DirtyList { get; set; } = new();
+		private static Queue<ulong> OrphanedItems { get; set; } = new();
 
 		private static ulong NextContainerId { get; set; }
 		private static ulong NextItemId { get; set; }
@@ -121,6 +122,7 @@ namespace Facepunch.CoreWars.Inventory
 
 			instance = Library.TryCreate<InventoryItem>( libraryId );
 			instance.ItemId = itemId;
+			instance.IsValid = true;
 			instance.StackSize = instance.DefaultStackSize;
 			instance.LibraryId = libraryId;
 			instance.OnCreated();
@@ -396,6 +398,33 @@ namespace Facepunch.CoreWars.Inventory
 			}
 
 			DirtyList.Clear();
+		}
+
+		[Event.Tick]
+		private static void CheckOrphanedItems()
+		{
+			foreach ( var kv in Items )
+			{
+				if ( !kv.Value.Container.IsValid() )
+				{
+					OrphanedItems.Enqueue( kv.Key );
+					kv.Value.IsValid = false;
+				}
+			}
+
+			var totalOrphanedItems = 0;
+
+			while ( OrphanedItems.Count > 0 )
+			{
+				var itemId = OrphanedItems.Dequeue();
+				Items.Remove( itemId );
+				totalOrphanedItems++;
+			}
+
+			if ( totalOrphanedItems > 0 )
+			{
+				Log.Info( $"Removed {totalOrphanedItems} orphaned items..." );
+			}
 		}
 	}
 }
