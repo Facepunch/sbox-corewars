@@ -200,10 +200,12 @@ namespace Facepunch.CoreWars
 				{
 					if ( Controller is MoveController )
 					{
+						EnableAllCollisions = false;
 						Controller = new FlyingController();
 					}
 					else
 					{
+						EnableAllCollisions = true;
 						Controller = new MoveController
 						{
 							WalkSpeed = 195f,
@@ -229,7 +231,7 @@ namespace Facepunch.CoreWars
 
 			if ( Prediction.FirstTime )
 			{
-				var currentSlotIndex = CurrentHotbarIndex;
+				var currentSlotIndex = (int)CurrentHotbarIndex;
 
 				if ( Input.MouseWheel > 0 )
 					currentSlotIndex++;
@@ -239,11 +241,11 @@ namespace Facepunch.CoreWars
 				var maxSlotIndex = HotbarInventory.Container.SlotLimit - 1;
 
 				if ( currentSlotIndex < 0 )
-					currentSlotIndex = (ushort)maxSlotIndex;
+					currentSlotIndex = maxSlotIndex;
 				else if ( currentSlotIndex > maxSlotIndex )
 					currentSlotIndex = 0;
 
-				CurrentHotbarIndex = currentSlotIndex;
+				CurrentHotbarIndex = (ushort)currentSlotIndex;
 			}
 
 			if ( IsServer )
