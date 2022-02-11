@@ -5,6 +5,7 @@ using Sandbox;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -32,6 +33,28 @@ namespace Facepunch.CoreWars
 		{
 			await GameTask.Delay( delayMs );
 			LoadChunk( chunk );
+		}
+
+		public void LoadChunks( List<Chunk> chunks )
+		{
+			using ( var stream = new MemoryStream() )
+			{
+				using ( var writer = new BinaryWriter( stream ) )
+				{
+					writer.Write( chunks.Count );
+
+					foreach ( var chunk in chunks )
+					{
+						writer.Write( chunk.Index );
+						writer.Write( chunk.Blocks );
+
+						chunk.SerializeData( writer );
+					}
+
+					var compressed = CompressionHelper.Compress( stream.ToArray() );
+					Map.ReceiveChunks( To.Single( Client ), compressed );
+				}
+			}
 		}
 
 		public void LoadChunk( Chunk chunk )

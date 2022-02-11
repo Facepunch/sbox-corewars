@@ -291,33 +291,54 @@ namespace Facepunch.CoreWars.Voxel
 			BuildMeshAndCollision();
 		}
 
+		public void DeserializeData( BinaryReader reader )
+		{
+			var count = reader.ReadInt32();
+
+			for ( var i = 0; i < count; i++ )
+			{
+				var x = reader.ReadByte();
+				var y = reader.ReadByte();
+				var z = reader.ReadByte();
+				var blockIndex = GetLocalPositionIndex( x, y, z );
+				var blockId = Blocks[blockIndex];
+				var block = Map.GetBlockType( blockId );
+				var position = new IntVector3( x, y, z );
+
+				if ( !Data.TryGetValue( position, out var blockData ) )
+				{
+					blockData = block.CreateDataInstance();
+					blockData.Chunk = this;
+					blockData.LocalPosition = position;
+					Data.Add( position, blockData );
+				}
+
+				blockData.Deserialize( reader );
+			}
+		}
+
 		public void DeserializeData( byte[] data )
 		{
 			using ( var stream = new MemoryStream( data ) )
 			{
 				using ( var reader = new BinaryReader( stream ) )
 				{
-					while ( stream.Position < stream.Length )
-					{
-						var x = reader.ReadByte();
-						var y = reader.ReadByte();
-						var z = reader.ReadByte();
-						var blockIndex = GetLocalPositionIndex( x, y, z );
-						var blockId = Blocks[blockIndex];
-						var block = Map.GetBlockType( blockId );
-						var position = new IntVector3( x, y, z );
-
-						if ( !Data.TryGetValue( position, out var blockData ) )
-						{
-							blockData = block.CreateDataInstance();
-							blockData.Chunk = this;
-							blockData.LocalPosition = position;
-							Data.Add( position, blockData );
-						}
-
-						blockData.Deserialize( reader );
-					}
+					DeserializeData( reader );
 				}
+			}
+		}
+
+		public void SerializeData( BinaryWriter writer )
+		{
+			writer.Write( Data.Count );
+
+			foreach ( var kv in Data )
+			{
+				var position = kv.Key;
+				writer.Write( (byte)position.x );
+				writer.Write( (byte)position.y );
+				writer.Write( (byte)position.z );
+				kv.Value.Serialize( writer );
 			}
 		}
 
@@ -327,15 +348,7 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				using ( var writer = new BinaryWriter( stream ) )
 				{
-					foreach ( var kv in Data )
-					{
-						var position = kv.Key;
-						writer.Write( (byte)position.x );
-						writer.Write( (byte)position.y );
-						writer.Write( (byte)position.z );
-						kv.Value.Serialize( writer );
-					}
-
+					SerializeData( writer );
 					return stream.ToArray();
 				}
 			}
@@ -861,7 +874,7 @@ namespace Facepunch.CoreWars.Voxel
 						faceB = GetBlockFace( blockPosition + blockOffset, faceSide );
 					}
 
-					if ( !faceA.Culled && !faceB.Culled && faceA.Equals( faceB ) && !faceA.IsTranslucent )
+					if ( !faceA.Culled && !faceB.Culled && faceA.Equals( faceB ) ) // && !faceA.IsTranslucent )
 					{
 						blockFaceMask[n].Culled = true;
 					}
@@ -1012,7 +1025,7 @@ namespace Facepunch.CoreWars.Voxel
 								faceB = GetBlockFace( blockPosition + blockOffset, faceSide );
 							}
 
-							if ( !faceA.Culled && !faceB.Culled && faceA.Equals( faceB ) && !faceA.IsTranslucent )
+							if ( !faceA.Culled && !faceB.Culled && faceA.Equals( faceB ) ) // && !faceA.IsTranslucent )
 							{
 								blockFaceMask[n].Culled = true;
 							}

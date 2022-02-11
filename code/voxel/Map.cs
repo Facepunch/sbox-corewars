@@ -3,6 +3,7 @@ using Sandbox;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -237,14 +238,44 @@ namespace Facepunch.CoreWars.Voxel
 			NextAvailableBlockId++;
 		}
 
-		public async void ReceiveChunk( int index, byte[] blocks, byte[] data )
+		[ClientRpc]
+		public static async void ReceiveChunks( byte[] data )
+		{
+			var decompressed = CompressionHelper.Decompress( data );
+
+			using ( var stream = new MemoryStream( decompressed ) )
+			{
+				using ( var reader = new BinaryReader( stream ) )
+				{
+					var count = reader.ReadInt32();
+
+					for ( var i = 0; i < count; i++ )
+					{
+						var index = reader.ReadInt32();
+						var chunk = Current.Chunks[index];
+						
+						chunk.Blocks = reader.ReadBytes( chunk.Blocks.Length );
+						chunk.DeserializeData( reader );
+
+						 _ = chunk.Init();
+
+						if ( i % 32 == 0 )
+						{
+							await GameTask.Delay( 1 );
+						}
+					}
+				}
+			}
+		}
+
+		public void ReceiveChunk( int index, byte[] blocks, byte[] data )
 		{
 			var chunk = Chunks[index];
 
 			chunk.Blocks = blocks;
 			chunk.DeserializeData( data );
 
-			await chunk.Init();
+			_ = chunk.Init();
 		}
 
 		public void AddAllBlockTypes()

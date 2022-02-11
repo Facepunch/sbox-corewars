@@ -2,6 +2,8 @@
 using Facepunch.CoreWars.Inventory;
 using Facepunch.CoreWars.Voxel;
 using Sandbox;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Facepunch.CoreWars
@@ -130,26 +132,13 @@ namespace Facepunch.CoreWars
 			}
 		}
 
-		private async void SendMapToPlayer( Player player )
+		private void SendMapToPlayer( Player player )
 		{
 			Map.Current.Send( player.Client );
 
-			var totalChunksSent = 0;
-
-			// For now just load every chunk in the map.
-			foreach ( var chunk in Map.Current.Chunks )
-			{
-				if ( totalChunksSent > 8 )
-				{
-					await GameTask.Delay( 1 );
-					totalChunksSent = 0;
-				}
-
-				player.LoadChunk( chunk );
-				totalChunksSent++;
-			}
-
 			StateSystem.Active?.OnPlayerJoined( player );
+
+			player.LoadChunks( Map.Current.Chunks.ToList() );
 			player.OnMapLoaded();
 		}
 	}
