@@ -985,17 +985,23 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				try
 				{
-					await GameTask.Delay( 10 );
+					var chunks = Chunks.AsEnumerable().Where( c => c.QueueUpdateBlockSlices );
 
-					foreach ( var chunk in Chunks )
+					if ( IsClient && Local.Pawn.IsValid() )
 					{
-						if ( chunk.QueueUpdateBlockSlices )
-						{
-							chunk.UpdateBlockSlices();
-							chunk.QueueUpdateBlockSlices = false;
-							chunk.QueueRebuild = true;
-						}
+						chunks = chunks.OrderBy( c => ToSourcePosition( c.Offset ).Distance( Local.Pawn.Position ) );
 					}
+
+					var chunk = chunks.FirstOrDefault();
+
+					if ( chunk.IsValid() )
+					{
+						chunk.UpdateBlockSlices();
+						chunk.QueueUpdateBlockSlices = false;
+						chunk.QueueRebuild = true;
+					}
+
+					await GameTask.Delay( 50 );
 				}
 				catch ( TaskCanceledException e )
 				{
