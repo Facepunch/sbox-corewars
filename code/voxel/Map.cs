@@ -255,7 +255,7 @@ namespace Facepunch.CoreWars.Voxel
 						chunk.Blocks = reader.ReadBytes( chunk.Blocks.Length );
 						chunk.DeserializeData( reader );
 
-						 _ = chunk.Init();
+						 chunk.Initialize();
 
 						if ( i % 32 == 0 )
 						{
@@ -272,8 +272,7 @@ namespace Facepunch.CoreWars.Voxel
 
 			chunk.Blocks = blocks;
 			chunk.DeserializeData( data );
-
-			_ = chunk.Init();
+			chunk.Initialize();
 		}
 
 		public void AddAllBlockTypes()
@@ -517,7 +516,7 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				foreach ( var chunk in Chunks )
 				{
-					_ = chunk.Init();
+					chunk.Initialize();
 				}
 			}
 

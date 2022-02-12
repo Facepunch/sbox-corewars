@@ -86,7 +86,7 @@ namespace Facepunch.CoreWars
 			var item = InventorySystem.CreateItem<BlockItem>();
 			item.BlockId = blockId;
 			item.StackSize = amount;
-			item.MaxStackSize = 48;
+			item.MaxStackSize = 1000;
 			HotbarInventory.Container.Stack( item );
 		}
 
@@ -108,9 +108,9 @@ namespace Facepunch.CoreWars
 
 			HotbarInventory = new NetInventory( container );
 
-			TryGiveBlock( Map.Current.FindBlockId<GrassBlock>(), 32 );
-			TryGiveBlock( Map.Current.FindBlockId<StoneBlock>(), 32 );
-			TryGiveBlock( Map.Current.FindBlockId<StoneBlock>(), 48 );
+			TryGiveBlock( Map.Current.FindBlockId<GrassBlock>(), 1000 );
+			TryGiveBlock( Map.Current.FindBlockId<StoneBlock>(), 1000 );
+			TryGiveBlock( Map.Current.FindBlockId<StoneBlock>(), 1000 );
 		}
 
 		public virtual void OnMapLoaded()
@@ -172,9 +172,9 @@ namespace Facepunch.CoreWars
 
 			if ( IsServer )
 			{
-				if ( Input.Pressed( InputButton.Attack1 ) && NextBlockPlace )
+				if ( Input.Down( InputButton.Attack1 ) && NextBlockPlace )
 				{
-					NextBlockPlace = 0.15f;
+					//NextBlockPlace = 0.01f;
 
 					var container = HotbarInventory.Container;
 					var item = container.GetFromSlot( CurrentHotbarIndex );
@@ -194,9 +194,9 @@ namespace Facepunch.CoreWars
 						}
 					}
 				}
-				else if ( Input.Pressed( InputButton.Attack2 ) && NextBlockPlace )
+				else if ( Input.Down( InputButton.Attack2 ) && NextBlockPlace )
 				{
-					NextBlockPlace = 0.15f;
+					//NextBlockPlace = 0.01f;
 
 					if ( Map.Current.GetBlockInDirection( Input.Position, Input.Rotation.Forward, out var blockPosition ) )
 					{
@@ -302,6 +302,11 @@ namespace Facepunch.CoreWars
 				DebugOverlay.ScreenText( 3, $"Torch Level: ({voxel.GetRedTorchLight( )}, {voxel.GetGreenTorchLight()}, {voxel.GetBlueTorchLight()})", 0.1f );
 				DebugOverlay.ScreenText( 4, $"Chunk Index: {voxel.ChunkIndex}", 0.1f );
 				DebugOverlay.ScreenText( 5, $"Position: {position}", 0.1f );
+
+				System.Threading.ThreadPool.GetAvailableThreads( out var available, out var cpThreads );
+
+				DebugOverlay.ScreenText( 6, $"Threads Available: {available}", 0.1f );
+				DebugOverlay.ScreenText( 7, $"Completion Pool Threads: {cpThreads}", 0.1f );
 			}
 
 			var voxelPosition = Map.ToVoxelPosition( Position );
