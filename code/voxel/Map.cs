@@ -11,6 +11,15 @@ namespace Facepunch.CoreWars.Voxel
 {
 	public partial class Map : IValid
 	{
+		public struct ChunkBlockUpdate
+		{
+			public int x;
+			public int y;
+			public int z;
+			public byte blockId;
+			public int direction;
+		}
+
 		public delegate void OnInitializedCallback();
 		public event OnInitializedCallback OnInitialized;
 
@@ -65,6 +74,53 @@ namespace Facepunch.CoreWars.Voxel
 		}
 
 		[ClientRpc]
+		public static void ReceiveBlockUpdate( byte[] data )
+		{
+			var decompressed = CompressionHelper.Decompress( data );
+
+			using ( var stream = new MemoryStream( decompressed ) )
+			{
+				using ( var reader = new BinaryReader( stream ) )
+				{
+					var count = reader.ReadInt32();
+					var chunkIds = new HashSet<int>();
+
+					for ( var i = 0; i < count; i++ )
+					{
+						var x = reader.ReadInt32();
+						var y = reader.ReadInt32();
+						var z = reader.ReadInt32();
+						var blockId = reader.ReadByte();
+						var direction = reader.ReadInt32();
+						var position = new IntVector3( x, y, z );
+
+						if ( Current.SetBlock( position, blockId, direction ) )
+						{
+							var chunkIndex = Current.GetChunkIndex( position );
+							chunkIds.Add( chunkIndex );
+
+							for ( int j = 0; j < 6; j++ )
+							{
+								var adjacentPosition = GetAdjacentPosition( position, j );
+
+								if ( Current.IsInside( adjacentPosition ) )
+								{
+									var adjadentChunkIndex = Current.GetChunkIndex( adjacentPosition );
+									chunkIds.Add( adjadentChunkIndex );
+								}
+							}
+						}
+					}
+
+					foreach ( var chunkId in chunkIds )
+					{
+						Current.Chunks[chunkId].QueueFullUpdate();
+					}
+				}
+			}
+		}
+
+		[ClientRpc]
 		public static void ReceiveDataUpdate( int chunkIndex, byte[] data )
 		{
 			if ( Current == null ) return;
@@ -101,6 +157,7 @@ namespace Facepunch.CoreWars.Voxel
 		public List<Vector3> SuitableSpawnPositions { get; private set; } = new();
 		public Dictionary<byte, BlockType> BlockData { get; private set; } = new();
 		public Dictionary<string, byte> BlockTypes { get; private set; } = new();
+		public List<ChunkBlockUpdate> OutgoingBlockUpdates { get; private set; } = new();
 		public BlockAtlas BlockAtlas { get; private set; }
 		public bool GreedyMeshing { get; private set; }
 		public bool Initialized { get; private set; }
@@ -196,7 +253,14 @@ namespace Facepunch.CoreWars.Voxel
 
 			if ( SetBlockAndUpdate( position, blockId, direction ) )
 			{
-				SetBlockOnClient( position.x, position.y, position.z, blockId, direction );
+				OutgoingBlockUpdates.Add( new ChunkBlockUpdate
+				{
+					x = position.x,
+					y = position.y,
+					z = position.z,
+					blockId = blockId,
+					direction = direction
+				} );
 			}
 		}
 
@@ -1004,6 +1068,35 @@ namespace Facepunch.CoreWars.Voxel
 				var entity = Library.Create<BlockEntity>( entityName );
 				entity.BlockType = block;
 				chunk.SetEntity( localPosition, entity );
+			}
+		}
+
+		[Event.Tick.Server]
+		private void ServerTick()
+		{
+			if ( OutgoingBlockUpdates.Count > 0 )
+			{
+				using ( var stream = new MemoryStream() )
+				{
+					using ( var writer = new BinaryWriter( stream ) )
+					{
+						writer.Write( OutgoingBlockUpdates.Count );
+						
+						foreach ( var update in OutgoingBlockUpdates )
+						{
+							writer.Write( update.x );
+							writer.Write( update.y );
+							writer.Write( update.z );
+							writer.Write( update.blockId );
+							writer.Write( update.direction );
+						}
+
+						var compressed = CompressionHelper.Compress( stream.ToArray() );
+						ReceiveBlockUpdate( compressed.ToArray() );
+					}
+				}
+
+				OutgoingBlockUpdates.Clear();
 			}
 		}
 
