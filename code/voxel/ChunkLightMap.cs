@@ -280,7 +280,7 @@ namespace Facepunch.CoreWars.Voxel
 			UpdateTorchLight();
 			UpdateSunLight();
 
-			if ( IsDirty && !Chunk.QueuedFullUpdate )
+			if ( IsDirty )
 			{
 				IsDirty = false;
 				Texture.Update( Data );

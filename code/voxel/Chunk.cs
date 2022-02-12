@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Facepunch.CoreWars.Voxel
@@ -100,6 +101,12 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
+		public bool IsFullUpdateTaskRunning()
+		{
+			if ( FullUpdateTask == null ) return false;
+			return !FullUpdateTask.IsCompleted;
+		}
+
 		public void QueueFullUpdate()
 		{
 			if ( !HasDoneFirstFullUpdate || QueuedFullUpdate ) return;
@@ -180,6 +187,63 @@ namespace Facepunch.CoreWars.Voxel
 			UpdateNeighbourLightMap( "LightMapSouth", southChunk, recurseNeighbours );
 			UpdateNeighbourLightMap( "LightMapTop", topChunk, recurseNeighbours );
 			UpdateNeighbourLightMap( "LightMapBottom", bottomChunk, recurseNeighbours );
+		}
+
+		public IEnumerable<Chunk> GetNeighbours()
+		{
+			var currentOffset = Offset;
+			currentOffset.x--;
+
+			if ( Map.IsInside( currentOffset ) )
+			{
+				var index = Map.GetChunkIndex( currentOffset );
+				yield return Map.Chunks[index];
+			}
+
+			currentOffset.x++;
+			currentOffset.y--;
+
+			if ( Map.IsInside( currentOffset ) )
+			{
+				var index = Map.GetChunkIndex( currentOffset );
+				yield return Map.Chunks[index];
+			}
+
+			currentOffset.y++;
+			currentOffset.y += ChunkSize + 1;
+
+			if ( Map.IsInside( currentOffset ) )
+			{
+				var index = Map.GetChunkIndex( currentOffset );
+				yield return Map.Chunks[index];
+			}
+
+			currentOffset.y -= ChunkSize + 1;
+			currentOffset.x += ChunkSize + 1;
+
+			if ( Map.IsInside( currentOffset ) )
+			{
+				var index = Map.GetChunkIndex( currentOffset );
+				yield return Map.Chunks[index];
+			}
+
+			currentOffset.x -= ChunkSize + 1;
+			currentOffset.z += ChunkSize + 1;
+
+			if ( Map.IsInside( currentOffset ) )
+			{
+				var index = Map.GetChunkIndex( currentOffset );
+				yield return Map.Chunks[index];
+			}
+
+			currentOffset.z -= ChunkSize + 1;
+			currentOffset.z--;
+
+			if ( Map.IsInside( currentOffset ) )
+			{
+				var index = Map.GetChunkIndex( currentOffset );
+				yield return Map.Chunks[index];
+			}
 		}
 
 		public void QueueNeighbourFullUpdate()
@@ -741,25 +805,24 @@ namespace Facepunch.CoreWars.Voxel
 		{
 			if ( IsFullUpdateTaskRunning() ) return;
 
-			if ( QueueRebuild )
+			if ( QueueRebuild && !AreAdjacentChunksUpdating() )
 			{
 				QueueRebuild = false;
 				Build();
 			}
 			
-			if ( Initialized && HasDoneFirstFullUpdate )
+			if ( HasDoneFirstFullUpdate )
 			{
 				LightMap.Update();
 			}
 		}
 
-		private bool IsFullUpdateTaskRunning()
+		private bool AreAdjacentChunksUpdating()
 		{
-			if ( FullUpdateTask == null ) return false;
-			return !FullUpdateTask.IsCompleted;
+			return GetNeighbours().Any( c => c.IsFullUpdateTaskRunning() );
 		}
 
-		private async Task StartFullUpdateTask()
+		private void StartFullUpdateTask()
 		{
 			try
 			{
@@ -767,12 +830,6 @@ namespace Facepunch.CoreWars.Voxel
 				BuildCollision();
 				QueuedFullUpdate = false;
 				QueueRebuild = true;
-
-				await GameTask.Delay( 5 );
-			}
-			catch ( TaskCanceledException e )
-			{
-				return;
 			}
 			catch ( Exception e )
 			{

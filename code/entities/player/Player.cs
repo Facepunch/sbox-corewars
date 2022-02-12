@@ -306,7 +306,7 @@ namespace Facepunch.CoreWars
 				var currentChunkIndex = Map.Current.GetChunkIndex( voxelPosition );
 				var currentChunk = Map.Current.Chunks[currentChunkIndex];
 
-				if ( currentChunk.IsValid() && !currentChunk.Shape.IsValid() )
+				if ( currentChunk.IsValid() && !currentChunk.HasDoneFirstFullUpdate )
 				{
 					return;
 				}
