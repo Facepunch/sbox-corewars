@@ -8,42 +8,15 @@ namespace Facepunch.CoreWars.Voxel
 {
 	public partial class Chunk : IValid
 	{
-		public struct SliceUpdate : IEquatable<SliceUpdate>
-		{
-			public IntVector3 Position;
-			public int Direction;
-
-			#region Equality
-			public static bool operator ==( SliceUpdate left, SliceUpdate right ) => left.Equals( right );
-			public static bool operator !=( SliceUpdate left, SliceUpdate right ) => !(left == right);
-			public override bool Equals( object obj ) => obj is SliceUpdate o && Equals( o );
-			public bool Equals( SliceUpdate o ) => Position == o.Position && Direction == o.Direction;
-			public override int GetHashCode() => HashCode.Combine( Position.x, Position.y, Position.z, Direction );
-			#endregion
-		}
-
-		private struct BlockFaceData
-		{
-			public bool IsTranslucent;
-			public int BlockIndex;
-			public bool Culled;
-			public byte Type;
-			public byte Side;
-
-			public bool Equals( BlockFaceData face )
-			{
-				return face.Culled == Culled && face.Type == Type;
-			}
-		};
-
 		public static readonly int ChunkSize = 32;
 		public static readonly int VoxelSize = 48;
 
 		public Dictionary<IntVector3, BlockData> Data { get; set; } = new();
-		public HashSet<SliceUpdate> PendingSliceUpdates { get; set; } = new();
 		public HashSet<IntVector3> DirtyData { get; set; } = new();
-		public bool QueueUpdateBlockSlices { get; set; }
+		public bool HasDoneFirstFullUpdate { get; set; }
+		public bool QueuedFullUpdate { get; set; }
 		public bool QueueRebuild { get; set; }
+		public bool IsModelCreated { get; private set; }
 		public bool Initialized { get; private set; }
 
 		public bool IsServer => Host.IsServer;
@@ -55,22 +28,23 @@ namespace Facepunch.CoreWars.Voxel
 		public int Index;
 		public Map Map;
 
-		[ThreadStatic]
-		private static BlockFaceData[] ThreadStaticBlockFaceMask;
+		public List<BlockVertex> TranslucentVertices = new();
+		public List<BlockVertex> OpaqueVertices = new();
+		public List<Vector3> CollisionVertices = new();
+		public List<int> CollisionIndices = new();
+		public PhysicsBody Body;
+		public PhysicsShape Shape;
 
-		private static BlockFaceData[] GetBlockFaceMask()
-		{
-			return ThreadStaticBlockFaceMask ??= new BlockFaceData[ChunkSize * ChunkSize * ChunkSize];
-		}
-
-		private readonly ChunkSlice[] Slices = new ChunkSlice[ChunkSize * 6];
 		private Dictionary<int, BlockEntity> Entities { get; set; }
 		private SceneObject TranslucentSceneObject { get; set; }
 		private SceneObject OpaqueSceneObject { get; set; }
+		private ModelBuilder TranslucentModelBuilder { get; set; }
 		private Model TranslucentModel { get; set; }
+		private ModelBuilder OpaqueModelBuilder { get; set; }
 		private Model OpaqueModel { get; set; }
 		private Mesh TranslucentMesh { get; set; }
 		private Mesh OpaqueMesh { get; set; }
+		private Task FullUpdateTask { get; set; }
 
 		public bool IsValid => true;
 
@@ -83,6 +57,7 @@ namespace Facepunch.CoreWars.Voxel
 			LightMap = new ChunkLightMap( this, map );
 			Offset = new IntVector3( x * ChunkSize, y * ChunkSize, z * ChunkSize );
 			Index = x + y * map.NumChunksX + z * map.NumChunksX * map.NumChunksY;
+			Body = PhysicsWorld.WorldBody;
 			Map = map;
 		}
 
@@ -95,24 +70,13 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				await GameTask.RunInThreadAsync( PropagateSunlight );
 				await GameTask.RunInThreadAsync( PerformFullTorchUpdate );
-				LightMap.Update();
-			}
 
-			await GameTask.RunInThreadAsync( UpdateBlockSlices );
+				LightMap.UpdateTorchLight();
+				LightMap.UpdateSunLight();
+			}
 
 			CreateEntities();
-
 			Initialized = true;
-
-			foreach ( var update in PendingSliceUpdates )
-			{
-				UpdateBlockSlice( update.Position, update.Direction );
-			}
-
-			PendingSliceUpdates.Clear();
-
-			var translucentModelBuilder = new ModelBuilder();
-			var opaqueModelBuilder = new ModelBuilder();
 
 			if ( IsClient )
 			{
@@ -126,37 +90,21 @@ namespace Facepunch.CoreWars.Voxel
 				OpaqueMesh.SetBounds( boundsMin, boundsMax );
 			}
 
-			Build();
-
-			if ( IsClient )
-			{
-				translucentModelBuilder.AddMesh( TranslucentMesh );
-				opaqueModelBuilder.AddMesh( OpaqueMesh );
-			}
-
-			TranslucentModel = translucentModelBuilder.Create();
-			OpaqueModel = opaqueModelBuilder.Create();
-
-			if ( IsClient )
-			{
-				var transform = new Transform( Offset * (float)VoxelSize );
-
-				OpaqueSceneObject = new SceneObject( OpaqueModel, transform );
-				OpaqueSceneObject.SetValue( "VoxelSize", VoxelSize );
-				OpaqueSceneObject.SetValue( "LightMap", LightMap.Texture );
-
-				TranslucentSceneObject = new SceneObject( TranslucentModel, transform );
-				TranslucentSceneObject.SetValue( "VoxelSize", VoxelSize );
-				TranslucentSceneObject.SetValue( "LightMap", LightMap.Texture );
-			}
+			QueueFullUpdate();
 
 			Event.Register( this );
 
 			if ( IsClient )
 			{
-				UpdateAdjacents( true );
-				BuildNeighbourEdges();
+				QueueNeighbourFullUpdate();
 			}
+		}
+
+		public void QueueFullUpdate()
+		{
+			if ( !HasDoneFirstFullUpdate || QueuedFullUpdate ) return;
+			FullUpdateTask = GameTask.RunInThreadAsync( StartFullUpdateTask );
+			QueuedFullUpdate = true;
 		}
 
 		public Voxel GetVoxel( IntVector3 position )
@@ -199,12 +147,6 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
-		public void FullUpdate()
-		{
-			UpdateBlockSlices();
-			Build();
-		}
-
 		public void UpdateAdjacents( bool recurseNeighbours = false )
 		{
 			var currentOffset = Offset;
@@ -240,14 +182,14 @@ namespace Facepunch.CoreWars.Voxel
 			UpdateNeighbourLightMap( "LightMapBottom", bottomChunk, recurseNeighbours );
 		}
 
-		public void BuildNeighbourEdges()
+		public void QueueNeighbourFullUpdate()
 		{
-			BuildNeighbourEdge( BlockFace.Top );
-			BuildNeighbourEdge( BlockFace.Bottom );
-			BuildNeighbourEdge( BlockFace.North );
-			BuildNeighbourEdge( BlockFace.East );
-			BuildNeighbourEdge( BlockFace.South );
-			BuildNeighbourEdge( BlockFace.West );
+			QueueNeighbourFullUpdate( BlockFace.Top );
+			QueueNeighbourFullUpdate( BlockFace.Bottom );
+			QueueNeighbourFullUpdate( BlockFace.North );
+			QueueNeighbourFullUpdate( BlockFace.East );
+			QueueNeighbourFullUpdate( BlockFace.South );
+			QueueNeighbourFullUpdate( BlockFace.West );
 		}
 
 		public IntVector3 GetAdjacentChunkCenter( BlockFace direction )
@@ -270,25 +212,45 @@ namespace Facepunch.CoreWars.Voxel
 			return Offset + position;
 		}
 
-		public void BuildNeighbourEdge( BlockFace direction )
+		public void QueueNeighbourFullUpdate( BlockFace direction )
 		{
 			var neighbour = GetNeighbour( direction );
 
 			if ( neighbour.IsValid() && neighbour.Initialized )
 			{
-				neighbour.QueueUpdateBlockSlices = true;
+				neighbour.QueueFullUpdate();
 			}
 		}
 
 		public void Build()
 		{
-			if ( IsServer )
-			{
-				BuildCollision();
-				return;
-			}
+			BuildMesh();
 
-			BuildMeshAndCollision();
+			if ( !IsModelCreated )
+			{
+				TranslucentModelBuilder = new ModelBuilder();
+				OpaqueModelBuilder = new ModelBuilder();
+
+				TranslucentModelBuilder.AddMesh( TranslucentMesh );
+				OpaqueModelBuilder.AddMesh( OpaqueMesh );
+
+				TranslucentModel = TranslucentModelBuilder.Create();
+				OpaqueModel = OpaqueModelBuilder.Create();
+
+				var transform = new Transform( Offset * (float)VoxelSize );
+
+				OpaqueSceneObject = new SceneObject( OpaqueModel, transform );
+				OpaqueSceneObject.SetValue( "VoxelSize", VoxelSize );
+				OpaqueSceneObject.SetValue( "LightMap", LightMap.Texture );
+
+				TranslucentSceneObject = new SceneObject( TranslucentModel, transform );
+				TranslucentSceneObject.SetValue( "VoxelSize", VoxelSize );
+				TranslucentSceneObject.SetValue( "LightMap", LightMap.Texture );
+
+				UpdateAdjacents( true );
+
+				IsModelCreated = true;
+			}
 		}
 
 		public void DeserializeData( BinaryReader reader )
@@ -526,14 +488,7 @@ namespace Facepunch.CoreWars.Voxel
 			}
 
 			Entities.Clear();
-
-			foreach ( var slice in Slices )
-			{
-				if ( slice == null )
-					continue;
-
-				slice.Body = null;
-			}
+			Body = null;
 
 			Event.Unregister( this );
 		}
@@ -573,66 +528,63 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
-		public void BuildMeshAndCollision()
+		public void BuildCollision()
+		{
+			if ( Body.IsValid() )
+			{
+				if ( CollisionVertices.Count > 0 && CollisionIndices.Count > 0 )
+				{
+					if ( Shape.IsValid() )
+						Shape.UpdateMesh( CollisionVertices, CollisionIndices );
+					else
+						Shape = Body.AddMeshShape( CollisionVertices, CollisionIndices );
+				}
+			}
+		}
+
+		public void BuildMesh()
 		{
 			if ( !OpaqueMesh.IsValid || !TranslucentMesh.IsValid )
 				return;
 
-			int translucentVertexCount = 0;
-			int opaqueVertexCount = 0;
 
-			foreach ( var slice in Slices )
+			int translucentVertexCount = TranslucentVertices.Count;
+			int opaqueVertexCount = OpaqueVertices.Count;
+
+			try
 			{
-				translucentVertexCount += slice.TranslucentVertices.Count;
-				opaqueVertexCount += slice.OpaqueVertices.Count;
+				if ( TranslucentMesh.HasVertexBuffer )
+					TranslucentMesh.SetVertexBufferSize( translucentVertexCount );
+				else
+					TranslucentMesh.CreateVertexBuffer<BlockVertex>( Math.Max( 1, translucentVertexCount ), BlockVertex.Layout );
+
+				if ( OpaqueMesh.HasVertexBuffer )
+					OpaqueMesh.SetVertexBufferSize( opaqueVertexCount );
+				else
+					OpaqueMesh.CreateVertexBuffer<BlockVertex>( Math.Max( 1, opaqueVertexCount ), BlockVertex.Layout );
+
+				translucentVertexCount = 0;
+				opaqueVertexCount = 0;
+
+				if ( OpaqueVertices.Count > 0 )
+				{
+					OpaqueMesh.SetVertexBufferData( OpaqueVertices, opaqueVertexCount );
+					opaqueVertexCount += OpaqueVertices.Count;
+				}
+
+				if ( TranslucentVertices.Count > 0 )
+				{
+					TranslucentMesh.SetVertexBufferData( TranslucentVertices, translucentVertexCount );
+					translucentVertexCount += TranslucentVertices.Count;
+				}
+
+				OpaqueMesh.SetVertexRange( 0, opaqueVertexCount );
+				TranslucentMesh.SetVertexRange( 0, translucentVertexCount );
 			}
-
-			if ( TranslucentMesh.HasVertexBuffer )
-				TranslucentMesh.SetVertexBufferSize( translucentVertexCount );
-			else
-				TranslucentMesh.CreateVertexBuffer<BlockVertex>( Math.Max( 1, translucentVertexCount ), BlockVertex.Layout );
-
-			if ( OpaqueMesh.HasVertexBuffer )
-				OpaqueMesh.SetVertexBufferSize( opaqueVertexCount );
-			else
-				OpaqueMesh.CreateVertexBuffer<BlockVertex>( Math.Max( 1, opaqueVertexCount ), BlockVertex.Layout );
-
-			translucentVertexCount = 0;
-			opaqueVertexCount = 0;
-
-			foreach ( var slice in Slices )
+			catch ( Exception e )
 			{
-				if ( slice.IsDirty )
-				{
-					if ( slice.Shape != null )
-					{
-						slice.Body.RemoveShape( slice.Shape, false );
-						slice.Shape = null;
-					}
-
-					if ( slice.CollisionVertices.Count > 0 && slice.CollisionIndices.Count > 0 )
-					{
-						slice.Shape = slice.Body.AddMeshShape( slice.CollisionVertices.ToArray(), slice.CollisionIndices.ToArray() );
-					}
-				}
-
-				slice.IsDirty = false;
-
-				if ( slice.OpaqueVertices.Count > 0 )
-				{
-					OpaqueMesh.SetVertexBufferData( slice.OpaqueVertices, opaqueVertexCount );
-					opaqueVertexCount += slice.OpaqueVertices.Count;
-				}
-
-				if ( slice.TranslucentVertices.Count > 0 )
-				{
-					TranslucentMesh.SetVertexBufferData( slice.TranslucentVertices, translucentVertexCount );
-					translucentVertexCount += slice.TranslucentVertices.Count;
-				}
+				Log.Error( e );
 			}
-
-			OpaqueMesh.SetVertexRange( 0, opaqueVertexCount );
-			TranslucentMesh.SetVertexRange( 0, translucentVertexCount );
 		}
 
 		private void UpdateNeighbourLightMap( string name, int chunkIndex, bool recurseNeighbours = false )
@@ -643,44 +595,12 @@ namespace Facepunch.CoreWars.Voxel
 
 				if ( neighbour != null && neighbour.Initialized )
 				{
-					TranslucentSceneObject.SetValue( name, neighbour.LightMap.Texture );
-					OpaqueSceneObject.SetValue( name, neighbour.LightMap.Texture );
+					TranslucentSceneObject?.SetValue( name, neighbour.LightMap.Texture );
+					OpaqueSceneObject?.SetValue( name, neighbour.LightMap.Texture );
 					if ( recurseNeighbours ) neighbour.UpdateAdjacents();
 				}
 			}
 		}
-
-		private void BuildCollision()
-		{
-			foreach ( var slice in Slices )
-			{
-				if ( slice.IsDirty && slice.Body.IsValid() )
-				{
-					if ( slice.Shape != null )
-					{
-						slice.Body.RemoveShape( slice.Shape, false );
-						slice.Shape = null;
-					}
-
-					if ( slice.CollisionVertices.Count > 0 && slice.CollisionIndices.Count > 0 )
-					{
-						slice.Shape = slice.Body.AddMeshShape( slice.CollisionVertices.ToArray(), slice.CollisionIndices.ToArray() );
-					}
-				}
-
-				slice.IsDirty = false;
-			}
-		}
-
-		static readonly int[] BackFaceBlockIndices = new[]
-		{
-			0, 1, 2, 2, 3, 0,
-			7, 6, 5, 5, 4, 7,
-			3, 7, 4, 4, 0, 3,
-			1, 5, 6, 6, 2, 1,
-			0, 4, 5, 5, 1, 0,
-			2, 6, 7, 7, 3, 2,
-		};
 
 		static readonly IntVector3[] BlockVertices = new[]
 		{
@@ -719,404 +639,68 @@ namespace Facepunch.CoreWars.Voxel
 			2, 2, 1, 1, 0, 0
 		};
 
-		private void AddQuad( ChunkSlice slice, int x, int y, int z, int width, int height, int widthAxis, int heightAxis, int face, byte blockId )
+		public void UpdateFaceVertices()
 		{
-			var block = Map.GetBlockType( blockId );
+			OpaqueVertices.Clear();
+			TranslucentVertices.Clear();
+			CollisionVertices.Clear();
+			CollisionIndices.Clear();
 
-			if ( block == null )
-				throw new Exception( $"Unable to find a block type registered with the id: {blockId}!" );
+			var faceWidth = 1;
+			var faceHeight = 1;
 
-			var textureId = block.GetTextureId( (BlockFace)face, this, x, y, z );
-			var normal = (byte)face;
-			var faceData = (uint)((textureId & 31) << 18 | (0 & 15) << 23 | (normal & 7) << 27);
-			var collisionIndex = slice.CollisionIndices.Count;
-
-			for ( int i = 0; i < 6; ++i )
+			for ( var x = 0; x < ChunkSize; x++ )
 			{
-				int vi = BlockIndices[(face * 6) + i];
-				var vOffset = BlockVertices[vi];
-
-				vOffset[widthAxis] *= width;
-				vOffset[heightAxis] *= height;
-
-				var vertex = new BlockVertex( (uint)(x + vOffset.x), (uint)(y + vOffset.y), (uint)(z + vOffset.z), (uint)x, (uint)y, (uint)z, faceData );
-
-				if ( block.IsTranslucent )
-					slice.TranslucentVertices.Add( vertex );
-				else
-					slice.OpaqueVertices.Add( vertex );
-
-				if ( !block.IsPassable )
+				for ( var y = 0; y < ChunkSize; y++ )
 				{
-					slice.CollisionVertices.Add( new Vector3( (x + vOffset.x) + Offset.x, (y + vOffset.y) + Offset.y, (z + vOffset.z) + Offset.z ) * VoxelSize );
-					slice.CollisionIndices.Add( collisionIndex + i );
-				}
-			}
-
-			if ( !block.CullBackFaces )
-			{
-				for ( int i = 0; i < 6; ++i )
-				{
-					int vi = BackFaceBlockIndices[(face * 6) + i];
-					var vOffset = BlockVertices[vi];
-
-					vOffset[widthAxis] *= width;
-					vOffset[heightAxis] *= height;
-
-					var vertex = new BlockVertex( (uint)(x + vOffset.x), (uint)(y + vOffset.y), (uint)(z + vOffset.z), (uint)x, (uint)y, (uint)z, faceData );
-
-					if ( block.IsTranslucent )
-						slice.TranslucentVertices.Add( vertex );
-					else
-						slice.OpaqueVertices.Add( vertex );
-				}
-			}
-		}
-
-		BlockFaceData GetBlockFace( IntVector3 position, int side )
-		{
-			var p = Offset + position;
-			var blockEmpty = Map.IsEmpty( p );
-			var blockId = blockEmpty ? (byte)0 : Map.GetBlock( p );
-			var block = Map.GetBlockType( blockId );
-
-			var face = new BlockFaceData
-			{
-				BlockIndex = GetLocalPositionIndex( position ),
-				IsTranslucent = block.IsTranslucent,
-				Side = (byte)side,
-				Culled = !block.HasTexture,
-				Type = blockId,
-			};
-
-			var adjacentBlockPosition = Map.GetAdjacentPosition( p, side );
-			var adjacentBlockId = Map.GetBlock( adjacentBlockPosition );
-			var adjacentBlock = Map.GetBlockType( adjacentBlockId );
-
-			if ( !face.Culled && !adjacentBlock.IsTranslucent )
-				face.Culled = true;
-
-			return face;
-		}
-
-		static int GetSliceIndex( int position, int direction )
-		{
-			int sliceIndex = 0;
-
-			for ( int i = 0; i < direction; ++i )
-			{
-				sliceIndex += ChunkSize;
-			}
-
-			sliceIndex += position;
-
-			return sliceIndex;
-		}
-
-		public void UpdateBlockSlice( IntVector3 position, int direction )
-		{
-			if ( !Initialized )
-			{
-				PendingSliceUpdates.Add( new SliceUpdate
-				{
-					Position = position,
-					Direction = direction
-				} );
-
-				return;
-			}
-
-			var blockFaceMask = GetBlockFaceMask();
-			int vertexOffset = 0;
-			int axis = BlockDirectionAxis[direction];
-			int sliceIndex = GetSliceIndex( position[axis], direction );
-			var slice = Slices[sliceIndex];
-
-			if ( slice.IsDirty ) return;
-
-			slice.IsDirty = true;
-			slice.OpaqueVertices.Clear();
-			slice.TranslucentVertices.Clear();
-			slice.CollisionVertices.Clear();
-			slice.CollisionIndices.Clear();
-
-			BlockFaceData faceA;
-			BlockFaceData faceB;
-
-			int uAxis = (axis + 1) % 3;
-			int vAxis = (axis + 2) % 3;
-			int faceSide = direction;
-
-			var blockPosition = new IntVector3( 0, 0, 0 );
-			blockPosition[axis] = position[axis];
-			var blockOffset = BlockDirections[direction];
-
-			bool maskEmpty = true;
-
-			int n = 0;
-
-			for ( blockPosition[vAxis] = 0; blockPosition[vAxis] < ChunkSize; blockPosition[vAxis]++ )
-			{
-				for ( blockPosition[uAxis] = 0; blockPosition[uAxis] < ChunkSize; blockPosition[uAxis]++ )
-				{
-					faceB = new()
+					for ( var z = 0; z < ChunkSize; z++ )
 					{
-						IsTranslucent = false,
-						Culled = true,
-						Side = (byte)faceSide,
-						Type = 0,
-					};
+						var position = new IntVector3( x, y, z );
+						var blockId = GetLocalPositionBlock( position );
+						if ( blockId == 0 ) continue;
 
-					faceA = GetBlockFace( blockPosition, faceSide );
+						var block = Map.GetBlockType( blockId );
 
-					if ( (blockPosition[axis] + blockOffset[axis]) < ChunkSize )
-					{
-						faceB = GetBlockFace( blockPosition + blockOffset, faceSide );
-					}
-
-					if ( !faceA.Culled && !faceB.Culled && faceA.Equals( faceB ) ) // && !faceA.IsTranslucent )
-					{
-						blockFaceMask[n].Culled = true;
-					}
-					else
-					{
-						blockFaceMask[n] = faceA;
-
-						if ( !faceA.Culled )
+						for ( int faceSide = 0; faceSide < 6; faceSide++ )
 						{
-							maskEmpty = false;
-						}
-					}
+							var neighbourId = Map.GetAdjacentBlock( Offset + position, faceSide );
+							var neighbourBlock = Map.GetBlockType( neighbourId );
 
-					n++;
-				}
-			}
-
-			if ( maskEmpty ) return;
-
-			n = 0;
-
-			for ( int j = 0; j < ChunkSize; j++ )
-			{
-				for ( int i = 0; i < ChunkSize; )
-				{
-					if ( blockFaceMask[n].Culled )
-					{
-						i++;
-						n++;
-
-						continue;
-					}
-
-					int faceWidth;
-					int faceHeight;
-
-					if ( Map.GreedyMeshing )
-					{
-						for ( faceWidth = 1; i + faceWidth < ChunkSize && !blockFaceMask[n + faceWidth].Culled && blockFaceMask[n + faceWidth].Equals( blockFaceMask[n] ); faceWidth++ )
-						{
-
-						}
-
-						bool done = false;
-
-						for ( faceHeight = 1; j + faceHeight < ChunkSize; faceHeight++ )
-						{
-							for ( int k = 0; k < faceWidth; k++ )
-							{
-								var maskFace = blockFaceMask[n + k + faceHeight * ChunkSize];
-
-								if ( maskFace.Culled || !maskFace.Equals( blockFaceMask[n] ) )
-								{
-									done = true;
-									break;
-								}
-							}
-
-							if ( done ) break;
-						}
-					}
-					else
-					{
-						faceWidth = 1;
-						faceHeight = 1;
-					}
-
-					if ( !blockFaceMask[n].Culled )
-					{
-						blockPosition[uAxis] = i;
-						blockPosition[vAxis] = j;
-
-						AddQuad( slice,
-							blockPosition.x, blockPosition.y, blockPosition.z,
-							faceWidth, faceHeight, uAxis, vAxis,
-							blockFaceMask[n].Side, blockFaceMask[n].Type );
-
-						vertexOffset += 6;
-					}
-
-					for ( int l = 0; l < faceHeight; ++l )
-					{
-						for ( int k = 0; k < faceWidth; ++k )
-						{
-							blockFaceMask[n + k + l * ChunkSize].Culled = true;
-						}
-					}
-
-					i += faceWidth;
-					n += faceWidth;
-				}
-			}
-		}
-
-		public void UpdateBlockSlices()
-		{
-			var blockFaceMask = GetBlockFaceMask();
-
-			for ( int i = 0; i < Slices.Length; ++i )
-			{
-				Slices[i] ??= new ChunkSlice();
-			}
-
-			IntVector3 blockPosition;
-			IntVector3 blockOffset;
-
-			BlockFaceData faceA;
-			BlockFaceData faceB;
-
-			for ( int faceSide = 0; faceSide < 6; faceSide++ )
-			{
-				int axis = BlockDirectionAxis[faceSide];
-				int uAxis = (axis + 1) % 3;
-				int vAxis = (axis + 2) % 3;
-
-				blockPosition = new IntVector3( 0, 0, 0 );
-				blockOffset = BlockDirections[faceSide];
-
-				for ( blockPosition[axis] = 0; blockPosition[axis] < ChunkSize; blockPosition[axis]++ )
-				{
-					var n = 0;
-					var maskEmpty = true;
-					var sliceIndex = GetSliceIndex( blockPosition[axis], faceSide );
-					var slice = Slices[sliceIndex];
-
-					slice.IsDirty = true;
-					slice.OpaqueVertices.Clear();
-					slice.TranslucentVertices.Clear();
-					slice.CollisionVertices.Clear();
-					slice.CollisionIndices.Clear();
-
-					for ( blockPosition[vAxis] = 0; blockPosition[vAxis] < ChunkSize; blockPosition[vAxis]++ )
-					{
-						for ( blockPosition[uAxis] = 0; blockPosition[uAxis] < ChunkSize; blockPosition[uAxis]++ )
-						{
-							faceB = new()
-							{
-								IsTranslucent = false,
-								Culled = true,
-								Side = (byte)faceSide,
-								Type = 0,
-							};
-
-							faceA = GetBlockFace( blockPosition, faceSide );
-
-							if ( (blockPosition[axis] + blockOffset[axis]) < ChunkSize )
-							{
-								faceB = GetBlockFace( blockPosition + blockOffset, faceSide );
-							}
-
-							if ( !faceA.Culled && !faceB.Culled && faceA.Equals( faceB ) ) // && !faceA.IsTranslucent )
-							{
-								blockFaceMask[n].Culled = true;
-							}
-							else
-							{
-								blockFaceMask[n] = faceA;
-
-								if ( !faceA.Culled )
-								{
-									maskEmpty = false;
-								}
-							}
-
-							n++;
-						}
-					}
-
-					if ( maskEmpty )
-					{
-						continue;
-					}
-
-					n = 0;
-
-					for ( int j = 0; j < ChunkSize; j++ )
-					{
-						for ( int i = 0; i < ChunkSize; )
-						{
-							if ( blockFaceMask[n].Culled )
-							{
-								i++;
-								n++;
-
+							if ( !neighbourBlock.IsTranslucent )
 								continue;
-							}
 
-							int faceWidth;
-							int faceHeight;
+							var collisionIndex = CollisionIndices.Count;
+							var textureId = block.GetTextureId( (BlockFace)faceSide, this, x, y, z );
+							var normal = (byte)faceSide;
+							var faceData = (uint)((textureId & 31) << 18 | (0 & 15) << 23 | (normal & 7) << 27);
+							var axis = BlockDirectionAxis[faceSide];
+							var uAxis = (axis + 1) % 3;
+							var vAxis = (axis + 2) % 3;
 
-							if ( Map.GreedyMeshing )
+							for ( int i = 0; i < 6; ++i )
 							{
-								for ( faceWidth = 1; i + faceWidth < ChunkSize && !blockFaceMask[n + faceWidth].Culled && blockFaceMask[n + faceWidth].Equals( blockFaceMask[n] ); faceWidth++ )
-								{
+								var vi = BlockIndices[(faceSide * 6) + i];
+								var vOffset = BlockVertices[vi];
 
+								vOffset[uAxis] *= faceWidth;
+								vOffset[vAxis] *= faceHeight;
+
+								if ( IsClient && block.HasTexture )
+								{
+									var vertex = new BlockVertex( (uint)(x + vOffset.x), (uint)(y + vOffset.y), (uint)(z + vOffset.z), (uint)x, (uint)y, (uint)z, faceData );
+
+									if ( block.IsTranslucent )
+										TranslucentVertices.Add( vertex );
+									else
+										OpaqueVertices.Add( vertex );
 								}
 
-								bool done = false;
-
-								for ( faceHeight = 1; j + faceHeight < ChunkSize; faceHeight++ )
+								if ( !block.IsPassable )
 								{
-									for ( int k = 0; k < faceWidth; k++ )
-									{
-										var maskFace = blockFaceMask[n + k + faceHeight * ChunkSize];
-
-										if ( maskFace.Culled || !maskFace.Equals( blockFaceMask[n] ) )
-										{
-											done = true;
-											break;
-										}
-									}
-
-									if ( done ) break;
+									CollisionVertices.Add( new Vector3( (x + vOffset.x) + Offset.x, (y + vOffset.y) + Offset.y, (z + vOffset.z) + Offset.z ) * VoxelSize );
+									CollisionIndices.Add( collisionIndex + i );
 								}
 							}
-							else
-							{
-								faceWidth = 1;
-								faceHeight = 1;
-							}
-
-							if ( !blockFaceMask[n].Culled )
-							{
-								blockPosition[uAxis] = i;
-								blockPosition[vAxis] = j;
-
-								AddQuad( slice,
-									blockPosition.x, blockPosition.y, blockPosition.z,
-									faceWidth, faceHeight, uAxis, vAxis,
-									blockFaceMask[n].Side, blockFaceMask[n].Type );
-							}
-
-							for ( int l = 0; l < faceHeight; ++l )
-							{
-								for ( int k = 0; k < faceWidth; ++k )
-								{
-									blockFaceMask[n + k + l * ChunkSize].Culled = true;
-								}
-							}
-
-							i += faceWidth;
-							n += faceWidth;
 						}
 					}
 				}
@@ -1132,6 +716,8 @@ namespace Facepunch.CoreWars.Voxel
 				{
 					using ( var writer = new BinaryWriter( stream ) )
 					{
+						writer.Write( DirtyData.Count );
+
 						foreach ( var position in DirtyData )
 						{
 							var data = GetData<BlockData>( position );
@@ -1154,16 +740,36 @@ namespace Facepunch.CoreWars.Voxel
 		[Event.Tick.Client]
 		private void ClientTick()
 		{
-			LightMap.Update();
-		}
-
-		[Event.Tick]
-		private void Tick()
-		{
 			if ( QueueRebuild )
 			{
-				Build();
 				QueueRebuild = false;
+				Build();
+			}
+			
+			if ( Initialized && HasDoneFirstFullUpdate && !QueuedFullUpdate )
+			{
+				LightMap.Update();
+			}
+		}
+
+		private async Task StartFullUpdateTask()
+		{
+			try
+			{
+				UpdateFaceVertices();
+				BuildCollision();
+				QueuedFullUpdate = false;
+				QueueRebuild = true;
+
+				await GameTask.Delay( 5 );
+			}
+			catch ( TaskCanceledException e )
+			{
+				return;
+			}
+			catch ( Exception e )
+			{
+				Log.Error( e );
 			}
 		}
 	}

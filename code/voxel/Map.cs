@@ -68,9 +68,7 @@ namespace Facepunch.CoreWars.Voxel
 		public static void ReceiveDataUpdate( int chunkIndex, byte[] data )
 		{
 			if ( Current == null ) return;
-
 			Current.Chunks[chunkIndex].DeserializeData( data );
-			Log.Info( "Received Data Update" );
 		}
 
 		[ClientRpc]
@@ -544,21 +542,15 @@ namespace Facepunch.CoreWars.Voxel
 
 				for ( int i = 0; i < 6; i++ )
 				{
-					var posInChunk = ToLocalPosition( position );
-					Chunks[chunkIndex].UpdateBlockSlice( posInChunk, i );
-
-					var adjacentPos = GetAdjacentPosition( position, i );
-					var adjadentChunkIndex = GetChunkIndex( adjacentPos );
-					var adjacentPosInChunk = ToLocalPosition( adjacentPos );
-
+					var adjacentPosition = GetAdjacentPosition( position, i );
+					var adjadentChunkIndex = GetChunkIndex( adjacentPosition );
 					chunkIds.Add( adjadentChunkIndex );
-					Chunks[adjadentChunkIndex].UpdateBlockSlice( adjacentPosInChunk, GetOppositeDirection( i ) );
 				}
 			}
 
-			foreach ( var chunkid in chunkIds )
+			foreach ( var chunkId in chunkIds )
 			{
-				Chunks[chunkid].Build();
+				Chunks[chunkId].QueueFullUpdate();
 			}
 
 			return shouldBuild;
@@ -785,7 +777,9 @@ namespace Facepunch.CoreWars.Voxel
 
 				chunk.Data.Remove( localPosition );
 				chunk.SetBlock( blockIndex, blockId );
-				chunk.LightMap.Update();
+
+				chunk.LightMap.UpdateTorchLight();
+				chunk.LightMap.UpdateSunLight();
 
 				block.OnBlockAdded( chunk, position.x, position.y, position.z, direction );
 
@@ -1016,27 +1010,33 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				try
 				{
-					var chunks = Chunks.AsEnumerable().Where( c => c.QueueUpdateBlockSlices );
+					var chunks = Chunks.Where( c => c.Initialized && !c.HasDoneFirstFullUpdate );
 
-					if ( IsClient && Local.Pawn.IsValid() )
+					if ( IsClient )
 					{
-						chunks = chunks.OrderBy( c => ToSourcePosition( c.Offset ).Distance( Local.Pawn.Position ) );
+						var chunkSize = Chunk.ChunkSize;
+						chunks = chunks.OrderBy( c => ToSourcePosition( c.Offset + new IntVector3( chunkSize / 2 ) ).Distance( Local.Pawn.Position ) );
 					}
 
 					var chunk = chunks.FirstOrDefault();
 
 					if ( chunk.IsValid() )
 					{
-						chunk.UpdateBlockSlices();
-						chunk.QueueUpdateBlockSlices = false;
+						chunk.UpdateFaceVertices();
+						chunk.BuildCollision();
+						chunk.HasDoneFirstFullUpdate = true;
 						chunk.QueueRebuild = true;
 					}
 
-					await GameTask.Delay( 50 );
+					await GameTask.Delay( 5 );
 				}
 				catch ( TaskCanceledException e )
 				{
 					break;
+				}
+				catch ( Exception e )
+				{
+					Log.Error( e );
 				}
 			}
 		}
