@@ -303,10 +303,10 @@ namespace Facepunch.CoreWars
 				DebugOverlay.ScreenText( 4, $"Chunk Index: {voxel.ChunkIndex}", 0.1f );
 				DebugOverlay.ScreenText( 5, $"Position: {position}", 0.1f );
 
-				System.Threading.ThreadPool.GetAvailableThreads( out var available, out var cpThreads );
+				//System.Threading.ThreadPool.GetAvailableThreads( out var available, out var cpThreads );
 
-				DebugOverlay.ScreenText( 6, $"Threads Available: {available}", 0.1f );
-				DebugOverlay.ScreenText( 7, $"Completion Pool Threads: {cpThreads}", 0.1f );
+				//DebugOverlay.ScreenText( 6, $"Threads Available: {available}", 0.1f );
+				//DebugOverlay.ScreenText( 7, $"Completion Pool Threads: {cpThreads}", 0.1f );
 			}
 
 			var voxelPosition = Map.ToVoxelPosition( Position );
