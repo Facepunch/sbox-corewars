@@ -174,7 +174,7 @@ namespace Facepunch.CoreWars
 			{
 				if ( Input.Down( InputButton.Attack1 ) && NextBlockPlace )
 				{
-					//NextBlockPlace = 0.01f;
+					NextBlockPlace = 0.1f;
 
 					var container = HotbarInventory.Container;
 					var item = container.GetFromSlot( CurrentHotbarIndex );
@@ -196,7 +196,7 @@ namespace Facepunch.CoreWars
 				}
 				else if ( Input.Down( InputButton.Attack2 ) && NextBlockPlace )
 				{
-					//NextBlockPlace = 0.01f;
+					NextBlockPlace = 0.1f;
 
 					if ( Map.Current.GetBlockInDirection( Input.Position, Input.Rotation.Forward, out var blockPosition ) )
 					{
