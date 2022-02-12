@@ -103,6 +103,7 @@ namespace Facepunch.CoreWars.Voxel
 
 		public bool IsFullUpdateTaskRunning()
 		{
+			if ( QueuedFullUpdate ) return true;
 			if ( FullUpdateTask == null ) return false;
 			return !FullUpdateTask.IsCompleted;
 		}
@@ -594,15 +595,19 @@ namespace Facepunch.CoreWars.Voxel
 
 		public void BuildCollision()
 		{
-			if ( Body.IsValid() )
+			if ( !Body.IsValid() ) return;
+
+			if ( CollisionVertices.Count > 0 && CollisionIndices.Count > 0 )
 			{
-				if ( CollisionVertices.Count > 0 && CollisionIndices.Count > 0 )
-				{
-					if ( Shape.IsValid() )
-						Shape.UpdateMesh( CollisionVertices, CollisionIndices );
-					else
-						Shape = Body.AddMeshShape( CollisionVertices, CollisionIndices );
-				}
+				if ( Shape.IsValid() )
+					Shape.UpdateMesh( CollisionVertices.ToArray(), CollisionIndices.ToArray() );
+				else
+					Shape = Body.AddMeshShape( CollisionVertices.ToArray(), CollisionIndices.ToArray() );
+			}
+			else
+			{
+				Body.RemoveShape( Shape );
+				Shape = null;
 			}
 		}
 
@@ -810,10 +815,12 @@ namespace Facepunch.CoreWars.Voxel
 				QueueRebuild = false;
 				Build();
 			}
-			
-			if ( HasDoneFirstFullUpdate )
+
+			if ( !QueueRebuild && HasDoneFirstFullUpdate )
 			{
-				LightMap.Update();
+				LightMap.UpdateTorchLight();
+				LightMap.UpdateSunLight();
+				LightMap.UpdateTexture();
 			}
 		}
 
@@ -822,14 +829,19 @@ namespace Facepunch.CoreWars.Voxel
 			return GetNeighbours().Any( c => c.IsFullUpdateTaskRunning() );
 		}
 
-		private void StartFullUpdateTask()
+		private async void StartFullUpdateTask()
 		{
 			try
 			{
 				UpdateFaceVertices();
 				BuildCollision();
+
+				await GameTask.Delay( 1 );
+
 				QueuedFullUpdate = false;
 				QueueRebuild = true;
+
+				await GameTask.Delay( 1 );
 			}
 			catch ( Exception e )
 			{

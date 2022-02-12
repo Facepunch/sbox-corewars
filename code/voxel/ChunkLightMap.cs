@@ -275,11 +275,8 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
-		public bool Update()
+		public bool UpdateTexture()
 		{
-			UpdateTorchLight();
-			UpdateSunLight();
-
 			if ( IsDirty )
 			{
 				IsDirty = false;

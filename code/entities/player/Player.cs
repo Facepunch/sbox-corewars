@@ -18,6 +18,7 @@ namespace Facepunch.CoreWars
 		[Net, Predicted] public ushort CurrentHotbarIndex { get; private set; }
 		[Net] public NetInventory HotbarInventory { get; private set; }
 		public DamageInfo LastDamageTaken { get; private set; }
+		public TimeUntil NextBlockPlace { get; private set; }
 
 		public Player() : base()
 		{
@@ -171,8 +172,10 @@ namespace Facepunch.CoreWars
 
 			if ( IsServer )
 			{
-				if ( Input.Pressed( InputButton.Attack1 ) )
+				if ( Input.Pressed( InputButton.Attack1 ) && NextBlockPlace )
 				{
+					NextBlockPlace = 0.15f;
+
 					var container = HotbarInventory.Container;
 					var item = container.GetFromSlot( CurrentHotbarIndex );
 
@@ -191,8 +194,10 @@ namespace Facepunch.CoreWars
 						}
 					}
 				}
-				else if ( Input.Pressed( InputButton.Attack2 ) )
+				else if ( Input.Pressed( InputButton.Attack2 ) && NextBlockPlace )
 				{
+					NextBlockPlace = 0.15f;
+
 					if ( Map.Current.GetBlockInDirection( Input.Position, Input.Rotation.Forward, out var blockPosition ) )
 					{
 						var voxel = Map.Current.GetVoxel( blockPosition );
