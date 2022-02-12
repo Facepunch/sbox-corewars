@@ -174,8 +174,6 @@ namespace Facepunch.CoreWars
 			{
 				if ( Input.Down( InputButton.Attack1 ) && NextBlockPlace )
 				{
-					NextBlockPlace = 0.1f;
-
 					var container = HotbarInventory.Container;
 					var item = container.GetFromSlot( CurrentHotbarIndex );
 
@@ -193,11 +191,11 @@ namespace Facepunch.CoreWars
 							}
 						}
 					}
+
+					NextBlockPlace = 0.1f;
 				}
 				else if ( Input.Down( InputButton.Attack2 ) && NextBlockPlace )
 				{
-					NextBlockPlace = 0.1f;
-
 					if ( Map.Current.GetBlockInDirection( Input.Position, Input.Rotation.Forward, out var blockPosition ) )
 					{
 						var voxel = Map.Current.GetVoxel( blockPosition );
@@ -210,8 +208,11 @@ namespace Facepunch.CoreWars
 							}
 						}
 					}
+
+					NextBlockPlace = 0.1f;
 				}
-				else if ( Input.Pressed( InputButton.Flashlight ) )
+
+				if ( Input.Pressed( InputButton.Flashlight ) )
 				{
 					Map.Current.GetBlockInDirection( Input.Position, Input.Rotation.Forward, out var position );
 

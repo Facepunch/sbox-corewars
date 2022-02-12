@@ -616,12 +616,16 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				if ( !Body.IsValid() ) return;
 
-				Body.RemoveShape( Shape );
-				Shape = null;
+				var oldShape = Shape;
 
 				if ( CollisionVertices.Count > 0 && CollisionIndices.Count > 0 )
 				{
 					Shape = Body.AddMeshShape( CollisionVertices.ToArray(), CollisionIndices.ToArray() );
+				}
+
+				if ( oldShape.IsValid() )
+				{
+					Body.RemoveShape( oldShape );
 				}
 			}
 		}

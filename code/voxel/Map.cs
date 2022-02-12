@@ -255,7 +255,7 @@ namespace Facepunch.CoreWars.Voxel
 						chunk.Blocks = reader.ReadBytes( chunk.Blocks.Length );
 						chunk.DeserializeData( reader );
 
-						 chunk.Initialize();
+						_ = chunk.Initialize();
 
 						if ( i % 32 == 0 )
 						{
@@ -542,8 +542,12 @@ namespace Facepunch.CoreWars.Voxel
 				for ( int i = 0; i < 6; i++ )
 				{
 					var adjacentPosition = GetAdjacentPosition( position, i );
-					var adjadentChunkIndex = GetChunkIndex( adjacentPosition );
-					chunkIds.Add( adjadentChunkIndex );
+
+					if ( IsInside( adjacentPosition ) )
+					{
+						var adjadentChunkIndex = GetChunkIndex( adjacentPosition );
+						chunkIds.Add( adjadentChunkIndex );
+					}
 				}
 			}
 
@@ -861,8 +865,12 @@ namespace Facepunch.CoreWars.Voxel
 			distance = 0;
 			Ray ray = new( position, direction );
 
-			while ( true )
+			var currentIterations = 0;
+
+			while ( currentIterations < 1000 )
 			{
+				currentIterations++;
+
 				IntVector3 position3i = new( (int)position3f.x, (int)position3f.y, (int)position3f.z );
 
 				Vector3 distanceToNearestEdge = new( position3i.x - position3f.x + edgeOffset.x,
@@ -884,17 +892,11 @@ namespace Facepunch.CoreWars.Voxel
 				int axis;
 
 				if ( lengthToNearestEdge.x < lengthToNearestEdge.y && lengthToNearestEdge.x < lengthToNearestEdge.z )
-				{
 					axis = 0;
-				}
 				else if ( lengthToNearestEdge.y < lengthToNearestEdge.x && lengthToNearestEdge.y < lengthToNearestEdge.z )
-				{
 					axis = 1;
-				}
 				else
-				{
 					axis = 2;
-				}
 
 				distance += lengthToNearestEdge[axis];
 				position3f = position + direction * distance;
@@ -911,7 +913,6 @@ namespace Facepunch.CoreWars.Voxel
 				if ( distance > length )
 				{
 					distance = length;
-
 					return BlockFace.Invalid;
 				}
 
