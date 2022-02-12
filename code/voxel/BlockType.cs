@@ -10,7 +10,6 @@ namespace Facepunch.CoreWars.Voxel
 		public virtual string DefaultTexture => "";
 		public virtual string FriendlyName => "";
 		public virtual bool AttenuatesSunLight => false;
-		public virtual bool CullBackFaces => true;
 		public virtual bool HasTexture => true;
 		public virtual bool IsPassable => false;
 		public virtual bool IsTranslucent => false;

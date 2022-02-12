@@ -299,6 +299,19 @@ namespace Facepunch.CoreWars
 				DebugOverlay.ScreenText( 5, $"Position: {position}", 0.1f );
 			}
 
+			var voxelPosition = Map.ToVoxelPosition( Position );
+
+			if ( Map.Current.IsValid() && Map.Current.IsInside( voxelPosition ) )
+			{
+				var currentChunkIndex = Map.Current.GetChunkIndex( voxelPosition );
+				var currentChunk = Map.Current.Chunks[currentChunkIndex];
+
+				if ( currentChunk.IsValid() && !currentChunk.Shape.IsValid() )
+				{
+					return;
+				}
+			}
+
 			var controller = GetActiveController();
 			controller?.Simulate( client, this, GetActiveAnimator() );
 		}

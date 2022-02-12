@@ -68,9 +68,7 @@ namespace Facepunch.CoreWars.Voxel
 		public static void ReceiveDataUpdate( int chunkIndex, byte[] data )
 		{
 			if ( Current == null ) return;
-
 			Current.Chunks[chunkIndex].DeserializeData( data );
-			Log.Info( "Received Data Update" );
 		}
 
 		[ClientRpc]
@@ -550,9 +548,9 @@ namespace Facepunch.CoreWars.Voxel
 				}
 			}
 
-			foreach ( var chunkid in chunkIds )
+			foreach ( var chunkId in chunkIds )
 			{
-				Chunks[chunkid].QueueFullUpdate = true;
+				Chunks[chunkId].QueueFullUpdate();
 			}
 
 			return shouldBuild;
@@ -779,7 +777,9 @@ namespace Facepunch.CoreWars.Voxel
 
 				chunk.Data.Remove( localPosition );
 				chunk.SetBlock( blockIndex, blockId );
-				chunk.LightMap.Update();
+
+				chunk.LightMap.UpdateTorchLight();
+				chunk.LightMap.UpdateSunLight();
 
 				block.OnBlockAdded( chunk, position.x, position.y, position.z, direction );
 
@@ -1010,11 +1010,12 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				try
 				{
-					var chunks = Chunks.AsEnumerable().Where( c => c.QueueFullUpdate );
+					var chunks = Chunks.Where( c => c.Initialized && !c.HasDoneFirstFullUpdate );
 
-					if ( IsClient && Local.Pawn.IsValid() )
+					if ( IsClient )
 					{
-						chunks = chunks.OrderBy( c => ToSourcePosition( c.Offset ).Distance( Local.Pawn.Position ) );
+						var chunkSize = Chunk.ChunkSize;
+						chunks = chunks.OrderBy( c => ToSourcePosition( c.Offset + new IntVector3( chunkSize / 2 ) ).Distance( Local.Pawn.Position ) );
 					}
 
 					var chunk = chunks.FirstOrDefault();
@@ -1022,15 +1023,20 @@ namespace Facepunch.CoreWars.Voxel
 					if ( chunk.IsValid() )
 					{
 						chunk.UpdateFaceVertices();
-						chunk.QueueFullUpdate = false;
-
-						await GameTask.Delay( 50 );
+						chunk.BuildCollision();
+						chunk.HasDoneFirstFullUpdate = true;
 						chunk.QueueRebuild = true;
 					}
+
+					await GameTask.Delay( 5 );
 				}
 				catch ( TaskCanceledException e )
 				{
 					break;
+				}
+				catch ( Exception e )
+				{
+					Log.Error( e );
 				}
 			}
 		}

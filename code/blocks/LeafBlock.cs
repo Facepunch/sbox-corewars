@@ -9,6 +9,5 @@ namespace Facepunch.CoreWars.Blocks
 		public override string DefaultTexture => "leaf";
 		public override string FriendlyName => "Leaf";
 		public override bool IsTranslucent => true;
-		public override bool CullBackFaces => false;
 	}
 }
