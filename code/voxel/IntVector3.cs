@@ -98,6 +98,14 @@ namespace Facepunch.CoreWars.Voxel
 			return new IntVector3( Math.Max( x, other.x ), Math.Max( y, other.y ), Math.Max( z, other.z ) );
 		}
 
+		public int Distance( IntVector3 other )
+		{
+			var dx = other.x - x;
+			var dy = other.y - y;
+			var dz = other.z - z;
+			return (int)Math.Sqrt( dx * dx + dy * dy + dz * dz );
+		}
+
 		public static IntVector3 Min( IntVector3 a, IntVector3 b ) => a.ComponentMin( b );
 		public static IntVector3 Max( IntVector3 a, IntVector3 b ) => a.ComponentMax( b );
 

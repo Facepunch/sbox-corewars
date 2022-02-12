@@ -190,16 +190,19 @@ namespace Facepunch.CoreWars.Voxel
 			return (face != BlockFace.Invalid);
 		}
 
-		public void SetBlockOnServer( int x, int y, int z, byte blockId, int direction )
+		public void SetBlockOnServer( IntVector3 position, byte blockId, int direction = 0 )
 		{
 			Host.AssertServer();
 
-			var position = new IntVector3( x, y, z );
-
 			if ( SetBlockAndUpdate( position, blockId, direction ) )
 			{
-				SetBlockOnClient( x, y, z, blockId, direction );
+				SetBlockOnClient( position.x, position.y, position.z, blockId, direction );
 			}
+		}
+
+		public void SetBlockOnServer( int x, int y, int z, byte blockId, int direction = 0 )
+		{
+			SetBlockOnServer( new IntVector3( x, y, z ), blockId, direction );
 		}
 
 		public byte FindBlockId<T>() where T : BlockType
@@ -1022,7 +1025,7 @@ namespace Facepunch.CoreWars.Voxel
 
 					if ( chunk.IsValid() )
 					{
-						chunk.UpdateFaceVertices();
+						chunk.UpdateVerticesResult = await chunk.StartUpdateVerticesTask();
 						chunk.BuildCollision();
 						chunk.HasDoneFirstFullUpdate = true;
 						chunk.QueueRebuild = true;

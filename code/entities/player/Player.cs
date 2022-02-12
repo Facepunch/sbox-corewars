@@ -216,14 +216,26 @@ namespace Facepunch.CoreWars
 				{
 					Map.Current.GetBlockInDirection( Input.Position, Input.Rotation.Forward, out var position );
 
-					var data = Map.Current.GetOrCreateData<BlockData>( position );
+					var radius = 8;
 
-					if ( data.Health == 0 )
-						data.Health = 100;
-					else
-						data.Health--;
+					for ( var x = -radius; x < radius; x++ )
+					{
+						for ( var y = -radius; y < radius; y++ )
+						{
+							for ( var z = -radius; z < radius; z++ )
+							{
+								var blockPosition = position + new IntVector3( x, y, z );
 
-					data.IsDirty = true;
+								if ( position.Distance( blockPosition ) <= radius )
+								{
+									if ( Map.Current.IsInside( blockPosition ) )
+									{
+										Map.Current.SetBlockOnServer( blockPosition, 0, 0 );
+									}
+								}
+							}
+						}
+					}
 				}
 				else if ( Input.Pressed( InputButton.Score ) )
 				{
@@ -240,20 +252,6 @@ namespace Facepunch.CoreWars
 							WalkSpeed = 195f,
 							SprintSpeed = 375f
 						};
-					}
-				}
-			}
-			else
-			{
-				if ( Input.Pressed( InputButton.Drop ) )
-				{
-					Map.Current.GetBlockInDirection( Input.Position, Input.Rotation.Forward, out var position );
-
-					var data = Map.Current.GetData<BlockData>( position );
-
-					if ( data.IsValid() )
-					{
-						Log.Info( data.Health );
 					}
 				}
 			}
