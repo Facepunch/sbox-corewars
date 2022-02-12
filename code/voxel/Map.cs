@@ -544,21 +544,15 @@ namespace Facepunch.CoreWars.Voxel
 
 				for ( int i = 0; i < 6; i++ )
 				{
-					var posInChunk = ToLocalPosition( position );
-					Chunks[chunkIndex].UpdateBlockSlice( posInChunk, i );
-
-					var adjacentPos = GetAdjacentPosition( position, i );
-					var adjadentChunkIndex = GetChunkIndex( adjacentPos );
-					var adjacentPosInChunk = ToLocalPosition( adjacentPos );
-
+					var adjacentPosition = GetAdjacentPosition( position, i );
+					var adjadentChunkIndex = GetChunkIndex( adjacentPosition );
 					chunkIds.Add( adjadentChunkIndex );
-					Chunks[adjadentChunkIndex].UpdateBlockSlice( adjacentPosInChunk, GetOppositeDirection( i ) );
 				}
 			}
 
 			foreach ( var chunkid in chunkIds )
 			{
-				Chunks[chunkid].Build();
+				Chunks[chunkid].QueueFullUpdate = true;
 			}
 
 			return shouldBuild;
@@ -1016,7 +1010,7 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				try
 				{
-					var chunks = Chunks.AsEnumerable().Where( c => c.QueueUpdateBlockSlices );
+					var chunks = Chunks.AsEnumerable().Where( c => c.QueueFullUpdate );
 
 					if ( IsClient && Local.Pawn.IsValid() )
 					{
@@ -1027,12 +1021,12 @@ namespace Facepunch.CoreWars.Voxel
 
 					if ( chunk.IsValid() )
 					{
-						chunk.UpdateBlockSlices();
-						chunk.QueueUpdateBlockSlices = false;
+						chunk.UpdateFaceVertices();
+						chunk.QueueFullUpdate = false;
+
+						await GameTask.Delay( 50 );
 						chunk.QueueRebuild = true;
 					}
-
-					await GameTask.Delay( 50 );
 				}
 				catch ( TaskCanceledException e )
 				{
