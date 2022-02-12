@@ -547,7 +547,6 @@ namespace Facepunch.CoreWars.Voxel
 			if ( !OpaqueMesh.IsValid || !TranslucentMesh.IsValid )
 				return;
 
-
 			int translucentVertexCount = TranslucentVertices.Count;
 			int opaqueVertexCount = OpaqueVertices.Count;
 
@@ -740,16 +739,24 @@ namespace Facepunch.CoreWars.Voxel
 		[Event.Tick.Client]
 		private void ClientTick()
 		{
+			if ( IsFullUpdateTaskRunning() ) return;
+
 			if ( QueueRebuild )
 			{
 				QueueRebuild = false;
 				Build();
 			}
 			
-			if ( Initialized && HasDoneFirstFullUpdate && !QueuedFullUpdate )
+			if ( Initialized && HasDoneFirstFullUpdate )
 			{
 				LightMap.Update();
 			}
+		}
+
+		private bool IsFullUpdateTaskRunning()
+		{
+			if ( FullUpdateTask == null ) return false;
+			return !FullUpdateTask.IsCompleted;
 		}
 
 		private async Task StartFullUpdateTask()
