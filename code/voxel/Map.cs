@@ -114,7 +114,8 @@ namespace Facepunch.CoreWars.Voxel
 
 					foreach ( var chunkId in chunkIds )
 					{
-						Current.Chunks[chunkId].QueueFullUpdate();
+						var chunk = Current.Chunks[chunkId];
+						chunk.QueueFullUpdate();
 					}
 				}
 			}
