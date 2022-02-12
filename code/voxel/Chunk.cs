@@ -829,7 +829,7 @@ namespace Facepunch.CoreWars.Voxel
 			return GetNeighbours().Any( c => c.IsFullUpdateTaskRunning() );
 		}
 
-		private async void StartFullUpdateTask()
+		private async Task StartFullUpdateTask()
 		{
 			try
 			{
@@ -842,6 +842,10 @@ namespace Facepunch.CoreWars.Voxel
 				QueueRebuild = true;
 
 				await GameTask.Delay( 1 );
+			}
+			catch ( TaskCanceledException e )
+			{
+				return;
 			}
 			catch ( Exception e )
 			{
