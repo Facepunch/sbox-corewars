@@ -144,6 +144,16 @@ namespace Facepunch.CoreWars.Voxel
 			return new BBox( sourceMins, sourceMaxs );
 		}
 
+		public static Vector3 ToSourcePositionCenter( IntVector3 position )
+		{
+			var halfVoxelSize = Chunk.VoxelSize * 0.5f;
+			return new Vector3(
+				position.x * Chunk.VoxelSize + halfVoxelSize,
+				position.y * Chunk.VoxelSize + halfVoxelSize,
+				position.z * Chunk.VoxelSize + halfVoxelSize
+			);
+		}
+
 		public static Vector3 ToSourcePosition( IntVector3 position )
 		{
 			return new Vector3( position.x * Chunk.VoxelSize, position.y * Chunk.VoxelSize, position.z * Chunk.VoxelSize );
@@ -697,7 +707,8 @@ namespace Facepunch.CoreWars.Voxel
 
 					if ( IsInside( topPosition ) && IsEmpty( topPosition ) )
 					{
-						SuitableSpawnPositions.Add( ToSourcePosition( new IntVector3( x, y, height + 1 ) ) );
+						var spawnPosition = ToSourcePositionCenter( new IntVector3( x, y, height + 1 ) );
+						SuitableSpawnPositions.Add( spawnPosition );
 					}
 
 					SetBlockAtPosition( new IntVector3( x, y, 0 ), config.BedrockId );
