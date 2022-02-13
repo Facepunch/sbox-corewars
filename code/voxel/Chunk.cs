@@ -231,6 +231,14 @@ namespace Facepunch.CoreWars.Voxel
 			int trunkTop = z + trunkHeight;
 			int leavesRadius = Rand.Int( minLeavesRadius, maxLeavesRadius );
 
+			// Would we be trying to generate a tree in another chunk?
+			if ( z + trunkHeight + leavesRadius >= ChunkSize
+				|| x < leavesRadius || x > ChunkSize - leavesRadius
+				|| y < leavesRadius || y > ChunkSize - leavesRadius )
+			{
+				return;
+			}
+
 			for ( int trunkZ = z + 1; trunkZ < trunkTop; trunkZ++ )
 			{
 				if ( IsInside( x, y, trunkZ ) )
