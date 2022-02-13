@@ -233,8 +233,8 @@ namespace Facepunch.CoreWars.Voxel
 
 			// Would we be trying to generate a tree in another chunk?
 			if ( z + trunkHeight + leavesRadius >= ChunkSize
-				|| x < leavesRadius || x > ChunkSize - leavesRadius
-				|| y < leavesRadius || y > ChunkSize - leavesRadius )
+				|| x <= leavesRadius || x >= ChunkSize - leavesRadius
+				|| y <= leavesRadius || y >= ChunkSize - leavesRadius )
 			{
 				return;
 			}
