@@ -100,25 +100,19 @@ namespace Facepunch.CoreWars
 			if ( !IsServer )
 				return;
 
-			var map = Map.Create();
+			var map = Map.Create( 1337 );
+
 			map.OnInitialized += OnMapInitialized;
+			map.SetSeaLevel( 48 );
 			map.SetSize( 256, 256, 128 );
 			map.LoadBlockAtlas( "textures/blocks.json" );
 			map.AddAllBlockTypes();
+			map.AddBiome<PlainsBiome>();
+			map.AddBiome<WeirdBiome>();
+			map.SetupChunks();
 
-			var config = new Map.PerlinGenerationConfig
-			{
-				GroundBlockId = map.FindBlockId<GrassBlock>(),
-				UndergroundBlockIds = new byte[]
-				{
-					map.FindBlockId<StoneBlock>(),
-					map.FindBlockId<GrassBlock>()
-				},
-				BedrockId = map.FindBlockId<StoneBlock>()
-			};
-
-			Log.Info( $"[Server] Creating perlin map with id #{map.FindBlockId<GrassBlock>()}" );
-			await map.GeneratePerlin( config );
+			Log.Info( $"[Server] Creating perlin map..." );
+			await map.GeneratePerlin();
 			Log.Info( $"[Server] Perlin map has been created successfully." );
 
 			map.Init();

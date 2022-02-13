@@ -25,9 +25,9 @@ namespace Facepunch.CoreWars.Voxel
 
 		public static Map Current { get; private set; }
 
-		public static Map Create()
+		public static Map Create( int seed )
 		{
-			return new Map();
+			return new Map( seed );
 		}
 
 		[ClientRpc]
@@ -42,12 +42,20 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				using ( var reader = new BinaryReader( stream ) )
 				{
-					Current = new Map
+					var sizeX = reader.ReadInt32();
+					var sizeY = reader.ReadInt32();
+					var sizeZ = reader.ReadInt32();
+					var seaLevel = reader.ReadInt32();
+					var seed = reader.ReadInt32();
+					var greedyMeshing = reader.ReadBoolean();
+
+					Current = new Map( seed )
 					{
-						SizeX = reader.ReadInt32(),
-						SizeY = reader.ReadInt32(),
-						SizeZ = reader.ReadInt32(),
-						GreedyMeshing = reader.ReadBoolean()
+						SizeX = sizeX,
+						SizeY = sizeY,
+						SizeZ = sizeZ,
+						SeaLevel = seaLevel,
+						GreedyMeshing = greedyMeshing
 					};
 
 					Current.LoadBlockAtlas( reader.ReadString() );
@@ -66,6 +74,21 @@ namespace Facepunch.CoreWars.Voxel
 
 						Current.BlockTypes.Add( name, id );
 						Current.BlockData.Add( id, type );
+					}
+
+					var biomeCount = reader.ReadInt32();
+
+					for ( var i = 0; i < biomeCount; i++ )
+					{
+						var biomeId = reader.ReadByte();
+						var biomeLibraryId = reader.ReadInt32();
+						var biome = Library.TryCreate<Biome>( biomeLibraryId );
+						biome.Id = biomeId;
+						biome.Map = Current;
+						biome.Initialize();
+						Current.BiomeLookup.Add( biomeId, biome );
+						Current.Biomes.Add( biome );
+						Log.Info( $"[Client] Initializing biome type {biome.Name}" );
 					}
 				}
 			}
@@ -169,9 +192,13 @@ namespace Facepunch.CoreWars.Voxel
 		public Dictionary<byte, BlockType> BlockData { get; private set; } = new();
 		public Dictionary<string, byte> BlockTypes { get; private set; } = new();
 		public List<ChunkBlockUpdate> OutgoingBlockUpdates { get; private set; } = new();
+		public Dictionary<byte, Biome> BiomeLookup { get; private set; } = new();
+		public List<Biome> Biomes { get; private set; } = new();
 		public BlockAtlas BlockAtlas { get; private set; }
 		public bool GreedyMeshing { get; private set; }
 		public bool Initialized { get; private set; }
+		public int SeaLevel { get; private set; }
+		public int Seed { get; private set; }
 
 		public bool IsServer => Host.IsServer;
 		public bool IsClient => Host.IsClient;
@@ -183,19 +210,24 @@ namespace Facepunch.CoreWars.Voxel
 		public int NumChunksY;
 		public int NumChunksZ;
 		public Chunk[] Chunks;
+		public FastNoiseLite CaveNoise;
 
 		private string BlockAtlasFileName { get; set; }
 		private byte NextAvailableBlockId { get; set; }
-		private FastNoiseLite CaveNoise { get; set; }
+		private byte NextAvailableBiomeId { get; set; }
+
+		private BiomeSampler BiomeSampler;
 
 		public bool IsValid => true;
 
-		private Map()
+		private Map() { }
+
+		private Map( int seed )
 		{
 			BlockTypes[typeof( AirBlock ).Name] = NextAvailableBlockId;
 			BlockData[NextAvailableBlockId] = new AirBlock( this );
 
-			CaveNoise = new();
+			CaveNoise = new( seed );
 			CaveNoise.SetNoiseType( FastNoiseLite.NoiseType.OpenSimplex2 );
 			CaveNoise.SetFractalType( FastNoiseLite.FractalType.FBm );
 			CaveNoise.SetFractalOctaves( 2 );
@@ -203,6 +235,43 @@ namespace Facepunch.CoreWars.Voxel
 
 			NextAvailableBlockId++;
 			Current = this;
+			Seed = seed;
+
+			BiomeSampler = new BiomeSampler( this );
+		}
+
+		public T AddBiome<T>() where T : Biome
+		{
+			var biome = Library.Create<T>( typeof( T ) );
+			biome.Id = NextAvailableBiomeId++;
+			biome.Map = this;
+			biome.Initialize();
+			BiomeLookup.Add( biome.Id, biome );
+			Biomes.Add( biome );
+			return biome;
+		}
+
+		public void SetSeaLevel( int seaLevel )
+		{
+			SeaLevel = seaLevel;
+		}
+
+		public void SetupChunks()
+		{
+			Chunks = new Chunk[NumChunksX * NumChunksY * NumChunksZ];
+
+			for ( int x = 0; x < NumChunksX; ++x )
+			{
+				for ( int y = 0; y < NumChunksY; ++y )
+				{
+					for ( int z = 0; z < NumChunksZ; ++z )
+					{
+						var chunk = new Chunk( this, x, y, z );
+						chunk.GenerateHeightmap();
+						Chunks[chunk.Index] = chunk;
+					}
+				}
+			}
 		}
 
 		public void Send( Client client )
@@ -214,6 +283,8 @@ namespace Facepunch.CoreWars.Voxel
 					writer.Write( SizeX );
 					writer.Write( SizeY );
 					writer.Write( SizeZ );
+					writer.Write( SeaLevel );
+					writer.Write( Seed );
 					writer.Write( GreedyMeshing );
 					writer.Write( BlockAtlasFileName );
 					writer.Write( BlockData.Count - 1 );
@@ -224,6 +295,15 @@ namespace Facepunch.CoreWars.Voxel
 
 						writer.Write( kv.Key );
 						writer.Write( kv.Value.GetType().Name );
+					}
+
+					writer.Write( BiomeLookup.Count );
+
+					foreach ( var kv in BiomeLookup )
+					{
+						var attribute = Library.GetAttribute( kv.Value.GetType() );
+						writer.Write( kv.Key );
+						writer.Write( attribute.Identifier );
 					}
 				}
 
@@ -350,7 +430,8 @@ namespace Facepunch.CoreWars.Voxel
 
 			chunk.Blocks = blocks;
 			chunk.DeserializeData( data );
-			chunk.Initialize();
+
+			_ = chunk.Initialize();
 		}
 
 		public void AddAllBlockTypes()
@@ -375,8 +456,6 @@ namespace Facepunch.CoreWars.Voxel
 			NumChunksX = SizeX / Chunk.ChunkSize;
 			NumChunksY = SizeY / Chunk.ChunkSize;
 			NumChunksZ = SizeZ / Chunk.ChunkSize;
-
-			SetupChunks();
 		}
 
 		public Voxel GetVoxel( IntVector3 position )
@@ -594,7 +673,7 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				foreach ( var chunk in Chunks )
 				{
-					chunk.Initialize();
+					_ = chunk.Initialize();
 				}
 			}
 
@@ -662,140 +741,19 @@ namespace Facepunch.CoreWars.Voxel
 			return direction + ((direction % 2 != 0) ? -1 : 1);
 		}
 
-		public struct PerlinGenerationConfig
+		public async Task GeneratePerlin()
 		{
-			public byte GroundBlockId;
-			public byte[] UndergroundBlockIds;
-			public byte BedrockId;
-		}
-
-		public async Task GeneratePerlin( PerlinGenerationConfig config )
-		{
-			byte undergroundBlock;
-
-			for ( int x = 0; x < SizeX; x++ )
+			for ( var i = 0; i < Chunks.Length; i++ )
 			{
-				await GameTask.Delay( 1 );
-
-				for ( int y = 0; y < SizeY; y++ )
-				{
-					int height = (int)((SizeZ * 0.5f) * (Noise.Perlin( (x * 64) * 0.001f, (y * 64) * 0.001f, 0 ) + 1f) * 0.5f);
-					if ( height <= 0 ) height = 0;
-					if ( height > SizeZ ) height = SizeZ;
-
-					for ( int z = 0; z < SizeZ; z++ )
-					{
-						var position = new IntVector3( x, y, z );
-
-						if ( IsEmpty( position ) )
-						{
-							SetBlockAtPosition( position, (byte)(z < height ? config.GroundBlockId : 0) );
-
-							if ( z < height / 2 )
-							{
-								undergroundBlock = config.UndergroundBlockIds[Rand.Int( config.UndergroundBlockIds.Length - 1 )];
-								SetBlockAtPosition( position, undergroundBlock );
-								GenerateCaves( x, y, z );
-							}
-						}
-					}
-
-					if ( Rand.Float( 100f ) <= 1f )
-						GenerateTree( x, y, height - 1 );
-
-					var topPosition = new IntVector3( x, y, height );
-
-					if ( IsInside( topPosition ) && IsEmpty( topPosition ) )
-					{
-						var spawnPosition = ToSourcePositionCenter( new IntVector3( x, y, height + 1 ) );
-						SuitableSpawnPositions.Add( spawnPosition );
-					}
-
-					SetBlockAtPosition( new IntVector3( x, y, 0 ), config.BedrockId );
-				}
+				var chunk = Chunks[i];
+				chunk.GeneratePerlin();
+				await GameTask.Delay( 5 );
 			}
 		}
 
-		public bool GenerateCaves( int x, int y, int z )
+		public Biome GetBiomeAt( int x, int y )
 		{
-			if ( !IsInside( x, y, z ) ) return false;
-
-			var position = new IntVector3( x, y, z );
-			var chunkIndex = GetChunkIndex( position );
-			var chunk = Chunks[chunkIndex];
-			var localPosition = ToLocalPosition( position );
-			int rx = localPosition.x + chunk.Offset.x * Chunk.ChunkSize;
-			int ry = localPosition.y + chunk.Offset.y * Chunk.ChunkSize;
-			int rz = localPosition.z + chunk.Offset.z * Chunk.ChunkSize;
-
-			double n1 = CaveNoise.GetNoise( rx, ry, rz );
-			double n2 = CaveNoise.GetNoise( rx, ry + 88f, rz );
-			double finalNoise = n1 * n1 + n2 * n2;
-
-			if ( finalNoise < 0.02f )
-			{
-				SetBlockAtPosition( position, 0 );
-				return true;
-			}
-
-			return false;
-		}
-
-		public void GenerateTree( int x, int y, int z )
-		{
-			var minTrunkHeight = 3;
-			var maxTrunkHeight = 6;
-			var minLeavesRadius = 1;
-			var maxLeavesRadius = 2;
-			int trunkHeight = Rand.Int( minTrunkHeight, maxTrunkHeight );
-			int trunkTop = z + trunkHeight;
-			int leavesRadius = Rand.Int( minLeavesRadius, maxLeavesRadius );
-
-			for ( int trunkZ = z + 1; trunkZ < trunkTop; trunkZ++ )
-			{
-				if ( IsInside( x, y, trunkZ ) )
-				{
-					SetBlockAtPosition( new IntVector3( x, y, trunkZ ), FindBlockId<WoodBlock>() );
-				}
-			}
-
-			for ( int leavesX = x - leavesRadius; leavesX <= x + leavesRadius; leavesX++ )
-			{
-				for ( int leavesY = y - leavesRadius; leavesY <= y + leavesRadius; leavesY++ )
-				{
-					for ( int leavesZ = trunkTop; leavesZ <= trunkTop + leavesRadius; leavesZ++ )
-					{
-						if ( IsInside( leavesX, leavesY, leavesZ  ) )
-						{
-							var position = new IntVector3( leavesX, leavesY, leavesZ );
-
-							if (
-								IsEmpty( position ) &&
-								(leavesX != x - leavesRadius || leavesY != y - leavesRadius) &&
-								(leavesX != x + leavesRadius || leavesY != y + leavesRadius) &&
-								(leavesX != x + leavesRadius || leavesY != y - leavesRadius) &&
-								(leavesX != x - leavesRadius || leavesY != y + leavesRadius)
-							)
-							{
-								SetBlockAtPosition( position, FindBlockId<LeafBlock>() );
-							}
-						}
-					}
-				}
-			}
-
-			for ( int leavesX = x - (leavesRadius - 1); leavesX <= x + (leavesRadius - 1); leavesX++ )
-			{
-				for ( int leavesY = y - (leavesRadius - 1); leavesY <= y + (leavesRadius - 1); leavesY++ )
-				{
-					var position = new IntVector3( leavesX, leavesY, trunkTop + leavesRadius + 1 );
-
-					if ( IsInside( position ) && IsEmpty( position ) )
-					{
-						SetBlockAtPosition( position, FindBlockId<LeafBlock>() );
-					}
-				}
-			}
+			return BiomeSampler.GetBiomeAt( x, y );
 		}
 
 		public byte GetBlock( IntVector3 position )
@@ -1044,24 +1002,7 @@ namespace Facepunch.CoreWars.Voxel
 			return BlockFace.Invalid;
 		}
 
-		private void SetupChunks()
-		{
-			Chunks = new Chunk[NumChunksX * NumChunksY * NumChunksZ];
-
-			for ( int x = 0; x < NumChunksX; ++x )
-			{
-				for ( int y = 0; y < NumChunksY; ++y )
-				{
-					for ( int z = 0; z < NumChunksZ; ++z )
-					{
-						var chunk = new Chunk( this, x, y, z );
-						Chunks[chunk.Index] = chunk;
-					}
-				}
-			}
-		}
-
-		private void SetBlockAtPosition( IntVector3 position, byte blockId )
+		private void CreateBlockAtPosition( IntVector3 position, byte blockId )
 		{
 			Host.AssertServer();
 

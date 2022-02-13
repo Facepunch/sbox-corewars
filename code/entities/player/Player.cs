@@ -301,6 +301,7 @@ namespace Facepunch.CoreWars
 				DebugOverlay.ScreenText( 3, $"Torch Level: ({voxel.GetRedTorchLight( )}, {voxel.GetGreenTorchLight()}, {voxel.GetBlueTorchLight()})", 0.1f );
 				DebugOverlay.ScreenText( 4, $"Chunk Index: {voxel.ChunkIndex}", 0.1f );
 				DebugOverlay.ScreenText( 5, $"Position: {position}", 0.1f );
+				DebugOverlay.ScreenText( 6, $"Biome: {Map.Current.GetBiomeAt( position.x, position.y ).Name}", 0.1f );
 
 				//System.Threading.ThreadPool.GetAvailableThreads( out var available, out var cpThreads );
 
