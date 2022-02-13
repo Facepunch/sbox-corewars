@@ -17,7 +17,7 @@
 
 		public virtual void Initialize()
 		{
-
+			
 		}
 
 		protected void SetTemperature( float temperature )
@@ -27,12 +27,17 @@
 
 		protected void SetPrecipitation( float precipitation )
 		{
-			Parameters[0] = precipitation;
+			Parameters[1] = precipitation;
+		}
+
+		protected void SetWeighting( float weighting )
+		{
+			Parameters[2] = weighting;
 		}
 
 		public Biome()
 		{
-			Parameters = new float[2];
+			Parameters = new float[3];
 		}
 	}
 }

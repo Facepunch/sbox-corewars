@@ -18,6 +18,8 @@ namespace Facepunch.CoreWars
 			TreeLeafBlockId = Map.FindBlockId<GrassBlock>();
 			LiquidBlockId = Map.FindBlockId<WaterBlock>();
 			UndergroundBlockId = Map.FindBlockId<StoneBlock>();
+
+			SetWeighting( 0.2f );
 		}
 	}
 }

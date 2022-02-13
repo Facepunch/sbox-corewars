@@ -9,7 +9,7 @@ namespace Facepunch.CoreWars.Voxel
 	public class BiomeSampler
 	{
 		private FastNoiseLite[] Noises { get; set; }
-		private int SampleCount { get; set; } = 2;
+		private int SampleCount { get; set; } = 3;
 		private Map Map { get; set; }
 
 		public BiomeSampler( Map map )
@@ -37,7 +37,7 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				var biome = Map.Biomes[b];
 
-				float deviation = 0;
+				float deviation = 0f;
 
 				for ( int i = 0; i < SampleCount; i++ )
 				{
