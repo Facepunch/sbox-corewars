@@ -125,7 +125,7 @@ namespace Facepunch.CoreWars.Voxel
 				{
 					using ( var writer = new BinaryWriter( stream ) )
 					{
-						var unloadedChunks = ChunksToSend.Where( c => !IsChunkLoaded( c ) );
+						var unloadedChunks = ChunksToSend.Where( c => !IsChunkLoaded( c ) && c.HasDoneFirstFullUpdate );
 						writer.Write( unloadedChunks.Count() );
 
 						foreach ( var chunk in unloadedChunks )

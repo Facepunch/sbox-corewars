@@ -84,10 +84,7 @@ namespace Facepunch.CoreWars.Voxel
 			if ( Initialized )
 				return;
 
-			if ( IsClient )
-			{
-				await GameTask.RunInThreadAsync( StartInitialLightingTask );
-			}
+			await GameTask.RunInThreadAsync( StartInitialLightingTask );
 
 			CreateEntities();
 			Initialized = true;
