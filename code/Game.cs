@@ -98,7 +98,7 @@ namespace Facepunch.CoreWars
 			}
 		}
 
-		public override async void PostLevelLoaded()
+		public override void PostLevelLoaded()
 		{
 			if ( !IsServer )
 				return;
