@@ -30,12 +30,6 @@ namespace Facepunch.CoreWars
 			CurrentHotbarIndex = 0;
 		}
 
-		public async Task LoadChunkDelayed( Chunk chunk, int delayMs )
-		{
-			await GameTask.Delay( delayMs );
-			LoadChunk( chunk );
-		}
-
 		public void LoadChunks( List<Chunk> chunks )
 		{
 			using ( var stream = new MemoryStream() )
@@ -46,9 +40,12 @@ namespace Facepunch.CoreWars
 
 					foreach ( var chunk in chunks )
 					{
-						writer.Write( chunk.Index );
+						writer.Write( chunk.Offset.x );
+						writer.Write( chunk.Offset.y );
+						writer.Write( chunk.Offset.z );
 						writer.Write( chunk.Blocks );
 
+						//chunk.LightMap.Serialize( writer );
 						chunk.SerializeData( writer );
 					}
 
@@ -56,29 +53,6 @@ namespace Facepunch.CoreWars
 					Map.ReceiveChunks( To.Single( Client ), compressed );
 				}
 			}
-		}
-
-		public void LoadChunk( Chunk chunk )
-		{
-			if ( ChunkViewer.LoadedChunks.Contains( chunk.Index ) )
-				return;
-
-			ChunkViewer.LoadedChunks.Add( chunk.Index );
-
-			var offset = chunk.Offset;
-			var blocks = chunk.Blocks;
-			var index = chunk.Index;
-
-			ReceiveChunk( To.Single( Client ), offset.x, offset.y, offset.z, index, blocks, chunk.SerializeData() );
-		}
-
-		[ClientRpc]
-		public void ReceiveChunk( int x, int y, int z, int index, byte[] blocks, byte[] data )
-		{
-			Map.Current.ReceiveChunk( index, blocks, data );
-
-			var totalSize = (blocks.Length + data.Length) / 1024;
-			Log.Info( $"(#{NetworkIdent}) Received all bytes for chunk{x},{y},{z} ({totalSize}kb)" );
 		}
 
 		public void TryGiveBlock( byte blockId, ushort amount )
@@ -228,10 +202,7 @@ namespace Facepunch.CoreWars
 
 								if ( position.Distance( blockPosition ) <= radius )
 								{
-									if ( Map.Current.IsInside( blockPosition ) )
-									{
-										Map.Current.SetBlockOnServer( blockPosition, 0, 0 );
-									}
+									Map.Current.SetBlockOnServer( blockPosition, 0, 0 );
 								}
 							}
 						}
@@ -297,26 +268,22 @@ namespace Facepunch.CoreWars
 				var position = Map.ToVoxelPosition( Input.Position );
 				var voxel = Map.Current.GetVoxel( position );
 
-				DebugOverlay.ScreenText( 2, $"Sunlight Level: {voxel.GetSunLight()}", 0.1f );
-				DebugOverlay.ScreenText( 3, $"Torch Level: ({voxel.GetRedTorchLight( )}, {voxel.GetGreenTorchLight()}, {voxel.GetBlueTorchLight()})", 0.1f );
-				DebugOverlay.ScreenText( 4, $"Chunk Index: {voxel.ChunkIndex}", 0.1f );
-				DebugOverlay.ScreenText( 5, $"Position: {position}", 0.1f );
-				DebugOverlay.ScreenText( 6, $"Biome: {Map.Current.GetBiomeAt( position.x, position.y ).Name}", 0.1f );
-
-				//System.Threading.ThreadPool.GetAvailableThreads( out var available, out var cpThreads );
-
-				//DebugOverlay.ScreenText( 6, $"Threads Available: {available}", 0.1f );
-				//DebugOverlay.ScreenText( 7, $"Completion Pool Threads: {cpThreads}", 0.1f );
+				if ( voxel.IsValid )
+				{
+					DebugOverlay.ScreenText( 2, $"Sunlight Level: {voxel.GetSunLight()}", 0.1f );
+					DebugOverlay.ScreenText( 3, $"Torch Level: ({voxel.GetRedTorchLight()}, {voxel.GetGreenTorchLight()}, {voxel.GetBlueTorchLight()})", 0.1f );
+					DebugOverlay.ScreenText( 4, $"Chunk: {voxel.Chunk.Offset}", 0.1f );
+					DebugOverlay.ScreenText( 5, $"Position: {position}", 0.1f );
+					DebugOverlay.ScreenText( 6, $"Biome: {Map.Current.GetBiomeAt( position.x, position.y ).Name}", 0.1f );
+				}
 			}
 
 			var voxelPosition = Map.ToVoxelPosition( Position );
+			var currentChunk = Map.Current.GetChunk( voxelPosition );
 
-			if ( Map.Current.IsValid() && Map.Current.IsInside( voxelPosition ) )
+			if ( Map.Current.IsValid() && currentChunk.IsValid() )
 			{
-				var currentChunkIndex = Map.Current.GetChunkIndex( voxelPosition );
-				var currentChunk = Map.Current.Chunks[currentChunkIndex];
-
-				if ( currentChunk.IsValid() && !currentChunk.HasDoneFirstFullUpdate )
+				if ( !currentChunk.HasDoneFirstFullUpdate )
 				{
 					return;
 				}

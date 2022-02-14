@@ -37,7 +37,6 @@ namespace Facepunch.CoreWars.Voxel
 		public ChunkLightMap LightMap { get; set; }
 		public byte[] Blocks;
 		public IntVector3 Offset;
-		public int Index;
 		public Map Map;
 
 		public PhysicsBody Body;
@@ -63,7 +62,10 @@ namespace Facepunch.CoreWars.Voxel
 
 		public bool IsValid => true;
 
-		public Chunk() { }
+		public Chunk()
+		{
+
+		}
 
 		public Chunk( Map map, int x, int y, int z )
 		{
@@ -71,7 +73,6 @@ namespace Facepunch.CoreWars.Voxel
 			Entities = new();
 			LightMap = new ChunkLightMap( this, map );
 			Offset = new IntVector3( x * ChunkSize, y * ChunkSize, z * ChunkSize );
-			Index = x + y * map.NumChunksX + z * map.NumChunksX * map.NumChunksY;
 			Body = PhysicsWorld.WorldBody;
 			Map = map;
 
@@ -184,7 +185,7 @@ namespace Facepunch.CoreWars.Voxel
 							}
 						}
 
-						if ( topChunk.IsValid() && topChunk.Initialized )
+						if ( topChunk.IsValid() )
 						{
 							var sunlightLevel = topChunk.LightMap.GetSunLight( new IntVector3( x, y, 0 ) );
 
@@ -200,9 +201,9 @@ namespace Facepunch.CoreWars.Voxel
 
 		public bool GenerateCaves( Biome biome, int x, int y, int z )
 		{
-			if ( !Map.IsInside( x, y, z ) ) return false;
-
 			var localPosition = new IntVector3( x, y, z );
+			if ( !IsInside( localPosition ) ) return false;
+
 			var position = Offset + new IntVector3( x, y, z );
 			int rx = localPosition.x + Offset.x;
 			int ry = localPosition.y + Offset.y;
@@ -277,7 +278,7 @@ namespace Facepunch.CoreWars.Voxel
 				{
 					var position = new IntVector3( leavesX, leavesY, trunkTop + leavesRadius + 1 );
 
-					if ( Map.IsInside( position ) && Map.IsEmpty( position ) )
+					if ( Map.IsEmpty( position ) )
 					{
 						CreateBlockAtPosition( position, biome.TreeLeafBlockId );
 					}
@@ -359,7 +360,6 @@ namespace Facepunch.CoreWars.Voxel
 			voxel.LocalPosition = new IntVector3( x, y, z );
 			voxel.Position = Offset + voxel.LocalPosition;
 			voxel.BlockIndex = GetLocalPositionIndex( x, y, z );
-			voxel.ChunkIndex = Index;
 			voxel.BlockId = GetLocalIndexBlock( voxel.BlockIndex );
 			voxel.IsValid = true;
 			return voxel;
@@ -390,94 +390,33 @@ namespace Facepunch.CoreWars.Voxel
 
 		public void UpdateAdjacents( bool recurseNeighbours = false )
 		{
-			var currentOffset = Offset;
-			currentOffset.x--;
-
-			var westChunk = Map.GetChunkIndex( currentOffset );
-			currentOffset.x++;
-			currentOffset.y--;
-
-			var southChunk = Map.GetChunkIndex( currentOffset );
-			currentOffset.y++;
-			currentOffset.y += ChunkSize + 1;
-
-			var northChunk = Map.GetChunkIndex( currentOffset );
-			currentOffset.y -= ChunkSize + 1;
-			currentOffset.x += ChunkSize + 1;
-
-			var eastChunk = Map.GetChunkIndex( currentOffset );
-			currentOffset.x -= ChunkSize + 1;
-			currentOffset.z += ChunkSize + 1;
-
-			var topChunk = Map.GetChunkIndex( currentOffset );
-			currentOffset.z -= ChunkSize + 1;
-			currentOffset.z--;
-
-			var bottomChunk = Map.GetChunkIndex( currentOffset );
-
-			UpdateNeighbourLightMap( "LightMapWest", westChunk, recurseNeighbours );
-			UpdateNeighbourLightMap( "LightMapEast", eastChunk, recurseNeighbours );
-			UpdateNeighbourLightMap( "LightMapNorth", northChunk, recurseNeighbours );
-			UpdateNeighbourLightMap( "LightMapSouth", southChunk, recurseNeighbours );
-			UpdateNeighbourLightMap( "LightMapTop", topChunk, recurseNeighbours );
-			UpdateNeighbourLightMap( "LightMapBottom", bottomChunk, recurseNeighbours );
+			UpdateNeighbourLightMap( "LightMapWest", BlockFace.West, recurseNeighbours );
+			UpdateNeighbourLightMap( "LightMapEast", BlockFace.East, recurseNeighbours );
+			UpdateNeighbourLightMap( "LightMapNorth", BlockFace.North, recurseNeighbours );
+			UpdateNeighbourLightMap( "LightMapSouth", BlockFace.South, recurseNeighbours );
+			UpdateNeighbourLightMap( "LightMapTop", BlockFace.Top, recurseNeighbours );
+			UpdateNeighbourLightMap( "LightMapBottom", BlockFace.Bottom, recurseNeighbours );
 		}
 
 		public IEnumerable<Chunk> GetNeighbours()
 		{
-			var currentOffset = Offset;
-			currentOffset.x--;
+			var chunk = Map.GetChunk( GetAdjacentChunkOffset( BlockFace.Top ) );
+			if ( chunk.IsValid() ) yield return chunk;
 
-			if ( Map.IsInside( currentOffset ) )
-			{
-				var index = Map.GetChunkIndex( currentOffset );
-				yield return Map.Chunks[index];
-			}
+			chunk = Map.GetChunk( GetAdjacentChunkOffset( BlockFace.Bottom ) );
+			if ( chunk.IsValid() ) yield return chunk;
 
-			currentOffset.x++;
-			currentOffset.y--;
+			chunk = Map.GetChunk( GetAdjacentChunkOffset( BlockFace.North ) );
+			if ( chunk.IsValid() ) yield return chunk;
 
-			if ( Map.IsInside( currentOffset ) )
-			{
-				var index = Map.GetChunkIndex( currentOffset );
-				yield return Map.Chunks[index];
-			}
+			chunk = Map.GetChunk( GetAdjacentChunkOffset( BlockFace.East ) );
+			if ( chunk.IsValid() ) yield return chunk;
 
-			currentOffset.y++;
-			currentOffset.y += ChunkSize + 1;
+			chunk = Map.GetChunk( GetAdjacentChunkOffset( BlockFace.South ) );
+			if ( chunk.IsValid() ) yield return chunk;
 
-			if ( Map.IsInside( currentOffset ) )
-			{
-				var index = Map.GetChunkIndex( currentOffset );
-				yield return Map.Chunks[index];
-			}
-
-			currentOffset.y -= ChunkSize + 1;
-			currentOffset.x += ChunkSize + 1;
-
-			if ( Map.IsInside( currentOffset ) )
-			{
-				var index = Map.GetChunkIndex( currentOffset );
-				yield return Map.Chunks[index];
-			}
-
-			currentOffset.x -= ChunkSize + 1;
-			currentOffset.z += ChunkSize + 1;
-
-			if ( Map.IsInside( currentOffset ) )
-			{
-				var index = Map.GetChunkIndex( currentOffset );
-				yield return Map.Chunks[index];
-			}
-
-			currentOffset.z -= ChunkSize + 1;
-			currentOffset.z--;
-
-			if ( Map.IsInside( currentOffset ) )
-			{
-				var index = Map.GetChunkIndex( currentOffset );
-				yield return Map.Chunks[index];
-			}
+			chunk = Map.GetChunk( GetAdjacentChunkOffset( BlockFace.West ) );
+			if ( chunk.IsValid() ) yield return chunk;
 		}
 
 		public void QueueNeighbourFullUpdate()
@@ -490,22 +429,22 @@ namespace Facepunch.CoreWars.Voxel
 			QueueNeighbourFullUpdate( BlockFace.West );
 		}
 
-		public IntVector3 GetAdjacentChunkCenter( BlockFace direction )
+		public IntVector3 GetAdjacentChunkOffset( BlockFace direction )
 		{
 			IntVector3 position;
 
 			if ( direction == BlockFace.Top )
-				position = new IntVector3( ChunkSize / 2, ChunkSize / 2, ChunkSize + 1 );
+				position = new IntVector3( 0, 0, ChunkSize );
 			else if ( direction == BlockFace.Bottom )
-				position = new IntVector3( ChunkSize / 2, ChunkSize / 2, -1 );
+				position = new IntVector3( 0, 0, -ChunkSize );
 			else if ( direction == BlockFace.North )
-				position = new IntVector3( ChunkSize / 2, ChunkSize + 1, ChunkSize / 2 );
+				position = new IntVector3( 0, ChunkSize, 0 );
 			else if ( direction == BlockFace.South )
-				position = new IntVector3( ChunkSize / 2, -1, ChunkSize / 2 );
+				position = new IntVector3( 0, -ChunkSize, 0 );
 			else if ( direction == BlockFace.East )
-				position = new IntVector3( ChunkSize + 1, ChunkSize / 2, ChunkSize / 2 );
+				position = new IntVector3( ChunkSize, 0, 0 );
 			else
-				position = new IntVector3( -1, ChunkSize / 2, ChunkSize / 2 );
+				position = new IntVector3( -ChunkSize, 0, 0 );
 
 			return Offset + position;
 		}
@@ -746,16 +685,7 @@ namespace Facepunch.CoreWars.Voxel
 		{
 			var directionIndex = (int)direction;
 			var neighbourPosition = Offset + (BlockDirections[directionIndex] * ChunkSize);
-
-			if ( Map.IsInside( neighbourPosition ) )
-			{
-				var neighbourIndex = Map.GetChunkIndex( neighbourPosition );
-				var neighbour = Map.Chunks[neighbourIndex];
-
-				return neighbour;
-			}
-
-			return null;
+			return Map.GetChunk( neighbourPosition );
 		}
 
 		public void SetBlock( IntVector3 position, byte blockId )
@@ -939,18 +869,15 @@ namespace Facepunch.CoreWars.Voxel
 			Noise4.SetFrequency( 1 / 1024.0f );
 		}
 
-		private void UpdateNeighbourLightMap( string name, int chunkIndex, bool recurseNeighbours = false )
+		private void UpdateNeighbourLightMap( string name, BlockFace direction, bool recurseNeighbours = false )
 		{
-			if ( chunkIndex >= 0 && chunkIndex < Map.Chunks.Length )
-			{
-				var neighbour = Map.Chunks[chunkIndex];
+			var neighbour = Map.GetChunk( GetAdjacentChunkOffset( direction ) );
 
-				if ( neighbour != null && neighbour.Initialized )
-				{
-					TranslucentSceneObject?.SetValue( name, neighbour.LightMap.Texture );
-					OpaqueSceneObject?.SetValue( name, neighbour.LightMap.Texture );
-					if ( recurseNeighbours ) neighbour.UpdateAdjacents();
-				}
+			if ( neighbour.IsValid() && neighbour.Initialized )
+			{
+				TranslucentSceneObject?.SetValue( name, neighbour.LightMap.Texture );
+				OpaqueSceneObject?.SetValue( name, neighbour.LightMap.Texture );
+				if ( recurseNeighbours ) neighbour.UpdateAdjacents();
 			}
 		}
 
@@ -1093,7 +1020,7 @@ namespace Facepunch.CoreWars.Voxel
 							data.IsDirty = false;
 						}
 
-						Map.ReceiveDataUpdate( To.Everyone, Index, stream.ToArray() );
+						Map.ReceiveDataUpdate( To.Everyone, Offset.x, Offset.y, Offset.z, stream.ToArray() );
 					}
 				}
 			}
@@ -1104,9 +1031,6 @@ namespace Facepunch.CoreWars.Voxel
 		[Event.Tick.Client]
 		private void ClientTick()
 		{
-			LightMap.UpdateTorchLight();
-			LightMap.UpdateSunLight();
-
 			if ( IsFullUpdateTaskRunning() ) return;
 
 			if ( QueueRebuild && !AreAdjacentChunksUpdating() )
@@ -1123,6 +1047,9 @@ namespace Facepunch.CoreWars.Voxel
 		[Event.Tick]
 		private void Tick()
 		{
+			LightMap.UpdateTorchLight();
+			LightMap.UpdateSunLight();
+
 			if ( QueuedFullUpdate )
 			{
 				FullUpdate();

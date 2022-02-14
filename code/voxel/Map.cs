@@ -106,7 +106,7 @@ namespace Facepunch.CoreWars.Voxel
 				using ( var reader = new BinaryReader( stream ) )
 				{
 					var count = reader.ReadInt32();
-					var chunkIds = new HashSet<int>();
+					var chunksToUpdate = new HashSet<Chunk>();
 
 					for ( var i = 0; i < count; i++ )
 					{
@@ -119,25 +119,24 @@ namespace Facepunch.CoreWars.Voxel
 
 						if ( Current.SetBlock( position, blockId, direction ) )
 						{
-							var chunkIndex = Current.GetChunkIndex( position );
-							chunkIds.Add( chunkIndex );
+							var chunk = Current.GetChunk( position );
+							chunksToUpdate.Add( chunk );
 
 							for ( int j = 0; j < 6; j++ )
 							{
 								var adjacentPosition = GetAdjacentPosition( position, j );
+								var adjacentChunk = Current.GetChunk( adjacentPosition );
 
-								if ( Current.IsInside( adjacentPosition ) )
+								if ( adjacentChunk.IsValid() )
 								{
-									var adjadentChunkIndex = Current.GetChunkIndex( adjacentPosition );
-									chunkIds.Add( adjadentChunkIndex );
+									chunksToUpdate.Add( adjacentChunk );
 								}
 							}
 						}
 					}
 
-					foreach ( var chunkId in chunkIds )
+					foreach ( var chunk in chunksToUpdate )
 					{
-						var chunk = Current.Chunks[chunkId];
 						chunk.QueueFullUpdate();
 					}
 				}
@@ -145,10 +144,17 @@ namespace Facepunch.CoreWars.Voxel
 		}
 
 		[ClientRpc]
-		public static void ReceiveDataUpdate( int chunkIndex, byte[] data )
+		public static void ReceiveDataUpdate( int x, int y, int z, byte[] data )
 		{
 			if ( Current == null ) return;
-			Current.Chunks[chunkIndex].DeserializeData( data );
+
+			var position = new IntVector3( x, y, z );
+			var chunk = Current.GetChunk( position );
+
+			if ( chunk.IsValid() )
+			{
+				chunk.DeserializeData( data );
+			}
 		}
 
 		[ClientRpc]
@@ -193,6 +199,7 @@ namespace Facepunch.CoreWars.Voxel
 		public Dictionary<string, byte> BlockTypes { get; private set; } = new();
 		public List<ChunkBlockUpdate> OutgoingBlockUpdates { get; private set; } = new();
 		public Dictionary<byte, Biome> BiomeLookup { get; private set; } = new();
+		public Dictionary<IntVector3, Chunk> Chunks { get; private set; } = new();
 		public List<Biome> Biomes { get; private set; } = new();
 		public BlockAtlas BlockAtlas { get; private set; }
 		public bool GreedyMeshing { get; private set; }
@@ -209,7 +216,6 @@ namespace Facepunch.CoreWars.Voxel
 		public int NumChunksX;
 		public int NumChunksY;
 		public int NumChunksZ;
-		public Chunk[] Chunks;
 		public FastNoiseLite CaveNoise;
 
 		private string BlockAtlasFileName { get; set; }
@@ -240,6 +246,35 @@ namespace Facepunch.CoreWars.Voxel
 			BiomeSampler = new BiomeSampler( this );
 		}
 
+		public Chunk GetOrCreateChunk( IntVector3 offset )
+		{
+			if ( Chunks.TryGetValue( offset, out var chunk ) )
+			{
+				return chunk;
+			}
+
+			var chunkSize = Chunk.ChunkSize;
+			chunk = new Chunk( this, offset.x / chunkSize, offset.y / chunkSize, offset.z / chunkSize );
+			Chunks.Add( offset, chunk );
+			return chunk;
+		}
+
+		public Chunk GetChunk( IntVector3 offset )
+		{
+			if ( offset.x < 0 || offset.y < 0 || offset.z < 0 ) return null;
+
+			offset.x = (offset.x / Chunk.ChunkSize) * Chunk.ChunkSize;
+			offset.y = (offset.y / Chunk.ChunkSize) * Chunk.ChunkSize;
+			offset.z = (offset.z / Chunk.ChunkSize) * Chunk.ChunkSize;
+
+			if ( Chunks.TryGetValue( offset, out var chunk ) )
+			{
+				return chunk;
+			}
+
+			return null;
+		}
+
 		public T AddBiome<T>() where T : Biome
 		{
 			var biome = Library.Create<T>( typeof( T ) );
@@ -258,8 +293,6 @@ namespace Facepunch.CoreWars.Voxel
 
 		public void SetupChunks()
 		{
-			Chunks = new Chunk[NumChunksX * NumChunksY * NumChunksZ];
-
 			for ( int x = 0; x < NumChunksX; ++x )
 			{
 				for ( int y = 0; y < NumChunksY; ++y )
@@ -268,7 +301,7 @@ namespace Facepunch.CoreWars.Voxel
 					{
 						var chunk = new Chunk( this, x, y, z );
 						chunk.GenerateHeightmap();
-						Chunks[chunk.Index] = chunk;
+						Chunks.Add( chunk.Offset, chunk );
 					}
 				}
 			}
@@ -407,10 +440,14 @@ namespace Facepunch.CoreWars.Voxel
 
 					for ( var i = 0; i < count; i++ )
 					{
-						var index = reader.ReadInt32();
-						var chunk = Current.Chunks[index];
+						var x = reader.ReadInt32();
+						var y = reader.ReadInt32();
+						var z = reader.ReadInt32();
+
+						var chunk = Current.GetOrCreateChunk( new IntVector3( x, y, z ) );
 						
 						chunk.Blocks = reader.ReadBytes( chunk.Blocks.Length );
+						//chunk.LightMap.Deserialize( reader );
 						chunk.DeserializeData( reader );
 
 						_ = chunk.Initialize();
@@ -422,16 +459,6 @@ namespace Facepunch.CoreWars.Voxel
 					}
 				}
 			}
-		}
-
-		public void ReceiveChunk( int index, byte[] blocks, byte[] data )
-		{
-			var chunk = Chunks[index];
-
-			chunk.Blocks = blocks;
-			chunk.DeserializeData( data );
-
-			_ = chunk.Initialize();
 		}
 
 		public void AddAllBlockTypes()
@@ -465,198 +492,222 @@ namespace Facepunch.CoreWars.Voxel
 
 		public Voxel GetVoxel( int x, int y, int z )
 		{
-			if ( !IsInside( x, y, z ) ) return new Voxel();
-			var chunkIndex = GetChunkIndex( x, y, z );
-			return Chunks[chunkIndex].GetVoxel( x % Chunk.ChunkSize, y % Chunk.ChunkSize, z % Chunk.ChunkSize );
+			var chunk = GetChunk( new IntVector3( x, y, z ) ) ;
+			if ( !chunk.IsValid() ) return Voxel.Empty;
+			return chunk.GetVoxel( x % Chunk.ChunkSize, y % Chunk.ChunkSize, z % Chunk.ChunkSize );
 		}
 
 		public T GetOrCreateData<T>( IntVector3 position ) where T : BlockData
 		{
-			if ( !IsInside( position ) ) return null;
-			var chunkIndex = GetChunkIndex( position );
+			var chunk = GetChunk( position );
+			if ( !chunk.IsValid() ) return null;
+
 			var localPosition = ToLocalPosition( position );
-			return Chunks[chunkIndex].GetOrCreateData<T>( localPosition );
+			return chunk.GetOrCreateData<T>( localPosition );
 		}
 
 		public T GetData<T>( IntVector3 position ) where T : BlockData
 		{
-			if ( !IsInside( position ) ) return null;
-			var chunkIndex = GetChunkIndex( position );
+			var chunk = GetChunk( position );
+			if ( !chunk.IsValid() ) return null;
+
 			var localPosition = ToLocalPosition( position );
-			return Chunks[chunkIndex].GetData<T>( localPosition );
+			return chunk.GetData<T>( localPosition );
 		}
 
 		public byte GetSunLight( IntVector3 position )
 		{
-			if ( !IsInside( position ) ) return 0;
-			var chunkIndex = GetChunkIndex( position );
+			var chunk = GetChunk( position );
+			if ( !chunk.IsValid() ) return 0;
+
 			var localPosition = ToLocalPosition( position );
-			return Chunks[chunkIndex].LightMap.GetSunLight( localPosition );
+			return chunk.LightMap.GetSunLight( localPosition );
 		}
 
 		public bool SetSunLight( IntVector3 position, byte value )
 		{
-			if ( !IsInside( position ) ) return false;
-			var chunkIndex = GetChunkIndex( position );
+			var chunk = GetChunk( position );
+			if ( !chunk.IsValid() ) return false;
+
 			var localPosition = ToLocalPosition( position );
-			return Chunks[chunkIndex].LightMap.SetSunLight( localPosition, value );
+			return chunk.LightMap.SetSunLight( localPosition, value );
 		}
 
 		public byte GetTorchLight( IntVector3 position, int channel )
 		{
-			if ( !IsInside( position ) ) return 0;
-			var chunkIndex = GetChunkIndex( position );
+			var chunk = GetChunk( position );
+			if ( !chunk.IsValid() ) return 0;
+
 			var localPosition = ToLocalPosition( position );
-			return Chunks[chunkIndex].LightMap.GetTorchLight( localPosition, channel );
+			return chunk.LightMap.GetTorchLight( localPosition, channel );
 		}
 
 		public bool SetTorchLight( IntVector3 position, int channel, byte value )
 		{
-			if ( !IsInside( position ) ) return false;
-			var chunkIndex = GetChunkIndex( position );
+			var chunk = GetChunk( position );
+			if ( !chunk.IsValid() ) return false;
+
 			var localPosition = ToLocalPosition( position );
-			return Chunks[chunkIndex].LightMap.SetTorchLight( localPosition, channel, value );
+			return chunk.LightMap.SetTorchLight( localPosition, channel, value );
 		}
 
 		public byte GetRedTorchLight( IntVector3 position )
 		{
-			if ( !IsInside( position ) ) return 0;
-			var chunkIndex = GetChunkIndex( position );
+			var chunk = GetChunk( position );
+			if ( !chunk.IsValid() ) return 0;
+
 			var localPosition = ToLocalPosition( position );
-			return Chunks[chunkIndex].LightMap.GetRedTorchLight( localPosition );
+			return chunk.LightMap.GetRedTorchLight( localPosition );
 		}
 
 		public bool SetRedTorchLight( IntVector3 position, byte value )
 		{
-			if ( !IsInside( position ) ) return false;
-			var chunkIndex = GetChunkIndex( position );
+			var chunk = GetChunk( position );
+			if ( !chunk.IsValid() ) return false;
+
 			var localPosition = ToLocalPosition( position );
-			return Chunks[chunkIndex].LightMap.SetRedTorchLight( localPosition, value );
+			return chunk.LightMap.SetRedTorchLight( localPosition, value );
 		}
 
 		public byte GetGreenTorchLight( IntVector3 position )
 		{
-			if ( !IsInside( position ) ) return 0;
-			var chunkIndex = GetChunkIndex( position );
+			var chunk = GetChunk( position );
+			if ( !chunk.IsValid() ) return 0;
+
 			var localPosition = ToLocalPosition( position );
-			return Chunks[chunkIndex].LightMap.GetGreenTorchLight( localPosition );
+			return chunk.LightMap.GetGreenTorchLight( localPosition );
 		}
 
 		public bool SetGreenTorchLight( IntVector3 position, byte value )
 		{
-			if ( !IsInside( position ) ) return false;
-			var chunkIndex = GetChunkIndex( position );
+			var chunk = GetChunk( position );
+			if ( !chunk.IsValid() ) return false;
+
 			var localPosition = ToLocalPosition( position );
-			return Chunks[chunkIndex].LightMap.SetGreenTorchLight( localPosition, value );
+			return chunk.LightMap.SetGreenTorchLight( localPosition, value );
 		}
 
 		public byte GetBlueTorchLight( IntVector3 position )
 		{
-			if ( !IsInside( position ) ) return 0;
-			var chunkIndex = GetChunkIndex( position );
+			var chunk = GetChunk( position );
+			if ( !chunk.IsValid() ) return 0;
+
 			var localPosition = ToLocalPosition( position );
-			return Chunks[chunkIndex].LightMap.GetGreenTorchLight( localPosition );
+			return chunk.LightMap.GetGreenTorchLight( localPosition );
 		}
 
 		public bool SetBlueTorchLight( IntVector3 position, byte value )
 		{
-			if ( !IsInside( position ) ) return false;
-			var chunkIndex = GetChunkIndex( position );
+			var chunk = GetChunk( position );
+			if ( !chunk.IsValid() ) return false;
+
 			var localPosition = ToLocalPosition( position );
-			return Chunks[chunkIndex].LightMap.SetGreenTorchLight( localPosition, value );
+			return chunk.LightMap.SetGreenTorchLight( localPosition, value );
 		}
 
 		public void RemoveSunLight( IntVector3 position )
 		{
-			if ( !IsInside( position ) ) return;
-			var chunkIndex = GetChunkIndex( position );
+			var chunk = GetChunk( position );
+			if ( !chunk.IsValid() ) return;
+
 			var localPosition = ToLocalPosition( position );
-			Chunks[chunkIndex].LightMap.RemoveSunLight( localPosition );
+			chunk.LightMap.RemoveSunLight( localPosition );
 		}
 
 		public void RemoveTorchLight( IntVector3 position, int channel )
 		{
-			if ( !IsInside( position ) ) return;
-			var chunkIndex = GetChunkIndex( position );
+			var chunk = GetChunk( position );
+			if ( !chunk.IsValid() ) return;
+
 			var localPosition = ToLocalPosition( position );
-			Chunks[chunkIndex].LightMap.RemoveTorchLight( localPosition, channel );
+			chunk.LightMap.RemoveTorchLight( localPosition, channel );
 		}
 
 		public void RemoveRedTorchLight( IntVector3 position )
 		{
-			if ( !IsInside( position ) ) return;
-			var chunkIndex = GetChunkIndex( position );
+			var chunk = GetChunk( position );
+			if ( !chunk.IsValid() ) return;
+
 			var localPosition = ToLocalPosition( position );
-			Chunks[chunkIndex].LightMap.RemoveRedTorchLight( localPosition );
+			chunk.LightMap.RemoveRedTorchLight( localPosition );
 		}
 
 		public void RemoveGreenTorchLight( IntVector3 position )
 		{
-			if ( !IsInside( position ) ) return;
-			var chunkIndex = GetChunkIndex( position );
+			var chunk = GetChunk( position );
+			if ( !chunk.IsValid() ) return;
+
 			var localPosition = ToLocalPosition( position );
-			Chunks[chunkIndex].LightMap.RemoveGreenTorchLight( localPosition );
+			chunk.LightMap.RemoveGreenTorchLight( localPosition );
 		}
 
 		public void RemoveBlueTorchLight( IntVector3 position )
 		{
-			if ( !IsInside( position ) ) return;
-			var chunkIndex = GetChunkIndex( position );
+			var chunk = GetChunk( position );
+			if ( !chunk.IsValid() ) return;
+
 			var localPosition = ToLocalPosition( position );
-			Chunks[chunkIndex].LightMap.RemoveBlueTorchLight( localPosition );
+			chunk.LightMap.RemoveBlueTorchLight( localPosition );
 		}
 
 		public void AddSunLight( IntVector3 position, byte value )
 		{
-			if ( !IsInside( position ) ) return;
-			var chunkIndex = GetChunkIndex( position );
+			var chunk = GetChunk( position );
+			if ( !chunk.IsValid() ) return;
+
 			var localPosition = ToLocalPosition( position );
-			Chunks[chunkIndex].LightMap.AddSunLight( localPosition, value );
+			chunk.LightMap.AddSunLight( localPosition, value );
 		}
 
 		public void AddTorchLight( IntVector3 position, int channel, byte value )
 		{
-			if ( !IsInside( position ) ) return;
-			var chunkIndex = GetChunkIndex( position );
+			var chunk = GetChunk( position );
+			if ( !chunk.IsValid() ) return;
+
 			var localPosition = ToLocalPosition( position );
-			Chunks[chunkIndex].LightMap.AddTorchLight( localPosition, channel, value );
+			chunk.LightMap.AddTorchLight( localPosition, channel, value );
 		}
 
 		public void AddRedTorchLight( IntVector3 position, byte value )
 		{
-			if ( !IsInside( position ) ) return;
-			var chunkIndex = GetChunkIndex( position );
+			var chunk = GetChunk( position );
+			if ( !chunk.IsValid() ) return;
+
 			var localPosition = ToLocalPosition( position );
-			Chunks[chunkIndex].LightMap.AddRedTorchLight( localPosition, value );
+			chunk.LightMap.AddRedTorchLight( localPosition, value );
 		}
 
 		public void AddGreenTorchLight( IntVector3 position, byte value )
 		{
-			if ( !IsInside( position ) ) return;
-			var chunkIndex = GetChunkIndex( position );
+			var chunk = GetChunk( position );
+			if ( !chunk.IsValid() ) return;
+
 			var localPosition = ToLocalPosition( position );
-			Chunks[chunkIndex].LightMap.AddGreenTorchLight( localPosition, value );
+			chunk.LightMap.AddGreenTorchLight( localPosition, value );
 		}
 
 		public void AddBlueTorchLight( IntVector3 position, byte value )
 		{
-			if ( !IsInside( position ) ) return;
-			var chunkIndex = GetChunkIndex( position );
+			var chunk = GetChunk( position );
+			if ( !chunk.IsValid() ) return;
+
 			var localPosition = ToLocalPosition( position );
-			Chunks[chunkIndex].LightMap.AddBlueTorchLight( localPosition, value );
+			chunk.LightMap.AddBlueTorchLight( localPosition, value );
 		}
 
 		public void Destroy()
 		{
-			foreach ( var chunk in Chunks )
+			foreach ( var kv in Chunks )
 			{
-				chunk.Destroy();
+				kv.Value.Destroy();
 			}
 
 			Event.Unregister( this );
+
+			Chunks.Clear();
 		}
 
-		public void Init()
+		public async void Init()
 		{
 			if ( Initialized ) return;
 
@@ -664,16 +715,11 @@ namespace Facepunch.CoreWars.Voxel
 			NumChunksY = SizeY / Chunk.ChunkSize;
 			NumChunksZ = SizeZ / Chunk.ChunkSize;
 
-			if ( Chunks == null )
-			{
-				SetupChunks();
-			}
-
 			if ( IsServer )
 			{
-				foreach ( var chunk in Chunks )
+				foreach ( var kv in Chunks )
 				{
-					_ = chunk.Initialize();
+					kv.Value.Initialize();
 				}
 			}
 
@@ -682,48 +728,40 @@ namespace Facepunch.CoreWars.Voxel
 
 			Event.Register( this );
 
-			GameTask.RunInThreadAsync( ChunkFullUpdateTask );
+			_ = GameTask.RunInThreadAsync( ChunkFullUpdateTask );
 		}
 
 		public bool SetBlockAndUpdate( IntVector3 position, byte blockId, int direction, bool forceUpdate = false )
 		{
-			var chunkIndex = GetChunkIndex( position );
+			var currentChunk = GetChunk( position );
+			if ( !currentChunk.IsValid() ) return false;
+
 			var shouldBuild = false;
-			var chunkIds = new HashSet<int>();
+			var chunksToUpdate = new HashSet<Chunk>();
 
 			if ( SetBlock( position, blockId, direction ) || forceUpdate )
 			{
 				shouldBuild = true;
-				chunkIds.Add( chunkIndex );
+				chunksToUpdate.Add( currentChunk );
 
 				for ( int i = 0; i < 6; i++ )
 				{
 					var adjacentPosition = GetAdjacentPosition( position, i );
+					var adjacentChunk = GetChunk( adjacentPosition );
 
-					if ( IsInside( adjacentPosition ) )
+					if ( adjacentChunk.IsValid() )
 					{
-						var adjadentChunkIndex = GetChunkIndex( adjacentPosition );
-						chunkIds.Add( adjadentChunkIndex );
+						chunksToUpdate.Add( adjacentChunk );
 					}
 				}
 			}
 
-			foreach ( var chunkId in chunkIds )
+			foreach ( var chunk in chunksToUpdate )
 			{
-				Chunks[chunkId].QueueFullUpdate();
+				chunk.QueueFullUpdate();
 			}
 
 			return shouldBuild;
-		}
-
-		public int GetChunkIndex( int x, int y, int z )
-		{
-			return (x / Chunk.ChunkSize) + (y / Chunk.ChunkSize) * NumChunksX + (z / Chunk.ChunkSize) * NumChunksX * NumChunksY;
-		}
-
-		public int GetChunkIndex( IntVector3 position )
-		{
-			return GetChunkIndex( position.x, position.y, position.z );
 		}
 
 		public static IntVector3 ToLocalPosition( IntVector3 position )
@@ -743,10 +781,9 @@ namespace Facepunch.CoreWars.Voxel
 
 		public async Task GeneratePerlin()
 		{
-			for ( var i = 0; i < Chunks.Length; i++ )
+			foreach ( var kv in Chunks )
 			{
-				var chunk = Chunks[i];
-				chunk.GeneratePerlin();
+				kv.Value.GeneratePerlin();
 				await GameTask.Delay( 5 );
 			}
 		}
@@ -758,36 +795,17 @@ namespace Facepunch.CoreWars.Voxel
 
 		public byte GetBlock( IntVector3 position )
 		{
-			if ( !IsInside( position ) ) return 0;
-
-			var chunkIndex = GetChunkIndex( position );
-			var chunk = Chunks[chunkIndex];
-
+			var chunk = GetChunk( position );
+			if ( !chunk.IsValid() ) return 0;
 			return chunk.GetMapPositionBlock( position );
-		}
-
-		public bool IsInside( int x, int y, int z )
-		{
-			if ( x < 0 || x >= SizeX ) return false;
-			if ( y < 0 || y >= SizeY ) return false;
-			if ( z < 0 || z >= SizeZ ) return false;
-
-			return true;
-		}
-
-
-		public bool IsInside( IntVector3 position )
-		{
-			return IsInside( position.x, position.y, position.z );
 		}
 
 		public bool SetBlock( IntVector3 position, byte blockId, int direction )
 		{
-			if ( !IsInside( position ) ) return false;
+			var chunk = GetChunk( position );
+			if ( !chunk.IsValid() ) return false;
 
-			var chunkIndex = GetChunkIndex( position );
 			var localPosition = ToLocalPosition( position );
-			var chunk = Chunks[chunkIndex];
 			var blockIndex = chunk.GetLocalPositionIndex( localPosition );
 			var currentBlockId = chunk.GetLocalIndexBlock( blockIndex );
 
@@ -797,19 +815,16 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				var block = GetBlockType( blockId );
 
-				if ( IsClient )
-				{
-					RemoveRedTorchLight( position );
-					RemoveGreenTorchLight( position );
-					RemoveBlueTorchLight( position );
-					RemoveSunLight( position );
+				RemoveRedTorchLight( position );
+				RemoveGreenTorchLight( position );
+				RemoveBlueTorchLight( position );
+				RemoveSunLight( position );
 
-					if ( block.LightLevel.x > 0 || block.LightLevel.y > 0 || block.LightLevel.z > 0 )
-					{
-						AddRedTorchLight( position, (byte)block.LightLevel.x );
-						AddGreenTorchLight( position, (byte)block.LightLevel.y );
-						AddBlueTorchLight( position, (byte)block.LightLevel.z );
-					}
+				if ( block.LightLevel.x > 0 || block.LightLevel.y > 0 || block.LightLevel.z > 0 )
+				{
+					AddRedTorchLight( position, (byte)block.LightLevel.x );
+					AddGreenTorchLight( position, (byte)block.LightLevel.y );
+					AddBlueTorchLight( position, (byte)block.LightLevel.z );
 				}
 
 				var currentBlock = GetBlockType( currentBlockId );
@@ -868,11 +883,8 @@ namespace Facepunch.CoreWars.Voxel
 
 		public bool IsEmpty( IntVector3 position )
 		{
-			if ( !IsInside( position ) ) return true;
-
-			var chunkIndex = GetChunkIndex( position );
-			var chunk = Chunks[chunkIndex];
-
+			var chunk = GetChunk( position );
+			if ( !chunk.IsValid() ) return true;
 			return chunk.GetMapPositionBlock( position ) == 0;
 		}
 
@@ -1002,28 +1014,6 @@ namespace Facepunch.CoreWars.Voxel
 			return BlockFace.Invalid;
 		}
 
-		private void CreateBlockAtPosition( IntVector3 position, byte blockId )
-		{
-			Host.AssertServer();
-
-			var chunkIndex = GetChunkIndex( position );
-			var localPosition = ToLocalPosition( position );
-			var chunk = Chunks[chunkIndex];
-			var block = GetBlockType( blockId );
-
-			chunk.SetBlock( localPosition, blockId );
-			block.OnBlockAdded( chunk, position.x, position.y, position.z, (int)BlockFace.Top );
-
-			var entityName = IsServer ? block.ServerEntity : block.ClientEntity;
-
-			if ( !string.IsNullOrEmpty( entityName ) )
-			{
-				var entity = Library.Create<BlockEntity>( entityName );
-				entity.BlockType = block;
-				chunk.SetEntity( localPosition, entity );
-			}
-		}
-
 		[Event.Tick.Server]
 		private void ServerTick()
 		{
@@ -1059,7 +1049,7 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				try
 				{
-					var chunks = Chunks.Where( c => c.Initialized && !c.HasDoneFirstFullUpdate );
+					var chunks = Chunks.Values.Where( c => c.Initialized && !c.HasDoneFirstFullUpdate );
 
 					if ( IsClient )
 					{

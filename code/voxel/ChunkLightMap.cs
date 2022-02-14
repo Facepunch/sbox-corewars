@@ -1,6 +1,7 @@
 ﻿using Sandbox;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Facepunch.CoreWars.Voxel
 {
@@ -39,6 +40,18 @@ namespace Facepunch.CoreWars.Voxel
 				.WithFormat( ImageFormat.R32F )
 				.WithData( Data )
 				.Finish();
+		}
+
+		public void Serialize( BinaryWriter writer )
+		{
+			writer.Write( Data );
+		}
+
+		public void Deserialize( BinaryReader reader )
+		{
+			Log.Info( $"Receiving Light Map Data {Chunk.Offset}" );
+			Data = reader.ReadBytes( Data.Length );
+			IsDirty = true;
 		}
 
 		public int ToIndex( IntVector3 position, int component )

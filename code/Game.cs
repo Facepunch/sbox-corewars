@@ -132,7 +132,7 @@ namespace Facepunch.CoreWars
 
 			StateSystem.Active?.OnPlayerJoined( player );
 
-			player.LoadChunks( Map.Current.Chunks.ToList() );
+			player.LoadChunks( Map.Current.Chunks.Values.ToList() );
 			player.OnMapLoaded();
 		}
 	}
