@@ -107,7 +107,7 @@ namespace Facepunch.CoreWars
 
 			map.OnInitialized += OnMapInitialized;
 			map.SetSeaLevel( 48 );
-			map.SetSize( 256, 256, 128 );
+			map.SetMaxSize( 256, 256, 128 );
 			map.LoadBlockAtlas( "textures/blocks.json" );
 			map.AddAllBlockTypes();
 			map.SetChunkGenerator<PerlinChunkGenerator>();

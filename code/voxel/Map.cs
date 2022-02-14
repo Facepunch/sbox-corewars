@@ -244,6 +244,17 @@ namespace Facepunch.CoreWars.Voxel
 			BiomeSampler = new BiomeSampler( this );
 		}
 
+		public bool IsInBounds( IntVector3 position )
+		{
+			if ( position.x >= 0 && position.y >= 0 && position.z >= 0 )
+			{
+				if ( IsInfinite ) return true;
+				return position.x < MaxSize.x && position.y < MaxSize.y && position.z < MaxSize.z;
+			}
+
+			return false;
+		}
+
 		public void SetMaxSize( int x, int y, int z )
 		{
 			MaxSize = new IntVector3( x, y, z );
@@ -499,13 +510,6 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				AddBlockType( Library.Create<BlockType>( type ) );
 			}
-		}
-
-		public void SetSize( int sizeX, int sizeY, int sizeZ )
-		{
-			SizeX = sizeX;
-			SizeY = sizeY;
-			SizeZ = sizeZ;
 		}
 
 		public Voxel GetVoxel( IntVector3 position )

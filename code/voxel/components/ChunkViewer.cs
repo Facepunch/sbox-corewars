@@ -97,7 +97,10 @@ namespace Facepunch.CoreWars.Voxel
 			var voxelPosition = Map.ToVoxelPosition( position );
 			var currentChunkOffset = Map.Current.ToChunkOffset( voxelPosition );
 
-			AddLoadedChunk( currentChunkOffset );
+			if ( Map.Current.IsInBounds( currentChunkOffset ) )
+			{
+				AddLoadedChunk( currentChunkOffset );
+			}
 
 			while ( ChunkSendQueue.Count > 0 )
 			{
@@ -121,10 +124,8 @@ namespace Facepunch.CoreWars.Voxel
 
 						foreach ( var neighbour in chunk.GetNeighbourOffsets() )
 						{
-							if ( neighbour.x < 0 || neighbour.y < 0 || neighbour.z < 0 )
-								continue;
-
-							ChunkSendQueue.Enqueue( neighbour );
+							if ( Map.Current.IsInBounds( neighbour ) )
+								ChunkSendQueue.Enqueue( neighbour );
 						}
 					}
 				}
