@@ -206,7 +206,7 @@ namespace Facepunch.CoreWars.Voxel
 
 			UpdateVerticesResult = await StartUpdateVerticesTask();
 
-			if ( IsServer && BuildCollisionInThread )
+			if ( BuildCollisionInThread )
 			{
 				BuildCollision();
 			}
@@ -319,7 +319,7 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
-		public void Build()
+		public void BuildMeshAndCollision()
 		{
 			BuildMesh();
 
@@ -347,6 +347,11 @@ namespace Facepunch.CoreWars.Voxel
 				UpdateAdjacents( true );
 
 				IsModelCreated = true;
+			}
+
+			if ( !BuildCollisionInThread )
+			{
+				BuildCollision();
 			}
 
 			QueueRebuild = false;
@@ -876,7 +881,7 @@ namespace Facepunch.CoreWars.Voxel
 
 			if ( QueueRebuild && !AreAdjacentChunksUpdating() )
 			{
-				Build();
+				BuildMeshAndCollision();
 			}
 
 			if ( !QueueRebuild && HasDoneFirstFullUpdate )
@@ -916,7 +921,7 @@ namespace Facepunch.CoreWars.Voxel
 
 				UpdateVerticesResult = await StartUpdateVerticesTask();
 
-				if ( IsServer && BuildCollisionInThread )
+				if ( BuildCollisionInThread )
 				{
 					BuildCollision();
 				}
