@@ -60,7 +60,7 @@ namespace Facepunch.CoreWars.Voxel
 		private Mesh TranslucentMesh { get; set; }
 		private Mesh OpaqueMesh { get; set; }
 
-		public bool IsValid => true;
+		public bool IsValid => Body.IsValid();
 
 		public Chunk()
 		{
@@ -72,7 +72,7 @@ namespace Facepunch.CoreWars.Voxel
 			Blocks = new byte[ChunkSize * ChunkSize * ChunkSize];
 			Entities = new();
 			LightMap = new ChunkLightMap( this, map );
-			Offset = new IntVector3( x * ChunkSize, y * ChunkSize, z * ChunkSize );
+			Offset = new IntVector3( x, y, z );
 			Body = PhysicsWorld.WorldBody;
 			Map = map;
 
@@ -181,6 +181,11 @@ namespace Facepunch.CoreWars.Voxel
 								if ( Rand.Float() < 0.01f )
 								{
 									GenerateTree( biome, position.x, position.y, position.z );
+								}
+								else if ( Rand.Float() <= 0.01f )
+								{
+									var spawnPositionSource = Map.ToSourcePosition( Offset + position + new IntVector3( 0, 0, 1 ) );
+									Map.SuitableSpawnPositions.Add( spawnPositionSource );
 								}
 							}
 						}

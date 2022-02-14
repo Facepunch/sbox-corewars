@@ -30,31 +30,6 @@ namespace Facepunch.CoreWars
 			CurrentHotbarIndex = 0;
 		}
 
-		public void LoadChunks( List<Chunk> chunks )
-		{
-			using ( var stream = new MemoryStream() )
-			{
-				using ( var writer = new BinaryWriter( stream ) )
-				{
-					writer.Write( chunks.Count );
-
-					foreach ( var chunk in chunks )
-					{
-						writer.Write( chunk.Offset.x );
-						writer.Write( chunk.Offset.y );
-						writer.Write( chunk.Offset.z );
-						writer.Write( chunk.Blocks );
-
-						//chunk.LightMap.Serialize( writer );
-						chunk.SerializeData( writer );
-					}
-
-					var compressed = CompressionHelper.Compress( stream.ToArray() );
-					Map.ReceiveChunks( To.Single( Client ), compressed );
-				}
-			}
-		}
-
 		public void TryGiveBlock( byte blockId, ushort amount )
 		{
 			var item = InventorySystem.CreateItem<BlockItem>();

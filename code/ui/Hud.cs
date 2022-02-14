@@ -26,15 +26,15 @@ namespace Facepunch.CoreWars
 		private string GetChunksLoaded()
 		{
 			if ( !Map.Current.IsValid() ) return "Generating Map...";
-
-			var chunksLoaded = Map.Current.Chunks.Count( kv => kv.Value.Initialized );
-			return $"{chunksLoaded} Chunks Loaded";
+			return string.Empty;
 		}
 
 		private bool HasWorldLoaded()
 		{
-			if ( Map.Current == null ) return false;
-			return !Map.Current.Chunks.Any( kv => !kv.Value.Initialized );
+			if ( Map.Current == null || !Map.Current.Initialized )
+				return false;
+
+			return true;
 		}
 	}
 }

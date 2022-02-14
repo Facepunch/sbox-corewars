@@ -15,13 +15,16 @@ namespace Facepunch.CoreWars.Voxel
 
 		public Queue<LightRemoveNode>[] TorchLightRemoveQueue { get; private set; }
 		public Queue<LightAddNode>[] TorchLightAddQueue { get; private set; }
-		public Queue<LightRemoveNode> SunLightRemoveQueue { get; private set; } = new();
-		public Queue<IntVector3> SunLightAddQueue { get; private set; } = new();
+		public Queue<LightRemoveNode> SunLightRemoveQueue { get; private set; }
+		public Queue<IntVector3> SunLightAddQueue { get; private set; }
 
 		private bool IsDirty { get; set; }
 
 		public ChunkLightMap( Chunk chunk, Map map )
 		{
+			SunLightRemoveQueue = new();
+			SunLightAddQueue = new();
+
 			TorchLightRemoveQueue = new Queue<LightRemoveNode>[3];
 			TorchLightAddQueue = new Queue<LightAddNode>[3];
 

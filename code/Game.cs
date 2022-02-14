@@ -81,12 +81,15 @@ namespace Facepunch.CoreWars
 			base.ClientDisconnect( client, reason );
 		}
 
-		public override async void ClientJoined( Client client )
+		public override void ClientJoined( Client client )
 		{
 			base.ClientJoined( client );
 
 			var player = new Player( client );
+
+			client.Components.Add( new ChunkViewer() );
 			client.Pawn = player;
+
 			player.CreateInventory();
 
 			if ( Map.Current.Initialized )
@@ -132,7 +135,6 @@ namespace Facepunch.CoreWars
 
 			StateSystem.Active?.OnPlayerJoined( player );
 
-			player.LoadChunks( Map.Current.Chunks.Values.ToList() );
 			player.OnMapLoaded();
 		}
 	}
