@@ -1,6 +1,7 @@
 ﻿using Facepunch.CoreWars.Blocks;
 using Sandbox;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -45,11 +46,13 @@ namespace Facepunch.CoreWars.Voxel
 					var seaLevel = reader.ReadInt32();
 					var seed = reader.ReadInt32();
 					var greedyMeshing = reader.ReadBoolean();
+					var buildCollisionInThread = reader.ReadBoolean();
 
 					Current = new Map( seed )
 					{
 						SeaLevel = seaLevel,
-						GreedyMeshing = greedyMeshing
+						GreedyMeshing = greedyMeshing,
+						BuildCollisionInThread = buildCollisionInThread
 					};
 
 					Current.LoadBlockAtlas( reader.ReadString() );
@@ -66,8 +69,8 @@ namespace Facepunch.CoreWars.Voxel
 
 						Log.Info( $"[Client] Initializing block type {name} with id #{id}" );
 
-						Current.BlockTypes.Add( name, id );
-						Current.BlockData.Add( id, type );
+						Current.BlockTypes.TryAdd( name, id );
+						Current.BlockData.TryAdd( id, type );
 					}
 
 					var biomeCount = reader.ReadInt32();
@@ -80,7 +83,7 @@ namespace Facepunch.CoreWars.Voxel
 						biome.Id = biomeId;
 						biome.Map = Current;
 						biome.Initialize();
-						Current.BiomeLookup.Add( biomeId, biome );
+						Current.BiomeLookup.TryAdd( biomeId, biome );
 						Current.Biomes.Add( biome );
 						Log.Info( $"[Client] Initializing biome type {biome.Name}" );
 					}
@@ -195,6 +198,7 @@ namespace Facepunch.CoreWars.Voxel
 		public Dictionary<byte, Biome> BiomeLookup { get; private set; } = new();
 		public Dictionary<IntVector3, Chunk> Chunks { get; private set; } = new();
 		public List<Biome> Biomes { get; private set; } = new();
+
 		public BlockAtlas BlockAtlas { get; private set; }
 		public IntVector3 MaxSize { get; private set; }
 		public bool BuildCollisionInThread { get; set; }
@@ -209,12 +213,10 @@ namespace Facepunch.CoreWars.Voxel
 		public int SizeX;
 		public int SizeY;
 		public int SizeZ;
-		public int NumChunksX;
-		public int NumChunksY;
-		public int NumChunksZ;
 		public FastNoiseLite CaveNoise;
 
-		private List<Chunk> ChunkInitialUpdateList { get; set; } = new();
+		private List<Chunk>[] ChunkInitialUpdateLists = new List<Chunk>[4];
+
 		private string BlockAtlasFileName { get; set; }
 		private byte NextAvailableBlockId { get; set; }
 		private byte NextAvailableBiomeId { get; set; }
@@ -231,6 +233,11 @@ namespace Facepunch.CoreWars.Voxel
 		{
 			BlockTypes[typeof( AirBlock ).Name] = NextAvailableBlockId;
 			BlockData[NextAvailableBlockId] = new AirBlock( this );
+
+			for ( var i = 0; i < ChunkInitialUpdateLists.Length; i++ )
+			{
+				ChunkInitialUpdateLists[i] = new();
+			}
 
 			CaveNoise = new( seed );
 			CaveNoise.SetNoiseType( FastNoiseLite.NoiseType.OpenSimplex2 );
@@ -266,6 +273,30 @@ namespace Facepunch.CoreWars.Voxel
 			return GetOrCreateChunk( new IntVector3( x, y, z ) );
 		}
 
+		public void AddToInitialUpdateList( Chunk chunk )
+		{
+			var smallestIndex = 0;
+			var smallestValue = int.MaxValue;
+
+			for ( var i = 0; i < ChunkInitialUpdateLists.Length; i++ )
+			{
+				var count = ChunkInitialUpdateLists[i].Count;
+
+				if ( count < smallestValue )
+				{
+					smallestIndex = i;
+					smallestValue = count;
+
+					if ( count == 0 ) break;
+				}
+			}
+
+			lock ( ChunkInitialUpdateLists[smallestIndex] )
+			{
+				ChunkInitialUpdateLists[smallestIndex].Add( chunk );
+			}
+		}
+
 		public Chunk GetOrCreateChunk( IntVector3 offset )
 		{
 			if ( Chunks.TryGetValue( offset, out var chunk ) )
@@ -282,12 +313,7 @@ namespace Facepunch.CoreWars.Voxel
 				chunk.Generator = generator;
 			}
 
-			Chunks.Add( offset, chunk );
-
-			lock ( ChunkInitialUpdateList )
-			{
-				ChunkInitialUpdateList.Add( chunk );
-			}
+			Chunks.TryAdd( offset, chunk );
 
 			SizeX = Math.Max( SizeX, offset.x + Chunk.ChunkSize );
 			SizeY = Math.Max( SizeY, offset.y + Chunk.ChunkSize );
@@ -331,7 +357,7 @@ namespace Facepunch.CoreWars.Voxel
 			biome.Id = NextAvailableBiomeId++;
 			biome.Map = this;
 			biome.Initialize();
-			BiomeLookup.Add( biome.Id, biome );
+			BiomeLookup.TryAdd( biome.Id, biome );
 			Biomes.Add( biome );
 			return biome;
 		}
@@ -359,6 +385,7 @@ namespace Facepunch.CoreWars.Voxel
 					writer.Write( SeaLevel );
 					writer.Write( Seed );
 					writer.Write( GreedyMeshing );
+					writer.Write( BuildCollisionInThread );
 					writer.Write( BlockAtlasFileName );
 					writer.Write( BlockData.Count - 1 );
 
@@ -752,7 +779,11 @@ namespace Facepunch.CoreWars.Voxel
 
 			Event.Register( this );
 
-			_ = GameTask.RunInThreadAsync( ChunkFullUpdateTask );
+			for ( var i = 0; i < ChunkInitialUpdateLists.Length; i++ )
+			{
+				var index = i;
+				_ = GameTask.RunInThreadAsync( () => ChunkFullUpdateTask( index ) );
+			}
 		}
 
 		public bool SetBlockAndUpdate( IntVector3 position, byte blockId, int direction, bool forceUpdate = false )
@@ -1063,39 +1094,56 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
-		private async void ChunkFullUpdateTask()
+		private async void ChunkFullUpdateTask( int index )
 		{
 			while ( true )
 			{
 				try
 				{
-					Chunk chunk;
+					var updateList = ChunkInitialUpdateLists[index];
 
-					lock ( ChunkInitialUpdateList )
+					Chunk currentChunk;
+
+					lock ( updateList )
 					{
-						var chunks = ChunkInitialUpdateList.Where( c => c.Initialized && !c.HasDoneFirstFullUpdate );
+						if ( updateList.Count == 0 ) continue;
+						currentChunk = updateList[0];
 
 						if ( IsClient )
 						{
 							var chunkSize = Chunk.ChunkSize;
-							chunks = chunks.OrderBy( c => ToSourcePosition( c.Offset + new IntVector3( chunkSize / 2 ) ).Distance( Local.Pawn.Position ) );
+							var currentDistance = float.PositiveInfinity;
+							var halfChunkSize = new IntVector3( chunkSize / 2 );
+							var localPawnPosition = Local.Pawn.Position;
+
+							for ( var i = 0; i < updateList.Count; i++ )
+							{
+								var chunk = updateList[i];
+								var distance = ToSourcePosition( chunk.Offset + halfChunkSize ).Distance( localPawnPosition );
+
+								if ( distance < currentDistance )
+								{
+									currentChunk = chunk;
+									currentDistance = distance;
+								}
+							}
 						}
-
-						chunk = chunks.FirstOrDefault();
 					}
 
-					if ( chunk.IsValid() )
+					if ( currentChunk.IsValid() )
 					{
-						_ = chunk.StartFirstFullUpdateTask();
+						_ = currentChunk.StartFirstFullUpdateTask();
 					}
 
-					if ( chunk != null )
+					if ( currentChunk != null )
 					{
-						lock ( ChunkInitialUpdateList )
+						lock ( updateList )
 						{
-							ChunkInitialUpdateList.Remove( chunk );
+							updateList.Remove( currentChunk );
 						}
 					}
+
+					await GameTask.Delay( 30 );
 				}
 				catch ( TaskCanceledException e )
 				{

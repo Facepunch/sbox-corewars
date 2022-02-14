@@ -31,8 +31,9 @@ namespace Facepunch.CoreWars
 
 			if ( !string.IsNullOrEmpty( icon ) )
 			{
-				var texture = Texture.Load( FileSystem.Mounted, icon );
-				Style.SetBackgroundImage( texture );
+				Style.SetBackgroundImage( icon );
+				Style.BackgroundSizeX = Length.Cover;
+				Style.BackgroundSizeY = Length.Cover;
 			}
 			else
 			{

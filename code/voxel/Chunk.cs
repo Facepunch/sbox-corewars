@@ -22,10 +22,11 @@ namespace Facepunch.CoreWars.Voxel
 		public static readonly int VoxelSize = 48;
 
 		public Dictionary<IntVector3, BlockData> Data { get; set; } = new();
+		public ChunkVertexData UpdateVerticesResult { get; set; }
+
 		public HashSet<IntVector3> DirtyData { get; set; } = new();
 		public bool HasDoneFirstFullUpdate { get; set; }
 		public bool IsFullUpdateActive { get; set; }
-		public ChunkVertexData UpdateVerticesResult { get; set; }
 		public bool BuildCollisionInThread { get; private set; }
 		public ChunkGenerator Generator { get; set; }
 		public bool QueueRebuild { get; set; }
@@ -36,8 +37,9 @@ namespace Facepunch.CoreWars.Voxel
 		public bool IsServer => Host.IsServer;
 		public bool IsClient => Host.IsClient;
 
-		public ChunkLightMap LightMap { get; set; }
 		public byte[] Blocks;
+
+		public ChunkLightMap LightMap { get; set; }
 		public IntVector3 Offset;
 		public Map Map;
 
@@ -97,6 +99,8 @@ namespace Facepunch.CoreWars.Voxel
 			}
 
 			Event.Register( this );
+
+			Map.AddToInitialUpdateList( this );
 
 			if ( IsClient )
 			{

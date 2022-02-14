@@ -11,8 +11,8 @@ namespace Facepunch.CoreWars.Voxel
 		public Texture Texture { get; private set; }
 		public Chunk Chunk { get; private set; }
 		public Map Map { get; private set; }
-		public byte[] Data;
 		public int ChunkSize;
+		public byte[] Data;
 
 		public ConcurrentQueue<LightRemoveNode>[] TorchLightRemoveQueue { get; private set; }
 		public ConcurrentQueue<LightAddNode>[] TorchLightAddQueue { get; private set; }
