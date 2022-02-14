@@ -81,12 +81,15 @@ namespace Facepunch.CoreWars
 			base.ClientDisconnect( client, reason );
 		}
 
-		public override async void ClientJoined( Client client )
+		public override void ClientJoined( Client client )
 		{
 			base.ClientJoined( client );
 
 			var player = new Player( client );
+
+			client.Components.Add( new ChunkViewer() );
 			client.Pawn = player;
+
 			player.CreateInventory();
 
 			if ( Map.Current.Initialized )
@@ -104,16 +107,29 @@ namespace Facepunch.CoreWars
 
 			map.OnInitialized += OnMapInitialized;
 			map.SetSeaLevel( 48 );
-			map.SetSize( 256, 256, 128 );
+			map.SetMaxSize( 256, 256, 128 );
 			map.LoadBlockAtlas( "textures/blocks.json" );
 			map.AddAllBlockTypes();
+			map.SetChunkGenerator<PerlinChunkGenerator>();
 			map.AddBiome<PlainsBiome>();
 			map.AddBiome<WeirdBiome>();
-			map.SetupChunks();
 
-			Log.Info( $"[Server] Creating perlin map..." );
-			await map.GeneratePerlin();
-			Log.Info( $"[Server] Perlin map has been created successfully." );
+			var startChunkSize = 4;
+
+			for ( var x = 0; x < startChunkSize; x++ )
+			{
+				for ( var y = 0; y < startChunkSize; y++ )
+				{
+					for ( var z = 0; z < startChunkSize; z++ )
+					{
+						map.GetOrCreateChunk(
+							x * Chunk.ChunkSize,
+							y * Chunk.ChunkSize,
+							z * Chunk.ChunkSize
+						);
+					}
+				}
+			}
 
 			map.Init();
 		}
@@ -132,7 +148,6 @@ namespace Facepunch.CoreWars
 
 			StateSystem.Active?.OnPlayerJoined( player );
 
-			player.LoadChunks( Map.Current.Chunks.ToList() );
 			player.OnMapLoaded();
 		}
 	}

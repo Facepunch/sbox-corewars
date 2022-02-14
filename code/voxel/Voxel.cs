@@ -2,14 +2,15 @@
 {
 	public struct Voxel
 	{
+		public static readonly Voxel Empty = new Voxel();
+
 		public bool IsValid;
 		public byte BlockId;
 		public int BlockIndex;
-		public int ChunkIndex;
 		public IntVector3 Position;
 		public IntVector3 LocalPosition;
 
-		public Chunk Chunk => Map.Current.Chunks[ChunkIndex];
+		public Chunk Chunk => Map.Current.GetChunk( Position );
 
 		public BlockData GetData<T>() where T : BlockData => Chunk.GetData<T>( LocalPosition );
 		public BlockData GetOrCreateData<T>() where T : BlockData => Chunk.GetOrCreateData<T>( LocalPosition );

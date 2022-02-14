@@ -1,6 +1,8 @@
 ﻿using Sandbox;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Facepunch.CoreWars.Voxel
 {
@@ -12,17 +14,20 @@ namespace Facepunch.CoreWars.Voxel
 		public byte[] Data;
 		public int ChunkSize;
 
-		public Queue<LightRemoveNode>[] TorchLightRemoveQueue { get; private set; }
-		public Queue<LightAddNode>[] TorchLightAddQueue { get; private set; }
-		public Queue<LightRemoveNode> SunLightRemoveQueue { get; private set; } = new();
-		public Queue<IntVector3> SunLightAddQueue { get; private set; } = new();
+		public ConcurrentQueue<LightRemoveNode>[] TorchLightRemoveQueue { get; private set; }
+		public ConcurrentQueue<LightAddNode>[] TorchLightAddQueue { get; private set; }
+		public ConcurrentQueue<LightRemoveNode> SunLightRemoveQueue { get; private set; }
+		public ConcurrentQueue<IntVector3> SunLightAddQueue { get; private set; }
 
 		private bool IsDirty { get; set; }
 
 		public ChunkLightMap( Chunk chunk, Map map )
 		{
-			TorchLightRemoveQueue = new Queue<LightRemoveNode>[3];
-			TorchLightAddQueue = new Queue<LightAddNode>[3];
+			SunLightRemoveQueue = new();
+			SunLightAddQueue = new();
+
+			TorchLightRemoveQueue = new ConcurrentQueue<LightRemoveNode>[3];
+			TorchLightAddQueue = new ConcurrentQueue<LightAddNode>[3];
 
 			for ( var i = 0; i < 3; i++ )
 				TorchLightRemoveQueue[i] = new();
@@ -39,6 +44,18 @@ namespace Facepunch.CoreWars.Voxel
 				.WithFormat( ImageFormat.R32F )
 				.WithData( Data )
 				.Finish();
+		}
+
+		public void Serialize( BinaryWriter writer )
+		{
+			writer.Write( Data );
+		}
+
+		public void Deserialize( BinaryReader reader )
+		{
+			Log.Info( $"Receiving Light Map Data {Chunk.Offset}" );
+			Data = reader.ReadBytes( Data.Length );
+			IsDirty = true;
 		}
 
 		public int ToIndex( IntVector3 position, int component )
@@ -63,9 +80,15 @@ namespace Facepunch.CoreWars.Voxel
 			var index = ToIndex( position, 1 );
 			if ( !IsInBounds( index ) ) return false;
 			if ( GetSunLight( position ) == value ) return false;
+
 			IsDirty = true;
-			Data[index] = (byte)((Data[index] & 0x0F) | ((value & 0xf) << 4));
-			Data[ToIndex( position, 3 )] |= 0x40;
+
+			lock ( Data )
+			{
+				Data[index] = (byte)((Data[index] & 0x0F) | ((value & 0xf) << 4));
+				Data[ToIndex( position, 3 )] |= 0x40;
+			}
+
 			return true;
 		}
 
@@ -153,7 +176,8 @@ namespace Facepunch.CoreWars.Voxel
 		{
 			while ( SunLightRemoveQueue.Count > 0 )
 			{
-				var node = SunLightRemoveQueue.Dequeue();
+				if ( !SunLightRemoveQueue.TryDequeue( out var node ) )
+					continue;
 
 				for ( var i = 0; i < 6; i++ )
 				{
@@ -179,7 +203,9 @@ namespace Facepunch.CoreWars.Voxel
 
 			while ( SunLightAddQueue.Count > 0 )
 			{
-				var node = SunLightAddQueue.Dequeue();
+				if ( !SunLightAddQueue.TryDequeue( out var node ) )
+					continue;
+
 				var blockId = Map.GetBlock( node );
 				var block = Map.GetBlockType( blockId );
 
@@ -225,7 +251,8 @@ namespace Facepunch.CoreWars.Voxel
 
 			while ( removeQueue.Count > 0 )
 			{
-				var node = removeQueue.Dequeue();
+				if ( !removeQueue.TryDequeue( out var node ) )
+					continue;
 
 				for ( var i = 0; i < 6; i++ )
 				{
@@ -255,7 +282,9 @@ namespace Facepunch.CoreWars.Voxel
 
 			while ( addQueue.Count > 0 )
 			{
-				var node = addQueue.Dequeue();
+				if ( !addQueue.TryDequeue( out var node ) )
+					continue;
+
 				var lightLevel = Map.GetTorchLight( node.Position, channel );
 
 				for ( var i = 0; i < 6; i++ )
