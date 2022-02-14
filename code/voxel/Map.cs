@@ -195,9 +195,9 @@ namespace Facepunch.CoreWars.Voxel
 		public Dictionary<byte, Biome> BiomeLookup { get; private set; } = new();
 		public Dictionary<IntVector3, Chunk> Chunks { get; private set; } = new();
 		public List<Biome> Biomes { get; private set; } = new();
-		private Type ChunkGeneratorType { get; set; }
 		public BlockAtlas BlockAtlas { get; private set; }
 		public IntVector3 MaxSize { get; private set; }
+		public bool BuildCollisionInThread { get; set; }
 		public bool GreedyMeshing { get; private set; }
 		public bool Initialized { get; private set; }
 		public int SeaLevel { get; private set; }
@@ -218,6 +218,7 @@ namespace Facepunch.CoreWars.Voxel
 		private string BlockAtlasFileName { get; set; }
 		private byte NextAvailableBlockId { get; set; }
 		private byte NextAvailableBiomeId { get; set; }
+		private Type ChunkGeneratorType { get; set; }
 
 		private BiomeSampler BiomeSampler;
 

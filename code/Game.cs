@@ -106,6 +106,7 @@ namespace Facepunch.CoreWars
 			var map = Map.Create( 1337 );
 
 			map.OnInitialized += OnMapInitialized;
+			map.BuildCollisionInThread = true;
 			map.SetSeaLevel( 48 );
 			map.SetMaxSize( 256, 256, 128 );
 			map.LoadBlockAtlas( "textures/blocks.json" );

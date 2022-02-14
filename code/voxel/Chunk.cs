@@ -26,6 +26,7 @@ namespace Facepunch.CoreWars.Voxel
 		public bool HasDoneFirstFullUpdate { get; set; }
 		public bool IsFullUpdateActive { get; set; }
 		public ChunkVertexData UpdateVerticesResult { get; set; }
+		public bool BuildCollisionInThread { get; private set; }
 		public ChunkGenerator Generator { get; set; }
 		public bool QueueRebuild { get; set; }
 		public bool IsModelCreated { get; private set; }
@@ -64,6 +65,7 @@ namespace Facepunch.CoreWars.Voxel
 
 		public Chunk( Map map, int x, int y, int z )
 		{
+			BuildCollisionInThread = map.BuildCollisionInThread;
 			Blocks = new byte[ChunkSize * ChunkSize * ChunkSize];
 			Entities = new();
 			LightMap = new ChunkLightMap( this, map );
@@ -201,7 +203,14 @@ namespace Facepunch.CoreWars.Voxel
 
 			LightMap.UpdateTorchLight();
 			LightMap.UpdateSunLight();
+
 			UpdateVerticesResult = await StartUpdateVerticesTask();
+
+			if ( IsServer && BuildCollisionInThread )
+			{
+				BuildCollision();
+			}
+
 			HasDoneFirstFullUpdate = true;
 			QueueRebuild = true;
 		}
@@ -853,7 +862,7 @@ namespace Facepunch.CoreWars.Voxel
 
 			if ( IsFullUpdateTaskRunning() ) return;
 
-			if ( QueueRebuild )
+			if ( !BuildCollisionInThread && QueueRebuild )
 			{
 				BuildCollision();
 				QueueRebuild = false;
@@ -904,7 +913,13 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				LightMap.UpdateTorchLight();
 				LightMap.UpdateSunLight();
+
 				UpdateVerticesResult = await StartUpdateVerticesTask();
+
+				if ( IsServer && BuildCollisionInThread )
+				{
+					BuildCollision();
+				}
 
 				await GameTask.Delay( 1 );
 			}
