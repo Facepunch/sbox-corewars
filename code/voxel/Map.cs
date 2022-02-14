@@ -42,18 +42,12 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				using ( var reader = new BinaryReader( stream ) )
 				{
-					var sizeX = reader.ReadInt32();
-					var sizeY = reader.ReadInt32();
-					var sizeZ = reader.ReadInt32();
 					var seaLevel = reader.ReadInt32();
 					var seed = reader.ReadInt32();
 					var greedyMeshing = reader.ReadBoolean();
 
 					Current = new Map( seed )
 					{
-						SizeX = sizeX,
-						SizeY = sizeY,
-						SizeZ = sizeZ,
 						SeaLevel = seaLevel,
 						GreedyMeshing = greedyMeshing
 					};
@@ -201,7 +195,9 @@ namespace Facepunch.CoreWars.Voxel
 		public Dictionary<byte, Biome> BiomeLookup { get; private set; } = new();
 		public Dictionary<IntVector3, Chunk> Chunks { get; private set; } = new();
 		public List<Biome> Biomes { get; private set; } = new();
+		private Type ChunkGeneratorType { get; set; }
 		public BlockAtlas BlockAtlas { get; private set; }
+		public IntVector3 MaxSize { get; private set; }
 		public bool GreedyMeshing { get; private set; }
 		public bool Initialized { get; private set; }
 		public int SeaLevel { get; private set; }
@@ -225,6 +221,7 @@ namespace Facepunch.CoreWars.Voxel
 
 		private BiomeSampler BiomeSampler;
 
+		public bool IsInfinite => MaxSize == 0;
 		public bool IsValid => true;
 
 		private Map() { }
@@ -247,6 +244,11 @@ namespace Facepunch.CoreWars.Voxel
 			BiomeSampler = new BiomeSampler( this );
 		}
 
+		public void SetMaxSize( int x, int y, int z )
+		{
+			MaxSize = new IntVector3( x, y, z );
+		}
+
 		public Chunk GetOrCreateChunk( int x, int y, int z )
 		{
 			return GetOrCreateChunk( new IntVector3( x, y, z ) );
@@ -260,6 +262,14 @@ namespace Facepunch.CoreWars.Voxel
 			}
 
 			chunk = new Chunk( this, offset.x, offset.y, offset.z );
+			
+			if ( IsServer && ChunkGeneratorType != null )
+			{
+				var generator = Library.Create<ChunkGenerator>( ChunkGeneratorType );
+				generator.Setup( this, chunk );
+				chunk.Generator = generator;
+			}
+
 			Chunks.Add( offset, chunk );
 
 			lock ( ChunkInitialUpdateList )
@@ -267,23 +277,40 @@ namespace Facepunch.CoreWars.Voxel
 				ChunkInitialUpdateList.Add( chunk );
 			}
 
+			SizeX = Math.Max( SizeX, offset.x + Chunk.ChunkSize );
+			SizeY = Math.Max( SizeY, offset.y + Chunk.ChunkSize );
+			SizeZ = Math.Max( SizeZ, offset.z + Chunk.ChunkSize );
+
 			return chunk;
 		}
 
-		public Chunk GetChunk( IntVector3 offset )
+		public IntVector3 ToChunkOffset( IntVector3 position )
 		{
-			if ( offset.x < 0 || offset.y < 0 || offset.z < 0 ) return null;
+			position.x = Math.Max( (position.x / Chunk.ChunkSize) * Chunk.ChunkSize, 0 );
+			position.y = Math.Max( (position.y / Chunk.ChunkSize) * Chunk.ChunkSize, 0 );
+			position.z = Math.Max( (position.z / Chunk.ChunkSize) * Chunk.ChunkSize, 0 );
+			return position;
+		}
 
-			offset.x = (offset.x / Chunk.ChunkSize) * Chunk.ChunkSize;
-			offset.y = (offset.y / Chunk.ChunkSize) * Chunk.ChunkSize;
-			offset.z = (offset.z / Chunk.ChunkSize) * Chunk.ChunkSize;
+		public Chunk GetChunk( IntVector3 position )
+		{
+			if ( position.x < 0 || position.y < 0 || position.z < 0 ) return null;
 
-			if ( Chunks.TryGetValue( offset, out var chunk ) )
+			position.x = (position.x / Chunk.ChunkSize) * Chunk.ChunkSize;
+			position.y = (position.y / Chunk.ChunkSize) * Chunk.ChunkSize;
+			position.z = (position.z / Chunk.ChunkSize) * Chunk.ChunkSize;
+
+			if ( Chunks.TryGetValue( position, out var chunk ) )
 			{
 				return chunk;
 			}
 
 			return null;
+		}
+
+		public void SetChunkGenerator<T>() where T : ChunkGenerator
+		{
+			ChunkGeneratorType = typeof( T );
 		}
 
 		public T AddBiome<T>() where T : Biome
@@ -311,35 +338,12 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
-		public void SetupChunks()
-		{
-			var chunkSize = Chunk.ChunkSize;
-
-			lock ( ChunkInitialUpdateList )
-			{
-				for ( int x = 0; x < NumChunksX; ++x )
-				{
-					for ( int y = 0; y < NumChunksY; ++y )
-					{
-						for ( int z = 0; z < NumChunksZ; ++z )
-						{
-							var chunk = GetOrCreateChunk( x * chunkSize, y * chunkSize, z * chunkSize );
-							chunk.GenerateHeightmap();
-						}
-					}
-				}
-			}
-		}
-
 		public void Send( Client client )
 		{
 			using ( var stream = new MemoryStream() )
 			{
 				using ( var writer = new BinaryWriter( stream ) )
 				{
-					writer.Write( SizeX );
-					writer.Write( SizeY );
-					writer.Write( SizeZ );
 					writer.Write( SeaLevel );
 					writer.Write( Seed );
 					writer.Write( GreedyMeshing );
@@ -473,8 +477,7 @@ namespace Facepunch.CoreWars.Voxel
 						chunk.Blocks = reader.ReadBytes( chunk.Blocks.Length );
 						//chunk.LightMap.Deserialize( reader );
 						chunk.DeserializeData( reader );
-
-						_ = chunk.Initialize();
+						chunk.Initialize();
 
 						if ( i % 32 == 0 )
 						{
@@ -503,10 +506,6 @@ namespace Facepunch.CoreWars.Voxel
 			SizeX = sizeX;
 			SizeY = sizeY;
 			SizeZ = sizeZ;
-
-			NumChunksX = SizeX / Chunk.ChunkSize;
-			NumChunksY = SizeY / Chunk.ChunkSize;
-			NumChunksZ = SizeZ / Chunk.ChunkSize;
 		}
 
 		public Voxel GetVoxel( IntVector3 position )
@@ -731,13 +730,9 @@ namespace Facepunch.CoreWars.Voxel
 			Chunks.Clear();
 		}
 
-		public async void Init()
+		public void Init()
 		{
 			if ( Initialized ) return;
-
-			NumChunksX = SizeX / Chunk.ChunkSize;
-			NumChunksY = SizeY / Chunk.ChunkSize;
-			NumChunksZ = SizeZ / Chunk.ChunkSize;
 
 			if ( IsServer )
 			{
@@ -801,15 +796,6 @@ namespace Facepunch.CoreWars.Voxel
 		public static int GetOppositeDirection( int direction )
 		{
 			return direction + ((direction % 2 != 0) ? -1 : 1);
-		}
-
-		public async Task GeneratePerlin()
-		{
-			foreach ( var kv in Chunks )
-			{
-				kv.Value.GeneratePerlin();
-				await GameTask.Delay( 5 );
-			}
 		}
 
 		public Biome GetBiomeAt( int x, int y )
@@ -1095,12 +1081,7 @@ namespace Facepunch.CoreWars.Voxel
 
 					if ( chunk.IsValid() )
 					{
-						chunk.LightMap.UpdateTorchLight();
-						chunk.LightMap.UpdateSunLight();
-						chunk.UpdateVerticesResult = await chunk.StartUpdateVerticesTask();
-						chunk.BuildCollision();
-						chunk.HasDoneFirstFullUpdate = true;
-						chunk.QueueRebuild = true;
+						_ = chunk.StartFirstFullUpdateTask();
 					}
 
 					if ( chunk != null )
@@ -1110,8 +1091,6 @@ namespace Facepunch.CoreWars.Voxel
 							ChunkInitialUpdateList.Remove( chunk );
 						}
 					}
-
-					await GameTask.Delay( 5 );
 				}
 				catch ( TaskCanceledException e )
 				{

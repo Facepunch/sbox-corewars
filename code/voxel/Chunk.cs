@@ -26,6 +26,7 @@ namespace Facepunch.CoreWars.Voxel
 		public bool HasDoneFirstFullUpdate { get; set; }
 		public bool IsFullUpdateActive { get; set; }
 		public ChunkVertexData UpdateVerticesResult { get; set; }
+		public ChunkGenerator Generator { get; set; }
 		public bool QueueRebuild { get; set; }
 		public bool IsModelCreated { get; private set; }
 		public bool Initialized { get; private set; }
@@ -41,12 +42,6 @@ namespace Facepunch.CoreWars.Voxel
 
 		public PhysicsBody Body;
 		public PhysicsShape Shape;
-
-		private int[] Heightmap;
-		private FastNoiseLite Noise1;
-		private FastNoiseLite Noise2;
-		private FastNoiseLite Noise3;
-		private FastNoiseLite Noise4;
 
 		private Dictionary<int, BlockEntity> Entities { get; set; }
 		private SceneObject TranslucentSceneObject { get; set; }
@@ -75,11 +70,9 @@ namespace Facepunch.CoreWars.Voxel
 			Offset = new IntVector3( x, y, z );
 			Body = PhysicsWorld.WorldBody;
 			Map = map;
-
-			SetupHeightmap();
 		}
 
-		public async Task Initialize()
+		public async void Initialize()
 		{
 			if ( Initialized )
 				return;
@@ -109,190 +102,24 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
-		public void GenerateHeightmap()
+		public void CreateBlockAtPosition( IntVector3 localPosition, byte blockId )
 		{
-			for ( int y = 0; y < ChunkSize; y++ )
+			if ( !IsInside( localPosition ) ) return;
+
+			var position = Offset + localPosition;
+			var block = Map.GetBlockType( blockId );
+
+			SetBlock( localPosition, blockId );
+			block.OnBlockAdded( this, position.x, position.y, position.z, (int)BlockFace.Top );
+
+			var entityName = IsServer ? block.ServerEntity : block.ClientEntity;
+
+			if ( !string.IsNullOrEmpty( entityName ) )
 			{
-				for ( int x = 0; x < ChunkSize; x++ )
-				{
-					var n1 = Noise1.GetNoise( x + Offset.x, y + Offset.y );
-					var n2 = Noise2.GetNoise( x + Offset.x, y + Offset.y );
-					var n3 = Noise3.GetNoise( x + Offset.x, y + Offset.y );
-					var n4 = Noise4.GetNoise( x + Offset.x, y + Offset.y );
-					Heightmap[x + y * ChunkSize] = (int)( (n1 + (n2 * n3 * (n4 * 2 - 1))) * 64 + 64 );
-				}
+				var entity = Library.Create<BlockEntity>( entityName );
+				entity.BlockType = block;
+				SetEntity( localPosition, entity );
 			}
-		}
-
-		public void GeneratePerlin()
-		{
-			Rand.SetSeed( Offset.x + Offset.y + Offset.z * ChunkSize + Map.Seed );
-
-			Log.Info( $"Generating Chunk {Offset}" );
-
-			var topChunk = GetNeighbour( BlockFace.Top );
-
-			for ( var x = 0; x < ChunkSize; x++ )
-			{
-				for ( var y = 0; y < ChunkSize; y++ )
-				{
-					var biome = Map.GetBiomeAt( x + Offset.x, y + Offset.y );
-					var h = GetHeight( x, y );
-
-					for ( var z = 0; z < ChunkSize; z++ )
-					{
-						var index = GetLocalPositionIndex( x, y, z );
-						var position = new IntVector3( x, y, z );
-
-						if ( z + Offset.z > h )
-						{
-							if ( z + Offset.z < Map.SeaLevel )
-							{
-								CreateBlockAtPosition( position, biome.LiquidBlockId );
-							}
-							else if ( Blocks[index] == 0 && z == ChunkSize - 1 )
-							{
-								//LightMap.AddSunLight( position, 15 );
-							}
-						}
-						else
-						{
-							var isGeneratingTopBlock = z + Offset.z == h && z + Offset.z > Map.SeaLevel - 1;
-
-							if ( isGeneratingTopBlock )
-								CreateBlockAtPosition( position, biome.TopBlockId );
-							else if ( z + Offset.z <= Map.SeaLevel - 1 && h < Map.SeaLevel && z + Offset.z > h - 3 )
-								CreateBlockAtPosition( position, biome.BeachBlockId );
-							else if ( z + Offset.z > h - 3 )
-								CreateBlockAtPosition( position, biome.GroundBlockId );
-							else
-								CreateBlockAtPosition( position, biome.UndergroundBlockId );
-
-							GenerateCaves( biome, x, y, z );
-
-							if ( isGeneratingTopBlock && Blocks[index] > 0 )
-							{
-								if ( Rand.Float() < 0.01f )
-								{
-									GenerateTree( biome, position.x, position.y, position.z );
-								}
-								else if ( Rand.Float() <= 0.01f )
-								{
-									var spawnPositionSource = Map.ToSourcePosition( Offset + position + new IntVector3( 0, 0, 1 ) );
-									Map.SuitableSpawnPositions.Add( spawnPositionSource );
-								}
-							}
-						}
-
-						if ( topChunk.IsValid() )
-						{
-							var sunlightLevel = topChunk.LightMap.GetSunLight( new IntVector3( x, y, 0 ) );
-
-							if ( sunlightLevel > 0 )
-							{
-								//LightMap.AddSunLight( new IntVector3( x, y, ChunkSize - 1 ), sunlightLevel );
-							}
-						}
-					}
-				}
-			}
-		}
-
-		public bool GenerateCaves( Biome biome, int x, int y, int z )
-		{
-			var localPosition = new IntVector3( x, y, z );
-			if ( !IsInside( localPosition ) ) return false;
-
-			var position = Offset + new IntVector3( x, y, z );
-			int rx = localPosition.x + Offset.x;
-			int ry = localPosition.y + Offset.y;
-			int rz = localPosition.z + Offset.z;
-
-			double n1 = Map.CaveNoise.GetNoise( rx, ry, rz );
-			double n2 = Map.CaveNoise.GetNoise( rx, ry + 88f, rz );
-			double finalNoise = n1 * n1 + n2 * n2;
-
-			if ( finalNoise < 0.02f )
-			{
-				CreateBlockAtPosition( position, 0 );
-				return true;
-			}
-
-			return false;
-		}
-
-		public void GenerateTree( Biome biome, int x, int y, int z )
-		{
-			var minTrunkHeight = 3;
-			var maxTrunkHeight = 6;
-			var minLeavesRadius = 1;
-			var maxLeavesRadius = 2;
-			int trunkHeight = Rand.Int( minTrunkHeight, maxTrunkHeight );
-			int trunkTop = z + trunkHeight;
-			int leavesRadius = Rand.Int( minLeavesRadius, maxLeavesRadius );
-
-			// Would we be trying to generate a tree in another chunk?
-			if ( z + trunkHeight + leavesRadius >= ChunkSize
-				|| x <= leavesRadius || x >= ChunkSize - leavesRadius
-				|| y <= leavesRadius || y >= ChunkSize - leavesRadius )
-			{
-				return;
-			}
-
-			for ( int trunkZ = z + 1; trunkZ < trunkTop; trunkZ++ )
-			{
-				if ( IsInside( x, y, trunkZ ) )
-				{
-					CreateBlockAtPosition( new IntVector3( x, y, trunkZ ), biome.TreeLogBlockId );
-				}
-			}
-
-			for ( int leavesX = x - leavesRadius; leavesX <= x + leavesRadius; leavesX++ )
-			{
-				for ( int leavesY = y - leavesRadius; leavesY <= y + leavesRadius; leavesY++ )
-				{
-					for ( int leavesZ = trunkTop; leavesZ <= trunkTop + leavesRadius; leavesZ++ )
-					{
-						if ( IsInside( leavesX, leavesY, leavesZ ) )
-						{
-							if (
-								IsEmpty( leavesX, leavesY, leavesZ ) &&
-								(leavesX != x - leavesRadius || leavesY != y - leavesRadius) &&
-								(leavesX != x + leavesRadius || leavesY != y + leavesRadius) &&
-								(leavesX != x + leavesRadius || leavesY != y - leavesRadius) &&
-								(leavesX != x - leavesRadius || leavesY != y + leavesRadius)
-							)
-							{
-								var position = new IntVector3( leavesX, leavesY, leavesZ );
-								CreateBlockAtPosition( position, biome.TreeLeafBlockId );
-							}
-						}
-					}
-				}
-			}
-
-			for ( int leavesX = x - (leavesRadius - 1); leavesX <= x + (leavesRadius - 1); leavesX++ )
-			{
-				for ( int leavesY = y - (leavesRadius - 1); leavesY <= y + (leavesRadius - 1); leavesY++ )
-				{
-					var position = new IntVector3( leavesX, leavesY, trunkTop + leavesRadius + 1 );
-
-					if ( Map.IsEmpty( position ) )
-					{
-						CreateBlockAtPosition( position, biome.TreeLeafBlockId );
-					}
-				}
-			}
-		}
-
-		public int GetHeight( int x, int y )
-		{
-			return Heightmap[x + y * ChunkSize];
-		}
-
-		public void SetHeight( int x, int y, int height )
-		{
-			Heightmap[x + y * ChunkSize] = height;
 		}
 
 		public bool IsEmpty( int lx, int ly, int lz )
@@ -364,6 +191,21 @@ namespace Facepunch.CoreWars.Voxel
 			return voxel;
 		}
 
+		public async Task StartFirstFullUpdateTask()
+		{
+			if ( IsServer && Generator != null )
+			{
+				Generator.Initialize();
+				Generator.Generate();
+			}
+
+			LightMap.UpdateTorchLight();
+			LightMap.UpdateSunLight();
+			UpdateVerticesResult = await StartUpdateVerticesTask();
+			HasDoneFirstFullUpdate = true;
+			QueueRebuild = true;
+		}
+
 		public void PerformFullTorchUpdate()
 		{
 			for ( var x = 0; x < ChunkSize; x++ )
@@ -395,6 +237,16 @@ namespace Facepunch.CoreWars.Voxel
 			UpdateNeighbourLightMap( "LightMapSouth", BlockFace.South, recurseNeighbours );
 			UpdateNeighbourLightMap( "LightMapTop", BlockFace.Top, recurseNeighbours );
 			UpdateNeighbourLightMap( "LightMapBottom", BlockFace.Bottom, recurseNeighbours );
+		}
+
+		public IEnumerable<IntVector3> GetNeighbourOffsets()
+		{
+			yield return GetAdjacentChunkOffset( BlockFace.Top );
+			yield return GetAdjacentChunkOffset( BlockFace.Bottom );
+			yield return GetAdjacentChunkOffset( BlockFace.North );
+			yield return GetAdjacentChunkOffset( BlockFace.East );
+			yield return GetAdjacentChunkOffset( BlockFace.South );
+			yield return GetAdjacentChunkOffset( BlockFace.West );
 		}
 
 		public IEnumerable<Chunk> GetNeighbours()
@@ -841,33 +693,6 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
-		private void SetupHeightmap()
-		{
-			Heightmap = new int[ChunkSize * ChunkSize];
-
-			Noise1 = new FastNoiseLite( Map.Seed );
-			Noise1.SetNoiseType( FastNoiseLite.NoiseType.OpenSimplex2 );
-			Noise1.SetFractalType( FastNoiseLite.FractalType.FBm );
-			Noise1.SetFractalOctaves( 4 );
-			Noise1.SetFrequency( 1 / 256.0f );
-
-			Noise2 = new FastNoiseLite( Map.Seed );
-			Noise2.SetNoiseType( FastNoiseLite.NoiseType.OpenSimplex2 );
-			Noise2.SetFractalType( FastNoiseLite.FractalType.FBm );
-			Noise2.SetFractalOctaves( 4 );
-			Noise2.SetFrequency( 1 / 256.0f );
-
-			Noise3 = new FastNoiseLite( Map.Seed );
-			Noise3.SetNoiseType( FastNoiseLite.NoiseType.OpenSimplex2 );
-			Noise3.SetFractalType( FastNoiseLite.FractalType.FBm );
-			Noise3.SetFractalOctaves( 4 );
-			Noise3.SetFrequency( 1 / 256.0f );
-
-			Noise4 = new FastNoiseLite( Map.Seed );
-			Noise4.SetNoiseType( FastNoiseLite.NoiseType.OpenSimplex2 );
-			Noise4.SetFrequency( 1 / 1024.0f );
-		}
-
 		private void UpdateNeighbourLightMap( string name, BlockFace direction, bool recurseNeighbours = false )
 		{
 			var neighbour = Map.GetChunk( GetAdjacentChunkOffset( direction ) );
@@ -1025,6 +850,14 @@ namespace Facepunch.CoreWars.Voxel
 			}
 
 			DirtyData.Clear();
+
+			if ( IsFullUpdateTaskRunning() ) return;
+
+			if ( QueueRebuild )
+			{
+				BuildCollision();
+				QueueRebuild = false;
+			}
 		}
 
 		[Event.Tick.Client]
@@ -1052,26 +885,6 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
-		private void CreateBlockAtPosition( IntVector3 localPosition, byte blockId )
-		{
-			if ( !IsInside( localPosition ) ) return;
-
-			var position = Offset + localPosition;
-			var block = Map.GetBlockType( blockId );
-
-			SetBlock( localPosition, blockId );
-			block.OnBlockAdded( this, position.x, position.y, position.z, (int)BlockFace.Top );
-
-			var entityName = IsServer ? block.ServerEntity : block.ClientEntity;
-
-			if ( !string.IsNullOrEmpty( entityName ) )
-			{
-				var entity = Library.Create<BlockEntity>( entityName );
-				entity.BlockType = block;
-				SetEntity( localPosition, entity );
-			}
-		}
-
 		private async Task StartInitialLightingTask()
 		{
 			PropagateSunlight();
@@ -1092,7 +905,6 @@ namespace Facepunch.CoreWars.Voxel
 				LightMap.UpdateTorchLight();
 				LightMap.UpdateSunLight();
 				UpdateVerticesResult = await StartUpdateVerticesTask();
-				BuildCollision();
 
 				await GameTask.Delay( 1 );
 			}

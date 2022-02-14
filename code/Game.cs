@@ -110,13 +110,26 @@ namespace Facepunch.CoreWars
 			map.SetSize( 256, 256, 128 );
 			map.LoadBlockAtlas( "textures/blocks.json" );
 			map.AddAllBlockTypes();
+			map.SetChunkGenerator<PerlinChunkGenerator>();
 			map.AddBiome<PlainsBiome>();
 			map.AddBiome<WeirdBiome>();
-			map.SetupChunks();
 
-			Log.Info( $"[Server] Creating perlin map..." );
-			await map.GeneratePerlin();
-			Log.Info( $"[Server] Perlin map has been created successfully." );
+			var startChunkSize = 4;
+
+			for ( var x = 0; x < startChunkSize; x++ )
+			{
+				for ( var y = 0; y < startChunkSize; y++ )
+				{
+					for ( var z = 0; z < startChunkSize; z++ )
+					{
+						map.GetOrCreateChunk(
+							x * Chunk.ChunkSize,
+							y * Chunk.ChunkSize,
+							z * Chunk.ChunkSize
+						);
+					}
+				}
+			}
 
 			map.Init();
 		}

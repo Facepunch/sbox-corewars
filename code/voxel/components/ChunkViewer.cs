@@ -21,46 +21,46 @@ namespace Facepunch.CoreWars.Voxel
 
 				if ( chunk.IsValid() )
 				{
-					viewer.RemoveLoadedChunk( chunk );
+					viewer.RemoveLoadedChunk( chunk.Offset );
 					Map.Current.RemoveChunk( chunk );
 				}
 			}
 		}
 
 		public float UnloadChunkDistance { get; set; } = 16f;
-		public float LoadChunkDistance { get; set; } = 8f;
+		public float LoadChunkDistance { get; set; } = 4f;
 		public HashSet<IntVector3> LoadedChunks { get; private set; }
-		public HashSet<Chunk> ChunksToRemove { get; private set; }
+		public HashSet<IntVector3> ChunksToRemove { get; private set; }
 		public HashSet<Chunk> ChunksToSend { get; private set; }
-		public Queue<Chunk> ChunkSendQueue { get; private set; }
+		public Queue<IntVector3> ChunkSendQueue { get; private set; }
 
-		public bool IsChunkLoaded( Chunk chunk )
+		public bool IsChunkLoaded( IntVector3 offset )
 		{
-			return LoadedChunks.Contains( chunk.Offset );
+			return LoadedChunks.Contains( offset );
 		}
 
-		public void AddLoadedChunk( Chunk chunk )
+		public void AddLoadedChunk( IntVector3 offset )
 		{
 			if ( IsServer )
 			{
-				ChunkSendQueue.Enqueue( chunk );
-				ChunksToRemove.Remove( chunk );
+				ChunkSendQueue.Enqueue( offset );
+				ChunksToRemove.Remove( offset );
 			}
 			else
 			{
-				LoadedChunks.Add( chunk.Offset );
+				LoadedChunks.Add( offset );
 			}
 		}
 
-		public void RemoveLoadedChunk( Chunk chunk )
+		public void RemoveLoadedChunk( IntVector3 offset )
 		{
 			if ( IsServer )
 			{
-				ChunksToRemove.Add( chunk );
+				ChunksToRemove.Add( offset );
 			}
 			else
 			{
-				LoadedChunks.Remove( chunk.Offset );
+				LoadedChunks.Remove( offset );
 			}
 		}
 
@@ -89,32 +89,43 @@ namespace Facepunch.CoreWars.Voxel
 
 					if ( position.Distance( chunkPositionSource ) >= Chunk.ChunkSize * Chunk.VoxelSize * UnloadChunkDistance )
 					{
-						RemoveLoadedChunk( chunk );
+						RemoveLoadedChunk( chunk.Offset );
 					}
 				}
 			}
 
 			var voxelPosition = Map.ToVoxelPosition( position );
-			var currentChunk = Map.Current.GetChunk( voxelPosition );
+			var currentChunkOffset = Map.Current.ToChunkOffset( voxelPosition );
 
-			if ( currentChunk.IsValid() )
-			{
-				AddLoadedChunk( currentChunk );
-			}
+			AddLoadedChunk( currentChunkOffset );
 
 			while ( ChunkSendQueue.Count > 0 )
 			{
-				var chunk = ChunkSendQueue.Dequeue();
-				var chunkPositionCenter = chunk.Offset + new IntVector3( Chunk.ChunkSize / 2 );
+				var offset = ChunkSendQueue.Dequeue();
+				var chunkPositionCenter = offset + new IntVector3( Chunk.ChunkSize / 2 );
 				var chunkPositionSource = Map.ToSourcePosition( chunkPositionCenter );
 
-				if ( !ChunksToSend.Contains( chunk ) && position.Distance( chunkPositionSource ) <= Chunk.ChunkSize * Chunk.VoxelSize * LoadChunkDistance )
+				if ( position.Distance( chunkPositionSource ) <= Chunk.ChunkSize * Chunk.VoxelSize * LoadChunkDistance )
 				{
-					ChunksToSend.Add( chunk );
+					var chunk = Map.Current.GetOrCreateChunk( offset );
+					if ( !chunk.IsValid() ) continue;
 
-					foreach ( var neighbour in chunk.GetNeighbours() )
+					if ( !chunk.Initialized )
 					{
-						ChunkSendQueue.Enqueue( neighbour );
+						chunk.Initialize();
+					}
+
+					if ( !ChunksToSend.Contains( chunk ) )
+					{
+						ChunksToSend.Add( chunk );
+
+						foreach ( var neighbour in chunk.GetNeighbourOffsets() )
+						{
+							if ( neighbour.x < 0 || neighbour.y < 0 || neighbour.z < 0 )
+								continue;
+
+							ChunkSendQueue.Enqueue( neighbour );
+						}
 					}
 				}
 			}
@@ -125,7 +136,7 @@ namespace Facepunch.CoreWars.Voxel
 				{
 					using ( var writer = new BinaryWriter( stream ) )
 					{
-						var unloadedChunks = ChunksToSend.Where( c => !IsChunkLoaded( c ) && c.HasDoneFirstFullUpdate );
+						var unloadedChunks = ChunksToSend.Where( c => !IsChunkLoaded( c.Offset ) && c.HasDoneFirstFullUpdate );
 						writer.Write( unloadedChunks.Count() );
 
 						foreach ( var chunk in unloadedChunks )
@@ -153,8 +164,8 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				foreach ( var chunk in ChunksToRemove )
 				{
-					UnloadChunkForClient( To.Single( client ), chunk.Offset.x, chunk.Offset.y, chunk.Offset.z );
-					LoadedChunks.Remove( chunk.Offset );
+					UnloadChunkForClient( To.Single( client ), chunk.x, chunk.y, chunk.z );
+					LoadedChunks.Remove( chunk );
 				}
 
 				ChunksToRemove.Clear();
