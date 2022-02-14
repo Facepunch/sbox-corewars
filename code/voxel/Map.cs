@@ -857,9 +857,6 @@ namespace Facepunch.CoreWars.Voxel
 				chunk.Data.Remove( localPosition );
 				chunk.SetBlock( blockIndex, blockId );
 
-				chunk.LightMap.UpdateTorchLight();
-				chunk.LightMap.UpdateSunLight();
-
 				block.OnBlockAdded( chunk, position.x, position.y, position.z, direction );
 
 				var entityName = IsServer ? block.ServerEntity : block.ClientEntity;
@@ -1098,6 +1095,8 @@ namespace Facepunch.CoreWars.Voxel
 
 					if ( chunk.IsValid() )
 					{
+						chunk.LightMap.UpdateTorchLight();
+						chunk.LightMap.UpdateSunLight();
 						chunk.UpdateVerticesResult = await chunk.StartUpdateVerticesTask();
 						chunk.BuildCollision();
 						chunk.HasDoneFirstFullUpdate = true;

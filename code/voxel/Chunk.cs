@@ -87,9 +87,6 @@ namespace Facepunch.CoreWars.Voxel
 			if ( IsClient )
 			{
 				await GameTask.RunInThreadAsync( StartInitialLightingTask );
-
-				LightMap.UpdateTorchLight();
-				LightMap.UpdateSunLight();
 			}
 
 			CreateEntities();
@@ -1052,9 +1049,6 @@ namespace Facepunch.CoreWars.Voxel
 		[Event.Tick]
 		private void Tick()
 		{
-			LightMap.UpdateTorchLight();
-			LightMap.UpdateSunLight();
-
 			if ( QueuedFullUpdate )
 			{
 				FullUpdate();
@@ -1098,6 +1092,8 @@ namespace Facepunch.CoreWars.Voxel
 		{
 			try
 			{
+				LightMap.UpdateTorchLight();
+				LightMap.UpdateSunLight();
 				UpdateVerticesResult = await StartUpdateVerticesTask();
 				BuildCollision();
 
