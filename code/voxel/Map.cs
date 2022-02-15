@@ -1201,6 +1201,26 @@ namespace Facepunch.CoreWars.Voxel
 							}
 						}
 					}
+					else if ( IsServer )
+					{
+						var clients = Client.All;
+
+						foreach ( var client in clients )
+						{
+							if ( client.Pawn.IsValid() )
+							{
+								var chunk = GetChunk( ToVoxelPosition( client.Pawn.Position ) );
+								var chunkIndex = chunksToUpdate.IndexOf( chunk );
+
+								if ( chunkIndex >= 0 )
+								{
+									currentChunk = chunksToUpdate[chunkIndex];
+									currentChunkIndex = chunkIndex;
+									break;
+								}
+							}
+						}
+					}
 
 					chunksToUpdate.RemoveAt( currentChunkIndex );
 
