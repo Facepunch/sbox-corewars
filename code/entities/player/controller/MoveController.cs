@@ -80,7 +80,6 @@ namespace Facepunch.CoreWars
 			var girth = BodyGirth * 0.5f;
 			var mins = Scale( new Vector3( -girth, -girth, 0 ) );
 			var maxs = Scale( new Vector3( +girth, +girth, BodyHeight ) );
-
 			SetBBox( mins, maxs );
 		}
 

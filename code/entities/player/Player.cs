@@ -17,17 +17,38 @@ namespace Facepunch.CoreWars
 		[BindComponent] public ChunkViewer ChunkViewer { get; }
 		[Net, Predicted] public ushort CurrentHotbarIndex { get; private set; }
 		[Net] public NetInventory HotbarInventory { get; private set; }
+		public ProjectileSimulator Projectiles { get; private set; }
 		public DamageInfo LastDamageTaken { get; private set; }
 		public TimeUntil NextBlockPlace { get; private set; }
 
 		public Player() : base()
 		{
-
+			Projectiles = new( this );
 		}
 
 		public Player( Client client ) : this()
 		{
 			CurrentHotbarIndex = 0;
+			client.Pawn = this;
+			CreateInventories();
+		}
+
+		public bool TryGiveWeapon( string weaponName )
+		{
+			var item = InventorySystem.CreateItem<WeaponItem>();
+			var weapon = Library.Create<Weapon>( weaponName );
+			weapon.OnCarryStart( this );
+			item.Weapon = weapon;
+			return HotbarInventory.Container.Give( item );
+		}
+
+		public void TryGiveAmmo( AmmoType type, ushort amount )
+		{
+			var item = InventorySystem.CreateItem<AmmoItem>();
+			item.AmmoType = type;
+			item.StackSize = amount;
+			item.MaxStackSize = 60;
+			HotbarInventory.Container.Stack( item );
 		}
 
 		public void TryGiveBlock( byte blockId, ushort amount )
@@ -39,27 +60,62 @@ namespace Facepunch.CoreWars
 			HotbarInventory.Container.Stack( item );
 		}
 
+		public ushort TakeAmmo( AmmoType type, ushort count )
+		{
+			var items = HotbarInventory.Container.FindItems<AmmoItem>();
+			var amountLeftToTake = count;
+			ushort totalAmountTaken = 0;
+
+			for ( int i = items.Count - 1; i >= 0; i-- )
+			{
+				var item = items[i];
+
+				if ( item.AmmoType == type )
+				{
+					if ( item.StackSize >= amountLeftToTake )
+					{
+						totalAmountTaken += amountLeftToTake;
+						item.StackSize -= amountLeftToTake;
+
+						if ( item.StackSize > 0 )
+							return totalAmountTaken;
+					}
+					else
+					{
+						amountLeftToTake -= item.StackSize;
+						totalAmountTaken += item.StackSize;
+						item.StackSize = 0;
+					}
+
+					HotbarInventory.Container.Remove( item.ItemId );
+				}
+			}
+
+			return totalAmountTaken;
+		}
+
+		public int GetAmmoCount( AmmoType type )
+		{
+			var items = HotbarInventory.Container.FindItems<AmmoItem>();
+			var output = 0;
+
+			foreach ( var item in items )
+			{
+				if ( item.AmmoType == type )
+				{
+					output += item.StackSize;
+				}
+			}
+
+			return output;
+		}
+
 		public void SetTeam( Team team )
 		{
 			Host.AssertServer();
 
 			Team = team;
 			OnTeamChanged( team );
-		}
-
-		public void CreateInventory()
-		{
-			var container = new InventoryContainer( this );
-			container.SetSlotLimit( 8 );
-			container.AddConnection( Client );
-
-			InventorySystem.Register( container );
-
-			HotbarInventory = new NetInventory( container );
-
-			TryGiveBlock( Map.Current.FindBlockId<GrassBlock>(), 1000 );
-			TryGiveBlock( Map.Current.FindBlockId<StoneBlock>(), 1000 );
-			TryGiveBlock( Map.Current.FindBlockId<StoneBlock>(), 1000 );
 		}
 
 		public virtual void OnMapLoaded()
@@ -79,6 +135,8 @@ namespace Facepunch.CoreWars
 			Animator = new PlayerAnimator();
 
 			SetModel( "models/citizen/citizen.vmdl" );
+
+			GiveInitialItems();
 		}
 
 		public override void Spawn()
@@ -218,7 +276,18 @@ namespace Facepunch.CoreWars
 				else if ( currentSlotIndex > maxSlotIndex )
 					currentSlotIndex = 0;
 
+
 				CurrentHotbarIndex = (ushort)currentSlotIndex;
+
+				if ( IsServer )
+				{
+					var item = HotbarInventory.Container.GetFromSlot( CurrentHotbarIndex );
+
+					if ( item is WeaponItem weaponItem )
+						ActiveChild = weaponItem.Weapon;
+					else
+						ActiveChild = null;
+				}
 			}
 
 			var currentMap = Map.Current;
@@ -255,6 +324,10 @@ namespace Facepunch.CoreWars
 				}
 			}
 
+			Projectiles.Simulate();
+
+			SimulateActiveChild( client, ActiveChild );
+
 			if ( !currentMap.IsValid() ) return;
 
 			var voxelPosition = currentMap.ToVoxelPosition( Position );
@@ -282,6 +355,26 @@ namespace Facepunch.CoreWars
 		protected virtual void OnTeamChanged( Team team )
 		{
 
+		}
+
+		protected virtual void GiveInitialItems()
+		{
+			TryGiveBlock( Map.Current.FindBlockId<GrassBlock>(), 1000 );
+			TryGiveBlock( Map.Current.FindBlockId<StoneBlock>(), 1000 );
+			TryGiveBlock( Map.Current.FindBlockId<StoneBlock>(), 1000 );
+
+			TryGiveWeapon( "weapon_boomer" );
+			TryGiveAmmo( AmmoType.Explosive, 200 );
+		}
+
+		public virtual void CreateInventories()
+		{
+			var container = new InventoryContainer( this );
+			container.SetSlotLimit( 8 );
+			container.AddConnection( Client );
+			InventorySystem.Register( container );
+
+			HotbarInventory = new NetInventory( container );
 		}
 	}
 }

@@ -87,11 +87,9 @@ namespace Facepunch.CoreWars
 			base.ClientJoined( client );
 
 			var player = new Player( client );
-			client.Pawn = player;
-			Map.Current.AddViewer( client );
-
-			player.CreateInventory();
 			player.LifeState = LifeState.Dead;
+
+			Map.Current.AddViewer( client );
 
 			if ( Map.Current.Initialized )
 			{
@@ -148,7 +146,9 @@ namespace Facepunch.CoreWars
 
 		private void OnMapInitialized()
 		{
-			foreach ( var player in All.OfType<Player>() )
+			var players = All.OfType<Player>().ToList();
+
+			foreach ( var player in players )
 			{
 				SendMapToPlayer( player );
 			}

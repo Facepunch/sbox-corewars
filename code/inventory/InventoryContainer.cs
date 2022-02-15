@@ -344,7 +344,7 @@ namespace Facepunch.CoreWars.Inventory
 			{
 				var instance = instances[i];
 
-				if ( Give( instance ) == null )
+				if ( !Give( instance ) )
 				{
 					remainder.Add( instance );
 				}
@@ -370,22 +370,22 @@ namespace Facepunch.CoreWars.Inventory
 			return false;
 		}
 
-		public InventoryItem Give( InventoryItem instance )
+		public bool Give( InventoryItem instance )
 		{
 			if ( !FindFreeSlot( out var slot ) )
 			{
 				Log.Error( "Unable to give an item to this inventory because there is no space!" );
-				return null;
+				return false;
 			}
 
 			return Give( instance, slot );
 		}
 
-		public InventoryItem Give( InventoryItem instance, ushort slot )
+		public bool Give( InventoryItem instance, ushort slot )
 		{
 			if ( IsClient )
 			{
-				return null;
+				return false;
 			}
 
 			var slotLimit = SlotLimit;
@@ -393,13 +393,13 @@ namespace Facepunch.CoreWars.Inventory
 			if ( slot >= slotLimit )
 			{
 				Log.Info( "Unable to give an item to this inventory because slot #" + slot + " is greater than the limit of " + slotLimit );
-				return null;
+				return false;
 			}
 
 			if ( ItemList[slot] != null )
 			{
 				Log.Info( "Unable to give an item to this inventory because slot #" + slot + " is occupied!" );
-				return null;
+				return false;
 			}
 
 			instance.SlotId = slot;
@@ -409,7 +409,7 @@ namespace Facepunch.CoreWars.Inventory
 
 			SendGiveEvent( slot, instance );
 
-			return ItemList[slot];
+			return true;
 		}
 
 		public ushort Stack( InventoryItem instance )
@@ -443,9 +443,9 @@ namespace Facepunch.CoreWars.Inventory
 			{
 				var item = Give( instance );
 
-				if ( item != null )
+				if ( item )
 				{
-					item.StackSize = amount;
+					instance.StackSize = amount;
 					return 0;
 				}
 			}
