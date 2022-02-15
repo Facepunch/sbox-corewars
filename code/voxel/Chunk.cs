@@ -60,6 +60,7 @@ namespace Facepunch.CoreWars.Voxel
 		private ModelBuilder OpaqueModelBuilder { get; set; }
 		private object VertexLock = new object();
 		private bool QueuedFullUpdate { get; set; }
+		private bool IsInitializing { get; set; }
 		private Model OpaqueModel { get; set; }
 		private Mesh TranslucentMesh { get; set; }
 		private Mesh OpaqueMesh { get; set; }
@@ -90,13 +91,16 @@ namespace Facepunch.CoreWars.Voxel
 
 		public async void Initialize()
 		{
-			if ( Initialized )
+			if ( IsInitializing || Initialized )
 				return;
+
+			IsInitializing = true;
 
 			await GameTask.RunInThreadAsync( StartThreadedInitializeTask );
 
 			CreateEntities();
 			Initialized = true;
+			IsInitializing = false;
 
 			if ( IsClient )
 			{
@@ -227,7 +231,7 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
-		public async Task StartFirstFullUpdateTask()
+		public async void StartFirstFullUpdateTask()
 		{
 			LightMap.UpdateTorchLight();
 			LightMap.UpdateSunLight();

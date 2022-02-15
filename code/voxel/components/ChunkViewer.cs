@@ -14,16 +14,11 @@ namespace Facepunch.CoreWars.Voxel
 		[ClientRpc]
 		public static void UnloadChunkForClient( int x, int y, int z )
 		{
-			var client = Local.Client;
+			var chunk = Map.Current.GetChunk( new IntVector3( x, y, z ) );
 
-			if ( client.Components.TryGet<ChunkViewer>( out var viewer ) )
+			if ( chunk.IsValid() )
 			{
-				var chunk = Map.Current.GetChunk( new IntVector3( x, y, z ) );
-
-				if ( chunk.IsValid() )
-				{
-					Map.Current.RemoveChunk( chunk );
-				}
+				Map.Current.RemoveChunk( chunk );
 			}
 		}
 
@@ -79,7 +74,7 @@ namespace Facepunch.CoreWars.Voxel
 
 			var position = pawn.Position;
 			var currentMap = Map.Current;
-			var largestSide = Math.Max( currentMap.ChunkSize.x, currentMap.ChunkSize.y );
+			var chunkBounds = currentMap.ChunkSize.LengthSquared;
 
 			foreach ( var offset in LoadedChunks )
 			{
@@ -90,7 +85,7 @@ namespace Facepunch.CoreWars.Voxel
 					var chunkPositionCenter = chunk.Offset + chunk.Center;
 					var chunkPositionSource = currentMap.ToSourcePosition( chunkPositionCenter );
 
-					if ( position.Distance( chunkPositionSource ) >= largestSide * currentMap.VoxelSize * currentMap.ChunkUnloadDistance )
+					if ( position.Distance( chunkPositionSource ) >= chunkBounds * currentMap.VoxelSize * currentMap.ChunkUnloadDistance )
 					{
 						RemoveLoadedChunk( chunk.Offset );
 					}
@@ -113,7 +108,7 @@ namespace Facepunch.CoreWars.Voxel
 				var chunkPositionCenter = offset + centerChunkPosition;
 				var chunkPositionSource = currentMap.ToSourcePosition( chunkPositionCenter );
 
-				if ( position.Distance( chunkPositionSource ) <= largestSide * currentMap.VoxelSize * currentMap.ChunkRenderDistance )
+				if ( position.Distance( chunkPositionSource ) <= chunkBounds * currentMap.VoxelSize * currentMap.ChunkRenderDistance )
 				{
 					var chunk = Map.Current.GetOrCreateChunk( offset );
 					if ( !chunk.IsValid() ) continue;

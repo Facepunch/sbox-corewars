@@ -230,7 +230,7 @@ namespace Facepunch.CoreWars.Voxel
 		public int SizeZ;
 		public FastNoiseLite CaveNoise;
 
-		private List<Chunk>[] ChunkInitialUpdateLists = new List<Chunk>[1];
+		private ConcurrentQueue<Chunk>[] ChunkInitialUpdateQueues = new ConcurrentQueue<Chunk>[1];
 
 		private string BlockAtlasFileName { get; set; }
 		private byte NextAvailableBlockId { get; set; }
@@ -249,9 +249,9 @@ namespace Facepunch.CoreWars.Voxel
 			BlockTypes[typeof( AirBlock ).Name] = NextAvailableBlockId;
 			BlockData[NextAvailableBlockId] = new AirBlock( this );
 
-			for ( var i = 0; i < ChunkInitialUpdateLists.Length; i++ )
+			for ( var i = 0; i < ChunkInitialUpdateQueues.Length; i++ )
 			{
-				ChunkInitialUpdateLists[i] = new();
+				ChunkInitialUpdateQueues[i] = new();
 			}
 
 			CaveNoise = new( seed );
@@ -293,9 +293,9 @@ namespace Facepunch.CoreWars.Voxel
 			var smallestIndex = 0;
 			var smallestValue = int.MaxValue;
 
-			for ( var i = 0; i < ChunkInitialUpdateLists.Length; i++ )
+			for ( var i = 0; i < ChunkInitialUpdateQueues.Length; i++ )
 			{
-				var count = ChunkInitialUpdateLists[i].Count;
+				var count = ChunkInitialUpdateQueues[i].Count;
 
 				if ( count < smallestValue )
 				{
@@ -306,10 +306,7 @@ namespace Facepunch.CoreWars.Voxel
 				}
 			}
 
-			lock ( ChunkInitialUpdateLists[smallestIndex] )
-			{
-				ChunkInitialUpdateLists[smallestIndex].Add( chunk );
-			}
+			ChunkInitialUpdateQueues[smallestIndex].Enqueue( chunk );
 		}
 
 		public Chunk GetOrCreateChunk( IntVector3 offset )
@@ -846,7 +843,7 @@ namespace Facepunch.CoreWars.Voxel
 
 			Event.Register( this );
 
-			for ( var i = 0; i < ChunkInitialUpdateLists.Length; i++ )
+			for ( var i = 0; i < ChunkInitialUpdateQueues.Length; i++ )
 			{
 				var index = i;
 				_ = GameTask.RunInThreadAsync( () => ChunkFullUpdateTask( index ) );
@@ -1163,48 +1160,56 @@ namespace Facepunch.CoreWars.Voxel
 
 		private async void ChunkFullUpdateTask( int index )
 		{
+			var chunksToUpdate = new List<Chunk>();
+			var queue = ChunkInitialUpdateQueues[index];
+
 			while ( true )
 			{
 				try
 				{
-					var updateList = ChunkInitialUpdateLists[index];
-
-					Chunk currentChunk;
-
-					lock ( updateList )
+					while ( queue.Count > 0 )
 					{
-						if ( updateList.Count == 0 ) continue;
-						currentChunk = updateList[0];
-
-						if ( IsClient )
+						if ( queue.TryDequeue( out var queuedChunk ) )
 						{
-							var currentDistance = float.PositiveInfinity;
-							var localPawnPosition = Local.Pawn.Position;
+							chunksToUpdate.Add( queuedChunk );
+						}
+					}
 
-							for ( var i = 0; i < updateList.Count; i++ )
+					if ( chunksToUpdate.Count == 0 )
+					{
+						await GameTask.Delay( 1000 / 30 );
+						continue;
+					}
+
+					var currentChunkIndex = chunksToUpdate.Count - 1;
+					var currentChunk = chunksToUpdate[currentChunkIndex];
+
+					if ( IsClient )
+					{
+						var currentDistance = float.PositiveInfinity;
+						var localPawnPosition = Local.Pawn.Position;
+
+						for ( var i = 0; i < chunksToUpdate.Count; i++ )
+						{
+							var chunk = chunksToUpdate[i];
+							var distance = ToSourcePosition( chunk.Offset + chunk.Center ).Distance( localPawnPosition );
+
+							if ( distance < currentDistance )
 							{
-								var chunk = updateList[i];
-								var distance = ToSourcePosition( chunk.Offset + chunk.Center ).Distance( localPawnPosition );
-
-								if ( distance < currentDistance )
-								{
-									currentChunk = chunk;
-									currentDistance = distance;
-								}
+								currentChunk = chunk;
+								currentDistance = distance;
+								currentChunkIndex = i;
 							}
 						}
 					}
 
-					if ( currentChunk.IsValid() )
-						await currentChunk.StartFirstFullUpdateTask();
-					else
-						await GameTask.Delay( 1000 / 30 );
+					chunksToUpdate.RemoveAt( currentChunkIndex );
 
-					if ( currentChunk != null )
+					if ( currentChunk.IsValid() )
 					{
-						lock ( updateList )
+						if ( !currentChunk.HasDoneFirstFullUpdate )
 						{
-							updateList.Remove( currentChunk );
+							currentChunk.StartFirstFullUpdateTask();
 						}
 					}
 				}

@@ -10,10 +10,25 @@ namespace Facepunch.CoreWars
 	{
 		public Panel LoadingScreen { get; private set; }
 		public string ChunksLoaded => GetChunksLoaded();
+		
+		private bool DidWorldLoad { get; set; } = false;
 
 		public Hud()
 		{
 			AddChild<ChatBox>();
+		}
+
+		public override void Tick()
+		{
+			if ( !Map.Current.IsValid() ) return;
+
+			var viewer = Local.Client.GetChunkViewer();
+			if ( !viewer.IsValid() ) return;
+
+			if ( viewer.HasLoadedMinimumChunks() )
+				DidWorldLoad = true;
+
+			base.Tick();
 		}
 
 		protected override void PostTemplateApplied()
@@ -46,10 +61,7 @@ namespace Facepunch.CoreWars
 			if ( Map.Current == null || !Map.Current.Initialized )
 				return false;
 
-			var viewer = Local.Client.GetChunkViewer();
-			if ( !viewer.IsValid() ) return false;
-
-			return viewer.HasLoadedMinimumChunks();
+			return DidWorldLoad;
 		}
 	}
 }

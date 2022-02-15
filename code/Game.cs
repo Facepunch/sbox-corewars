@@ -5,6 +5,7 @@ using Sandbox;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Facepunch.CoreWars
 {
@@ -86,8 +87,8 @@ namespace Facepunch.CoreWars
 			base.ClientJoined( client );
 
 			var player = new Player( client );
-
 			client.Pawn = player;
+			Map.Current.AddViewer( client );
 
 			player.CreateInventory();
 
@@ -102,13 +103,18 @@ namespace Facepunch.CoreWars
 			if ( !IsServer )
 				return;
 
+			StartLoadMapTask();
+		}
+		
+		private async void StartLoadMapTask()
+		{
 			var map = Map.Create( 1337 );
 
 			map.OnInitialized += OnMapInitialized;
 			map.SetBuildCollisionInThread( true );
-			map.SetMinimumLoadedChunks( 32 );
-			map.SetChunkRenderDistance( 8 );
-			map.SetChunkUnloadDistance( 16 );
+			map.SetMinimumLoadedChunks( 8 );
+			map.SetChunkRenderDistance( 4 );
+			map.SetChunkUnloadDistance( 8 );
 			map.SetChunkSize( 32, 32, 32 );
 			map.SetSeaLevel( 48 );
 			map.SetMaxSize( 256, 256, 128 );
@@ -118,25 +124,27 @@ namespace Facepunch.CoreWars
 			map.AddBiome<PlainsBiome>();
 			map.AddBiome<WeirdBiome>();
 
-			var startChunkSize = 4;
+			await GameTask.Delay( 500 );
+
+			var startChunkSize = 2;
 
 			for ( var x = 0; x < startChunkSize; x++ )
 			{
 				for ( var y = 0; y < startChunkSize; y++ )
 				{
-					for ( var z = 0; z < startChunkSize; z++ )
-					{
-						map.GetOrCreateChunk(
-							x * map.ChunkSize.x,
-							y * map.ChunkSize.y,
-							z * map.ChunkSize.z
-						);
-					}
+					map.GetOrCreateChunk(
+						x * map.ChunkSize.x,
+						y * map.ChunkSize.y,
+						0
+					);
 				}
 			}
 
+			await GameTask.Delay( 1000 );
+
 			map.Init();
 		}
+
 
 		private void OnMapInitialized()
 		{
@@ -149,7 +157,6 @@ namespace Facepunch.CoreWars
 		private void SendMapToPlayer( Player player )
 		{
 			Map.Current.Send( player.Client );
-			Map.Current.AddViewer( player.Client );
 
 			StateSystem.Active?.OnPlayerJoined( player );
 

@@ -63,7 +63,7 @@ namespace Facepunch.CoreWars.Voxel
 
 		public int ToIndex( IntVector3 position, int component )
 		{
-			return (((position.z * ChunkSizeY * ChunkSizeZ) + (position.y * ChunkSizeZ) + position.x) * 4) + component;
+			return (((position.z * ChunkSizeY * ChunkSizeX) + (position.y * ChunkSizeX) + position.x) * 4) + component;
 		}
 
 		public bool IsInBounds( int index )

@@ -72,7 +72,7 @@ namespace Facepunch.CoreWars.Voxel
 					var biome = Map.GetBiomeAt( x + offset.x, y + offset.y );
 					var h = GetHeight( x, y );
 
-					for ( var z = 0; z < Chunk.SizeX; z++ )
+					for ( var z = 0; z < Chunk.SizeZ; z++ )
 					{
 						var index = Chunk.GetLocalPositionIndex( x, y, z );
 						var position = new IntVector3( x, y, z );
@@ -80,13 +80,9 @@ namespace Facepunch.CoreWars.Voxel
 						if ( z + offset.z > h )
 						{
 							if ( z + offset.z < Map.SeaLevel )
-							{
 								Chunk.CreateBlockAtPosition( position, biome.LiquidBlockId );
-							}
 							else if ( Chunk.Blocks[index] == 0 && z == Chunk.SizeZ - 1 )
-							{
 								Chunk.LightMap.AddSunLight( position, 15 );
-							}
 						}
 						else
 						{
@@ -122,9 +118,7 @@ namespace Facepunch.CoreWars.Voxel
 							var sunlightLevel = topChunk.LightMap.GetSunLight( new IntVector3( x, y, 0 ) );
 
 							if ( sunlightLevel > 0 )
-							{
 								Chunk.LightMap.AddSunLight( new IntVector3( x, y, Chunk.SizeZ - 1 ), sunlightLevel );
-							}
 						}
 					}
 				}

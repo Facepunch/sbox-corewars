@@ -69,6 +69,8 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
+		public readonly int Length => (int)Math.Sqrt( x * x + y * y + z * z );
+
 		public readonly int LengthSquared => x * x + y * y + z * z;
 
 		public override string ToString()
