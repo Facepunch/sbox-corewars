@@ -199,9 +199,9 @@ namespace Facepunch.CoreWars.Voxel
 				IsFullUpdateActive = false;
 				QueueRebuild = true;
 			}
-			catch ( TaskCanceledException e )
+			catch ( TaskCanceledException )
 			{
-				return;
+
 			}
 		}
 
@@ -231,12 +231,12 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
-		public async void StartFirstFullUpdateTask()
+		public void StartFirstFullUpdateTask()
 		{
 			LightMap.UpdateTorchLight();
 			LightMap.UpdateSunLight();
 
-			UpdateVerticesResult = await StartUpdateVerticesTask();
+			UpdateVerticesResult = StartUpdateVerticesTask();
 
 			if ( Map.BuildCollisionInThread )
 			{
@@ -815,8 +815,13 @@ namespace Facepunch.CoreWars.Voxel
 			2, 2, 1, 1, 0, 0
 		};
 
-		public Task<ChunkVertexData> StartUpdateVerticesTask()
+		public ChunkVertexData StartUpdateVerticesTask()
 		{
+			var output = new ChunkVertexData
+			{
+				IsValid = false
+			};
+
 			lock ( VertexLock )
 			{
 				var translucentVertices = new List<BlockVertex>();
@@ -833,7 +838,8 @@ namespace Facepunch.CoreWars.Voxel
 					{
 						for ( var z = 0; z < SizeZ; z++ )
 						{
-							//GameTask.CancelIfInvalid();
+							// We need to check if the game is still running.
+							if ( !Game.Current.IsValid() ) break;
 
 							var position = new IntVector3( x, y, z );
 							var index = x * SizeY * SizeZ + y * SizeZ + z;
@@ -889,15 +895,14 @@ namespace Facepunch.CoreWars.Voxel
 					}
 				}
 
-				return GameTask.FromResult( new ChunkVertexData
-				{
-					TranslucentVertices = translucentVertices.ToArray(),
-					OpaqueVertices = opaqueVertices.ToArray(),
-					CollisionVertices = collisionVertices.ToArray(),
-					CollisionIndices = collisionIndices.ToArray(),
-					IsValid = true
-				} );
+				output.TranslucentVertices = translucentVertices.ToArray();
+				output.OpaqueVertices = opaqueVertices.ToArray();
+				output.CollisionVertices = collisionVertices.ToArray();
+				output.CollisionIndices = collisionIndices.ToArray();
+				output.IsValid = true;
 			}
+
+			return output;
 		}
 
 		[Event.Tick.Server]
@@ -1009,25 +1014,19 @@ namespace Facepunch.CoreWars.Voxel
 			return GetNeighbours().Any( c => c.IsFullUpdateTaskRunning() );
 		}
 
-		private async Task StartFullUpdateTask()
+		private void StartFullUpdateTask()
 		{
 			try
 			{
 				LightMap.UpdateTorchLight();
 				LightMap.UpdateSunLight();
 
-				UpdateVerticesResult = await StartUpdateVerticesTask();
+				UpdateVerticesResult = StartUpdateVerticesTask();
 
 				if ( Map.BuildCollisionInThread )
 				{
 					BuildCollision();
 				}
-
-				await GameTask.Delay( 1 );
-			}
-			catch ( TaskCanceledException e )
-			{
-				return;
 			}
 			catch ( Exception e )
 			{

@@ -1179,6 +1179,12 @@ namespace Facepunch.CoreWars.Voxel
 
 					if ( IsClient )
 					{
+						if ( !Local.Pawn.IsValid() )
+						{
+							await GameTask.Delay( 1000 / 30 );
+							continue;
+						}
+
 						var currentDistance = float.PositiveInfinity;
 						var localPawnPosition = Local.Pawn.Position;
 
@@ -1206,13 +1212,14 @@ namespace Facepunch.CoreWars.Voxel
 						}
 					}
 				}
-				catch ( TaskCanceledException e )
+				catch ( TaskCanceledException )
 				{
 					break;
 				}
 				catch ( Exception e )
 				{
 					Log.Error( e );
+					break;
 				}
 			}
 		}
