@@ -324,13 +324,9 @@ namespace Facepunch.CoreWars
 
 			SimulateActiveChild( client, ActiveChild );
 
-			if ( !currentMap.IsValid() ) return;
-
-			var voxelPosition = currentMap.ToVoxelPosition( Position );
-			var currentChunk = currentMap.GetChunk( voxelPosition );
-
-			if ( currentChunk.IsValid() && !currentChunk.HasDoneFirstFullUpdate )
-				return;
+			var viewer = Client.Components.Get<ChunkViewer>();
+			if ( !viewer.IsValid() ) return;
+			if ( !viewer.IsCurrentChunkReady ) return;
 
 			var controller = GetActiveController();
 			controller?.Simulate( client, this, GetActiveAnimator() );

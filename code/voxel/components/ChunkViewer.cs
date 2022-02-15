@@ -8,6 +8,8 @@ namespace Facepunch.CoreWars.Voxel
 {
 	public partial class ChunkViewer : EntityComponent, IValid
 	{
+		[Net] public bool IsCurrentChunkReady { get; private set; }
+
 		public bool IsServer => Host.IsServer;
 		public bool IsClient => Host.IsClient;
 
@@ -94,6 +96,9 @@ namespace Facepunch.CoreWars.Voxel
 
 			var voxelPosition = currentMap.ToVoxelPosition( position );
 			var currentChunkOffset = currentMap.ToChunkOffset( voxelPosition );
+			var currentChunk = currentMap.GetChunk( voxelPosition );
+
+			IsCurrentChunkReady = currentChunk.IsValid() && currentChunk.HasDoneFirstFullUpdate;
 
 			if ( Map.Current.IsInBounds( currentChunkOffset ) )
 			{

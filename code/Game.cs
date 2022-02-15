@@ -123,7 +123,7 @@ namespace Facepunch.CoreWars
 			map.AddBiome<PlainsBiome>();
 			map.AddBiome<WeirdBiome>();
 
-			await GameTask.Delay( 1000 );
+			await GameTask.Delay( 500 );
 
 			var startChunkSize = 4;
 
@@ -131,13 +131,15 @@ namespace Facepunch.CoreWars
 			{
 				for ( var y = 0; y < startChunkSize; y++ )
 				{
+					await GameTask.Delay( 100 );
+
 					var chunk = map.GetOrCreateChunk(
 						x * map.ChunkSize.x,
 						y * map.ChunkSize.y,
 						0
 					);
 
-					await chunk.Initialize();
+					_ = chunk.Initialize();
 				}
 			}
 
