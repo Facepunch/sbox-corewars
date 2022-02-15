@@ -36,7 +36,7 @@ namespace Facepunch.CoreWars
 		public override string ProjectileModel => "models/weapons/barage_grenade/barage_grenade.vmdl";
 		public override int ClipSize => 1;
 		public override float ReloadTime => 2.3f;
-		public override float ProjectileLifeTime => 1.5f;
+		public override float ProjectileLifeTime => 4f;
 		public virtual float BlastRadius => 96f;
 
 		public override void Spawn()
