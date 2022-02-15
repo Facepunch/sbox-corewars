@@ -78,7 +78,7 @@
         <key>jpgQuality</key>
         <uint>80</uint>
         <key>pngOptimizationLevel</key>
-        <uint>1</uint>
+        <uint>0</uint>
         <key>webpQualityLevel</key>
         <uint>101</uint>
         <key>textureSubPath</key>
@@ -106,7 +106,7 @@
         <key>algorithmSettings</key>
         <struct type="AlgorithmSettings">
             <key>algorithm</key>
-            <enum type="AlgorithmSettings::AlgorithmId">MaxRects</enum>
+            <enum type="AlgorithmSettings::AlgorithmId">Basic</enum>
             <key>freeSizeMode</key>
             <enum type="AlgorithmSettings::AlgorithmFreeSizeMode">Best</enum>
             <key>sizeConstraints</key>
@@ -167,7 +167,7 @@
             <key>trimMargin</key>
             <uint>1</uint>
             <key>trimMode</key>
-            <enum type="SpriteSettings::TrimMode">Trim</enum>
+            <enum type="SpriteSettings::TrimMode">None</enum>
             <key>tracerTolerance</key>
             <int>200</int>
             <key>heuristicMask</key>
@@ -179,17 +179,18 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
-            <key type="filename">blocks/dirt_ao.png</key>
-            <key type="filename">blocks/dirt_grass_ao.png</key>
-            <key type="filename">blocks/grass_ao.png</key>
-            <key type="filename">blocks/leaf_ao.png</key>
-            <key type="filename">blocks/log_side_ao.png</key>
-            <key type="filename">blocks/log_top_ao.png</key>
-            <key type="filename">blocks/metalgrate_ao.png</key>
-            <key type="filename">blocks/sand_ao.png</key>
-            <key type="filename">blocks/stone_ao.png</key>
-            <key type="filename">blocks/window_ao.png</key>
-            <key type="filename">blocks/woodplanks_ao.png</key>
+            <key type="filename">blocks/ao/dirt_ao.png</key>
+            <key type="filename">blocks/ao/dirt_grass_ao.png</key>
+            <key type="filename">blocks/ao/grass_ao.png</key>
+            <key type="filename">blocks/ao/leaf_ao.png</key>
+            <key type="filename">blocks/ao/log_side_ao.png</key>
+            <key type="filename">blocks/ao/log_top_ao.png</key>
+            <key type="filename">blocks/ao/metalgrate_ao.png</key>
+            <key type="filename">blocks/ao/sand_ao.png</key>
+            <key type="filename">blocks/ao/stone_ao.png</key>
+            <key type="filename">blocks/ao/water_ao.png</key>
+            <key type="filename">blocks/ao/window_ao.png</key>
+            <key type="filename">blocks/ao/woodplanks_ao.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -207,17 +208,7 @@
         </map>
         <key>fileList</key>
         <array>
-            <filename>blocks/dirt_ao.png</filename>
-            <filename>blocks/dirt_grass_ao.png</filename>
-            <filename>blocks/grass_ao.png</filename>
-            <filename>blocks/leaf_ao.png</filename>
-            <filename>blocks/log_side_ao.png</filename>
-            <filename>blocks/log_top_ao.png</filename>
-            <filename>blocks/metalgrate_ao.png</filename>
-            <filename>blocks/sand_ao.png</filename>
-            <filename>blocks/stone_ao.png</filename>
-            <filename>blocks/window_ao.png</filename>
-            <filename>blocks/woodplanks_ao.png</filename>
+            <filename>blocks/ao</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

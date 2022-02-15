@@ -29,7 +29,7 @@ namespace Facepunch.CoreWars.Voxel
 			var block = Map.Current.GetBlockType( BlockId );
 			if ( string.IsNullOrEmpty( block.DefaultTexture ) ) return string.Empty;
 
-			return $"textures/blocks/{ block.DefaultTexture }_color.png";
+			return $"textures/blocks/color/{ block.DefaultTexture }.png";
 		}
 
 		public override void Write( BinaryWriter writer )

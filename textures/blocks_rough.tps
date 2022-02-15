@@ -179,18 +179,18 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
-            <key type="filename">blocks/dirt_grass_rough.png</key>
-            <key type="filename">blocks/dirt_rough.png</key>
-            <key type="filename">blocks/grass_rough.png</key>
-            <key type="filename">blocks/leaf_rough.png</key>
-            <key type="filename">blocks/log_side_rough.png</key>
-            <key type="filename">blocks/log_top_rough.png</key>
-            <key type="filename">blocks/metalgrate_rough.png</key>
-            <key type="filename">blocks/sand_rough.png</key>
-            <key type="filename">blocks/stone_rough.png</key>
-            <key type="filename">blocks/water_rough.png</key>
-            <key type="filename">blocks/window_rough.png</key>
-            <key type="filename">blocks/woodplanks_rough.png</key>
+            <key type="filename">blocks/rough/dirt_grass_rough.png</key>
+            <key type="filename">blocks/rough/dirt_rough.png</key>
+            <key type="filename">blocks/rough/grass_rough.png</key>
+            <key type="filename">blocks/rough/leaf_rough.png</key>
+            <key type="filename">blocks/rough/log_side_rough.png</key>
+            <key type="filename">blocks/rough/log_top_rough.png</key>
+            <key type="filename">blocks/rough/metalgrate_rough.png</key>
+            <key type="filename">blocks/rough/sand_rough.png</key>
+            <key type="filename">blocks/rough/stone_rough.png</key>
+            <key type="filename">blocks/rough/water_rough.png</key>
+            <key type="filename">blocks/rough/window_rough.png</key>
+            <key type="filename">blocks/rough/woodplanks_rough.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -208,18 +208,7 @@
         </map>
         <key>fileList</key>
         <array>
-            <filename>blocks/dirt_grass_rough.png</filename>
-            <filename>blocks/dirt_rough.png</filename>
-            <filename>blocks/grass_rough.png</filename>
-            <filename>blocks/leaf_rough.png</filename>
-            <filename>blocks/log_side_rough.png</filename>
-            <filename>blocks/log_top_rough.png</filename>
-            <filename>blocks/metalgrate_rough.png</filename>
-            <filename>blocks/sand_rough.png</filename>
-            <filename>blocks/stone_rough.png</filename>
-            <filename>blocks/water_rough.png</filename>
-            <filename>blocks/window_rough.png</filename>
-            <filename>blocks/woodplanks_rough.png</filename>
+            <filename>blocks/rough</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

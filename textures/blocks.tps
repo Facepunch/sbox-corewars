@@ -185,18 +185,18 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
-            <key type="filename">blocks/dirt_color.png</key>
-            <key type="filename">blocks/dirt_grass_color.png</key>
-            <key type="filename">blocks/grass_color.png</key>
-            <key type="filename">blocks/leaf_color.png</key>
-            <key type="filename">blocks/log_side_color.png</key>
-            <key type="filename">blocks/log_top_color.png</key>
-            <key type="filename">blocks/metalgrate_color.png</key>
-            <key type="filename">blocks/sand_color.png</key>
-            <key type="filename">blocks/stone_color.png</key>
-            <key type="filename">blocks/water_color.png</key>
-            <key type="filename">blocks/window_color.png</key>
-            <key type="filename">blocks/woodplanks_color.png</key>
+            <key type="filename">blocks/color/dirt_color.png</key>
+            <key type="filename">blocks/color/dirt_grass_color.png</key>
+            <key type="filename">blocks/color/grass_color.png</key>
+            <key type="filename">blocks/color/leaf_color.png</key>
+            <key type="filename">blocks/color/log_side_color.png</key>
+            <key type="filename">blocks/color/log_top_color.png</key>
+            <key type="filename">blocks/color/metalgrate_color.png</key>
+            <key type="filename">blocks/color/sand_color.png</key>
+            <key type="filename">blocks/color/stone_color.png</key>
+            <key type="filename">blocks/color/water_color.png</key>
+            <key type="filename">blocks/color/window_color.png</key>
+            <key type="filename">blocks/color/woodplanks_color.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -214,18 +214,7 @@
         </map>
         <key>fileList</key>
         <array>
-            <filename>blocks/dirt_color.png</filename>
-            <filename>blocks/dirt_grass_color.png</filename>
-            <filename>blocks/grass_color.png</filename>
-            <filename>blocks/leaf_color.png</filename>
-            <filename>blocks/log_side_color.png</filename>
-            <filename>blocks/log_top_color.png</filename>
-            <filename>blocks/metalgrate_color.png</filename>
-            <filename>blocks/sand_color.png</filename>
-            <filename>blocks/stone_color.png</filename>
-            <filename>blocks/window_color.png</filename>
-            <filename>blocks/woodplanks_color.png</filename>
-            <filename>blocks/water_color.png</filename>
+            <filename>blocks/color</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>
