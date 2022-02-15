@@ -26,6 +26,18 @@ namespace Facepunch.CoreWars
 		private string GetChunksLoaded()
 		{
 			if ( !Map.Current.IsValid() ) return "Generating Map...";
+
+			var viewer = Local.Client.GetChunkViewer();
+			if ( !viewer.IsValid() ) return "Initializing Player...";
+
+			if ( !viewer.HasLoadedMinimumChunks() )
+			{
+				var minimumChunks = Map.Current.MinimumLoadedChunks;
+				var loadedChunks = viewer.LoadedChunks.Count;
+
+				return $"Loading Minimum Chunks {loadedChunks}/{minimumChunks}";
+			}
+
 			return string.Empty;
 		}
 
@@ -34,7 +46,10 @@ namespace Facepunch.CoreWars
 			if ( Map.Current == null || !Map.Current.Initialized )
 				return false;
 
-			return true;
+			var viewer = Local.Client.GetChunkViewer();
+			if ( !viewer.IsValid() ) return false;
+
+			return viewer.HasLoadedMinimumChunks();
 		}
 	}
 }

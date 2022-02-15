@@ -87,7 +87,6 @@ namespace Facepunch.CoreWars
 
 			var player = new Player( client );
 
-			client.Components.Add( new ChunkViewer() );
 			client.Pawn = player;
 
 			player.CreateInventory();
@@ -106,7 +105,11 @@ namespace Facepunch.CoreWars
 			var map = Map.Create( 1337 );
 
 			map.OnInitialized += OnMapInitialized;
-			map.BuildCollisionInThread = true;
+			map.SetBuildCollisionInThread( true );
+			map.SetMinimumLoadedChunks( 32 );
+			map.SetChunkRenderDistance( 8 );
+			map.SetChunkUnloadDistance( 16 );
+			map.SetChunkSize( 32, 32, 32 );
 			map.SetSeaLevel( 48 );
 			map.SetMaxSize( 256, 256, 128 );
 			map.LoadBlockAtlas( "textures/blocks.json" );
@@ -124,9 +127,9 @@ namespace Facepunch.CoreWars
 					for ( var z = 0; z < startChunkSize; z++ )
 					{
 						map.GetOrCreateChunk(
-							x * Chunk.ChunkSize,
-							y * Chunk.ChunkSize,
-							z * Chunk.ChunkSize
+							x * map.ChunkSize.x,
+							y * map.ChunkSize.y,
+							z * map.ChunkSize.z
 						);
 					}
 				}
@@ -146,6 +149,7 @@ namespace Facepunch.CoreWars
 		private void SendMapToPlayer( Player player )
 		{
 			Map.Current.Send( player.Client );
+			Map.Current.AddViewer( player.Client );
 
 			StateSystem.Active?.OnPlayerJoined( player );
 

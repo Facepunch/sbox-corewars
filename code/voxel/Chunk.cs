@@ -1,5 +1,6 @@
 ﻿using Sandbox;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,20 +19,18 @@ namespace Facepunch.CoreWars.Voxel
 			public bool IsValid;
 		}
 
-		public static readonly int ChunkSize = 32;
-		public static readonly int VoxelSize = 48;
-
 		public Dictionary<IntVector3, BlockData> Data { get; set; } = new();
 		public ChunkVertexData UpdateVerticesResult { get; set; }
 
 		public HashSet<IntVector3> DirtyData { get; set; } = new();
 		public bool HasDoneFirstFullUpdate { get; set; }
 		public bool IsFullUpdateActive { get; set; }
-		public bool BuildCollisionInThread { get; private set; }
 		public ChunkGenerator Generator { get; set; }
 		public bool QueueRebuild { get; set; }
 		public bool IsModelCreated { get; private set; }
+		public bool HasGenerated { get; private set; }
 		public bool Initialized { get; private set; }
+		public Vector3 Bounds { get; private set; }
 		public Biome Biome { get; set; }
 
 		public bool IsServer => Host.IsServer;
@@ -40,12 +39,19 @@ namespace Facepunch.CoreWars.Voxel
 		public byte[] Blocks;
 
 		public ChunkLightMap LightMap { get; set; }
+		public int VoxelSize;
+		public int SizeX;
+		public int SizeY;
+		public int SizeZ;
+		public IntVector3 Center;
 		public IntVector3 Offset;
+		public IntVector3 Size;
 		public Map Map;
 
 		public PhysicsBody Body;
 		public PhysicsShape Shape;
 
+		private ConcurrentQueue<PhysicsShape> ShapesToDelete { get; set; } = new();
 		private Dictionary<int, BlockEntity> Entities { get; set; }
 		private SceneObject TranslucentSceneObject { get; set; }
 		private SceneObject OpaqueSceneObject { get; set; }
@@ -67,8 +73,14 @@ namespace Facepunch.CoreWars.Voxel
 
 		public Chunk( Map map, int x, int y, int z )
 		{
-			BuildCollisionInThread = map.BuildCollisionInThread;
-			Blocks = new byte[ChunkSize * ChunkSize * ChunkSize];
+			VoxelSize = map.VoxelSize;
+			SizeX = map.ChunkSize.x;
+			SizeY = map.ChunkSize.y;
+			SizeZ = map.ChunkSize.z;
+			Size = new IntVector3( SizeX, SizeY, SizeZ );
+			Center = new IntVector3( SizeX / 2, SizeY / 2, SizeZ / 2 );
+			Bounds = new Vector3( SizeX, SizeY, SizeZ ) * VoxelSize;
+			Blocks = new byte[SizeX * SizeY * SizeZ];
 			Entities = new();
 			LightMap = new ChunkLightMap( this, map );
 			Offset = new IntVector3( x, y, z );
@@ -81,7 +93,7 @@ namespace Facepunch.CoreWars.Voxel
 			if ( Initialized )
 				return;
 
-			await GameTask.RunInThreadAsync( StartInitialLightingTask );
+			await GameTask.RunInThreadAsync( StartThreadedInitializeTask );
 
 			CreateEntities();
 			Initialized = true;
@@ -93,7 +105,7 @@ namespace Facepunch.CoreWars.Voxel
 				OpaqueMesh = new Mesh( material );
 
 				var boundsMin = Vector3.Zero;
-				var boundsMax = boundsMin + (ChunkSize * VoxelSize);
+				var boundsMax = boundsMin + new Vector3( SizeX, SizeY, SizeZ) * VoxelSize;
 				TranslucentMesh.SetBounds( boundsMin, boundsMax );
 				OpaqueMesh.SetBounds( boundsMin, boundsMax );
 			}
@@ -140,7 +152,7 @@ namespace Facepunch.CoreWars.Voxel
 			if ( lx < 0 || ly < 0 || lz < 0 )
 				return false;
 
-			if ( lx >= ChunkSize || ly >= ChunkSize || lz >= ChunkSize )
+			if ( lx >= SizeX || ly >= SizeY || lz >= SizeZ )
 				return false;
 
 			return true;
@@ -151,7 +163,7 @@ namespace Facepunch.CoreWars.Voxel
 			if ( localPosition.x < 0 || localPosition.y < 0 || localPosition.z < 0 )
 				return false;
 
-			if ( localPosition.x >= ChunkSize || localPosition.y >= ChunkSize || localPosition.z >= ChunkSize )
+			if ( localPosition.x >= SizeX || localPosition.y >= SizeY || localPosition.z >= SizeZ )
 				return false;
 
 			return true;
@@ -170,15 +182,23 @@ namespace Facepunch.CoreWars.Voxel
 
 		public async void FullUpdate()
 		{
-			if ( IsFullUpdateTaskRunning() ) return;
+			if ( !IsValid || IsFullUpdateTaskRunning() )
+				return;
 
-			IsFullUpdateActive = true;
-			QueuedFullUpdate = false;
+			try
+			{
+				IsFullUpdateActive = true;
+				QueuedFullUpdate = false;
 
-			await GameTask.RunInThreadAsync( StartFullUpdateTask );
+				await GameTask.RunInThreadAsync( StartFullUpdateTask );
 
-			IsFullUpdateActive = false;
-			QueueRebuild = true;
+				IsFullUpdateActive = false;
+				QueueRebuild = true;
+			}
+			catch ( TaskCanceledException e )
+			{
+				return;
+			}
 		}
 
 		public Voxel GetVoxel( IntVector3 position )
@@ -197,20 +217,24 @@ namespace Facepunch.CoreWars.Voxel
 			return voxel;
 		}
 
-		public async Task StartFirstFullUpdateTask()
+		public void StartGeneratorTask()
 		{
-			if ( IsServer && Generator != null )
+			if ( !HasGenerated && Generator != null )
 			{
 				Generator.Initialize();
 				Generator.Generate();
+				HasGenerated = true;
 			}
+		}
 
+		public async Task StartFirstFullUpdateTask()
+		{
 			LightMap.UpdateTorchLight();
 			LightMap.UpdateSunLight();
 
 			UpdateVerticesResult = await StartUpdateVerticesTask();
 
-			if ( BuildCollisionInThread )
+			if ( Map.BuildCollisionInThread )
 			{
 				BuildCollision();
 			}
@@ -221,11 +245,11 @@ namespace Facepunch.CoreWars.Voxel
 
 		public void PerformFullTorchUpdate()
 		{
-			for ( var x = 0; x < ChunkSize; x++ )
+			for ( var x = 0; x < SizeX; x++ )
 			{
-				for ( var y = 0; y < ChunkSize; y++ )
+				for ( var y = 0; y < SizeY; y++ )
 				{
-					for ( var z = 0; z < ChunkSize; z++ )
+					for ( var z = 0; z < SizeZ; z++ )
 					{
 						var position = new IntVector3( x, y, z );
 						var blockIndex = GetLocalPositionIndex( position );
@@ -298,17 +322,17 @@ namespace Facepunch.CoreWars.Voxel
 			IntVector3 position;
 
 			if ( direction == BlockFace.Top )
-				position = new IntVector3( 0, 0, ChunkSize );
+				position = new IntVector3( 0, 0, SizeZ );
 			else if ( direction == BlockFace.Bottom )
-				position = new IntVector3( 0, 0, -ChunkSize );
+				position = new IntVector3( 0, 0, -SizeZ );
 			else if ( direction == BlockFace.North )
-				position = new IntVector3( 0, ChunkSize, 0 );
+				position = new IntVector3( 0, SizeY, 0 );
 			else if ( direction == BlockFace.South )
-				position = new IntVector3( 0, -ChunkSize, 0 );
+				position = new IntVector3( 0, -SizeY, 0 );
 			else if ( direction == BlockFace.East )
-				position = new IntVector3( ChunkSize, 0, 0 );
+				position = new IntVector3( SizeX, 0, 0 );
 			else
-				position = new IntVector3( -ChunkSize, 0, 0 );
+				position = new IntVector3( -SizeX, 0, 0 );
 
 			return Offset + position;
 		}
@@ -348,15 +372,15 @@ namespace Facepunch.CoreWars.Voxel
 				TranslucentSceneObject.SetValue( "VoxelSize", VoxelSize );
 				TranslucentSceneObject.SetValue( "LightMap", LightMap.Texture );
 
-				UpdateAdjacents( true );
-
 				IsModelCreated = true;
 			}
 
-			if ( !BuildCollisionInThread )
+			if ( !Map.BuildCollisionInThread )
 			{
 				BuildCollision();
 			}
+
+			UpdateAdjacents( true );
 
 			QueueRebuild = false;
 		}
@@ -452,20 +476,20 @@ namespace Facepunch.CoreWars.Voxel
 
 		public int GetLocalPositionIndex( int x, int y, int z )
 		{
-			return x + y * ChunkSize + z * ChunkSize * ChunkSize;
+			return x * SizeY * SizeZ + y * SizeZ + z;
 		}
 
 		public int GetLocalPositionIndex( IntVector3 position )
 		{
-			return position.x + position.y * ChunkSize + position.z * ChunkSize * ChunkSize;
+			return position.x * SizeY * SizeZ + position.y * SizeZ + position.z;
 		}
 
 		public byte GetMapPositionBlock( IntVector3 position )
 		{
-			var x = position.x % ChunkSize;
-			var y = position.y % ChunkSize;
-			var z = position.z % ChunkSize;
-			var index = x + y * ChunkSize + z * ChunkSize * ChunkSize;
+			var x = position.x % SizeX;
+			var y = position.y % SizeY;
+			var z = position.z % SizeZ;
+			var index = x * SizeY * SizeZ + y * SizeZ + z;
 			return Blocks[index];
 		}
 
@@ -491,20 +515,25 @@ namespace Facepunch.CoreWars.Voxel
 
 		public void CreateEntities()
 		{
-			for ( var x = 0; x < ChunkSize; x++ )
+			var isServer = IsServer;
+
+			for ( var x = 0; x < SizeX; x++ )
 			{
-				for ( var y = 0; y < ChunkSize; y++ )
+				for ( var y = 0; y < SizeY; y++ )
 				{
-					for ( var z = 0; z < ChunkSize; z++ )
+					for ( var z = 0; z < SizeZ; z++ )
 					{
-						var position = new IntVector3( x, y, z );
-						var blockId = GetLocalPositionBlock( position );
+						var index = x * SizeY * SizeZ + y * SizeZ + z;
+						var blockId = Blocks[index];
+						if ( blockId == 0 ) continue;
+
 						var block = Map.GetBlockType( blockId );
-						var entityName = IsServer ? block.ServerEntity : block.ClientEntity;
+						var entityName = isServer ? block.ServerEntity : block.ClientEntity;
 
 						if ( !string.IsNullOrEmpty( entityName ) )
 						{
 							var entity = Library.Create<BlockEntity>( entityName );
+							var position = new IntVector3( x, y, z );
 							entity.BlockType = block;
 							SetEntity( position, entity );
 						}
@@ -515,11 +544,11 @@ namespace Facepunch.CoreWars.Voxel
 
 		public void PropagateSunlight()
 		{
-			var z = ChunkSize - 1;
+			var z = SizeZ - 1;
 
-			for ( var x = 0; x < ChunkSize; x++ )
+			for ( var x = 0; x < SizeX; x++ )
 			{
-				for ( var y = 0; y < ChunkSize; y++ )
+				for ( var y = 0; y < SizeY; y++ )
 				{
 					var position = new IntVector3( x, y, z );
 					var blockId = GetLocalPositionBlock( position );
@@ -536,24 +565,34 @@ namespace Facepunch.CoreWars.Voxel
 			if ( !chunkAbove.IsValid() ) return;
 			if ( !chunkAbove.Initialized ) return;
 
-			for ( var x = 0; x < ChunkSize; x++ )
+			for ( var x = 0; x < SizeX; x++ )
 			{
-				for ( var y = 0; y < ChunkSize; y++ )
+				for ( var y = 0; y < SizeY; y++ )
 				{
 					var lightLevel = Map.GetSunLight( chunkAbove.Offset + new IntVector3( x, y, 0 ) );
 
 					if ( lightLevel > 0 )
 					{
-						LightMap.AddSunLight( new IntVector3( x, y, ChunkSize - 1 ), lightLevel );
+						LightMap.AddSunLight( new IntVector3( x, y, SizeZ - 1 ), lightLevel );
 					}
 				}
 			}
 		}
 
+		public int GetSizeInDirection( BlockFace direction )
+		{
+			if ( direction == BlockFace.Top || direction == BlockFace.Bottom )
+				return SizeZ;
+			else if ( direction == BlockFace.North || direction == BlockFace.South )
+				return SizeY;
+			else
+				return SizeX;
+		}
+
 		public Chunk GetNeighbour( BlockFace direction )
 		{
 			var directionIndex = (int)direction;
-			var neighbourPosition = Offset + (BlockDirections[directionIndex] * ChunkSize);
+			var neighbourPosition = Offset + (BlockDirections[directionIndex] * GetSizeInDirection( direction ));
 			return Map.GetChunk( neighbourPosition );
 		}
 
@@ -569,6 +608,16 @@ namespace Facepunch.CoreWars.Voxel
 
 		public void Destroy()
 		{
+			if ( IsClient )
+			{
+				var viewer = Local.Client.GetChunkViewer();
+
+				if ( viewer.IsValid() )
+				{
+					viewer.RemoveLoadedChunk( Offset );
+				}
+			}
+
 			if ( TranslucentSceneObject != null )
 			{
 				TranslucentSceneObject.Delete();
@@ -587,6 +636,8 @@ namespace Facepunch.CoreWars.Voxel
 			}
 
 			Entities.Clear();
+
+			UpdateShapeDeleteQueue();
 
 			if ( Body.IsValid() && Shape.IsValid() )
 			{
@@ -652,7 +703,7 @@ namespace Facepunch.CoreWars.Voxel
 
 				if ( oldShape.IsValid() )
 				{
-					Body.RemoveShape( oldShape );
+					ShapesToDelete.Enqueue( oldShape );
 				}
 			}
 		}
@@ -715,7 +766,7 @@ namespace Facepunch.CoreWars.Voxel
 		{
 			var neighbour = Map.GetChunk( GetAdjacentChunkOffset( direction ) );
 
-			if ( neighbour.IsValid() && neighbour.Initialized )
+			if ( neighbour.IsValid() )
 			{
 				TranslucentSceneObject?.SetValue( name, neighbour.LightMap.Texture );
 				OpaqueSceneObject?.SetValue( name, neighbour.LightMap.Texture );
@@ -772,14 +823,15 @@ namespace Facepunch.CoreWars.Voxel
 				var faceWidth = 1;
 				var faceHeight = 1;
 
-				for ( var x = 0; x < ChunkSize; x++ )
+				for ( var x = 0; x < SizeX; x++ )
 				{
-					for ( var y = 0; y < ChunkSize; y++ )
+					for ( var y = 0; y < SizeY; y++ )
 					{
-						for ( var z = 0; z < ChunkSize; z++ )
+						for ( var z = 0; z < SizeZ; z++ )
 						{
 							var position = new IntVector3( x, y, z );
-							var blockId = GetLocalPositionBlock( position );
+							var index = x * SizeY * SizeZ + y * SizeZ + z;
+							var blockId = Blocks[index];
 							if ( blockId == 0 ) continue;
 
 							var block = Map.GetBlockType( blockId );
@@ -871,7 +923,7 @@ namespace Facepunch.CoreWars.Voxel
 
 			if ( IsFullUpdateTaskRunning() ) return;
 
-			if ( !BuildCollisionInThread && QueueRebuild )
+			if ( !Map.BuildCollisionInThread && QueueRebuild )
 			{
 				BuildCollision();
 				QueueRebuild = false;
@@ -886,27 +938,60 @@ namespace Facepunch.CoreWars.Voxel
 			if ( QueueRebuild && !AreAdjacentChunksUpdating() )
 			{
 				BuildMeshAndCollision();
+
+				var viewer = Local.Client.GetChunkViewer();
+
+				if ( viewer.IsValid() )
+				{
+					viewer.AddLoadedChunk( Offset );
+				}
 			}
 
 			if ( !QueueRebuild && HasDoneFirstFullUpdate )
 			{
-				LightMap.UpdateTexture();
+				LightMap.UpdateTorchLight();
+				LightMap.UpdateSunLight();
+
+				if ( LightMap.UpdateTexture() )
+				{
+					QueueFullUpdate();
+				}
 			}
 		}
 
 		[Event.Tick]
 		private void Tick()
 		{
+			UpdateShapeDeleteQueue();
+
 			if ( QueuedFullUpdate )
 			{
 				FullUpdate();
 			}
 		}
 
-		private async Task StartInitialLightingTask()
+		private void UpdateShapeDeleteQueue()
 		{
-			PropagateSunlight();
-			PerformFullTorchUpdate();
+			while ( ShapesToDelete.Count > 0 )
+			{
+				if ( ShapesToDelete.TryDequeue( out var shape ) )
+				{
+					Body.RemoveShape( shape );
+				}
+			}
+		}
+
+		private async Task StartThreadedInitializeTask()
+		{
+			if ( IsServer )
+			{
+				StartGeneratorTask();
+				PropagateSunlight();
+				PerformFullTorchUpdate();
+			}
+
+			LightMap.UpdateTorchLight();
+			LightMap.UpdateSunLight();
 
 			await GameTask.Delay( 1 );
 		}
@@ -925,7 +1010,7 @@ namespace Facepunch.CoreWars.Voxel
 
 				UpdateVerticesResult = await StartUpdateVerticesTask();
 
-				if ( BuildCollisionInThread )
+				if ( Map.BuildCollisionInThread )
 				{
 					BuildCollision();
 				}

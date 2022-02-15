@@ -45,13 +45,23 @@ namespace Facepunch.CoreWars.Voxel
 				{
 					var seaLevel = reader.ReadInt32();
 					var seed = reader.ReadInt32();
-					var greedyMeshing = reader.ReadBoolean();
+					var chunkSizeX = reader.ReadInt32();
+					var chunkSizeY = reader.ReadInt32();
+					var chunkSizeZ = reader.ReadInt32();
+					var voxelSize = reader.ReadInt32();
+					var chunkRenderDistance = reader.ReadInt32();
+					var chunkUnloadDistance = reader.ReadInt32();
+					var minimumLoadedChunks = reader.ReadInt32();
 					var buildCollisionInThread = reader.ReadBoolean();
 
 					Current = new Map( seed )
 					{
 						SeaLevel = seaLevel,
-						GreedyMeshing = greedyMeshing,
+						ChunkSize = new IntVector3( chunkSizeX, chunkSizeY, chunkSizeZ ),
+						VoxelSize = voxelSize,
+						ChunkRenderDistance = chunkRenderDistance,
+						ChunkUnloadDistance = chunkUnloadDistance,
+						MinimumLoadedChunks = minimumLoadedChunks,
 						BuildCollisionInThread = buildCollisionInThread
 					};
 
@@ -74,7 +84,7 @@ namespace Facepunch.CoreWars.Voxel
 					}
 
 					var biomeCount = reader.ReadInt32();
-
+					
 					for ( var i = 0; i < biomeCount; i++ )
 					{
 						var biomeId = reader.ReadByte();
@@ -161,33 +171,34 @@ namespace Facepunch.CoreWars.Voxel
 			Current?.SetBlockAndUpdate( new IntVector3( x, y, z ), blockId, direction, true );
 		}
 
-		public static BBox ToSourceBBox( IntVector3 position )
+		public BBox ToSourceBBox( IntVector3 position )
 		{
 			var sourcePosition = ToSourcePosition( position );
 			var sourceMins = sourcePosition;
-			var sourceMaxs = sourcePosition + Vector3.One * Chunk.VoxelSize;
+			var sourceMaxs = sourcePosition + new Vector3( ChunkSize.x, ChunkSize.y, ChunkSize.z );
 
 			return new BBox( sourceMins, sourceMaxs );
 		}
 
-		public static Vector3 ToSourcePositionCenter( IntVector3 position )
+		public Vector3 ToSourcePositionCenter( IntVector3 position )
 		{
-			var halfVoxelSize = Chunk.VoxelSize * 0.5f;
+			var halfVoxelSize = VoxelSize * 0.5f;
+
 			return new Vector3(
-				position.x * Chunk.VoxelSize + halfVoxelSize,
-				position.y * Chunk.VoxelSize + halfVoxelSize,
-				position.z * Chunk.VoxelSize + halfVoxelSize
+				position.x * VoxelSize + halfVoxelSize,
+				position.y * VoxelSize + halfVoxelSize,
+				position.z * VoxelSize + halfVoxelSize
 			);
 		}
 
-		public static Vector3 ToSourcePosition( IntVector3 position )
+		public Vector3 ToSourcePosition( IntVector3 position )
 		{
-			return new Vector3( position.x * Chunk.VoxelSize, position.y * Chunk.VoxelSize, position.z * Chunk.VoxelSize );
+			return new Vector3( position.x * VoxelSize, position.y * VoxelSize, position.z * VoxelSize );
 		}
 
-		public static IntVector3 ToVoxelPosition( Vector3 position )
+		public IntVector3 ToVoxelPosition( Vector3 position )
 		{
-			var fPosition = position * (1.0f / Chunk.VoxelSize);
+			var fPosition = position * (1.0f / VoxelSize);
 			return new IntVector3( (int)fPosition.x, (int)fPosition.y, (int)fPosition.z );
 		}
 
@@ -201,8 +212,12 @@ namespace Facepunch.CoreWars.Voxel
 
 		public BlockAtlas BlockAtlas { get; private set; }
 		public IntVector3 MaxSize { get; private set; }
-		public bool BuildCollisionInThread { get; set; }
-		public bool GreedyMeshing { get; private set; }
+		public bool BuildCollisionInThread { get; private set; }
+		public int MinimumLoadedChunks { get; private set; }
+		public int ChunkRenderDistance { get; private set; }
+		public int ChunkUnloadDistance { get; private set; }
+		public IntVector3 ChunkSize { get; private set; } = new IntVector3( 32, 32, 32 );
+		public int VoxelSize { get; private set; } = 48;
 		public bool Initialized { get; private set; }
 		public int SeaLevel { get; private set; }
 		public int Seed { get; private set; }
@@ -215,7 +230,7 @@ namespace Facepunch.CoreWars.Voxel
 		public int SizeZ;
 		public FastNoiseLite CaveNoise;
 
-		private List<Chunk>[] ChunkInitialUpdateLists = new List<Chunk>[4];
+		private List<Chunk>[] ChunkInitialUpdateLists = new List<Chunk>[1];
 
 		private string BlockAtlasFileName { get; set; }
 		private byte NextAvailableBlockId { get; set; }
@@ -315,28 +330,43 @@ namespace Facepunch.CoreWars.Voxel
 
 			Chunks.TryAdd( offset, chunk );
 
-			SizeX = Math.Max( SizeX, offset.x + Chunk.ChunkSize );
-			SizeY = Math.Max( SizeY, offset.y + Chunk.ChunkSize );
-			SizeZ = Math.Max( SizeZ, offset.z + Chunk.ChunkSize );
+			SizeX = Math.Max( SizeX, offset.x + ChunkSize.x );
+			SizeY = Math.Max( SizeY, offset.y + ChunkSize.y );
+			SizeZ = Math.Max( SizeZ, offset.z + ChunkSize.z );
 
 			return chunk;
 		}
 
 		public IntVector3 ToChunkOffset( IntVector3 position )
 		{
-			position.x = Math.Max( (position.x / Chunk.ChunkSize) * Chunk.ChunkSize, 0 );
-			position.y = Math.Max( (position.y / Chunk.ChunkSize) * Chunk.ChunkSize, 0 );
-			position.z = Math.Max( (position.z / Chunk.ChunkSize) * Chunk.ChunkSize, 0 );
+			position.x = Math.Max( (position.x / ChunkSize.x) * ChunkSize.x, 0 );
+			position.y = Math.Max( (position.y / ChunkSize.y) * ChunkSize.y, 0 );
+			position.z = Math.Max( (position.z / ChunkSize.z) * ChunkSize.z, 0 );
 			return position;
+		}
+
+		public ChunkViewer GetViewer( Client client )
+		{
+			if ( client.Components.TryGet<ChunkViewer>( out var viewer ) )
+			{
+				return viewer;
+			}
+
+			return null; ;
+		}
+
+		public ChunkViewer AddViewer( Client client )
+		{
+			return client.Components.GetOrCreate<ChunkViewer>();
 		}
 
 		public Chunk GetChunk( IntVector3 position )
 		{
 			if ( position.x < 0 || position.y < 0 || position.z < 0 ) return null;
 
-			position.x = (position.x / Chunk.ChunkSize) * Chunk.ChunkSize;
-			position.y = (position.y / Chunk.ChunkSize) * Chunk.ChunkSize;
-			position.z = (position.z / Chunk.ChunkSize) * Chunk.ChunkSize;
+			position.x = (position.x / ChunkSize.x) * ChunkSize.x;
+			position.y = (position.y / ChunkSize.y) * ChunkSize.y;
+			position.z = (position.z / ChunkSize.z) * ChunkSize.z;
 
 			if ( Chunks.TryGetValue( position, out var chunk ) )
 			{
@@ -384,7 +414,13 @@ namespace Facepunch.CoreWars.Voxel
 				{
 					writer.Write( SeaLevel );
 					writer.Write( Seed );
-					writer.Write( GreedyMeshing );
+					writer.Write( ChunkSize.x );
+					writer.Write( ChunkSize.y );
+					writer.Write( ChunkSize.z );
+					writer.Write( VoxelSize );
+					writer.Write( ChunkRenderDistance );
+					writer.Write( ChunkUnloadDistance );
+					writer.Write( MinimumLoadedChunks );
 					writer.Write( BuildCollisionInThread );
 					writer.Write( BlockAtlasFileName );
 					writer.Write( BlockData.Count - 1 );
@@ -411,9 +447,39 @@ namespace Facepunch.CoreWars.Voxel
 			}
 		}
 
+		public void SetChunkRenderDistance( int distance )
+		{
+			ChunkRenderDistance = distance;
+		}
+
+		public void SetChunkUnloadDistance( int distance )
+		{
+			ChunkUnloadDistance = distance;
+		}
+
+		public void SetChunkSize( int x, int y, int z )
+		{
+			ChunkSize = new IntVector3( x, y, z );
+		}
+
+		public void SetVoxelSize( int voxelSize )
+		{
+			VoxelSize = voxelSize;
+		}
+
+		public void SetMinimumLoadedChunks( int minimum )
+		{
+			MinimumLoadedChunks = minimum;
+		}
+
+		public void SetBuildCollisionInThread( bool value )
+		{
+			BuildCollisionInThread = value;
+		}
+
 		public bool SetBlockInDirection( Vector3 origin, Vector3 direction, byte blockId, bool checkSourceCollision = false )
 		{
-			var face = Trace( origin * (1.0f / Chunk.VoxelSize), direction.Normal, 10000f, out var endPosition, out _ );
+			var face = Trace( origin * (1.0f / VoxelSize), direction.Normal, 10000f, out var endPosition, out _ );
 
 			if ( face == BlockFace.Invalid )
 				return false;
@@ -434,7 +500,7 @@ namespace Facepunch.CoreWars.Voxel
 
 		public bool GetBlockInDirection( Vector3 origin, Vector3 direction, out IntVector3 position )
 		{
-			var face = Trace( origin * (1.0f / Chunk.VoxelSize), direction.Normal, 10000f, out position, out _ );
+			var face = Trace( origin * (1.0f / VoxelSize), direction.Normal, 10000f, out position, out _ );
 			return (face != BlockFace.Invalid);
 		}
 
@@ -498,6 +564,7 @@ namespace Facepunch.CoreWars.Voxel
 		public static async void ReceiveChunks( byte[] data )
 		{
 			var decompressed = CompressionHelper.Decompress( data );
+			var viewer = Local.Client.GetChunkViewer();
 
 			using ( var stream = new MemoryStream( decompressed ) )
 			{
@@ -514,7 +581,7 @@ namespace Facepunch.CoreWars.Voxel
 						var chunk = Current.GetOrCreateChunk( new IntVector3( x, y, z ) );
 						
 						chunk.Blocks = reader.ReadBytes( chunk.Blocks.Length );
-						//chunk.LightMap.Deserialize( reader );
+						chunk.LightMap.Deserialize( reader );
 						chunk.DeserializeData( reader );
 						chunk.Initialize();
 
@@ -549,7 +616,7 @@ namespace Facepunch.CoreWars.Voxel
 		{
 			var chunk = GetChunk( new IntVector3( x, y, z ) ) ;
 			if ( !chunk.IsValid() ) return Voxel.Empty;
-			return chunk.GetVoxel( x % Chunk.ChunkSize, y % Chunk.ChunkSize, z % Chunk.ChunkSize );
+			return chunk.GetVoxel( x % ChunkSize.x, y % ChunkSize.y, z % ChunkSize.z );
 		}
 
 		public T GetOrCreateData<T>( IntVector3 position ) where T : BlockData
@@ -819,9 +886,9 @@ namespace Facepunch.CoreWars.Voxel
 			return shouldBuild;
 		}
 
-		public static IntVector3 ToLocalPosition( IntVector3 position )
+		public IntVector3 ToLocalPosition( IntVector3 position )
 		{
-			return new IntVector3( position.x % Chunk.ChunkSize, position.y % Chunk.ChunkSize, position.z % Chunk.ChunkSize );
+			return new IntVector3( position.x % ChunkSize.x, position.y % ChunkSize.y, position.z % ChunkSize.z );
 		}
 
 		public static BlockFace GetOppositeDirection( BlockFace direction )
@@ -1111,15 +1178,13 @@ namespace Facepunch.CoreWars.Voxel
 
 						if ( IsClient )
 						{
-							var chunkSize = Chunk.ChunkSize;
 							var currentDistance = float.PositiveInfinity;
-							var halfChunkSize = new IntVector3( chunkSize / 2 );
 							var localPawnPosition = Local.Pawn.Position;
 
 							for ( var i = 0; i < updateList.Count; i++ )
 							{
 								var chunk = updateList[i];
-								var distance = ToSourcePosition( chunk.Offset + halfChunkSize ).Distance( localPawnPosition );
+								var distance = ToSourcePosition( chunk.Offset + chunk.Center ).Distance( localPawnPosition );
 
 								if ( distance < currentDistance )
 								{
@@ -1131,9 +1196,9 @@ namespace Facepunch.CoreWars.Voxel
 					}
 
 					if ( currentChunk.IsValid() )
-					{
-						_ = currentChunk.StartFirstFullUpdateTask();
-					}
+						await currentChunk.StartFirstFullUpdateTask();
+					else
+						await GameTask.Delay( 1000 / 30 );
 
 					if ( currentChunk != null )
 					{
@@ -1142,8 +1207,6 @@ namespace Facepunch.CoreWars.Voxel
 							updateList.Remove( currentChunk );
 						}
 					}
-
-					await GameTask.Delay( 30 );
 				}
 				catch ( TaskCanceledException e )
 				{

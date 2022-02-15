@@ -13,7 +13,7 @@ namespace Facepunch.CoreWars.Voxel
 
 		public override void Initialize()
 		{
-			Heightmap = new int[Chunk.ChunkSize * Chunk.ChunkSize];
+			Heightmap = new int[Chunk.SizeX * Chunk.SizeY];
 
 			Noise1 = new FastNoiseLite( Map.Seed );
 			Noise1.SetNoiseType( FastNoiseLite.NoiseType.OpenSimplex2 );
@@ -42,39 +42,37 @@ namespace Facepunch.CoreWars.Voxel
 
 		public void GenerateHeightmap()
 		{
-			var chunkSize = Chunk.ChunkSize;
 			var offset = Chunk.Offset;
 
-			for ( int y = 0; y < chunkSize; y++ )
+			for ( int y = 0; y < Chunk.SizeY; y++ )
 			{
-				for ( int x = 0; x < chunkSize; x++ )
+				for ( int x = 0; x < Chunk.SizeX; x++ )
 				{
 					var n1 = Noise1.GetNoise( x + offset.x, y + offset.y );
 					var n2 = Noise2.GetNoise( x + offset.x, y + offset.y );
 					var n3 = Noise3.GetNoise( x + offset.x, y + offset.y );
 					var n4 = Noise4.GetNoise( x + offset.x, y + offset.y );
-					Heightmap[x + y * chunkSize] = (int)((n1 + (n2 * n3 * (n4 * 2 - 1))) * 64 + 64);
+					Heightmap[x + y * Chunk.SizeX] = (int)((n1 + (n2 * n3 * (n4 * 2 - 1))) * 64 + 64);
 				}
 			}
 		}
 
 		public override void Generate()
 		{
-			var chunkSize = Chunk.ChunkSize;
 			var offset = Chunk.Offset;
 
-			Rand.SetSeed( offset.x + offset.y + offset.z * chunkSize + Map.Seed );
+			Rand.SetSeed( offset.x + offset.y + offset.z * Chunk.SizeZ + Map.Seed );
 
 			var topChunk = Chunk.GetNeighbour( BlockFace.Top );
 
-			for ( var x = 0; x < chunkSize; x++ )
+			for ( var x = 0; x < Chunk.SizeX; x++ )
 			{
-				for ( var y = 0; y < chunkSize; y++ )
+				for ( var y = 0; y < Chunk.SizeY; y++ )
 				{
 					var biome = Map.GetBiomeAt( x + offset.x, y + offset.y );
 					var h = GetHeight( x, y );
 
-					for ( var z = 0; z < chunkSize; z++ )
+					for ( var z = 0; z < Chunk.SizeX; z++ )
 					{
 						var index = Chunk.GetLocalPositionIndex( x, y, z );
 						var position = new IntVector3( x, y, z );
@@ -85,9 +83,9 @@ namespace Facepunch.CoreWars.Voxel
 							{
 								Chunk.CreateBlockAtPosition( position, biome.LiquidBlockId );
 							}
-							else if ( Chunk.Blocks[index] == 0 && z == chunkSize - 1 )
+							else if ( Chunk.Blocks[index] == 0 && z == Chunk.SizeZ - 1 )
 							{
-								//LightMap.AddSunLight( position, 15 );
+								Chunk.LightMap.AddSunLight( position, 15 );
 							}
 						}
 						else
@@ -125,7 +123,7 @@ namespace Facepunch.CoreWars.Voxel
 
 							if ( sunlightLevel > 0 )
 							{
-								//LightMap.AddSunLight( new IntVector3( x, y, ChunkSize - 1 ), sunlightLevel );
+								Chunk.LightMap.AddSunLight( new IntVector3( x, y, Chunk.SizeZ - 1 ), sunlightLevel );
 							}
 						}
 					}
@@ -167,12 +165,11 @@ namespace Facepunch.CoreWars.Voxel
 			int trunkHeight = Rand.Int( minTrunkHeight, maxTrunkHeight );
 			int trunkTop = z + trunkHeight;
 			int leavesRadius = Rand.Int( minLeavesRadius, maxLeavesRadius );
-			var chunkSize = Chunk.ChunkSize;
 
 			// Would we be trying to generate a tree in another chunk?
-			if ( z + trunkHeight + leavesRadius >= chunkSize
-				|| x <= leavesRadius || x >= chunkSize - leavesRadius
-				|| y <= leavesRadius || y >= chunkSize - leavesRadius )
+			if ( z + trunkHeight + leavesRadius >= Chunk.SizeZ
+				|| x <= leavesRadius || x >= Chunk.SizeX - leavesRadius
+				|| y <= leavesRadius || y >= Chunk.SizeY - leavesRadius )
 			{
 				return;
 			}
@@ -225,12 +222,12 @@ namespace Facepunch.CoreWars.Voxel
 
 		public int GetHeight( int x, int y )
 		{
-			return Heightmap[x + y * Chunk.ChunkSize];
+			return Heightmap[x + y * Chunk.SizeX];
 		}
 
 		public void SetHeight( int x, int y, int height )
 		{
-			Heightmap[x + y * Chunk.ChunkSize] = height;
+			Heightmap[x + y * Chunk.SizeX] = height;
 		}
 	}
 }

@@ -140,7 +140,8 @@ namespace Facepunch.CoreWars
 
 			Duck.PreTick();
 
-			var currentBlockBelow = Map.Current.GetVoxel( Map.ToVoxelPosition( Position ) + Chunk.BlockDirections[(int)BlockFace.Bottom] );
+			var currentMap = Map.Current;
+			var currentBlockBelow = currentMap.GetVoxel( currentMap.ToVoxelPosition( Position ) + Chunk.BlockDirections[(int)BlockFace.Bottom] );
 
 			if ( currentBlockBelow.IsValid && !currentBlockBelow.GetBlockType().IsPassable )
 				BlockPosition = currentBlockBelow.Position;
@@ -150,17 +151,17 @@ namespace Facepunch.CoreWars
 
 			if ( Input.Down( InputButton.Run ) )
 			{
-				var halfVoxelSize = Chunk.VoxelSize * 0.5f;
-				var blockBelowSource = Map.ToSourcePosition( BlockPosition ) + new Vector3( halfVoxelSize, halfVoxelSize, 0f );
+				var halfVoxelSize = currentMap.VoxelSize * 0.5f;
+				var blockBelowSource = currentMap.ToSourcePosition( BlockPosition ) + new Vector3( halfVoxelSize, halfVoxelSize, 0f );
 				var targetPositionX = Position + WishVelocity.Normal.WithY( 0f ) * halfVoxelSize;
 				var targetPositionY = Position + WishVelocity.Normal.WithX( 0f ) * halfVoxelSize;
 				var currentDistanceX = Math.Abs( targetPositionX.x - blockBelowSource.x );
 				var currentDistanceY = Math.Abs( targetPositionY.y - blockBelowSource.y );
 
-				if ( currentDistanceX > Chunk.VoxelSize )
+				if ( currentDistanceX > currentMap.VoxelSize )
 					WishVelocity = WishVelocity.WithX( 0f );
 
-				if ( currentDistanceY > Chunk.VoxelSize )
+				if ( currentDistanceY > currentMap.VoxelSize )
 					WishVelocity = WishVelocity.WithY( 0f );
 
 				IsSneakingOnBlock = lastValidBlockBelow.IsValid;
@@ -196,11 +197,11 @@ namespace Facepunch.CoreWars
 
 			if ( IsSneakingOnBlock )
 			{
-				var blockSourceBoundsMin = Map.ToSourcePosition( lastValidBlockBelow.Position );
-				var blockSourceBoundsMax = blockSourceBoundsMin + new Vector3( Chunk.VoxelSize, Chunk.VoxelSize );
+				var blockSourceBoundsMin = currentMap.ToSourcePosition( lastValidBlockBelow.Position );
+				var blockSourceBoundsMax = blockSourceBoundsMin + new Vector3( currentMap.VoxelSize, currentMap.VoxelSize );
 
-				blockSourceBoundsMin -= new Vector3( Chunk.VoxelSize * 0.25f, Chunk.VoxelSize * 0.25f );
-				blockSourceBoundsMax += new Vector3( Chunk.VoxelSize * 0.25f, Chunk.VoxelSize * 0.25f );
+				blockSourceBoundsMin -= new Vector3( currentMap.VoxelSize * 0.25f, currentMap.VoxelSize * 0.25f );
+				blockSourceBoundsMax += new Vector3( currentMap.VoxelSize * 0.25f, currentMap.VoxelSize * 0.25f );
 
 				var position = Position;
 				position.x = Math.Clamp( position.x, blockSourceBoundsMin.x, blockSourceBoundsMax.x );

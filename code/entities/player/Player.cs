@@ -221,6 +221,8 @@ namespace Facepunch.CoreWars
 				CurrentHotbarIndex = (ushort)currentSlotIndex;
 			}
 
+			var currentMap = Map.Current;
+
 			if ( IsServer )
 			{
 				if ( Input.Released( InputButton.Use) )
@@ -229,19 +231,19 @@ namespace Facepunch.CoreWars
 
 					byte blockId;
 					if ( random >= 0.66f )
-						blockId = Map.Current.FindBlockId<RedTorchBlock>();
+						blockId = currentMap.FindBlockId<RedTorchBlock>();
 					else if ( random >= 0.33f )
-						blockId = Map.Current.FindBlockId<GreenTorchBlock>();
+						blockId = currentMap.FindBlockId<GreenTorchBlock>();
 					else
-						blockId = Map.Current.FindBlockId<BlueTorchBlock>();
+						blockId = currentMap.FindBlockId<BlueTorchBlock>();
 
-					Map.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, blockId );
+					currentMap.SetBlockInDirection( Input.Position, Input.Rotation.Forward, blockId );
 				}
 			}
-			else if ( Map.Current.IsValid() )
+			else if ( currentMap.IsValid() )
 			{
-				var position = Map.ToVoxelPosition( Input.Position );
-				var voxel = Map.Current.GetVoxel( position );
+				var position = currentMap.ToVoxelPosition( Input.Position );
+				var voxel = currentMap.GetVoxel( position );
 
 				if ( voxel.IsValid )
 				{
@@ -253,16 +255,13 @@ namespace Facepunch.CoreWars
 				}
 			}
 
-			var voxelPosition = Map.ToVoxelPosition( Position );
-			var currentChunk = Map.Current.GetChunk( voxelPosition );
+			if ( !currentMap.IsValid() ) return;
 
-			if ( Map.Current.IsValid() && currentChunk.IsValid() )
-			{
-				if ( !currentChunk.HasDoneFirstFullUpdate )
-				{
-					return;
-				}
-			}
+			var voxelPosition = currentMap.ToVoxelPosition( Position );
+			var currentChunk = currentMap.GetChunk( voxelPosition );
+
+			if ( currentChunk.IsValid() && !currentChunk.HasDoneFirstFullUpdate )
+				return;
 
 			var controller = GetActiveController();
 			controller?.Simulate( client, this, GetActiveAnimator() );

@@ -11,7 +11,9 @@ namespace Facepunch.CoreWars.Voxel
 		public Texture Texture { get; private set; }
 		public Chunk Chunk { get; private set; }
 		public Map Map { get; private set; }
-		public int ChunkSize;
+		public int ChunkSizeX;
+		public int ChunkSizeY;
+		public int ChunkSizeZ;
 		public byte[] Data;
 
 		public ConcurrentQueue<LightRemoveNode>[] TorchLightRemoveQueue { get; private set; }
@@ -35,12 +37,14 @@ namespace Facepunch.CoreWars.Voxel
 			for ( var i = 0; i < 3; i++ )
 				TorchLightAddQueue[i] = new();
 
-			ChunkSize = Chunk.ChunkSize;
+			ChunkSizeX = chunk.SizeX;
+			ChunkSizeY = chunk.SizeY;
+			ChunkSizeZ = chunk.SizeZ;
 			Chunk = chunk;
 			Map = map;
 
-			Data = new byte[ChunkSize * ChunkSize * ChunkSize * 4];
-			Texture = Texture.CreateVolume( ChunkSize, ChunkSize, ChunkSize )
+			Data = new byte[ChunkSizeX * ChunkSizeY * ChunkSizeZ * 4];
+			Texture = Texture.CreateVolume( ChunkSizeX, ChunkSizeY, ChunkSizeZ )
 				.WithFormat( ImageFormat.R32F )
 				.WithData( Data )
 				.Finish();
@@ -53,14 +57,13 @@ namespace Facepunch.CoreWars.Voxel
 
 		public void Deserialize( BinaryReader reader )
 		{
-			Log.Info( $"Receiving Light Map Data {Chunk.Offset}" );
 			Data = reader.ReadBytes( Data.Length );
 			IsDirty = true;
 		}
 
 		public int ToIndex( IntVector3 position, int component )
 		{
-			return (((position.z * ChunkSize * ChunkSize) + (position.y * ChunkSize) + position.x) * 4) + component;
+			return (((position.z * ChunkSizeY * ChunkSizeZ) + (position.y * ChunkSizeZ) + position.x) * 4) + component;
 		}
 
 		public bool IsInBounds( int index )
@@ -80,15 +83,9 @@ namespace Facepunch.CoreWars.Voxel
 			var index = ToIndex( position, 1 );
 			if ( !IsInBounds( index ) ) return false;
 			if ( GetSunLight( position ) == value ) return false;
-
 			IsDirty = true;
-
-			lock ( Data )
-			{
-				Data[index] = (byte)((Data[index] & 0x0F) | ((value & 0xf) << 4));
-				Data[ToIndex( position, 3 )] |= 0x40;
-			}
-
+			Data[index] = (byte)((Data[index] & 0x0F) | ((value & 0xf) << 4));
+			Data[ToIndex( position, 3 )] |= 0x40;
 			return true;
 		}
 
