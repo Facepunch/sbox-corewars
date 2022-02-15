@@ -107,7 +107,7 @@ namespace Facepunch.CoreWars.Voxel
 								}
 								else if ( Map.SuitableSpawnPositions.Count == 0 || Rand.Float() <= 0.1f )
 								{
-									var spawnPositionSource = Map.ToSourcePosition( offset + position + new IntVector3( 0, 0, 1 ) );
+									var spawnPositionSource = Map.ToSourcePositionCenter( offset + position + new IntVector3( 0, 0, 1 ) );
 									Map.SuitableSpawnPositions.Add( spawnPositionSource );
 								}
 							}

@@ -245,12 +245,10 @@ namespace Facepunch.CoreWars
 				{
 					if ( Controller is MoveController )
 					{
-						EnableAllCollisions = false;
-						Controller = new FlyingController();
+						Controller = new FlyController();
 					}
 					else
 					{
-						EnableAllCollisions = true;
 						Controller = new MoveController
 						{
 							WalkSpeed = 195f,
