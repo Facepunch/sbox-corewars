@@ -833,7 +833,7 @@ namespace Facepunch.CoreWars.Voxel
 					{
 						for ( var z = 0; z < SizeZ; z++ )
 						{
-							GameTask.CancelIfInvalid();
+							//GameTask.CancelIfInvalid();
 
 							var position = new IntVector3( x, y, z );
 							var index = x * SizeY * SizeZ + y * SizeZ + z;
