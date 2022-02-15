@@ -7,6 +7,6 @@ namespace Facepunch.CoreWars.Blocks
 	public class GreenTorchBlock : BaseTorchBlock
 	{
 		public override string FriendlyName => "Green Torch";
-		public override IntVector3 LightLevel => new IntVector3( 0, 6, 0 );
+		public override IntVector3 LightLevel => new IntVector3( 10, 14, 10 );
 	}
 }

@@ -487,7 +487,7 @@ namespace Facepunch.CoreWars.Voxel
 			{
 				var bbox = ToSourceBBox( position );
 
-				if ( Physics.GetEntitiesInBox( bbox ).Any() )
+				if ( Entity.FindInBox( bbox ).Any() )
 					return false;
 			}
 

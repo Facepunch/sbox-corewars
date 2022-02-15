@@ -85,7 +85,7 @@ namespace Facepunch.CoreWars.Voxel
 			Entities = new();
 			LightMap = new ChunkLightMap( this, map );
 			Offset = new IntVector3( x, y, z );
-			Body = PhysicsWorld.WorldBody;
+			Body = Global.PhysicsWorld.WorldBody;
 			Map = map;
 		}
 
@@ -368,13 +368,13 @@ namespace Facepunch.CoreWars.Voxel
 
 				var transform = new Transform( Offset * (float)VoxelSize );
 
-				OpaqueSceneObject = new SceneObject( OpaqueModel, transform );
-				OpaqueSceneObject.SetValue( "VoxelSize", VoxelSize );
-				OpaqueSceneObject.SetValue( "LightMap", LightMap.Texture );
+				OpaqueSceneObject = new SceneObject( Global.SceneWorld, OpaqueModel, transform );
+				OpaqueSceneObject.Attributes.Set( "VoxelSize", VoxelSize );
+				OpaqueSceneObject.Attributes.Set( "LightMap", LightMap.Texture );
 
-				TranslucentSceneObject = new SceneObject( TranslucentModel, transform );
-				TranslucentSceneObject.SetValue( "VoxelSize", VoxelSize );
-				TranslucentSceneObject.SetValue( "LightMap", LightMap.Texture );
+				TranslucentSceneObject = new SceneObject( Global.SceneWorld, TranslucentModel, transform );
+				TranslucentSceneObject.Attributes.Set( "VoxelSize", VoxelSize );
+				TranslucentSceneObject.Attributes.Set( "LightMap", LightMap.Texture );
 
 				IsModelCreated = true;
 			}
@@ -641,15 +641,7 @@ namespace Facepunch.CoreWars.Voxel
 
 			Entities.Clear();
 
-			UpdateShapeDeleteQueue();
-
-			if ( Body.IsValid() && Shape.IsValid() )
-			{
-				Body.RemoveShape( Shape );
-				Shape = null;
-			}
-
-			Body = null;
+			Global.PhysicsWorld.RemoveBody( Body );
 
 			Event.Unregister( this );
 		}
@@ -772,8 +764,8 @@ namespace Facepunch.CoreWars.Voxel
 
 			if ( neighbour.IsValid() )
 			{
-				TranslucentSceneObject?.SetValue( name, neighbour.LightMap.Texture );
-				OpaqueSceneObject?.SetValue( name, neighbour.LightMap.Texture );
+				TranslucentSceneObject?.Attributes.Set( name, neighbour.LightMap.Texture );
+				OpaqueSceneObject?.Attributes.Set( name, neighbour.LightMap.Texture );
 				if ( recurseNeighbours ) neighbour.UpdateAdjacents();
 			}
 		}
