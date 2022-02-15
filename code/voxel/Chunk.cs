@@ -833,6 +833,8 @@ namespace Facepunch.CoreWars.Voxel
 					{
 						for ( var z = 0; z < SizeZ; z++ )
 						{
+							GameTask.CancelIfInvalid();
+
 							var position = new IntVector3( x, y, z );
 							var index = x * SizeY * SizeZ + y * SizeZ + z;
 							var blockId = Blocks[index];
@@ -852,7 +854,7 @@ namespace Facepunch.CoreWars.Voxel
 								var uAxis = (axis + 1) % 3;
 								var vAxis = (axis + 2) % 3;
 
-								var shouldGenerateVertices = (IsClient && neighbourBlock.IsTranslucent && block.HasTexture);
+								var shouldGenerateVertices = IsClient && block.HasTexture && neighbourBlock.IsTranslucent && !block.ShouldCullFace( (BlockFace)faceSide, neighbourBlock );
 								var shouldGenerateCollision = !block.IsPassable && neighbourBlock.IsPassable;
 
 								if ( !shouldGenerateCollision && !shouldGenerateVertices )

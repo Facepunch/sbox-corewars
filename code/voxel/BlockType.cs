@@ -28,6 +28,11 @@ namespace Facepunch.CoreWars.Voxel
 
 		public virtual BlockData CreateDataInstance() => new BlockData();
 
+		public virtual bool ShouldCullFace( BlockFace face, BlockType neighbour )
+		{
+			return false;
+		}
+
 		public virtual void OnBlockAdded( Chunk chunk, int x, int y, int z, int direction )
 		{
 			
