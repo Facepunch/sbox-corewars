@@ -7,6 +7,7 @@ namespace Facepunch.CoreWars.Voxel
 	[Library( "item_weapon" )]
 	public class WeaponItem : InventoryItem
 	{
+		public string WeaponName { get; set; }
 		public Weapon Weapon { get; set; }
 
 		public override string GetName()

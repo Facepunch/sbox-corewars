@@ -36,9 +36,7 @@ namespace Facepunch.CoreWars
 		public bool TryGiveWeapon( string weaponName )
 		{
 			var item = InventorySystem.CreateItem<WeaponItem>();
-			var weapon = Library.Create<Weapon>( weaponName );
-			weapon.OnCarryStart( this );
-			item.Weapon = weapon;
+			item.WeaponName = weaponName;
 			return HotbarInventory.Container.Give( item );
 		}
 
@@ -370,9 +368,45 @@ namespace Facepunch.CoreWars
 			var container = new InventoryContainer( this );
 			container.SetSlotLimit( 8 );
 			container.AddConnection( Client );
+			container.OnItemTaken += OnHotbarItemTaken;
+			container.OnItemGiven += OnHotbarItemGiven;
 			InventorySystem.Register( container );
 
 			HotbarInventory = new NetInventory( container );
+		}
+
+		protected override void OnDestroy()
+		{
+			if ( IsServer )
+			{
+				InventorySystem.Remove( HotbarInventory.Container, true );
+			}
+
+			base.OnDestroy();
+		}
+
+		private void OnHotbarItemGiven( ushort slot, InventoryItem instance )
+		{
+			if ( instance is WeaponItem weapon )
+			{
+				if ( !weapon.Weapon.IsValid() )
+				{
+					weapon.Weapon = Library.Create<Weapon>( weapon.WeaponName );
+					weapon.Weapon.OnCarryStart( this );
+				}
+			}
+		}
+
+		private void OnHotbarItemTaken( ushort slot, InventoryItem instance )
+		{
+			if ( instance is WeaponItem weapon )
+			{
+				if ( weapon.Weapon.IsValid() )
+				{
+					weapon.Weapon.Delete();
+					weapon.Weapon = null;
+				}
+			}
 		}
 	}
 }
