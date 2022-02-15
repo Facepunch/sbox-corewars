@@ -844,10 +844,6 @@ namespace Facepunch.CoreWars.Voxel
 							{
 								var neighbourId = Map.GetAdjacentBlock( Offset + position, faceSide );
 								var neighbourBlock = Map.GetBlockType( neighbourId );
-
-								if ( !neighbourBlock.IsTranslucent )
-									continue;
-
 								var collisionIndex = collisionIndices.Count;
 								var textureId = block.GetTextureId( (BlockFace)faceSide, this, x, y, z );
 								var normal = (byte)faceSide;
@@ -855,6 +851,12 @@ namespace Facepunch.CoreWars.Voxel
 								var axis = BlockDirectionAxis[faceSide];
 								var uAxis = (axis + 1) % 3;
 								var vAxis = (axis + 2) % 3;
+
+								var shouldGenerateVertices = (IsClient && neighbourBlock.IsTranslucent && block.HasTexture);
+								var shouldGenerateCollision = !block.IsPassable && neighbourBlock.IsPassable;
+
+								if ( !shouldGenerateCollision && !shouldGenerateVertices )
+									continue;
 
 								for ( int i = 0; i < 6; ++i )
 								{
@@ -864,7 +866,7 @@ namespace Facepunch.CoreWars.Voxel
 									vOffset[uAxis] *= faceWidth;
 									vOffset[vAxis] *= faceHeight;
 
-									if ( IsClient && block.HasTexture )
+									if ( shouldGenerateVertices )
 									{
 										var vertex = new BlockVertex( (uint)(x + vOffset.x), (uint)(y + vOffset.y), (uint)(z + vOffset.z), (uint)x, (uint)y, (uint)z, faceData );
 
@@ -874,7 +876,7 @@ namespace Facepunch.CoreWars.Voxel
 											opaqueVertices.Add( vertex );
 									}
 
-									if ( !block.IsPassable )
+									if ( shouldGenerateCollision )
 									{
 										collisionVertices.Add( new Vector3( (x + vOffset.x) + Offset.x, (y + vOffset.y) + Offset.y, (z + vOffset.z) + Offset.z ) * VoxelSize );
 										collisionIndices.Add( collisionIndex + i );

@@ -356,8 +356,7 @@ namespace Facepunch.CoreWars
 		protected virtual void GiveInitialItems()
 		{
 			TryGiveBlock( Map.Current.FindBlockId<GrassBlock>(), 1000 );
-			TryGiveBlock( Map.Current.FindBlockId<StoneBlock>(), 1000 );
-			TryGiveBlock( Map.Current.FindBlockId<StoneBlock>(), 1000 );
+			TryGiveBlock( Map.Current.FindBlockId<WindowBlock>(), 500 );
 
 			TryGiveWeapon( "weapon_boomer" );
 			TryGiveAmmo( AmmoType.Explosive, 200 );

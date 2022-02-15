@@ -78,7 +78,7 @@
         <key>jpgQuality</key>
         <uint>80</uint>
         <key>pngOptimizationLevel</key>
-        <uint>1</uint>
+        <uint>0</uint>
         <key>webpQualityLevel</key>
         <uint>101</uint>
         <key>textureSubPath</key>
@@ -106,7 +106,7 @@
         <key>algorithmSettings</key>
         <struct type="AlgorithmSettings">
             <key>algorithm</key>
-            <enum type="AlgorithmSettings::AlgorithmId">MaxRects</enum>
+            <enum type="AlgorithmSettings::AlgorithmId">Basic</enum>
             <key>freeSizeMode</key>
             <enum type="AlgorithmSettings::AlgorithmFreeSizeMode">Best</enum>
             <key>sizeConstraints</key>
@@ -167,7 +167,7 @@
             <key>trimMargin</key>
             <uint>1</uint>
             <key>trimMode</key>
-            <enum type="SpriteSettings::TrimMode">Trim</enum>
+            <enum type="SpriteSettings::TrimMode">None</enum>
             <key>tracerTolerance</key>
             <int>200</int>
             <key>heuristicMask</key>
@@ -188,6 +188,7 @@
             <key type="filename">blocks/metalgrate_normal.png</key>
             <key type="filename">blocks/sand_normal.png</key>
             <key type="filename">blocks/stone_normal.png</key>
+            <key type="filename">blocks/water_normal.png</key>
             <key type="filename">blocks/window_normal.png</key>
             <key type="filename">blocks/woodplanks_normal.png</key>
             <struct type="IndividualSpriteSettings">
@@ -218,6 +219,7 @@
             <filename>blocks/stone_normal.png</filename>
             <filename>blocks/window_normal.png</filename>
             <filename>blocks/woodplanks_normal.png</filename>
+            <filename>blocks/water_normal.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

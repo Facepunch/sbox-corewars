@@ -34,7 +34,7 @@ namespace Facepunch.CoreWars.Voxel
 
 			for ( var i = 0; i < Blocks.Length; i++ )
 			{
-				var block = Blocks[i];
+				var block = Blocks[i].Replace( "_color", "" );
 				TextureIds[block] = (byte)i;
 			}
 		}

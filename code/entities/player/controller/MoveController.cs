@@ -101,8 +101,11 @@ namespace Facepunch.CoreWars
 			}
 
 			CheckLadder();
-			Swimming = Pawn.WaterLevel.Fraction > 0.6f;
 
+			var currentMap = Map.Current;
+			var currentBlock = currentMap.GetVoxel( currentMap.ToVoxelPosition( Position ) );
+
+			Swimming = currentBlock.IsValid && currentBlock.GetBlockType().IsLiquid;
 			PreVelocity = Velocity;
 
 			if ( !Swimming && !IsTouchingLadder )
@@ -139,7 +142,6 @@ namespace Facepunch.CoreWars
 
 			Duck.PreTick();
 
-			var currentMap = Map.Current;
 			var currentBlockBelow = currentMap.GetVoxel( currentMap.ToVoxelPosition( Position ) + Chunk.BlockDirections[(int)BlockFace.Bottom] );
 
 			if ( currentBlockBelow.IsValid && !currentBlockBelow.GetBlockType().IsPassable )
