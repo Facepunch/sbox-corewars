@@ -53,6 +53,12 @@ namespace Facepunch.CoreWars
 				return $"Loading Minimum Chunks {loadedChunks}/{minimumChunks}";
 			}
 
+			if ( Local.Client.Pawn is Player player )
+			{
+				if ( player.LifeState == LifeState.Dead )
+					return $"Spawning Player...";
+			}
+
 			return string.Empty;
 		}
 

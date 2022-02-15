@@ -91,6 +91,7 @@ namespace Facepunch.CoreWars
 			Map.Current.AddViewer( client );
 
 			player.CreateInventory();
+			player.LifeState = LifeState.Dead;
 
 			if ( Map.Current.Initialized )
 			{
@@ -124,27 +125,26 @@ namespace Facepunch.CoreWars
 			map.AddBiome<PlainsBiome>();
 			map.AddBiome<WeirdBiome>();
 
-			await GameTask.Delay( 500 );
+			await GameTask.Delay( 1000 );
 
-			var startChunkSize = 2;
+			var startChunkSize = 4;
 
 			for ( var x = 0; x < startChunkSize; x++ )
 			{
 				for ( var y = 0; y < startChunkSize; y++ )
 				{
-					map.GetOrCreateChunk(
+					var chunk = map.GetOrCreateChunk(
 						x * map.ChunkSize.x,
 						y * map.ChunkSize.y,
 						0
 					);
+
+					await chunk.Initialize();
 				}
 			}
 
-			await GameTask.Delay( 1000 );
-
 			map.Init();
 		}
-
 
 		private void OnMapInitialized()
 		{

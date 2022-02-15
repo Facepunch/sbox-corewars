@@ -1,4 +1,5 @@
-﻿using Sandbox;
+﻿using Facepunch.CoreWars.Voxel;
+using Sandbox;
 using System.Linq;
 
 namespace Facepunch.CoreWars
@@ -11,7 +12,8 @@ namespace Facepunch.CoreWars
 			{
 				foreach ( var player in Entity.All.OfType<Player>() )
 				{
-					player.Respawn();
+					Log.Info( player.LifeState );
+					SpawnPlayerWhenReady( player );
 				}
 			}
 		}
@@ -23,6 +25,19 @@ namespace Facepunch.CoreWars
 
 		public override void OnPlayerJoined( Player player )
 		{
+			Log.Info( player.LifeState );
+			SpawnPlayerWhenReady( player );
+		}
+
+		private async void SpawnPlayerWhenReady( Player player )
+		{
+			while ( Map.Current.SuitableSpawnPositions.Count == 0 )
+			{
+				await GameTask.Delay( 50 );
+			}
+
+			if ( player.LifeState == LifeState.Alive ) return;
+
 			player.Respawn();
 		}
 	}

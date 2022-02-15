@@ -580,7 +580,8 @@ namespace Facepunch.CoreWars.Voxel
 						chunk.Blocks = reader.ReadBytes( chunk.Blocks.Length );
 						chunk.LightMap.Deserialize( reader );
 						chunk.DeserializeData( reader );
-						chunk.Initialize();
+
+						_ = chunk.Initialize();
 
 						if ( i % 32 == 0 )
 						{
@@ -829,14 +830,6 @@ namespace Facepunch.CoreWars.Voxel
 		public void Init()
 		{
 			if ( Initialized ) return;
-
-			if ( IsServer )
-			{
-				foreach ( var kv in Chunks )
-				{
-					kv.Value.Initialize();
-				}
-			}
 
 			Initialized = true;
 			OnInitialized?.Invoke();

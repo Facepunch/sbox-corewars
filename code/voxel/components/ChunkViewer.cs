@@ -115,7 +115,7 @@ namespace Facepunch.CoreWars.Voxel
 
 					if ( !chunk.Initialized )
 					{
-						chunk.Initialize();
+						_ = chunk.Initialize();
 					}
 
 					if ( !ChunksToSend.Contains( chunk ) )

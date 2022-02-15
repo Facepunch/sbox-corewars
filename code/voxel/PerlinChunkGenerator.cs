@@ -105,7 +105,7 @@ namespace Facepunch.CoreWars.Voxel
 								{
 									GenerateTree( biome, position.x, position.y, position.z );
 								}
-								else if ( Rand.Float() <= 0.01f )
+								else if ( Map.SuitableSpawnPositions.Count == 0 || Rand.Float() <= 0.1f )
 								{
 									var spawnPositionSource = Map.ToSourcePosition( offset + position + new IntVector3( 0, 0, 1 ) );
 									Map.SuitableSpawnPositions.Add( spawnPositionSource );

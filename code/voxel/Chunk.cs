@@ -89,7 +89,7 @@ namespace Facepunch.CoreWars.Voxel
 			Map = map;
 		}
 
-		public async void Initialize()
+		public async Task Initialize()
 		{
 			if ( IsInitializing || Initialized )
 				return;
