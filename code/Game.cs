@@ -113,7 +113,7 @@ namespace Facepunch.CoreWars
 			map.SetBuildCollisionInThread( true );
 			map.SetMinimumLoadedChunks( 8 );
 			map.SetChunkRenderDistance( 4 );
-			map.SetChunkUnloadDistance( 8 );
+			map.SetChunkUnloadDistance( 10 );
 			map.SetChunkSize( 32, 32, 32 );
 			map.SetSeaLevel( 48 );
 			map.SetMaxSize( 256, 256, 128 );

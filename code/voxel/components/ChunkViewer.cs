@@ -31,6 +31,17 @@ namespace Facepunch.CoreWars.Voxel
 
 		public bool IsValid => Entity.IsValid();
 
+		public bool IsInMapBounds()
+		{
+			if ( Entity is Client client && client.Pawn.IsValid() )
+			{
+				var voxelPosition = Map.Current.ToVoxelPosition( client.Pawn.Position );
+				return Map.Current.IsInBounds( voxelPosition );
+			}
+
+			return false;
+		}
+
 		public bool HasLoadedMinimumChunks()
 		{
 			return LoadedChunks.Count >= Map.Current.MinimumLoadedChunks;
@@ -76,7 +87,7 @@ namespace Facepunch.CoreWars.Voxel
 
 			var position = pawn.Position;
 			var currentMap = Map.Current;
-			var chunkBounds = currentMap.ChunkSize.LengthSquared;
+			var chunkBounds = currentMap.ChunkSize.Length;
 
 			foreach ( var offset in LoadedChunks )
 			{

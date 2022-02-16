@@ -326,7 +326,7 @@ namespace Facepunch.CoreWars
 
 			var viewer = Client.Components.Get<ChunkViewer>();
 			if ( !viewer.IsValid() ) return;
-			if ( !viewer.IsCurrentChunkReady ) return;
+			if ( viewer.IsInMapBounds() && !viewer.IsCurrentChunkReady ) return;
 
 			var controller = GetActiveController();
 			controller?.Simulate( client, this, GetActiveAnimator() );
