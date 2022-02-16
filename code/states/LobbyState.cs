@@ -25,7 +25,6 @@ namespace Facepunch.CoreWars
 
 		public override void OnPlayerJoined( Player player )
 		{
-			Log.Info( player.LifeState );
 			SpawnPlayerWhenReady( player );
 		}
 

@@ -7,6 +7,7 @@ namespace Facepunch.CoreWars
 		public float EyeHeight { get; set; } = 72f;
 		public float BodyGirth { get; set; } = 32f;
 		public float BodyHeight { get; set; } = 72f;
+		public bool EnableCollisions { get; set; } = true;
 
 		protected Vector3 Mins { get; set; }
 		protected Vector3 Maxs { get; set; }
@@ -52,6 +53,12 @@ namespace Facepunch.CoreWars
 
 		private void Move()
 		{
+			if ( !EnableCollisions )
+			{
+				Position += Velocity * Time.Delta;
+				return;
+			}
+
 			var mover = new MoveHelper( Position, Velocity );
 			mover.Trace = mover.Trace.Size( Mins, Maxs ).Ignore( Pawn );
 			mover.TryMove( Time.Delta );

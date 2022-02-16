@@ -1,4 +1,5 @@
-﻿using Facepunch.CoreWars.Inventory;
+﻿using Facepunch.CoreWars.Editor;
+using Facepunch.CoreWars.Inventory;
 using Facepunch.Voxels;
 using Sandbox;
 using System.Linq;
@@ -20,7 +21,6 @@ namespace Facepunch.CoreWars
 			if ( IsServer )
 			{
 				StateSystem = new();
-				StateSystem.Set( new LobbyState() );
 			}
 
 			if ( IsClient )
@@ -45,23 +45,17 @@ namespace Facepunch.CoreWars
 
 		public override void MoveToSpawnpoint( Entity pawn )
 		{
-			if ( pawn is not Player player ) return;
-
 			if ( Map.Current.IsValid() )
 			{
+				if ( IsEditorMode )
+				{
+					pawn.Position = (Map.Current.MaxSize * Map.Current.VoxelSize * 0.5f).WithZ( Map.Current.MaxSize.z * Map.Current.VoxelSize );
+					return;
+				}
+
 				var spawnpoint = Rand.FromList( Map.Current.SuitableSpawnPositions );
-				player.Position = spawnpoint;
+				pawn.Position = spawnpoint;
 				return;
-			}
-
-			var spawnpoints = All.OfType<PlayerSpawnpoint>()
-				.Where( e => e.Team == player.Team )
-				.ToList();
-
-			if ( spawnpoints.Count > 0 )
-			{
-				var spawnpoint = Rand.FromList( spawnpoints );
-				player.Transform = spawnpoint.Transform;
 			}
 		}
 
@@ -85,14 +79,22 @@ namespace Facepunch.CoreWars
 		{
 			base.ClientJoined( client );
 
-			var player = new Player( client );
-			player.LifeState = LifeState.Dead;
+			if ( IsEditorMode )
+			{
+				var player = new EditorPlayer( client );
+				player.LifeState = LifeState.Dead;
+			}
+			else
+			{
+				var player = new Player( client );
+				player.LifeState = LifeState.Dead;
+			}
 
 			Map.Current.AddViewer( client );
 
 			if ( Map.Current.Initialized )
 			{
-				SendMapToPlayer( player );
+				SendMapToClient( client);
 			}
 		}
 
@@ -100,6 +102,11 @@ namespace Facepunch.CoreWars
 		{
 			if ( !IsServer )
 				return;
+
+			if ( IsEditorMode )
+				StateSystem.Set( new EditorState() );
+			else
+				StateSystem.Set( new LobbyState() );
 
 			StartLoadMapTask();
 		}
@@ -111,58 +118,78 @@ namespace Facepunch.CoreWars
 			map.OnInitialized += OnMapInitialized;
 			map.SetBuildCollisionInThread( true );
 			map.SetVoxelMaterial( "materials/corewars/voxel.vmat" );
-			map.SetMinimumLoadedChunks( 8 );
 			map.SetChunkRenderDistance( 4 );
-			map.SetChunkUnloadDistance( 10 );
+			map.SetChunkUnloadDistance( 8 );
 			map.SetChunkSize( 32, 32, 32 );
 			map.SetSeaLevel( 48 );
 			map.SetMaxSize( 256, 256, 128 );
 			map.LoadBlockAtlas( "textures/blocks.json" );
 			map.AddAllBlockTypes();
-			map.SetChunkGenerator<PerlinChunkGenerator>();
-			map.AddBiome<PlainsBiome>();
-			map.AddBiome<WeirdBiome>();
 
-			await GameTask.Delay( 500 );
-
-			var startChunkSize = 4;
-
-			for ( var x = 0; x < startChunkSize; x++ )
+			if ( !IsEditorMode )
 			{
-				for ( var y = 0; y < startChunkSize; y++ )
+				map.SetMinimumLoadedChunks( 8 );
+				map.SetChunkGenerator<PerlinChunkGenerator>();
+				map.AddBiome<PlainsBiome>();
+				map.AddBiome<WeirdBiome>();
+
+				var startChunkSize = 4;
+
+				for ( var x = 0; x < startChunkSize; x++ )
 				{
-					await GameTask.Delay( 100 );
+					for ( var y = 0; y < startChunkSize; y++ )
+					{
+						await GameTask.Delay( 100 );
 
-					var chunk = map.GetOrCreateChunk(
-						x * map.ChunkSize.x,
-						y * map.ChunkSize.y,
-						0
-					);
+						var chunk = map.GetOrCreateChunk(
+							x * map.ChunkSize.x,
+							y * map.ChunkSize.y,
+							0
+						);
 
-					_ = chunk.Initialize();
+						_ = chunk.Initialize();
+					}
 				}
 			}
+			else
+			{
+				map.SetChunkRenderDistance( 4 );
+				map.SetChunkUnloadDistance( 8 );
+				map.SetChunkGenerator<EditorChunkGenerator>();
+				map.AddBiome<EditorBiome>();
+			}
+
+			await GameTask.Delay( 500 );
 
 			map.Init();
 		}
 
 		private void OnMapInitialized()
 		{
-			var players = All.OfType<Player>().ToList();
+			var clients = Client.All.ToList();
 
-			foreach ( var player in players )
+			foreach ( var client in clients )
 			{
-				SendMapToPlayer( player );
+				SendMapToClient( client );
 			}
 		}
 
-		private void SendMapToPlayer( Player player )
+		private void SendMapToClient( Client client )
 		{
-			Map.Current.Send( player.Client );
+			Map.Current.Send( client );
 
-			StateSystem.Active?.OnPlayerJoined( player );
-
-			player.OnMapLoaded();
+			if ( client.Pawn is Player )
+			{
+				var player = (client.Pawn as Player);
+				StateSystem.Active?.OnPlayerJoined( player );
+				player.OnMapLoaded();
+			}
+			else if ( client.Pawn is EditorPlayer )
+			{
+				var player = (client.Pawn as EditorPlayer);
+				player.OnMapLoaded();
+				player.Respawn();
+			}
 		}
 	}
 }

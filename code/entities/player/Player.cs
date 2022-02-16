@@ -14,7 +14,6 @@ namespace Facepunch.CoreWars
 	public partial class Player : Sandbox.Player
 	{
 		[Net, Change( nameof( OnTeamChanged ) )] public Team Team { get; private set; }
-		[BindComponent] public ChunkViewer ChunkViewer { get; }
 		[Net, Predicted] public ushort CurrentHotbarIndex { get; private set; }
 		[Net] public NetInventory HotbarInventory { get; private set; }
 		public ProjectileSimulator Projectiles { get; private set; }
@@ -139,7 +138,6 @@ namespace Facepunch.CoreWars
 
 		public override void Spawn()
 		{
-			Components.Create<ChunkViewer>();
 			EnableDrawing = false;
 			base.Spawn();
 		}
