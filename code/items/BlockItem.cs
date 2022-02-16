@@ -1,8 +1,9 @@
 ﻿using Facepunch.CoreWars.Inventory;
+using Facepunch.Voxels;
 using Sandbox;
 using System.IO;
 
-namespace Facepunch.Voxels
+namespace Facepunch.CoreWars
 {
 	[Library( "item_block" )]
 	public class BlockItem : InventoryItem
