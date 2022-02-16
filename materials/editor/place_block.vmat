@@ -46,7 +46,7 @@ Layer0
 
 	DynamicParams
 	{
-		TextureColor "GhostColor"
+		g_vColorTint "GhostColor"
 		g_flOpacityScale "Opacity"
 	}
 }
