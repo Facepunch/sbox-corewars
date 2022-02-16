@@ -12,6 +12,9 @@ namespace Facepunch.CoreWars
 		public static new Game Current { get; private set; }
 		public static Hud Hud { get; private set; }
 
+		[ServerVar( "cw_editor", Saved = true )]
+		public static bool IsEditorMode { get; set; }
+
 		public Game()
 		{
 			if ( IsServer )
