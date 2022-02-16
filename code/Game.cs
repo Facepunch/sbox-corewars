@@ -110,6 +110,7 @@ namespace Facepunch.CoreWars
 
 			map.OnInitialized += OnMapInitialized;
 			map.SetBuildCollisionInThread( true );
+			map.SetVoxelMaterial( "materials/corewars/voxel.vmat" );
 			map.SetMinimumLoadedChunks( 8 );
 			map.SetChunkRenderDistance( 4 );
 			map.SetChunkUnloadDistance( 10 );
