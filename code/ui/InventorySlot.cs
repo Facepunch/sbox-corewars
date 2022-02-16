@@ -1,5 +1,5 @@
 ﻿using Facepunch.CoreWars.Inventory;
-using Facepunch.CoreWars.Voxel;
+using Facepunch.Voxels;
 using Sandbox;
 using Sandbox.UI;
 using System.Linq;

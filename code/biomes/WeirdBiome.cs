@@ -1,5 +1,5 @@
 ﻿using Facepunch.CoreWars.Blocks;
-using Facepunch.CoreWars.Voxel;
+using Facepunch.Voxels;
 using Sandbox;
 
 namespace Facepunch.CoreWars

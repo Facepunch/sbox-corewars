@@ -2,7 +2,7 @@
 using Sandbox;
 using System.IO;
 
-namespace Facepunch.CoreWars.Voxel
+namespace Facepunch.Voxels
 {
 	[Library( "item_block" )]
 	public class BlockItem : InventoryItem

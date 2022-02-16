@@ -2,7 +2,7 @@
 using Sandbox;
 using System.IO;
 
-namespace Facepunch.CoreWars.Voxel
+namespace Facepunch.Voxels
 {
 	[Library( "item_ammo" )]
 	public class AmmoItem : InventoryItem

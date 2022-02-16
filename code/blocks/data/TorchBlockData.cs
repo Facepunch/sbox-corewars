@@ -1,7 +1,7 @@
 ﻿using Sandbox;
 using System.IO;
 
-namespace Facepunch.CoreWars.Voxel
+namespace Facepunch.Voxels
 {
 	public class TorchBlockData : BlockData
 	{

@@ -1,4 +1,4 @@
-﻿using Facepunch.CoreWars.Voxel;
+﻿using Facepunch.Voxels;
 using Sandbox;
 using System;
 

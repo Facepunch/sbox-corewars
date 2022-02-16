@@ -1,11 +1,7 @@
-﻿using Facepunch.CoreWars.Blocks;
-using Facepunch.CoreWars.Inventory;
-using Facepunch.CoreWars.Voxel;
+﻿using Facepunch.CoreWars.Inventory;
+using Facepunch.Voxels;
 using Sandbox;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Facepunch.CoreWars
 {

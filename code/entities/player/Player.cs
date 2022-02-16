@@ -1,6 +1,6 @@
 ﻿using Facepunch.CoreWars.Blocks;
 using Facepunch.CoreWars.Inventory;
-using Facepunch.CoreWars.Voxel;
+using Facepunch.Voxels;
 using Sandbox;
 using System;
 using System.Collections.Generic;
