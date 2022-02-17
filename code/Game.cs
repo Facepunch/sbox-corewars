@@ -31,6 +31,15 @@ namespace Facepunch.CoreWars
 			Current = this;
 		}
 
+		[ServerCmd( "cw_editor_save" )]
+		public static void SaveEditorMapToDisk()
+		{
+			if ( Game.Current.StateSystem.Active is EditorState state )
+			{
+				state.SaveChunksToDisk( Map.Current );
+			}
+		}
+
 		public virtual void PlayerRespawned( Player player )
 		{
 			StateSystem.Active?.OnPlayerRespawned( player );
@@ -157,6 +166,9 @@ namespace Facepunch.CoreWars
 				map.SetChunkUnloadDistance( 8 );
 				map.SetChunkGenerator<EditorChunkGenerator>();
 				map.AddBiome<EditorBiome>();
+
+				var state = StateSystem.Active as EditorState;
+				await state.LoadInitialChunks( map );
 			}
 
 			await GameTask.Delay( 500 );
