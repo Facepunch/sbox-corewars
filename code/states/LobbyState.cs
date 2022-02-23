@@ -30,7 +30,7 @@ namespace Facepunch.CoreWars
 
 		private async void SpawnPlayerWhenReady( Player player )
 		{
-			while ( Map.Current.SuitableSpawnPositions.Count == 0 )
+			while ( VoxelWorld.Current.SuitableSpawnPositions.Count == 0 )
 			{
 				await GameTask.Delay( 50 );
 			}

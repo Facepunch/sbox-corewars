@@ -11,13 +11,13 @@ namespace Facepunch.CoreWars
 
 		public override void Initialize()
 		{
-			TopBlockId = Map.FindBlockId<SandBlock>();
-			BeachBlockId = Map.FindBlockId<SandBlock>();
-			GroundBlockId = Map.FindBlockId<SandBlock>();
-			TreeLogBlockId = Map.FindBlockId<StoneBlock>();
-			TreeLeafBlockId = Map.FindBlockId<GrassBlock>();
-			LiquidBlockId = Map.FindBlockId<WaterBlock>();
-			UndergroundBlockId = Map.FindBlockId<StoneBlock>();
+			TopBlockId = VoxelWorld.FindBlockId<SandBlock>();
+			BeachBlockId = VoxelWorld.FindBlockId<SandBlock>();
+			GroundBlockId = VoxelWorld.FindBlockId<SandBlock>();
+			TreeLogBlockId = VoxelWorld.FindBlockId<StoneBlock>();
+			TreeLeafBlockId = VoxelWorld.FindBlockId<GrassBlock>();
+			LiquidBlockId = VoxelWorld.FindBlockId<WaterBlock>();
+			UndergroundBlockId = VoxelWorld.FindBlockId<StoneBlock>();
 
 			SetWeighting( 0.2f );
 		}

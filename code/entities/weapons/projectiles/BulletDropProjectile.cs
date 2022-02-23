@@ -110,7 +110,7 @@ namespace Facepunch.CoreWars
 				LaunchSound = PlaySound( LaunchSoundName );
 
 			if ( !string.IsNullOrEmpty( ModelName ) )
-				ModelEntity = SceneObject.CreateModel( ModelName );
+				ModelEntity = new SceneObject( Map.Scene, ModelName );
 		}
 
         public virtual void Simulate()
@@ -134,7 +134,7 @@ namespace Facepunch.CoreWars
 				.Ignore( IgnoreEntity )
 				.Run();
 
-			Position = trace.EndPos;
+			Position = trace.EndPosition;
 
 			if ( LifeTime.HasValue && DestroyTime )
 			{

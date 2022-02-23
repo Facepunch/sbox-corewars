@@ -12,8 +12,8 @@ namespace Facepunch.CoreWars
 
 		public override string GetName()
 		{
-			if ( Map.Current.IsValid() )
-				return Map.Current.GetBlockType( BlockId ).FriendlyName;
+			if ( VoxelWorld.Current.IsValid() )
+				return VoxelWorld.Current.GetBlockType( BlockId ).FriendlyName;
 			else
 				return "INVALID_BLOCK";
 		}
@@ -25,9 +25,9 @@ namespace Facepunch.CoreWars
 
 		public override string GetIcon()
 		{
-			if ( Map.Current == null ) return string.Empty;
+			if ( VoxelWorld.Current == null ) return string.Empty;
 
-			var block = Map.Current.GetBlockType( BlockId );
+			var block = VoxelWorld.Current.GetBlockType( BlockId );
 			if ( string.IsNullOrEmpty( block.DefaultTexture ) ) return string.Empty;
 
 			return $"textures/blocks/color/{ block.DefaultTexture }.png";

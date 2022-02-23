@@ -10,7 +10,7 @@ namespace Facepunch.CoreWars.Editor
 {
 	public class EditorState : BaseState
 	{
-		public virtual async Task LoadInitialChunks( Map map )
+		public virtual async Task LoadInitialChunks( VoxelWorld world )
 		{
 			var fileName = "editor.voxels";
 
@@ -38,9 +38,9 @@ namespace Facepunch.CoreWars.Editor
 						var chunkSizeY = reader.ReadInt32();
 						var chunkSizeZ = reader.ReadInt32();
 
-						map.SetVoxelSize( voxelSize );
-						map.SetMaxSize( maxSizeX, maxSizeY, maxSizeZ );
-						map.SetChunkSize( chunkSizeX, chunkSizeY, chunkSizeZ );
+						world.SetVoxelSize( voxelSize );
+						world.SetMaxSize( maxSizeX, maxSizeY, maxSizeZ );
+						world.SetChunkSize( chunkSizeX, chunkSizeY, chunkSizeZ );
 
 						var blockCount = reader.ReadInt32();
 
@@ -49,7 +49,7 @@ namespace Facepunch.CoreWars.Editor
 							var blockId = reader.ReadByte();
 							var blockType = reader.ReadString();
 
-							if ( !map.BlockTypes.TryGetValue( blockType, out var realBlockId ) )
+							if ( !world.BlockTypes.TryGetValue( blockType, out var realBlockId ) )
 								throw new Exception( $"Unable to locate a block id for {blockType}!" );
 
 							blockIdRemap[blockId] = realBlockId;
@@ -62,12 +62,12 @@ namespace Facepunch.CoreWars.Editor
 							var chunkX = reader.ReadInt32();
 							var chunkY = reader.ReadInt32();
 							var chunkZ = reader.ReadInt32();
-							var chunk = map.GetOrCreateChunk( chunkX, chunkY, chunkZ );
+							var chunk = world.GetOrCreateChunk( chunkX, chunkY, chunkZ );
 
 							chunk.HasOnlyAirBlocks = reader.ReadBoolean();
 
 							if ( !chunk.HasOnlyAirBlocks )
-								chunk.Blocks = reader.ReadBytes( map.ChunkSize.x * map.ChunkSize.y * map.ChunkSize.z );
+								chunk.Blocks = reader.ReadBytes( world.ChunkSize.x * world.ChunkSize.y * world.ChunkSize.z );
 
 							for ( var j = 0; j < chunk.Blocks.Length; j++ )
 							{
@@ -92,7 +92,7 @@ namespace Facepunch.CoreWars.Editor
 			}
 		}
 
-		public virtual void SaveChunksToDisk( Map map )
+		public virtual void SaveChunksToDisk( VoxelWorld world )
 		{
 			var fileName = "editor.voxels";
 
@@ -102,25 +102,25 @@ namespace Facepunch.CoreWars.Editor
 				{
 					using ( var writer = new BinaryWriter( stream ) )
 					{
-						writer.Write( map.VoxelSize );
-						writer.Write( map.MaxSize.x );
-						writer.Write( map.MaxSize.y );
-						writer.Write( map.MaxSize.z );
-						writer.Write( map.ChunkSize.x );
-						writer.Write( map.ChunkSize.y );
-						writer.Write( map.ChunkSize.z );
+						writer.Write( world.VoxelSize );
+						writer.Write( world.MaxSize.x );
+						writer.Write( world.MaxSize.y );
+						writer.Write( world.MaxSize.z );
+						writer.Write( world.ChunkSize.x );
+						writer.Write( world.ChunkSize.y );
+						writer.Write( world.ChunkSize.z );
 
-						writer.Write( map.BlockTypes.Count );
+						writer.Write( world.BlockTypes.Count );
 
-						foreach ( var kv in map.BlockTypes )
+						foreach ( var kv in world.BlockTypes )
 						{
 							writer.Write( kv.Value );
 							writer.Write( kv.Key );
 						}
 
-						writer.Write( map.Chunks.Count );
+						writer.Write( world.Chunks.Count );
 
-						foreach ( var kv in map.Chunks )
+						foreach ( var kv in world.Chunks )
 						{
 							var chunk = kv.Value;
 

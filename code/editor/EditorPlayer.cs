@@ -27,7 +27,7 @@ namespace Facepunch.CoreWars.Editor
 			EnableAllCollisions = false;
 			EnableDrawing = true;
 
-			Camera = new FirstPersonCamera();
+			CameraMode = new FirstPersonCamera();
 
 			Controller = new FlyController
 			{
@@ -82,34 +82,34 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void Simulate( Client client )
 		{
-			if ( !Map.Current.IsValid() ) return;
+			if ( !VoxelWorld.Current.IsValid() ) return;
 
 			if ( IsServer && Prediction.FirstTime )
 			{
 				if ( Input.Released( InputButton.Attack1 ) && NextBlockPlace )
 				{
-					var distance = Map.Current.VoxelSize * 4f;
-					var aimVoxelPosition = Map.Current.ToVoxelPosition( Input.Position + Input.Rotation.Forward * distance );
-					var face = Map.Current.Trace( Input.Position * (1.0f / Map.Current.VoxelSize), Input.Rotation.Forward, distance, out var endPosition, out _ );
+					var distance = VoxelWorld.Current.VoxelSize * 4f;
+					var aimVoxelPosition = VoxelWorld.Current.ToVoxelPosition( Input.Position + Input.Rotation.Forward * distance );
+					var face = VoxelWorld.Current.Trace( Input.Position * (1.0f / VoxelWorld.Current.VoxelSize), Input.Rotation.Forward, distance, out var endPosition, out _ );
 
-					if ( face != BlockFace.Invalid && Map.Current.GetBlock( endPosition ) != 0 )
+					if ( face != BlockFace.Invalid && VoxelWorld.Current.GetBlock( endPosition ) != 0 )
 					{
-						var oppositePosition = Map.GetAdjacentPosition( endPosition, (int)face );
+						var oppositePosition = VoxelWorld.GetAdjacentPosition( endPosition, (int)face );
 						aimVoxelPosition = oppositePosition;
 					}
 
-					Map.Current.SetBlockOnServer( aimVoxelPosition, Map.Current.FindBlockId<GrassBlock>() );
+					VoxelWorld.Current.SetBlockOnServer( aimVoxelPosition, VoxelWorld.Current.FindBlockId<GrassBlock>() );
 					NextBlockPlace = 0.1f;
 				}
 				else if ( Input.Released( InputButton.Attack2 ) && NextBlockPlace )
 				{
-					if ( Map.Current.GetBlockInDirection( Input.Position, Input.Rotation.Forward, out var blockPosition ) )
+					if ( VoxelWorld.Current.GetBlockInDirection( Input.Position, Input.Rotation.Forward, out var blockPosition ) )
 					{
-						var voxel = Map.Current.GetVoxel( blockPosition );
+						var voxel = VoxelWorld.Current.GetVoxel( blockPosition );
 
 						if ( voxel.IsValid )
 						{
-							Map.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, 0 );
+							VoxelWorld.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, 0 );
 						}
 					}
 
@@ -117,7 +117,7 @@ namespace Facepunch.CoreWars.Editor
 				}
 			}
 
-			var currentMap = Map.Current;
+			var currentMap = VoxelWorld.Current;
 
 			if ( IsClient && currentMap.IsValid() )
 			{
@@ -130,20 +130,20 @@ namespace Facepunch.CoreWars.Editor
 					DebugOverlay.ScreenText( 3, $"Torch Level: ({voxel.GetRedTorchLight()}, {voxel.GetGreenTorchLight()}, {voxel.GetBlueTorchLight()})", 0.1f );
 					DebugOverlay.ScreenText( 4, $"Chunk: {voxel.Chunk.Offset}", 0.1f );
 					DebugOverlay.ScreenText( 5, $"Position: {position}", 0.1f );
-					DebugOverlay.ScreenText( 6, $"Biome: {Map.Current.GetBiomeAt( position.x, position.y ).Name}", 0.1f );
+					DebugOverlay.ScreenText( 6, $"Biome: {VoxelWorld.Current.GetBiomeAt( position.x, position.y ).Name}", 0.1f );
 				}
 
-				var distance = Map.Current.VoxelSize * 4f;
-				var aimVoxelPosition = Map.Current.ToVoxelPosition( Input.Position + Input.Rotation.Forward * distance );
-				var face = Map.Current.Trace( Input.Position * (1.0f / Map.Current.VoxelSize), Input.Rotation.Forward, distance, out var endPosition, out _ );
+				var distance = VoxelWorld.Current.VoxelSize * 4f;
+				var aimVoxelPosition = VoxelWorld.Current.ToVoxelPosition( Input.Position + Input.Rotation.Forward * distance );
+				var face = VoxelWorld.Current.Trace( Input.Position * (1.0f / VoxelWorld.Current.VoxelSize), Input.Rotation.Forward, distance, out var endPosition, out _ );
 
-				if ( face != BlockFace.Invalid && Map.Current.GetBlock( endPosition ) != 0 )
+				if ( face != BlockFace.Invalid && VoxelWorld.Current.GetBlock( endPosition ) != 0 )
 				{
-					var oppositePosition = Map.GetAdjacentPosition( endPosition, (int)face );
+					var oppositePosition = VoxelWorld.GetAdjacentPosition( endPosition, (int)face );
 					aimVoxelPosition = oppositePosition;
 				}
 
-				var aimSourcePosition = Map.Current.ToSourcePosition( aimVoxelPosition );
+				var aimSourcePosition = VoxelWorld.Current.ToSourcePosition( aimVoxelPosition );
 
 				BlockGhost.Position = aimSourcePosition;
 			}

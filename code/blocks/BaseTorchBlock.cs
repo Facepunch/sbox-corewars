@@ -14,7 +14,7 @@ namespace Facepunch.CoreWars.Blocks
 
 		public override void OnBlockAdded( Chunk chunk, int x, int y, int z, int direction )
 		{
-			var data = Map.GetOrCreateData<TorchBlockData>( new IntVector3( x, y, z ) );
+			var data = VoxelWorld.GetOrCreateData<TorchBlockData>( new IntVector3( x, y, z ) );
 
 			data.Direction = (BlockFace)direction;
 			data.IsDirty = true;

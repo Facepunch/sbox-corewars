@@ -54,7 +54,7 @@ namespace Facepunch.CoreWars
 				.Ignore( this )
 				.Run();
 
-			var direction = (trace.EndPos - position).Normal;
+			var direction = (trace.EndPosition - position).Normal;
 			direction += (Vector3.Random + Vector3.Random + Vector3.Random + Vector3.Random) * Spread * 0.25f;
 			direction = direction.Normal;
 
@@ -69,7 +69,7 @@ namespace Facepunch.CoreWars
 
 		protected virtual void DamageInRadius( Vector3 position, float radius, float baseDamage, float force = 1f )
 		{
-			var entities = Physics.GetEntitiesInSphere( position, radius );
+			var entities = Entity.FindInSphere( position, radius );
 
 			foreach ( var entity in entities )
 			{

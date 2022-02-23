@@ -22,11 +22,11 @@ namespace Facepunch.CoreWars
 
 		public override void Simulate()
 		{
-			EyePosLocal = Vector3.Up * Scale( EyeHeight );
+			EyeLocalPosition = Vector3.Up * Scale( EyeHeight );
 			UpdateBBox();
 
-			EyePosLocal += TraceOffset;
-			EyeRot = Input.Rotation;
+			EyeLocalPosition += TraceOffset;
+			EyeRotation = Input.Rotation;
 
 			var vel = (Input.Rotation.Forward * Input.Forward) + (Input.Rotation.Left * Input.Left);
 

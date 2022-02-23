@@ -16,11 +16,11 @@ namespace Facepunch.CoreWars.Blocks
 
 		public override void Initialize()
 		{
-			var data = Map.GetData<TorchBlockData>( BlockPosition );
+			var data = VoxelWorld.GetData<TorchBlockData>( BlockPosition );
 
 			if ( data.IsValid() )
 			{
-				CenterOnSide( Map.GetOppositeDirection( data.Direction ) );
+				CenterOnSide( VoxelWorld.GetOppositeDirection( data.Direction ) );
 			}
 
 			base.Initialize();

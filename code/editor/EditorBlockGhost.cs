@@ -10,12 +10,12 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void DoRender( SceneObject sceneObject )
 		{
-			if ( !EnableDrawing || !Map.Current.IsValid() )
+			if ( !EnableDrawing || !VoxelWorld.Current.IsValid() )
 				return;
 
 			var vb = Render.GetDynamicVB( true );
-			var center = new Vector3( Map.Current.VoxelSize * 0.5f );
-			var size = new IntVector3( Map.Current.VoxelSize );
+			var center = new Vector3( VoxelWorld.Current.VoxelSize * 0.5f );
+			var size = new IntVector3( VoxelWorld.Current.VoxelSize );
 
 			DrawBox( vb, center, size * 1f );
 		}
@@ -24,8 +24,8 @@ namespace Facepunch.CoreWars.Editor
 		{
 			vb.AddCube( center, size, Rotation.Identity );
 
-			Render.Set( "GhostColor", Color );
-			Render.Set( "Opacity", 0.8f );
+			Render.Attributes.Set( "GhostColor", Color );
+			Render.Attributes.Set( "Opacity", 0.8f );
 
 			vb.Draw( BoxMaterial );
 		}

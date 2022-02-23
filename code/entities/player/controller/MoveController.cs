@@ -87,11 +87,11 @@ namespace Facepunch.CoreWars
 		{
 			if ( Pawn is not Player player ) return;
 
-			EyePosLocal = Vector3.Up * Scale( EyeHeight );
+			EyeLocalPosition = Vector3.Up * Scale( EyeHeight );
 			UpdateBBox();
 
-			EyePosLocal += TraceOffset;
-			EyeRot = Input.Rotation;
+			EyeLocalPosition += TraceOffset;
+			EyeRotation = Input.Rotation;
 			Player = player;
 
 			if ( Unstuck.TestAndFix() )
@@ -102,7 +102,7 @@ namespace Facepunch.CoreWars
 
 			CheckLadder();
 
-			var currentMap = Map.Current;
+			var currentMap = VoxelWorld.Current;
 			var currentBlock = currentMap.GetVoxel( currentMap.ToVoxelPosition( Position ) );
 
 			Swimming = currentBlock.IsValid && currentBlock.GetBlockType().IsLiquid;
@@ -147,7 +147,7 @@ namespace Facepunch.CoreWars
 			if ( currentBlockBelow.IsValid && !currentBlockBelow.GetBlockType().IsPassable )
 				BlockPosition = currentBlockBelow.Position;
 
-			var lastValidBlockBelow = Map.Current.GetVoxel( BlockPosition );
+			var lastValidBlockBelow = VoxelWorld.Current.GetVoxel( BlockPosition );
 			IsSneakingOnBlock = false;
 
 			if ( Input.Down( InputButton.Run ) )
@@ -255,7 +255,7 @@ namespace Facepunch.CoreWars
 
 				if ( pm.Fraction == 1 )
 				{
-					Position = pm.EndPos;
+					Position = pm.EndPosition;
 					StayOnGround();
 					return;
 				}
@@ -492,7 +492,7 @@ namespace Facepunch.CoreWars
 
 			if ( moveToEndPos && !pm.StartedSolid && pm.Fraction > 0f && pm.Fraction < 1f )
 			{
-				Position = pm.EndPos;
+				Position = pm.EndPosition;
 			}
 		}
 
@@ -563,7 +563,7 @@ namespace Facepunch.CoreWars
 			var end = Position + Vector3.Down * StepSize;
 
 			var trace = TraceBBox( Position, start );
-			start = trace.EndPos;
+			start = trace.EndPosition;
 
 			trace = TraceBBox( start, end );
 
@@ -572,7 +572,7 @@ namespace Facepunch.CoreWars
 			if ( trace.StartedSolid ) return;
 			if ( Vector3.GetAngle( Vector3.Up, trace.Normal ) > StayOnGroundAngle ) return;
 
-			Position = trace.EndPos;
+			Position = trace.EndPosition;
 		}
 	}
 }

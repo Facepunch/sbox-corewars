@@ -94,12 +94,12 @@ namespace Facepunch.CoreWars
 
 		public virtual void PlayAttackAnimation()
 		{
-			AnimationOwner?.SetAnimBool( "b_attack", true );
+			AnimationOwner?.SetAnimParameter( "b_attack", true );
 		}
 
 		public virtual void PlayReloadAnimation()
 		{
-			AnimationOwner?.SetAnimBool( "b_reload", true );
+			AnimationOwner?.SetAnimParameter( "b_reload", true );
 		}
 
 		public override bool CanReload()
@@ -248,7 +248,7 @@ namespace Facepunch.CoreWars
 		{
 			if ( ReloadAnimation )
 			{
-				ViewModelEntity?.SetAnimBool( "reload", true );
+				ViewModelEntity?.SetAnimParameter( "reload", true );
 			}
 		}
 
@@ -281,7 +281,7 @@ namespace Facepunch.CoreWars
 					using ( Prediction.Off() )
 					{
 						var damageInfo = new DamageInfo()
-							.WithPosition( trace.EndPos )
+							.WithPosition( trace.EndPosition )
 							.WithFlag( DamageFlags.Blunt )
 							.WithForce( forward * 100f * force )
 							.UsingTraceResult( trace )
@@ -309,7 +309,7 @@ namespace Facepunch.CoreWars
 					trace.Surface.DoBulletImpact( trace );
 				}
 
-				var fullEndPos = trace.EndPos + trace.Direction * bulletSize;
+				var fullEndPos = trace.EndPosition + trace.Direction * bulletSize;
 
 				if ( !string.IsNullOrEmpty( TracerEffect ) )
 				{
@@ -332,7 +332,7 @@ namespace Facepunch.CoreWars
 					using ( Prediction.Off() )
 					{
 						var damageInfo = new DamageInfo()
-							.WithPosition( trace.EndPos )
+							.WithPosition( trace.EndPosition )
 							.WithFlag( DamageType )
 							.WithForce( forward * 100f * force )
 							.UsingTraceResult( trace )
@@ -396,7 +396,7 @@ namespace Facepunch.CoreWars
 
 		public override IEnumerable<TraceResult> TraceBullet( Vector3 start, Vector3 end, float radius = 2.0f )
 		{
-			bool inWater = Physics.TestPointContents( start, CollisionLayer.Water );
+			bool inWater = Map.Physics.IsPointWater( start );
 
 			yield return Trace.Ray( start, end )
 				.UseHitboxes()
@@ -430,7 +430,7 @@ namespace Facepunch.CoreWars
 				_ = new Sandbox.ScreenShake.Perlin();
 			}
 
-			ViewModelEntity?.SetAnimBool( "fire", true );
+			ViewModelEntity?.SetAnimParameter( "fire", true );
 			CrosshairPanel?.CreateEvent( "fire" );
 		}
 

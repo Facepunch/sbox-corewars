@@ -12,7 +12,7 @@ namespace Facepunch.CoreWars.Blocks
 		public override byte GetTextureId( BlockFace face, Chunk chunk, int x, int y, int z )
 		{
 			if ( face == BlockFace.Top || face == BlockFace.Bottom )
-				return Map.BlockAtlas.GetTextureId( "log_top" );
+				return VoxelWorld.BlockAtlas.GetTextureId( "log_top" );
 
 			return base.GetTextureId( face, chunk, x, y, z );
 		}

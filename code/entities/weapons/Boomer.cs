@@ -73,8 +73,7 @@ namespace Facepunch.CoreWars
 
 		public override void SimulateAnimator( PawnAnimator anim )
 		{
-			anim.SetParam( "holdtype", 2 );
-			anim.SetParam( "aimat_weight", 1.0f );
+			anim.SetAnimParameter( "holdtype", 2 );
 		}
 
 		protected override float ModifyDamage( Entity victim, float damage )
@@ -93,8 +92,8 @@ namespace Facepunch.CoreWars
             {
 				DamageInRadius( projectile.Position, BlastRadius, Config.Damage, 4f );
 
-				var voxelBlastRadius = (int)(BlastRadius / Map.Current.VoxelSize);
-				var voxelPosition = Map.Current.ToVoxelPosition( projectile.Position );
+				var voxelBlastRadius = (int)(BlastRadius / VoxelWorld.Current.VoxelSize);
+				var voxelPosition = VoxelWorld.Current.ToVoxelPosition( projectile.Position );
 
 				for ( var x = -voxelBlastRadius; x <= voxelBlastRadius; ++x )
 				{
@@ -106,7 +105,7 @@ namespace Facepunch.CoreWars
 
 							if ( voxelPosition.Distance( blockPosition ) <= voxelBlastRadius )
 							{
-								Map.Current.SetBlockOnServer( blockPosition, 0, 0 );
+								VoxelWorld.Current.SetBlockOnServer( blockPosition, 0, 0 );
 							}
 						}
 					}

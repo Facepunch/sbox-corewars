@@ -30,7 +30,7 @@ namespace Sandbox
 			if ( IsActive )
 			{
 				Controller.SetTag( "ducked" );
-				Controller.EyePosLocal *= 0.8f;
+				Controller.EyeLocalPosition *= 0.8f;
 			}
 		}
 

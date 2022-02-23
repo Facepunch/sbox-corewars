@@ -121,7 +121,7 @@ namespace Facepunch.CoreWars
 			EnableAllCollisions = true;
 			EnableDrawing = true;
 
-			Camera = new FirstPersonCamera();
+			CameraMode = new FirstPersonCamera();
 
 			Controller = new MoveController()
 			{
@@ -171,7 +171,7 @@ namespace Facepunch.CoreWars
 
 		public override void Simulate( Client client )
 		{
-			if ( !Map.Current.IsValid() ) return;
+			if ( !VoxelWorld.Current.IsValid() ) return;
 
 			if ( IsServer )
 			{
@@ -182,7 +182,7 @@ namespace Facepunch.CoreWars
 
 					if ( item.IsValid() && item is BlockItem blockItem )
 					{
-						var success = Map.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, blockItem.BlockId, true );
+						var success = VoxelWorld.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, blockItem.BlockId, true );
 
 						if ( success )
 						{
@@ -199,13 +199,13 @@ namespace Facepunch.CoreWars
 				}
 				else if ( Input.Down( InputButton.Attack2 ) && NextBlockPlace )
 				{
-					if ( Map.Current.GetBlockInDirection( Input.Position, Input.Rotation.Forward, out var blockPosition ) )
+					if ( VoxelWorld.Current.GetBlockInDirection( Input.Position, Input.Rotation.Forward, out var blockPosition ) )
 					{
-						var voxel = Map.Current.GetVoxel( blockPosition );
+						var voxel = VoxelWorld.Current.GetVoxel( blockPosition );
 
 						if ( voxel.IsValid )
 						{
-							if ( Map.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, 0 ) )
+							if ( VoxelWorld.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, 0 ) )
 							{
 								TryGiveBlock( voxel.BlockId, 1 );
 							}
@@ -217,7 +217,7 @@ namespace Facepunch.CoreWars
 
 				if ( Input.Pressed( InputButton.Flashlight ) )
 				{
-					Map.Current.GetBlockInDirection( Input.Position, Input.Rotation.Forward, out var position );
+					VoxelWorld.Current.GetBlockInDirection( Input.Position, Input.Rotation.Forward, out var position );
 
 					var radius = 8;
 
@@ -231,7 +231,7 @@ namespace Facepunch.CoreWars
 
 								if ( position.Distance( blockPosition ) <= radius )
 								{
-									Map.Current.SetBlockOnServer( blockPosition, 0, 0 );
+									VoxelWorld.Current.SetBlockOnServer( blockPosition, 0, 0 );
 								}
 							}
 						}
@@ -284,7 +284,7 @@ namespace Facepunch.CoreWars
 				}
 			}
 
-			var currentMap = Map.Current;
+			var currentMap = VoxelWorld.Current;
 
 			if ( IsServer )
 			{
@@ -314,7 +314,7 @@ namespace Facepunch.CoreWars
 					DebugOverlay.ScreenText( 3, $"Torch Level: ({voxel.GetRedTorchLight()}, {voxel.GetGreenTorchLight()}, {voxel.GetBlueTorchLight()})", 0.1f );
 					DebugOverlay.ScreenText( 4, $"Chunk: {voxel.Chunk.Offset}", 0.1f );
 					DebugOverlay.ScreenText( 5, $"Position: {position}", 0.1f );
-					DebugOverlay.ScreenText( 6, $"Biome: {Map.Current.GetBiomeAt( position.x, position.y ).Name}", 0.1f );
+					DebugOverlay.ScreenText( 6, $"Biome: {VoxelWorld.Current.GetBiomeAt( position.x, position.y ).Name}", 0.1f );
 				}
 			}
 
@@ -349,8 +349,8 @@ namespace Facepunch.CoreWars
 
 		protected virtual void GiveInitialItems()
 		{
-			TryGiveBlock( Map.Current.FindBlockId<GrassBlock>(), 1000 );
-			TryGiveBlock( Map.Current.FindBlockId<WindowBlock>(), 500 );
+			TryGiveBlock( VoxelWorld.Current.FindBlockId<GrassBlock>(), 1000 );
+			TryGiveBlock( VoxelWorld.Current.FindBlockId<WindowBlock>(), 500 );
 
 			TryGiveWeapon( "weapon_boomer" );
 			TryGiveAmmo( AmmoType.Explosive, 200 );

@@ -36,7 +36,7 @@ namespace Facepunch.CoreWars
 		{
 			if ( Game.Current.StateSystem.Active is EditorState state )
 			{
-				state.SaveChunksToDisk( Map.Current );
+				state.SaveChunksToDisk( VoxelWorld.Current );
 			}
 		}
 
@@ -54,15 +54,15 @@ namespace Facepunch.CoreWars
 
 		public override void MoveToSpawnpoint( Entity pawn )
 		{
-			if ( Map.Current.IsValid() )
+			if ( VoxelWorld.Current.IsValid() )
 			{
 				if ( IsEditorMode )
 				{
-					pawn.Position = (Map.Current.MaxSize * Map.Current.VoxelSize * 0.5f).WithZ( Map.Current.MaxSize.z * Map.Current.VoxelSize );
+					pawn.Position = (VoxelWorld.Current.MaxSize * VoxelWorld.Current.VoxelSize * 0.5f).WithZ( VoxelWorld.Current.MaxSize.z * VoxelWorld.Current.VoxelSize );
 					return;
 				}
 
-				var spawnpoint = Rand.FromList( Map.Current.SuitableSpawnPositions );
+				var spawnpoint = Rand.FromList( VoxelWorld.Current.SuitableSpawnPositions );
 				pawn.Position = spawnpoint;
 				return;
 			}
@@ -99,9 +99,9 @@ namespace Facepunch.CoreWars
 				player.LifeState = LifeState.Dead;
 			}
 
-			Map.Current.AddViewer( client );
+			VoxelWorld.Current.AddViewer( client );
 
-			if ( Map.Current.Initialized )
+			if ( VoxelWorld.Current.Initialized )
 			{
 				SendMapToClient( client);
 			}
@@ -122,25 +122,25 @@ namespace Facepunch.CoreWars
 		
 		private async void StartLoadMapTask()
 		{
-			var map = Map.Create( 1337 );
+			var world = VoxelWorld.Create( 1337 );
 
-			map.OnInitialized += OnMapInitialized;
-			map.SetBuildCollisionInThread( true );
-			map.SetVoxelMaterial( "materials/corewars/voxel.vmat" );
-			map.SetChunkRenderDistance( 4 );
-			map.SetChunkUnloadDistance( 8 );
-			map.SetChunkSize( 32, 32, 32 );
-			map.SetSeaLevel( 48 );
-			map.SetMaxSize( 256, 256, 128 );
-			map.LoadBlockAtlas( "textures/blocks.json" );
-			map.AddAllBlockTypes();
+			world.OnInitialized += OnMapInitialized;
+			world.SetBuildCollisionInThread( true );
+			world.SetVoxelMaterial( "materials/corewars/voxel.vmat" );
+			world.SetChunkRenderDistance( 4 );
+			world.SetChunkUnloadDistance( 8 );
+			world.SetChunkSize( 32, 32, 32 );
+			world.SetSeaLevel( 48 );
+			world.SetMaxSize( 256, 256, 128 );
+			world.LoadBlockAtlas( "textures/blocks.json" );
+			world.AddAllBlockTypes();
 
 			if ( !IsEditorMode )
 			{
-				map.SetMinimumLoadedChunks( 8 );
-				map.SetChunkGenerator<PerlinChunkGenerator>();
-				map.AddBiome<PlainsBiome>();
-				map.AddBiome<WeirdBiome>();
+				world.SetMinimumLoadedChunks( 8 );
+				world.SetChunkGenerator<PerlinChunkGenerator>();
+				world.AddBiome<PlainsBiome>();
+				world.AddBiome<WeirdBiome>();
 
 				var startChunkSize = 4;
 
@@ -150,9 +150,9 @@ namespace Facepunch.CoreWars
 					{
 						await GameTask.Delay( 100 );
 
-						var chunk = map.GetOrCreateChunk(
-							x * map.ChunkSize.x,
-							y * map.ChunkSize.y,
+						var chunk = world.GetOrCreateChunk(
+							x * world.ChunkSize.x,
+							y * world.ChunkSize.y,
 							0
 						);
 
@@ -162,18 +162,18 @@ namespace Facepunch.CoreWars
 			}
 			else
 			{
-				map.SetChunkRenderDistance( 4 );
-				map.SetChunkUnloadDistance( 8 );
-				map.SetChunkGenerator<EditorChunkGenerator>();
-				map.AddBiome<EditorBiome>();
+				world.SetChunkRenderDistance( 4 );
+				world.SetChunkUnloadDistance( 8 );
+				world.SetChunkGenerator<EditorChunkGenerator>();
+				world.AddBiome<EditorBiome>();
 
 				var state = StateSystem.Active as EditorState;
-				await state.LoadInitialChunks( map );
+				await state.LoadInitialChunks( world );
 			}
 
 			await GameTask.Delay( 500 );
 
-			map.Init();
+			world.Init();
 		}
 
 		private void OnMapInitialized()
@@ -188,7 +188,7 @@ namespace Facepunch.CoreWars
 
 		private void SendMapToClient( Client client )
 		{
-			Map.Current.Send( client );
+			VoxelWorld.Current.Send( client );
 
 			if ( client.Pawn is Player )
 			{

@@ -20,7 +20,7 @@ namespace Facepunch.CoreWars
 
 		public override void Tick()
 		{
-			if ( !Map.Current.IsValid() ) return;
+			if ( !VoxelWorld.Current.IsValid() ) return;
 
 			var viewer = Local.Client.GetChunkViewer();
 			if ( !viewer.IsValid() ) return;
@@ -40,14 +40,14 @@ namespace Facepunch.CoreWars
 
 		private string GetChunksLoaded()
 		{
-			if ( !Map.Current.IsValid() ) return "Generating Map...";
+			if ( !VoxelWorld.Current.IsValid() ) return "Generating VoxelWorld...";
 
 			var viewer = Local.Client.GetChunkViewer();
 			if ( !viewer.IsValid() ) return "Initializing Player...";
 
 			if ( !viewer.HasLoadedMinimumChunks() )
 			{
-				var minimumChunks = Map.Current.MinimumLoadedChunks;
+				var minimumChunks = VoxelWorld.Current.MinimumLoadedChunks;
 				var loadedChunks = viewer.LoadedChunks.Count;
 
 				return $"Loading Minimum Chunks {loadedChunks}/{minimumChunks}";
@@ -67,7 +67,7 @@ namespace Facepunch.CoreWars
 
 		private bool HasWorldLoaded()
 		{
-			if ( Map.Current == null || !Map.Current.Initialized )
+			if ( VoxelWorld.Current == null || !VoxelWorld.Current.Initialized )
 				return false;
 
 			return DidWorldLoad;
