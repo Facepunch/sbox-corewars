@@ -40,7 +40,7 @@ namespace Facepunch.CoreWars
 
 		private string GetChunksLoaded()
 		{
-			if ( !VoxelWorld.Current.IsValid() ) return "Generating VoxelWorld...";
+			if ( !VoxelWorld.Current.IsValid() ) return "Generating World...";
 
 			var viewer = Local.Client.GetChunkViewer();
 			if ( !viewer.IsValid() ) return "Initializing Player...";
