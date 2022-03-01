@@ -63,7 +63,7 @@ namespace Facepunch.CoreWars
 			{
 				if ( IsEditorMode )
 				{
-					pawn.Position = (VoxelWorld.Current.MaxSize * VoxelWorld.Current.VoxelSize * 0.5f).WithZ( VoxelWorld.Current.MaxSize.z * VoxelWorld.Current.VoxelSize );
+					pawn.Position = (VoxelWorld.Current.MaxSize * VoxelWorld.Current.VoxelSize * 0.5f);
 					return;
 				}
 
