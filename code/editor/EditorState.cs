@@ -136,6 +136,8 @@ namespace Facepunch.CoreWars.Editor
 						}
 					}
 				}
+
+				Log.Info( $"Saved chunks to disk ({fileName})..." );
 			}
 			catch ( Exception e )
 			{

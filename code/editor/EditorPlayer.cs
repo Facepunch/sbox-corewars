@@ -209,6 +209,14 @@ namespace Facepunch.CoreWars.Editor
 
 
 				CurrentHotbarIndex = (ushort)currentSlotIndex;
+
+				if ( IsServer && Input.Down( InputButton.Duck ) && Input.Pressed( InputButton.Back ) )
+				{
+					if ( Game.Current.StateSystem.Active is EditorState state )
+					{
+						state.SaveChunksToDisk( VoxelWorld.Current );
+					}
+				}
 			}
 
 			var viewer = Client.Components.Get<ChunkViewer>();
