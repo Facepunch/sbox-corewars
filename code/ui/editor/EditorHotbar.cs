@@ -12,7 +12,6 @@ namespace Facepunch.CoreWars.Editor
 	{
 		public static EditorHotbar Current { get; private set; }
 
-		public InventoryContainer Container { get; private set; }
 		public List<EditorHotbarSlot> Slots { get; private set; }
 
 		public EditorHotbar()

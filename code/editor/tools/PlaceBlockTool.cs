@@ -4,10 +4,9 @@ using Sandbox;
 
 namespace Facepunch.CoreWars.Editor
 {
+	[EditorToolLibrary( Title = "Place Block", Description = "Place a block" )]
 	public class PlaceBlockTool : EditorTool
 	{
-		public override string Name => "Place Block";
-
 		private EditorBlockGhost BlockGhost { get; set; }
 		private TimeUntil NextBlockPlace { get; set; }
 
