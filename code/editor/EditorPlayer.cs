@@ -247,14 +247,14 @@ namespace Facepunch.CoreWars.Editor
 
 		private void UpdateHotbarSlotKeys()
 		{
-			if ( Input.Pressed( InputButton.Slot0 ) ) CurrentHotbarIndex = 0;
-			if ( Input.Pressed( InputButton.Slot1 ) ) CurrentHotbarIndex = 1;
-			if ( Input.Pressed( InputButton.Slot2 ) ) CurrentHotbarIndex = 2;
-			if ( Input.Pressed( InputButton.Slot3 ) ) CurrentHotbarIndex = 3;
-			if ( Input.Pressed( InputButton.Slot4 ) ) CurrentHotbarIndex = 4;
-			if ( Input.Pressed( InputButton.Slot5 ) ) CurrentHotbarIndex = 5;
-			if ( Input.Pressed( InputButton.Slot6 ) ) CurrentHotbarIndex = 6;
-			if ( Input.Pressed( InputButton.Slot7 ) ) CurrentHotbarIndex = 7;
+			if ( Input.Pressed( InputButton.Slot1 ) ) CurrentHotbarIndex = 0;
+			if ( Input.Pressed( InputButton.Slot2 ) ) CurrentHotbarIndex = 1;
+			if ( Input.Pressed( InputButton.Slot3 ) ) CurrentHotbarIndex = 2;
+			if ( Input.Pressed( InputButton.Slot4 ) ) CurrentHotbarIndex = 3;
+			if ( Input.Pressed( InputButton.Slot5 ) ) CurrentHotbarIndex = 4;
+			if ( Input.Pressed( InputButton.Slot6 ) ) CurrentHotbarIndex = 5;
+			if ( Input.Pressed( InputButton.Slot7 ) ) CurrentHotbarIndex = 6;
+			if ( Input.Pressed( InputButton.Slot8 ) ) CurrentHotbarIndex = 7;
 		}
 	}
 }
