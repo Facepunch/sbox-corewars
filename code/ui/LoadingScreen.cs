@@ -5,7 +5,7 @@ using Sandbox.UI;
 namespace Facepunch.CoreWars
 {
 	[UseTemplate]
-	public partial class LoadingScreen : RootPanel
+	public partial class LoadingScreen : Panel
 	{
 		public string ChunksLoaded => GetChunksLoaded();
 		
