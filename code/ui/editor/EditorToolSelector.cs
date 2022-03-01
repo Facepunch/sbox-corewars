@@ -56,6 +56,15 @@ namespace Facepunch.CoreWars.Editor
 			foreach ( var item in Items )
 			{
 				item.IsSelected = (Hovered == item);
+
+				var maxItemScale = 1.3f;
+				var minItemScale = 0.9f;
+				var distanceToMouse = item.Box.Rect.Center.Distance( VirtualMouse );
+				var distanceToScale = distanceToMouse.Remap( 0f, item.Box.Rect.Size.Length * 1.5f, maxItemScale, minItemScale ).Clamp( minItemScale, maxItemScale );
+
+				var tx = new PanelTransform();
+				tx.AddScale( distanceToScale );
+				item.Style.Transform = tx;
 			}
 
 			base.Tick();
