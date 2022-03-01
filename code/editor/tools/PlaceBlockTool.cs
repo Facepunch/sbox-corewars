@@ -17,7 +17,6 @@ namespace Facepunch.CoreWars.Editor
 
 			if ( IsClient && currentMap.IsValid() )
 			{
-				var position = currentMap.ToVoxelPosition( Input.Position );
 				var distance = VoxelWorld.Current.VoxelSize * 4f;
 				var aimVoxelPosition = VoxelWorld.Current.ToVoxelPosition( Input.Position + Input.Rotation.Forward * distance );
 				var face = VoxelWorld.Current.Trace( Input.Position * (1.0f / VoxelWorld.Current.VoxelSize), Input.Rotation.Forward, distance, out var endPosition, out _ );
