@@ -25,7 +25,7 @@ namespace Facepunch.CoreWars
 
 			if ( IsClient )
 			{
-				Hud = new Hud();
+				Hud = IsEditorMode ? new EditorHud() : new Hud();
 			}
 
 			Current = this;
@@ -34,7 +34,7 @@ namespace Facepunch.CoreWars
 		[ServerCmd( "cw_editor_save" )]
 		public static void SaveEditorMapToDisk()
 		{
-			if ( Game.Current.StateSystem.Active is EditorState state )
+			if ( Current.StateSystem.Active is EditorState state )
 			{
 				state.SaveChunksToDisk( VoxelWorld.Current );
 			}

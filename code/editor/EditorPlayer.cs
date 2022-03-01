@@ -1,24 +1,83 @@
 ﻿using Facepunch.CoreWars.Blocks;
 using Facepunch.Voxels;
 using Sandbox;
+using System.Collections.Generic;
+using System.Text.Json;
 
 namespace Facepunch.CoreWars.Editor
 {
 	public partial class EditorPlayer : Sandbox.Player
 	{
-		public TimeUntil NextBlockPlace { get; private set; }
+		[ConVar.ClientData( Name = "HotbarBlocks" )]
+		public static string HotbarBlocks { get; set; } = string.Empty;
+
+		[Net, Predicted] public ushort CurrentHotbarIndex { get; private set; }
+		[Net] public IList<byte> HotbarBlockIds { get; set; }
+		[Net, Change( nameof( OnToolChanged ) )] public EditorTool Tool { get; private set; }
+
+		public byte SelectedBlockId => HotbarBlockIds[CurrentHotbarIndex];
 
 		private EditorBounds EditorBounds { get; set; }
-		private EditorBlockGhost BlockGhost { get; set; }
 
 		public EditorPlayer() : base()
 		{
+			HotbarBlockIds = new List<byte>();
 
+			for ( var i = 0; i < 8; i++ )
+			{
+				HotbarBlockIds.Add( 1 );
+			}
 		}
 
 		public EditorPlayer( Client client ) : this()
 		{
+			var storedHotbarInfo = JsonSerializer.Deserialize<byte[]>( client.GetClientData( "HotbarBlocks" ) );
+
+			if ( storedHotbarInfo != null )
+			{
+				for ( var i = 0; i < storedHotbarInfo.Length; i++ )
+				{
+					HotbarBlockIds[i] = storedHotbarInfo[i];
+				}
+			}
+
 			client.Pawn = this;
+		}
+
+		[ServerCmd]
+		public static void SetHotbarBlockId( int slot, byte blockId )
+		{
+			var client = ConsoleSystem.Caller;
+
+			if ( client.Pawn is EditorPlayer player )
+			{
+				player.HotbarBlockIds[slot] = blockId;
+			}
+		}
+
+		public void SetActiveTool( EditorTool tool )
+		{
+			if ( Tool.IsValid() )
+			{
+				Tool.OnDeselected();
+			}
+
+			Tool = tool;
+			Tool.Player = this;
+			Tool.OnSelected();
+		}
+
+		protected virtual void OnToolChanged( EditorTool next, EditorTool previous )
+		{
+			if ( previous.IsValid() )
+			{
+				previous.OnDeselected();
+			}
+
+			if ( next.IsValid() )
+			{
+				next.OnSelected();
+			}
 		}
 
 		public virtual void OnMapLoaded()
@@ -37,6 +96,8 @@ namespace Facepunch.CoreWars.Editor
 			Animator = new PlayerAnimator();
 
 			SetModel( "models/citizen/citizen.vmdl" );
+
+			SetActiveTool( new PlaceBlockTool() );
 		}
 
 		public override void Spawn()
@@ -48,16 +109,14 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void ClientSpawn()
 		{
+			if ( IsLocalPawn )
+			{
+				EditorHotbar.Current?.Initialize( HotbarBlockIds.Count );
+			}
+
 			EditorBounds = new EditorBounds
 			{
 				RenderBounds = new BBox( Vector3.One * -10000f, Vector3.One * 10000f ),
-				EnableDrawing = true,
-				Color = Color.Green
-			};
-
-			BlockGhost = new EditorBlockGhost
-			{
-				RenderBounds = new BBox( Vector3.One * -100f, Vector3.One* 100f ),
 				EnableDrawing = true,
 				Color = Color.Green
 			};
@@ -84,39 +143,6 @@ namespace Facepunch.CoreWars.Editor
 		{
 			if ( !VoxelWorld.Current.IsValid() ) return;
 
-			if ( IsServer && Prediction.FirstTime )
-			{
-				if ( Input.Released( InputButton.Attack1 ) && NextBlockPlace )
-				{
-					var distance = VoxelWorld.Current.VoxelSize * 4f;
-					var aimVoxelPosition = VoxelWorld.Current.ToVoxelPosition( Input.Position + Input.Rotation.Forward * distance );
-					var face = VoxelWorld.Current.Trace( Input.Position * (1.0f / VoxelWorld.Current.VoxelSize), Input.Rotation.Forward, distance, out var endPosition, out _ );
-
-					if ( face != BlockFace.Invalid && VoxelWorld.Current.GetBlock( endPosition ) != 0 )
-					{
-						var oppositePosition = VoxelWorld.GetAdjacentPosition( endPosition, (int)face );
-						aimVoxelPosition = oppositePosition;
-					}
-
-					VoxelWorld.Current.SetBlockOnServer( aimVoxelPosition, VoxelWorld.Current.FindBlockId<GrassBlock>() );
-					NextBlockPlace = 0.1f;
-				}
-				else if ( Input.Released( InputButton.Attack2 ) && NextBlockPlace )
-				{
-					if ( VoxelWorld.Current.GetBlockInDirection( Input.Position, Input.Rotation.Forward, out var blockPosition ) )
-					{
-						var voxel = VoxelWorld.Current.GetVoxel( blockPosition );
-
-						if ( voxel.IsValid )
-						{
-							VoxelWorld.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, 0 );
-						}
-					}
-
-					NextBlockPlace = 0.1f;
-				}
-			}
-
 			var currentMap = VoxelWorld.Current;
 
 			if ( IsClient && currentMap.IsValid() )
@@ -132,20 +158,26 @@ namespace Facepunch.CoreWars.Editor
 					DebugOverlay.ScreenText( 5, $"Position: {position}", 0.1f );
 					DebugOverlay.ScreenText( 6, $"Biome: {VoxelWorld.Current.GetBiomeAt( position.x, position.y ).Name}", 0.1f );
 				}
+			}
 
-				var distance = VoxelWorld.Current.VoxelSize * 4f;
-				var aimVoxelPosition = VoxelWorld.Current.ToVoxelPosition( Input.Position + Input.Rotation.Forward * distance );
-				var face = VoxelWorld.Current.Trace( Input.Position * (1.0f / VoxelWorld.Current.VoxelSize), Input.Rotation.Forward, distance, out var endPosition, out _ );
+			if ( Prediction.FirstTime )
+			{
+				var currentSlotIndex = (int)CurrentHotbarIndex;
 
-				if ( face != BlockFace.Invalid && VoxelWorld.Current.GetBlock( endPosition ) != 0 )
-				{
-					var oppositePosition = VoxelWorld.GetAdjacentPosition( endPosition, (int)face );
-					aimVoxelPosition = oppositePosition;
-				}
+				if ( Input.MouseWheel > 0 )
+					currentSlotIndex++;
+				else if ( Input.MouseWheel < 0 )
+					currentSlotIndex--;
 
-				var aimSourcePosition = VoxelWorld.Current.ToSourcePosition( aimVoxelPosition );
+				var maxSlotIndex = HotbarBlockIds.Count - 1;
 
-				BlockGhost.Position = aimSourcePosition;
+				if ( currentSlotIndex < 0 )
+					currentSlotIndex = maxSlotIndex;
+				else if ( currentSlotIndex > maxSlotIndex )
+					currentSlotIndex = 0;
+
+
+				CurrentHotbarIndex = (ushort)currentSlotIndex;
 			}
 
 			var viewer = Client.Components.Get<ChunkViewer>();
@@ -154,6 +186,8 @@ namespace Facepunch.CoreWars.Editor
 
 			var controller = GetActiveController();
 			controller?.Simulate( client, this, GetActiveAnimator() );
+
+			Tool?.Simulate( client );
 		}
 
 		public override void PostCameraSetup( ref CameraSetup setup )
@@ -165,6 +199,8 @@ namespace Facepunch.CoreWars.Editor
 		{
 			EditorBounds?.Delete();
 			EditorBounds = null;
+
+			Tool?.OnDeselected();
 
 			base.OnDestroy();
 		}
