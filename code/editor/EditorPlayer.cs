@@ -31,7 +31,7 @@ namespace Facepunch.CoreWars.Editor
 
 		public EditorPlayer( Client client ) : this()
 		{
-			var storedHotbarInfo = JsonSerializer.Deserialize<byte[]>( client.GetClientData( "HotbarBlocks" ) );
+			var storedHotbarInfo = JsonSerializer.Deserialize<byte[]>( client.GetClientData( "HotbarBlocks", "[]" ) );
 
 			if ( storedHotbarInfo != null )
 			{
