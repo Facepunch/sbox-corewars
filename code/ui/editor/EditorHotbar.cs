@@ -16,12 +16,13 @@ namespace Facepunch.CoreWars.Editor
 
 		public EditorHotbar()
 		{
-			Slots = new();
 			Current = this;
 		}
 
 		public void Initialize( int slots )
 		{
+			Slots ??= new();
+
 			foreach ( var slot in Slots )
 			{
 				slot.Delete();
