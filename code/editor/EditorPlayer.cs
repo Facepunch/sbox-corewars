@@ -26,7 +26,7 @@ namespace Facepunch.CoreWars.Editor
 
 			for ( var i = 0; i < 8; i++ )
 			{
-				HotbarBlockIds.Add( 1 );
+				HotbarBlockIds.Add( 0 );
 			}
 		}
 
@@ -108,6 +108,27 @@ namespace Facepunch.CoreWars.Editor
 			SetModel( "models/citizen/citizen.vmdl" );
 
 			SetActiveTool( new PlaceBlockTool() );
+
+			var validBlocks = new List<BlockType>();
+			var blocks = VoxelWorld.Current.BlockTypes.Values;
+
+			foreach ( var blockId in blocks )
+			{
+				var block = VoxelWorld.Current.GetBlockType( blockId );
+
+				if ( block.HasTexture )
+				{
+					validBlocks.Add( block );
+				}
+			}
+
+			for ( var i = 0; i < HotbarBlockIds.Count; i++ )
+			{
+				if ( HotbarBlockIds[i] > 0 ) continue;
+				if ( validBlocks.Count == 0 ) break;
+				HotbarBlockIds[i] = validBlocks[0].BlockId;
+				validBlocks.RemoveAt( 0 );
+			}
 		}
 
 		public override void Spawn()
