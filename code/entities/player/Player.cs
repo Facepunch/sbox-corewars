@@ -273,6 +273,8 @@ namespace Facepunch.CoreWars
 
 				CurrentHotbarIndex = (ushort)currentSlotIndex;
 
+				UpdateHotbarSlotKeys();
+
 				if ( IsServer )
 				{
 					var item = HotbarInventory.Container.GetFromSlot( CurrentHotbarIndex );
@@ -400,6 +402,33 @@ namespace Facepunch.CoreWars
 					weapon.Weapon = null;
 				}
 			}
+		}
+
+		private void UpdateHotbarSlotKeys()
+		{
+			if ( Input.Pressed( InputButton.Slot0 ) )
+				CurrentHotbarIndex = (ushort)Math.Min( 0, HotbarInventory.Container.SlotLimit - 1 );
+
+			if ( Input.Pressed( InputButton.Slot1 ) )
+				CurrentHotbarIndex = (ushort)Math.Min( 1, HotbarInventory.Container.SlotLimit - 1 );
+
+			if ( Input.Pressed( InputButton.Slot2 ) )
+				CurrentHotbarIndex = (ushort)Math.Min( 2, HotbarInventory.Container.SlotLimit - 1 );
+
+			if ( Input.Pressed( InputButton.Slot3 ) )
+				CurrentHotbarIndex = (ushort)Math.Min( 3, HotbarInventory.Container.SlotLimit - 1 );
+
+			if ( Input.Pressed( InputButton.Slot4 ) )
+				CurrentHotbarIndex = (ushort)Math.Min( 4, HotbarInventory.Container.SlotLimit - 1 );
+
+			if ( Input.Pressed( InputButton.Slot5 ) )
+				CurrentHotbarIndex = (ushort)Math.Min( 5, HotbarInventory.Container.SlotLimit - 1 );
+
+			if ( Input.Pressed( InputButton.Slot6 ) )
+				CurrentHotbarIndex = (ushort)Math.Min( 6, HotbarInventory.Container.SlotLimit - 1 );
+
+			if ( Input.Pressed( InputButton.Slot7 ) )
+				CurrentHotbarIndex = (ushort)Math.Min( 7, HotbarInventory.Container.SlotLimit - 1 );
 		}
 	}
 }

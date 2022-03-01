@@ -12,7 +12,7 @@ namespace Facepunch.CoreWars.Editor
 		[ConVar.ClientData( Name = "cw_hotbarblocks", Saved = true )]
 		public static string HotbarBlocks { get; set; } = "[]";
 
-		[Net, Predicted] public ushort CurrentHotbarIndex { get; private set; }
+		[Net, Predicted] public int CurrentHotbarIndex { get; private set; }
 		[Net] public IList<byte> HotbarBlockIds { get; set; }
 		[Net, Change( nameof( OnToolChanged ) )] public EditorTool Tool { get; private set; }
 
@@ -207,7 +207,6 @@ namespace Facepunch.CoreWars.Editor
 				else if ( currentSlotIndex > maxSlotIndex )
 					currentSlotIndex = 0;
 
-
 				CurrentHotbarIndex = (ushort)currentSlotIndex;
 
 				if ( IsServer && Input.Down( InputButton.Duck ) && Input.Pressed( InputButton.Back ) )
@@ -217,6 +216,8 @@ namespace Facepunch.CoreWars.Editor
 						state.SaveChunksToDisk( VoxelWorld.Current );
 					}
 				}
+
+				UpdateHotbarSlotKeys();
 			}
 
 			var viewer = Client.Components.Get<ChunkViewer>();
@@ -242,6 +243,18 @@ namespace Facepunch.CoreWars.Editor
 			Tool?.OnDeselected();
 
 			base.OnDestroy();
+		}
+
+		private void UpdateHotbarSlotKeys()
+		{
+			if ( Input.Pressed( InputButton.Slot0 ) ) CurrentHotbarIndex = 0;
+			if ( Input.Pressed( InputButton.Slot1 ) ) CurrentHotbarIndex = 1;
+			if ( Input.Pressed( InputButton.Slot2 ) ) CurrentHotbarIndex = 2;
+			if ( Input.Pressed( InputButton.Slot3 ) ) CurrentHotbarIndex = 3;
+			if ( Input.Pressed( InputButton.Slot4 ) ) CurrentHotbarIndex = 4;
+			if ( Input.Pressed( InputButton.Slot5 ) ) CurrentHotbarIndex = 5;
+			if ( Input.Pressed( InputButton.Slot6 ) ) CurrentHotbarIndex = 6;
+			if ( Input.Pressed( InputButton.Slot7 ) ) CurrentHotbarIndex = 7;
 		}
 	}
 }
