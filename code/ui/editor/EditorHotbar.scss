@@ -1,0 +1,10 @@
+﻿EditorHotbar {
+    position: absolute;
+    bottom: 32px;
+    display: flex;
+    flex-direction: row;
+
+    EditorHotbarSlot {
+        margin-right: 16px;
+    }
+}

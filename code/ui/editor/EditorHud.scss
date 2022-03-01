@@ -1,0 +1,27 @@
+﻿rootpanel {
+  &.devcamera {
+    display: none;
+  }
+}
+
+EditorHud {
+    .crosshair {
+        background-color: white;
+        border-radius: 50%;
+        transform: translate( -50% -50% );
+        border: 2px solid black;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 16px;
+        height: 16px;
+    }
+
+    .bottom {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}
