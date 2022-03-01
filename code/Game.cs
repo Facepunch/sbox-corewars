@@ -2,6 +2,7 @@
 using Facepunch.CoreWars.Inventory;
 using Facepunch.Voxels;
 using Sandbox;
+using Sandbox.UI;
 using System.Linq;
 
 namespace Facepunch.CoreWars
@@ -11,7 +12,7 @@ namespace Facepunch.CoreWars
 		[Net] public StateSystem StateSystem { get; private set; }
 
 		public static new Game Current { get; private set; }
-		public static Hud Hud { get; private set; }
+		public static RootPanel Hud { get; private set; }
 
 		[ServerVar( "cw_editor", Saved = true )]
 		public static bool IsEditorMode { get; set; }
