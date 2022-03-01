@@ -79,12 +79,10 @@ namespace Facepunch.CoreWars.Editor
 
 		private bool IsHidden() => !IsOpen;
 
-		public override void OnLayout( ref Rect layoutRect )
+		protected override void FinalLayoutChildren()
 		{
-			base.OnLayout( ref layoutRect );
-
-			var radius = layoutRect.Size.x * 0.5f;
-			var center = layoutRect.WithoutPosition.Center;
+			var radius = Box.Rect.Size.x * 0.5f;
+			var center = Box.Rect.WithoutPosition.Center;
 
 			for ( var i = 0; i < Items.Count; i++ )
 			{
@@ -94,8 +92,10 @@ namespace Facepunch.CoreWars.Editor
 				var item = Items[i];
 
 				item.Style.Left = Length.Pixels( (center.x + x) * ScaleFromScreen );
-				item.Style.Top = Length.Pixels( (center.y + y) * ScaleFromScreen  );
+				item.Style.Top = Length.Pixels( (center.y + y) * ScaleFromScreen );
 			}
+
+			base.FinalLayoutChildren();
 		}
 
 		[Event.BuildInput]
