@@ -55,6 +55,16 @@ namespace Facepunch.CoreWars.Editor
 		}
 
 		[ServerCmd]
+		public static void ChangeToolTo( int libraryId )
+		{
+			if ( ConsoleSystem.Caller.Pawn is EditorPlayer player )
+			{
+				var tool = Library.TryCreate<EditorTool>( libraryId );
+				player.SetActiveTool( tool );
+			}
+		}
+
+		[ServerCmd]
 		public static void SetHotbarBlockId( int slot, byte blockId )
 		{
 			var client = ConsoleSystem.Caller;
