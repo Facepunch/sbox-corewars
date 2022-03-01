@@ -1,5 +1,6 @@
 ﻿using Facepunch.CoreWars.Editor;
 using Facepunch.CoreWars.Inventory;
+using Facepunch.Voxels;
 using Sandbox;
 using Sandbox.UI;
 using System.Collections.Generic;
@@ -40,6 +41,8 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void Tick()
 		{
+			if ( !VoxelWorld.Current.IsValid() ) return;
+
 			if ( Local.Pawn is EditorPlayer player )
 			{
 				for ( ushort i = 0; i < Slots.Count; i++)
