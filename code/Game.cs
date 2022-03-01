@@ -10,26 +10,30 @@ namespace Facepunch.CoreWars
 	public partial class Game : Sandbox.Game
 	{
 		[Net] public StateSystem StateSystem { get; private set; }
+		[Net] public bool IsEditorMode { get; private set; }
 
 		public static new Game Current { get; private set; }
 		public static RootPanel Hud { get; private set; }
 
 		[ServerVar( "cw_editor", Saved = true )]
-		public static bool IsEditorMode { get; set; }
+		public static bool EditorModeConVar { get; set; }
 
 		public Game()
 		{
 			if ( IsServer )
 			{
+				IsEditorMode = EditorModeConVar;
 				StateSystem = new();
 			}
 
-			if ( IsClient )
-			{
-				Hud = IsEditorMode ? new EditorHud() : new Hud();
-			}
-
 			Current = this;
+		}
+
+		public override void ClientSpawn()
+		{
+			Hud = IsEditorMode ? new EditorHud() : new Hud();
+
+			base.ClientSpawn();
 		}
 
 		[ServerCmd( "cw_editor_save" )]
