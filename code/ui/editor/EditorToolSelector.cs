@@ -54,5 +54,15 @@ namespace Facepunch.CoreWars.Editor
 		}
 
 		private bool IsHidden() => !Input.Down( InputButton.Score );
+
+		[Event.BuildInput]
+		private void BuildInput( InputBuilder builder )
+		{
+			if ( builder.Down( InputButton.Score ) )
+			{
+				builder.ClearButton( InputButton.Attack1 );
+				builder.ClearButton( InputButton.Attack2 );
+			}
+		}
 	}
 }
