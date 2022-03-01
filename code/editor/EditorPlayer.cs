@@ -1,6 +1,7 @@
 ﻿using Facepunch.CoreWars.Blocks;
 using Facepunch.Voxels;
 using Sandbox;
+using System;
 using System.Collections.Generic;
 using System.Text.Json;
 
@@ -8,8 +9,8 @@ namespace Facepunch.CoreWars.Editor
 {
 	public partial class EditorPlayer : Sandbox.Player
 	{
-		[ConVar.ClientData( Name = "HotbarBlocks" )]
-		public static string HotbarBlocks { get; set; } = string.Empty;
+		[ConVar.ClientData( Name = "cw_hotbarblocks", Saved = true )]
+		public static string HotbarBlocks { get; set; } = "[]";
 
 		[Net, Predicted] public ushort CurrentHotbarIndex { get; private set; }
 		[Net] public IList<byte> HotbarBlockIds { get; set; }
@@ -31,14 +32,23 @@ namespace Facepunch.CoreWars.Editor
 
 		public EditorPlayer( Client client ) : this()
 		{
-			var storedHotbarInfo = JsonSerializer.Deserialize<byte[]>( client.GetClientData( "HotbarBlocks", "[]" ) );
+			var hotbarBlocksClientData = client.GetClientData( "cw_hotbarblocks", "[]" );
 
-			if ( storedHotbarInfo != null )
+			try
 			{
-				for ( var i = 0; i < storedHotbarInfo.Length; i++ )
+				var storedHotbarInfo = JsonSerializer.Deserialize<int[]>( hotbarBlocksClientData );
+
+				if ( storedHotbarInfo != null )
 				{
-					HotbarBlockIds[i] = storedHotbarInfo[i];
+					for ( var i = 0; i < storedHotbarInfo.Length; i++ )
+					{
+						HotbarBlockIds[i] = (byte)storedHotbarInfo[i];
+					}
 				}
+			}
+			catch ( Exception e )
+			{
+				Log.Warning( e );
 			}
 
 			client.Pawn = this;
@@ -67,7 +77,7 @@ namespace Facepunch.CoreWars.Editor
 			Tool.OnSelected();
 		}
 
-		protected virtual void OnToolChanged( EditorTool next, EditorTool previous )
+		protected virtual void OnToolChanged( EditorTool previous, EditorTool next )
 		{
 			if ( previous.IsValid() )
 			{
