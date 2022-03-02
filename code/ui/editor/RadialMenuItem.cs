@@ -1,22 +1,25 @@
 ﻿using Sandbox;
 using Sandbox.UI;
+using System;
 
 namespace Facepunch.CoreWars.Editor
 {
 	[UseTemplate]
-	public partial class EditorToolItem : Panel
+	public partial class RadialMenuItem : Panel
 	{
-		public ushort Slot { get; set; }
 		public bool IsSelected { get; set; }
-		public EditorToolLibraryAttribute Attribute { get; private set; }
+		public string Title { get; set; }
+		public string Description { get; set; }
+		public string IconPath { get; private set; }
+		public Action OnSelected { get; set; }
 		public Image Icon { get; set; }
 
-		public EditorToolItem() { }
+		public RadialMenuItem() { }
 
-		public void SetLibraryItem( EditorToolLibraryAttribute item )
+		public void SetIcon( string icon )
 		{
-			Attribute = item;
-			Icon?.SetTexture( Attribute.Icon );
+			Icon?.SetTexture( icon );
+			IconPath = icon;
 		}
 
 		public override void OnLayout( ref Rect layoutRect )
@@ -36,10 +39,7 @@ namespace Facepunch.CoreWars.Editor
 		{
 			BindClass( "selected", () => IsSelected );
 
-			if ( Attribute != null )
-			{
-				SetLibraryItem( Attribute );
-			}
+			SetIcon( IconPath );
 
 			base.PostTemplateApplied();
 		}

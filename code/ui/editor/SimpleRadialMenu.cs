@@ -9,24 +9,18 @@ using System.Collections.Generic;
 namespace Facepunch.CoreWars.Editor
 {
 	[UseTemplate]
-	public partial class EditorToolSelector : Panel
+	public partial class SimpleRadialMenu : Panel
 	{
-		public static EditorToolSelector Current { get; private set; }
-
-		public List<EditorToolItem> Items { get; private set; }
-		public EditorToolItem Hovered { get; private set; }
-		public string Title => Hovered?.Attribute?.Title ?? string.Empty;
-		public string Description => Hovered?.Attribute?.Description ?? string.Empty;
+		public List<RadialMenuItem> Items { get; private set; }
+		public RadialMenuItem Hovered { get; private set; }
+		public Panel ItemContainer { get; set; }
+		public string Title => Hovered?.Title ?? string.Empty;
+		public string Description => Hovered?.Description ?? string.Empty;
 		public Panel Dot { get; set; }
 
 		private TimeSince LastCloseTime { get; set; }
 		private Vector2 VirtualMouse { get; set; }
 		private bool IsOpen { get; set; }
-
-		public EditorToolSelector()
-		{
-			Current = this;
-		}
 
 		public void Initialize()
 		{
@@ -43,10 +37,31 @@ namespace Facepunch.CoreWars.Editor
 
 			foreach ( var attribute in available )
 			{
-				var item = AddChild<EditorToolItem>();
-				item.SetLibraryItem( attribute );
-				Items.Add( item );
+				AddTool( attribute );
 			}
+
+			AddAction( "Save World", "Save world to disk", "textures/ui/save.png", () => Game.SaveEditorMapToDisk() );
+			AddAction( "Load World", "Load world from disk", "textures/ui/load.png", () => Game.SaveEditorMapToDisk() );
+		}
+
+		public void AddTool( EditorToolLibraryAttribute attribute )
+		{
+			var item = ItemContainer.AddChild<RadialMenuItem>();
+			item.Title = attribute.Title;
+			item.Description = attribute.Description;
+			item.SetIcon( attribute.Icon );
+			item.OnSelected = () => EditorPlayer.ChangeToolTo( attribute.Identifier );
+			Items.Add( item );
+		}
+
+		public void AddAction( string title, string description, string icon, Action callback )
+		{
+			var item = ItemContainer.AddChild<RadialMenuItem>();
+			item.Title = title;
+			item.Description = description;
+			item.SetIcon( icon );
+			item.OnSelected = callback;
+			Items.Add( item );
 		}
 
 		public override void Tick()
@@ -57,8 +72,9 @@ namespace Facepunch.CoreWars.Editor
 			{
 				item.IsSelected = (Hovered == item);
 
+				var fItemCount = (float)Items.Count;
 				var maxItemScale = 1.3f;
-				var minItemScale = 0.9f;
+				var minItemScale = 0.9f - fItemCount.Remap( 4f, 8f, 0f, 0.2f );
 				var distanceToMouse = item.Box.Rect.Center.Distance( VirtualMouse );
 				var distanceToScale = distanceToMouse.Remap( 0f, item.Box.Rect.Size.Length * 1.5f, maxItemScale, minItemScale ).Clamp( minItemScale, maxItemScale );
 
@@ -119,14 +135,14 @@ namespace Facepunch.CoreWars.Editor
 				var lx = VirtualMouse.x - Box.Left;
 				var ly = VirtualMouse.y - Box.Top;
 
-				EditorToolItem closestItem = null;
+				RadialMenuItem closestItem = null;
 				var closestDistance = 0f;
 
-				if ( VirtualMouse.Distance( Screen.Size * 0.5f ) >= 100f )
+				if ( VirtualMouse.Distance( Screen.Size * 0.5f ) >= Box.Rect.Size.x * 0.1f )
 				{
 					foreach ( var item in Items )
 					{
-						var distance = item.Box.Rect.Position.Distance( VirtualMouse );
+						var distance = item.Box.Rect.Center.Distance( VirtualMouse );
 
 						if ( closestItem == null || distance < closestDistance )
 						{
@@ -143,7 +159,7 @@ namespace Facepunch.CoreWars.Editor
 
 				if ( Hovered != null && builder.Down( InputButton.Attack1 ) )
 				{
-					EditorPlayer.ChangeToolTo( Hovered.Attribute.Identifier );
+					Hovered.OnSelected?.Invoke();
 					LastCloseTime = 0f;
 					IsOpen = false;
 				}
