@@ -15,7 +15,11 @@ HEADER
 FEATURES
 {
 	#include "common/features.hlsl"
-	Feature( F_ADDITIVE_BLEND, 0..1 );
+
+	Feature( F_ALPHA_TEST, 0..1, "Translucent" );
+	Feature( F_TRANSLUCENT, 0..1, "Translucent" );
+	FeatureRule( Allow1( F_TRANSLUCENT, F_ALPHA_TEST ), "Translucent and Alpha Test are not compatible" );
+	Feature( F_PREPASS_ALPHA_TEST, 0..1, "Translucent" );
 }
 
 //=========================================================================================================================
@@ -37,8 +41,10 @@ COMMON
 	#include "sbox_shared.fxc"
 	#define VS_INPUT_HAS_TANGENT_BASIS 1
 	#define PS_INPUT_HAS_TANGENT_BASIS 1
-
 	float g_flVoxelSize < Default( 32.0 ); >;
+
+	StaticCombo( S_ALPHA_TEST, F_ALPHA_TEST, Sys( ALL ) );
+	StaticCombo( S_TRANSLUCENT, F_TRANSLUCENT, Sys( ALL ) );
 }
 
 //=========================================================================================================================
@@ -122,6 +128,25 @@ PS
 		#define DEPTH_STATE_ALREADY_SET
 	#endif
 
+	#if S_TRANSLUCENT
+		RenderState( BlendEnable, true );
+		RenderState( SrcBlend, SRC_ALPHA );
+		RenderState( DstBlend, INV_SRC_ALPHA );
+		RenderState( BlendOp, ADD );
+		RenderState( SrcBlendAlpha, ONE );
+		RenderState( DstBlendAlpha, INV_SRC_ALPHA );
+		RenderState( BlendOpAlpha, ADD );
+		#ifndef DEPTH_STATE_ALREADY_SET
+			RenderState( DepthFunc, LESS_EQUAL );
+			RenderState( DepthWriteEnable, true );
+			#define DEPTH_STATE_ALREADY_SET
+		#endif
+
+		#define BLEND_MODE_ALREADY_SET
+	#endif
+
+	#define COLOR_SAMPLER_DEFINED
+
 	#include "common/pixel.hlsl"
 
 	CreateInputTexture2D( TextureAtlasColor, Srgb, 8, "", "_color", "Voxel Atlas,10/10", Default4( 1.0f, 1.0f, 1.0f, 1.0f ) );
@@ -160,6 +185,8 @@ PS
 	CreateTexture3DWithoutSampler( g_tLightmapAdjacent3 ) < Channel( R, None( TextureLightmapNorth ), Linear ); OutputFormat( R32F ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
 	CreateTexture3DWithoutSampler( g_tLightmapAdjacent4 ) < Channel( R, None( TextureLightmapTop ), Linear ); OutputFormat( R32F ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
 	CreateTexture3DWithoutSampler( g_tLightmapAdjacent5 ) < Channel( R, None( TextureLightmapBottom ), Linear ); OutputFormat( R32F ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
+
+	float g_GlobalOpacity< Range(0.0f, 1.0f); Default(1.0f); >;
 
 	struct LightmapData
 	{
@@ -242,8 +269,14 @@ PS
 		#if ( S_MODE_DEPTH )
 		{
 			PixelOutput o;
-			float4 vColor = Tex2DLevelS( g_tAtlasColor, g_sPointSampler, vTexCoordAtlas, 0 );
-			if(vColor.a < 0.5f) discard;
+			#if (S_ALPHA_TEST || S_TRANSLUCENT)
+				float4 vColor = Tex2DLevelS( g_tAtlasColor, g_sPointSampler, vTexCoordAtlas, 0 );
+				#if (S_ALPHA_TEST)
+					if(vColor.a < g_flAlphaTestReference) discard;
+				#else
+					o.vColor.rgba = float4( 0.0, 0.0, 0.0, vColor.a );
+				#endif
+			#endif
 			o.vColor.rgba = float4( 0.0, 0.0, 0.0, 1.0f );
 			return o;
 		}
@@ -283,8 +316,8 @@ PS
 			m.TransmissiveMask = 1.0f;
 			m.Emission.rgb = vEmission;
 			
-			return FinalizePixelMaterial( i, m );
-			
+			PixelOutput o = FinalizePixelMaterial( i, m );
+			return o;
 
 		}
 		#endif

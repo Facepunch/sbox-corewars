@@ -4,6 +4,10 @@ Layer0
 {
 	shader "voxel.vfx"
 
+	//---- Translucent ----
+	F_ALPHA_TEST 1
+	F_PREPASS_ALPHA_TEST 1
+
 	flTextureAtlasCellSize "64.000"
 	g_flVoxelSize "48.000"
 
@@ -23,7 +27,7 @@ Layer0
 
 	//---- Material ----
 	TextureColor "materials/default/default_color.tga"
-	TextureTintMask "materials/default/default.tga"
+	TextureTranslucency "[1.000000 1.000000 1.000000 0.000000]"
 
 	//---- Texture Coordinates ----
 	g_nScaleTexCoordUByModelScaleAxis "0"
@@ -31,6 +35,10 @@ Layer0
 	g_vTexCoordOffset "[0.000 0.000]"
 	g_vTexCoordScale "[1.000 1.000]"
 	g_vTexCoordScrollSpeed "[0.000 0.000]"
+
+	//---- Translucent ----
+	g_flAlphaTestReference "0.500"
+	g_flAntiAliasedEdgeStrength "1.000"
 
 	//---- Voxel Atlas ----
 	TextureAtlasAmbientOcclusion "textures/blocks_ao.png"
@@ -46,7 +54,7 @@ Layer0
 	TextureLightmapSouth "materials/default/default_lightmap.tga"
 	TextureLightmapTop "materials/default/default_lightmap.tga"
 	TextureLightmapWest "materials/default/default_lightmap.tga"
-	
+
 	DynamicParams
 	{
 		g_flVoxelSize "VoxelSize"
