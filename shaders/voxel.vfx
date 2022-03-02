@@ -312,7 +312,7 @@ PS
 			m.AmbientOcclusion = vRma.b;
 			m.BlendMask = 1.0f;
 			m.TintMask = 1.0f;
-			m.Opacity = 1.0f;
+			m.Opacity = vColor.a;
 			m.TransmissiveMask = 1.0f;
 			m.Emission.rgb = vEmission;
 			
