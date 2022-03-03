@@ -20,6 +20,7 @@ FEATURES
 	Feature( F_TRANSLUCENT, 0..1, "Translucent" );
 	FeatureRule( Allow1( F_TRANSLUCENT, F_ALPHA_TEST ), "Translucent and Alpha Test are not compatible" );
 	Feature( F_PREPASS_ALPHA_TEST, 0..1, "Translucent" );
+	Feature( F_NON_DIRECTIONAL_DIFFUSE_LIGHTING, 0..1, "Rendering" );
 }
 
 //=========================================================================================================================
@@ -45,6 +46,7 @@ COMMON
 
 	StaticCombo( S_ALPHA_TEST, F_ALPHA_TEST, Sys( ALL ) );
 	StaticCombo( S_TRANSLUCENT, F_TRANSLUCENT, Sys( ALL ) );
+	StaticCombo( S_NON_DIRECTIONAL_DIFFUSE_LIGHTING, F_NON_DIRECTIONAL_DIFFUSE_LIGHTING, Sys( ALL ) );
 }
 
 //=========================================================================================================================
