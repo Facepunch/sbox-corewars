@@ -6,7 +6,7 @@ namespace Facepunch.CoreWars.Blocks
 	[Library]
 	public class WaterBlock : BlockType
 	{
-		public override string DefaultTexture => "stone";
+		public override string DefaultTexture => "water";
 		public override string FriendlyName => "Water";
 		public override bool UseTransparency => true;
 		public override bool IsTranslucent => true;
