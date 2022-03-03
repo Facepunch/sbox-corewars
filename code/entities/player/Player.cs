@@ -177,20 +177,29 @@ namespace Facepunch.CoreWars
 			{
 				if ( Input.Down( InputButton.Attack1 ) && NextBlockPlace )
 				{
-					var container = HotbarInventory.Container;
-					var item = container.GetFromSlot( CurrentHotbarIndex );
-
-					if ( item.IsValid() && item is BlockItem blockItem )
+					if ( Input.Down( InputButton.Run ) )
 					{
-						var success = VoxelWorld.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, blockItem.BlockId, true );
+						var environmentLight = Entity.All.OfType<EnvironmentLightEntity>().FirstOrDefault();
+						environmentLight.Color = Color.Red;
+						environmentLight.SkyColor = Color.Red;
+					}
+					else
+					{
+						var container = HotbarInventory.Container;
+						var item = container.GetFromSlot( CurrentHotbarIndex );
 
-						if ( success )
+						if ( item.IsValid() && item is BlockItem blockItem )
 						{
-							item.StackSize--;
+							var success = VoxelWorld.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, blockItem.BlockId, true );
 
-							if ( item.StackSize <= 0 )
+							if ( success )
 							{
-								InventorySystem.RemoveItem( item );
+								item.StackSize--;
+
+								if ( item.StackSize <= 0 )
+								{
+									InventorySystem.RemoveItem( item );
+								}
 							}
 						}
 					}
@@ -199,7 +208,13 @@ namespace Facepunch.CoreWars
 				}
 				else if ( Input.Down( InputButton.Attack2 ) && NextBlockPlace )
 				{
-					if ( VoxelWorld.Current.GetBlockInDirection( Input.Position, Input.Rotation.Forward, out var blockPosition ) )
+					if ( Input.Down( InputButton.Run ) )
+					{
+						var environmentLight = Entity.All.OfType<EnvironmentLightEntity>().FirstOrDefault();
+						environmentLight.Color = Color.Black;
+						environmentLight.SkyColor = Color.Black;
+					}
+					else if ( VoxelWorld.Current.GetBlockInDirection( Input.Position, Input.Rotation.Forward, out var blockPosition ) )
 					{
 						var voxel = VoxelWorld.Current.GetVoxel( blockPosition );
 
@@ -231,7 +246,10 @@ namespace Facepunch.CoreWars
 
 								if ( position.Distance( blockPosition ) <= radius )
 								{
-									VoxelWorld.Current.SetBlockOnServer( blockPosition, 0, 0 );
+									if ( Input.Down( InputButton.Duck ) )
+										VoxelWorld.Current.SetBlockOnServer( blockPosition, VoxelWorld.Current.FindBlockId<WaterBlock>(), 0 );
+									else
+										VoxelWorld.Current.SetBlockOnServer( blockPosition, 0, 0 );
 								}
 							}
 						}

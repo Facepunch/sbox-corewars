@@ -185,18 +185,18 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
-            <key type="filename">blocks/color/dirt_color.png</key>
-            <key type="filename">blocks/color/dirt_grass_color.png</key>
-            <key type="filename">blocks/color/grass_color.png</key>
-            <key type="filename">blocks/color/leaf_color.png</key>
-            <key type="filename">blocks/color/log_side_color.png</key>
-            <key type="filename">blocks/color/log_top_color.png</key>
-            <key type="filename">blocks/color/metalgrate_color.png</key>
-            <key type="filename">blocks/color/sand_color.png</key>
-            <key type="filename">blocks/color/stone_color.png</key>
-            <key type="filename">blocks/color/water_color.png</key>
-            <key type="filename">blocks/color/window_color.png</key>
-            <key type="filename">blocks/color/woodplanks_color.png</key>
+            <key type="filename">blocks/color/dirt.png</key>
+            <key type="filename">blocks/color/dirt_grass.png</key>
+            <key type="filename">blocks/color/grass.png</key>
+            <key type="filename">blocks/color/leaf.png</key>
+            <key type="filename">blocks/color/log_side.png</key>
+            <key type="filename">blocks/color/log_top.png</key>
+            <key type="filename">blocks/color/metalgrate.png</key>
+            <key type="filename">blocks/color/sand.png</key>
+            <key type="filename">blocks/color/stone.png</key>
+            <key type="filename">blocks/color/water.png</key>
+            <key type="filename">blocks/color/window.png</key>
+            <key type="filename">blocks/color/woodplanks.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
