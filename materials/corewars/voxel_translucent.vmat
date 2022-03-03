@@ -4,6 +4,9 @@ Layer0
 {
 	shader "voxel.vfx"
 
+	//---- Rendering ----
+	F_DO_NOT_CAST_SHADOWS 1
+
 	//---- Translucent ----
 	F_TRANSLUCENT 1
 
