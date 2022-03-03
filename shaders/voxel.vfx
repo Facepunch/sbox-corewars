@@ -128,23 +128,6 @@ PS
 		#define DEPTH_STATE_ALREADY_SET
 	#endif
 
-	#if S_TRANSLUCENT
-		RenderState( BlendEnable, true );
-		RenderState( SrcBlend, SRC_ALPHA );
-		RenderState( DstBlend, INV_SRC_ALPHA );
-		RenderState( BlendOp, ADD );
-		RenderState( SrcBlendAlpha, ONE );
-		RenderState( DstBlendAlpha, INV_SRC_ALPHA );
-		RenderState( BlendOpAlpha, ADD );
-		#ifndef DEPTH_STATE_ALREADY_SET
-			RenderState( DepthFunc, LESS_EQUAL );
-			RenderState( DepthWriteEnable, true );
-			#define DEPTH_STATE_ALREADY_SET
-		#endif
-
-		#define BLEND_MODE_ALREADY_SET
-	#endif
-
 	#define COLOR_SAMPLER_DEFINED
 
 	#include "common/pixel.hlsl"
@@ -297,6 +280,10 @@ PS
 
 			float4 vColor = Tex2DLevelS( g_tAtlasColor, g_sPointSampler, vTexCoordAtlas, 0 );
 
+			#if S_ALPHA_TEST
+				if(vColor.a < g_flAlphaTestReference) discard;
+			#endif
+
 			float3 vRma = Tex2DLevelS( g_tAtlasRma, g_sPointSampler, vTexCoordAtlas, 0 ).rgb;
 			float3 vEmission = Tex2DLevelS( g_tAtlasEmission, g_sPointSampler, vTexCoordAtlas, 0 ).rgb;
 			
@@ -308,7 +295,11 @@ PS
 			m.AmbientOcclusion = vRma.b;
 			m.BlendMask = 1.0f;
 			m.TintMask = 1.0f;
-			m.Opacity = vColor.a;
+			#if (S_ALPHA_TEST || S_TRANSLUCENT)
+				m.Opacity = vColor.a;
+			#else
+				m.Opacity = 1.0f;
+			#endif
 			m.TransmissiveMask = 1.0f;
 			m.Emission.rgb = vEmission;
 			
