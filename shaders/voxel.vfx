@@ -119,6 +119,7 @@ PS
 	float flTextureAtlasCellSize< Default(64.0f); >;
 	StaticCombo( S_MODE_DEPTH, 0..1, Sys( ALL ) );
 	StaticCombo( S_MODE_TOOLS_WIREFRAME, 0..1, Sys( ALL ) );
+	StaticCombo( S_DO_NOT_CAST_SHADOWS, F_DO_NOT_CAST_SHADOWS, Sys( ALL ) );
 
 	#if ( S_MODE_TOOLS_WIREFRAME )
 		RenderState( FillMode, WIREFRAME );
@@ -170,6 +171,8 @@ PS
 	CreateTexture3DWithoutSampler( g_tLightmapAdjacent5 ) < Channel( R, None( TextureLightmapBottom ), Linear ); OutputFormat( R32F ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
 
 	float g_GlobalOpacity< Range(0.0f, 1.0f); Default(1.0f); >;
+
+	BoolAttribute( DoNotCastShadows, F_DO_NOT_CAST_SHADOWS ? true : false );
 
 	struct LightmapData
 	{
@@ -257,7 +260,11 @@ PS
 				#if (S_ALPHA_TEST)
 					if(vColor.a < g_flAlphaTestReference) discard;
 				#else
-					o.vColor.rgba = float4( 0.0, 0.0, 0.0, vColor.a );
+					#if S_DO_NOT_CAST_SHADOWS
+						o.vColor.rgba = float4( 0.0, 0.0, 0.0, 0.0f );
+					#else
+						o.vColor.rgba = float4( 0.0, 0.0, 0.0, vColor.a );
+					#endif
 				#endif
 			#endif
 			o.vColor.rgba = float4( 0.0, 0.0, 0.0, 1.0f );
