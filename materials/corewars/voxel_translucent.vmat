@@ -6,6 +6,7 @@ Layer0
 
 	//---- Rendering ----
 	F_DO_NOT_CAST_SHADOWS 1
+	F_NON_DIRECTIONAL_DIFFUSE_LIGHTING 1
 
 	//---- Translucent ----
 	F_TRANSLUCENT 1
