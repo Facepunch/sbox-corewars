@@ -131,7 +131,7 @@ namespace Facepunch.CoreWars
 
 			world.OnInitialized += OnMapInitialized;
 			world.SetBuildCollisionInThread( true );
-			world.SetVoxelMaterial( "materials/corewars/voxel.vmat" );
+			world.SetMaterials( "materials/corewars/voxel.vmat", "materials/corewars/voxel_translucent.vmat" );
 			world.SetChunkRenderDistance( 4 );
 			world.SetChunkUnloadDistance( 8 );
 			world.SetChunkSize( 32, 32, 32 );

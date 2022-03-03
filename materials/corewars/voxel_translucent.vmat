@@ -1,0 +1,67 @@
+// THIS FILE IS AUTO-GENERATED
+
+Layer0
+{
+	shader "voxel.vfx"
+
+	//---- Translucent ----
+	F_TRANSLUCENT 1
+
+	flTextureAtlasCellSize "64.000"
+	g_flVoxelSize "48.000"
+
+	//---- Color ----
+	g_flModelTintAmount "1.000"
+	g_vColorTint "[1.000000 1.000000 1.000000 0.000000]"
+
+	//---- Fade ----
+	g_flFadeExponent "1.000"
+
+	//---- Fog ----
+	g_bFogEnabled "1"
+
+	//---- Lighting ----
+	g_flDirectionalLightmapMinZ "0.050"
+	g_flDirectionalLightmapStrength "1.000"
+
+	//---- Material ----
+	TextureColor "materials/default/default_color.tga"
+	TextureTranslucency "[1.000000 1.000000 1.000000 0.000000]"
+
+	//---- Texture Coordinates ----
+	g_nScaleTexCoordUByModelScaleAxis "0"
+	g_nScaleTexCoordVByModelScaleAxis "0"
+	g_vTexCoordOffset "[0.000 0.000]"
+	g_vTexCoordScale "[1.000 1.000]"
+	g_vTexCoordScrollSpeed "[0.000 0.000]"
+
+	//---- Translucent ----
+	g_flOpacityScale "1.000"
+
+	//---- Voxel Atlas ----
+	TextureAtlasAmbientOcclusion "textures/blocks_ao.png"
+	TextureAtlasColor "textures/blocks_color.png"
+	TextureAtlasEmission "[0.000000 0.000000 0.000000 0.000000]"
+	TextureAtlasMetalness "materials/default/default_metal.tga"
+	TextureAtlasNormal "textures/blocks_normal.png"
+	TextureAtlasRoughness "textures/blocks_rough.png"
+	TextureLightmap "materials/default/default_lightmap.tga"
+	TextureLightmapBottom "materials/default/default_lightmap.tga"
+	TextureLightmapEast "materials/default/default_lightmap.tga"
+	TextureLightmapNorth "materials/default/default_lightmap.tga"
+	TextureLightmapSouth "materials/default/default_lightmap.tga"
+	TextureLightmapTop "materials/default/default_lightmap.tga"
+	TextureLightmapWest "materials/default/default_lightmap.tga"
+
+	DynamicParams
+	{
+		g_flVoxelSize "VoxelSize"
+		TextureLightmap "Lightmap"
+		TextureLightmapBottom "LightMapBottom"
+		TextureLightmapEast "LightMapEast"
+		TextureLightmapNorth "LightMapNorth"
+		TextureLightmapSouth "LightMapSouth"
+		TextureLightmapTop "LightMapTop"
+		TextureLightmapWest "LightMapWest"
+	}
+}

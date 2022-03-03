@@ -8,6 +8,7 @@ namespace Facepunch.CoreWars.Blocks
 	{
 		public override string DefaultTexture => "stone";
 		public override string FriendlyName => "Water";
+		public override bool UseTransparency => true;
 		public override bool IsTranslucent => true;
 		public override bool IsPassable => true;
 		public override bool IsLiquid => true;
