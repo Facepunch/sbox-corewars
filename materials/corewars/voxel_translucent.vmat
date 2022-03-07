@@ -11,8 +11,10 @@ Layer0
 	//---- Translucent ----
 	F_TRANSLUCENT 1
 
-	flTextureAtlasCellSize "64.000"
+	g_flTextureAtlasCellSize "64.000"
 	g_flVoxelSize "48.000"
+	g_GlobalBrightness "1.000"
+	g_GlobalOpacity "1.000"
 
 	//---- Color ----
 	g_flModelTintAmount "1.000"
@@ -60,6 +62,8 @@ Layer0
 	DynamicParams
 	{
 		g_flVoxelSize "VoxelSize"
+		g_GlobalBrightness "GlobalBrightness"
+		g_GlobalOpacity "GlobalOpacity"
 		TextureLightmap "Lightmap"
 		TextureLightmapBottom "LightMapBottom"
 		TextureLightmapEast "LightMapEast"
