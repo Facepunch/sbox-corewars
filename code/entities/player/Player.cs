@@ -310,16 +310,7 @@ namespace Facepunch.CoreWars
 			{
 				if ( Input.Released( InputButton.Use) )
 				{
-					var random = Rand.Float();
-
-					byte blockId;
-					if ( random >= 0.66f )
-						blockId = currentMap.FindBlockId<RedTorchBlock>();
-					else if ( random >= 0.33f )
-						blockId = currentMap.FindBlockId<GreenTorchBlock>();
-					else
-						blockId = currentMap.FindBlockId<BlueTorchBlock>();
-
+					byte blockId = currentMap.FindBlockId<WhiteTorchBlock>();
 					currentMap.SetBlockInDirection( Input.Position, Input.Rotation.Forward, blockId );
 				}
 			}
