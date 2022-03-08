@@ -79,7 +79,7 @@ namespace Facepunch.CoreWars.Editor
 								}
 							}
 
-							chunk.DeserializeData( reader );
+							chunk.DeserializeBlockStates( reader );
 
 							await GameTask.Delay( 5 );
 						}
@@ -132,7 +132,7 @@ namespace Facepunch.CoreWars.Editor
 							if ( !chunk.HasOnlyAirBlocks )
 								writer.Write( chunk.Blocks );
 
-							chunk.SerializeData( writer );
+							chunk.SerializeBlockStates( writer );
 						}
 					}
 				}

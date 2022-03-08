@@ -105,7 +105,7 @@ namespace Facepunch.CoreWars
 			var currentMap = VoxelWorld.Current;
 			var currentBlock = currentMap.GetVoxel( currentMap.ToVoxelPosition( Position ) );
 
-			Swimming = currentBlock.IsValid && currentBlock.GetBlockType().IsLiquid;
+			Swimming = currentBlock.IsValid && currentBlock.GetBlockType() is LiquidBlock;
 			PreVelocity = Velocity;
 
 			if ( !Swimming && !IsTouchingLadder )

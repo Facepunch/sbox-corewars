@@ -12,23 +12,23 @@ namespace Facepunch.CoreWars.Blocks
 		public override byte GetTextureId( BlockFace face, Chunk chunk, int x, int y, int z )
 		{
 			var position = new IntVector3( x, y, z );
-			var sunlightLevel = VoxelWorld.GetSunLight( chunk.Offset + position + Chunk.BlockDirections[0] ) ;
+			var sunlightLevel = World.GetSunLight( chunk.Offset + position + Chunk.BlockDirections[0] ) ;
 
 			if ( sunlightLevel < 5 )
-				return VoxelWorld.BlockAtlas.GetTextureId( "dirt" );
+				return World.BlockAtlas.GetTextureId( "dirt" );
 
 			if ( face == BlockFace.Top )
-				return VoxelWorld.BlockAtlas.GetTextureId( "grass" );
+				return World.BlockAtlas.GetTextureId( "grass" );
 			else if ( face == BlockFace.Bottom )
-				return VoxelWorld.BlockAtlas.GetTextureId( "dirt" );
+				return World.BlockAtlas.GetTextureId( "dirt" );
 
-			var adjacentBlockId = VoxelWorld.GetAdjacentBlock( chunk.Offset + position, (int)BlockFace.Top );
-			var adjacentBlock = VoxelWorld.GetBlockType( adjacentBlockId );
+			var adjacentBlockId = World.GetAdjacentBlock( chunk.Offset + position, (int)BlockFace.Top );
+			var adjacentBlock = World.GetBlockType( adjacentBlockId );
 
 			if ( adjacentBlock.IsTranslucent )
-				return VoxelWorld.BlockAtlas.GetTextureId( DefaultTexture );
+				return World.BlockAtlas.GetTextureId( DefaultTexture );
 
-			return VoxelWorld.BlockAtlas.GetTextureId( "dirt" );
+			return World.BlockAtlas.GetTextureId( "dirt" );
 		}
 	}
 }

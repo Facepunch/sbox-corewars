@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Facepunch.Voxels
 {
-	public class TorchBlockData : BlockData
+	public class TorchState : BlockState
 	{
 		public BlockFace Direction { get; set; }
 		

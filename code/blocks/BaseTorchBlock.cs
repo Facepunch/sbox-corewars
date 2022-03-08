@@ -10,16 +10,16 @@ namespace Facepunch.CoreWars.Blocks
 		public override bool HasTexture => false;
 		public override bool IsPassable => true;
 
-		public override BlockData CreateDataInstance() => new TorchBlockData();
+		public override BlockState CreateState() => new TorchState();
 
-		public override void OnBlockAdded( Chunk chunk, int x, int y, int z, int direction )
+		public override void OnBlockAdded( Chunk chunk, IntVector3 position, int direction )
 		{
-			var data = VoxelWorld.GetOrCreateData<TorchBlockData>( new IntVector3( x, y, z ) );
+			var state = World.GetOrCreateState<TorchState>( position );
 
-			data.Direction = (BlockFace)direction;
-			data.IsDirty = true;
+			state.Direction = (BlockFace)direction;
+			state.IsDirty = true;
 
-			base.OnBlockAdded( chunk, x, y, z, direction );
+			base.OnBlockAdded( chunk, position, direction );
 		}
 	}
 }
