@@ -88,7 +88,7 @@ namespace Facepunch.CoreWars.Editor
 						var startVoxelPosition = VoxelWorld.Current.ToVoxelPosition( StartPosition.Value );
 						var endVoxelPosition = aimVoxelPosition;
 
-						foreach ( var position in VoxelWorld.Current.GetBlocksInBox( startVoxelPosition, endVoxelPosition ) )
+						foreach ( var position in VoxelWorld.Current.GetPositionsInBox( startVoxelPosition, endVoxelPosition ) )
 						{
 							VoxelWorld.Current.SetBlockOnServer( position, Player.SelectedBlockId );
 						}
@@ -119,7 +119,7 @@ namespace Facepunch.CoreWars.Editor
 						var startVoxelPosition = VoxelWorld.Current.ToVoxelPosition( StartPosition.Value );
 						var endVoxelPosition = aimVoxelPosition;
 
-						foreach ( var position in VoxelWorld.Current.GetBlocksInBox( startVoxelPosition, endVoxelPosition ) )
+						foreach ( var position in VoxelWorld.Current.GetPositionsInBox( startVoxelPosition, endVoxelPosition ) )
 						{
 							VoxelWorld.Current.SetBlockOnServer( position, 0 );
 						}
