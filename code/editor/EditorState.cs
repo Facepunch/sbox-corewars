@@ -12,12 +12,12 @@ namespace Facepunch.CoreWars.Editor
 	{
 		public virtual async Task LoadInitialChunks( VoxelWorld world, string fileName )
 		{
-			await world.LoadFromFile( "editor.voxels" );
+			await world.LoadFromFile( FileSystem.Data, "editor.voxels" );
 		}
 
 		public virtual void SaveChunksToDisk( VoxelWorld world )
 		{
-			world.SaveToFile( "editor.voxels" );
+			world.SaveToFile( FileSystem.Data, "editor.voxels" );
 		}
 
 		public override void OnEnter()

@@ -148,10 +148,10 @@ namespace Facepunch.CoreWars
 
 				if ( worldLoader.IsValid() )
 				{
-					world.SetChunkGenerator<ChunkGenerator>();
-					world.AddBiome<Biome>();
+					world.SetChunkGenerator<EmptyChunkGenerator>();
+					world.AddBiome<EmptyBiome>();
 
-					var result = await world.LoadFromFile( worldLoader.FileName );
+					var result = await world.LoadFromFile( FileSystem.Mounted, worldLoader.FileName );
 
 					if ( !result )
 					{
