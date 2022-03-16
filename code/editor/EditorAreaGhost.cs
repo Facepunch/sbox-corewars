@@ -26,6 +26,17 @@ namespace Facepunch.CoreWars.Editor
 			DrawBox( vb, center, size );
 		}
 
+		public void MoveStartBlock( BBox block )
+		{
+			var endBlockMinsDelta = (EndBlock.Mins - StartBlock.Mins);
+			var endBlockMaxsDelta = (EndBlock.Mins - StartBlock.Maxs);
+
+			StartBlock = block;
+			EndBlock = new BBox( block.Mins + endBlockMinsDelta, block.Maxs + endBlockMaxsDelta );
+
+			UpdateRenderBounds();
+		}
+
 		public void UpdateRenderBounds()
 		{
 			WorldBBox = new BBox( StartBlock.Mins, StartBlock.Maxs );
