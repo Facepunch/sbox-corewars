@@ -14,6 +14,23 @@
 ]
 
 //
+// Facepunch.CoreWars.VoxelWorldLoader
+//
+@PointClass base(BaseProperties_facepunch_corewars) iconsprite( "editor/rts_minimap.vmat" ) 
+metadata
+{
+	entity_tool_name = "Voxel World Loader"
+	entity_tool_group = "Core Wars"
+}
+= cw_voxel_world_loader : ""
+[
+	filename(string) : "File Name" :  : ""
+	enable_shadows(boolean) { group = "Rendering" } : "Shadow Casting" : 1 : "Whether this entity should cast shadows or not"
+
+	input SetColor(string) : "Sets the color of this entity. Format is '255 255 255 255'."
+]
+
+//
 // Facepunch.CoreWars.Boomer
 //
 @PointClass base(BaseProperties_facepunch_corewars) = weapon_boomer : ""

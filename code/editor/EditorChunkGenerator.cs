@@ -8,8 +8,6 @@ namespace Facepunch.CoreWars.Editor
 	{
 		public override void Generate()
 		{
-
-
 			base.Generate();
 		}
 	}

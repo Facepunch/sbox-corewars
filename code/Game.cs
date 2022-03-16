@@ -3,6 +3,7 @@ using Facepunch.CoreWars.Inventory;
 using Facepunch.Voxels;
 using Sandbox;
 using Sandbox.UI;
+using System;
 using System.Linq;
 
 namespace Facepunch.CoreWars
@@ -142,25 +143,42 @@ namespace Facepunch.CoreWars
 			if ( !IsEditorMode )
 			{
 				world.SetMinimumLoadedChunks( 8 );
-				world.SetChunkGenerator<PerlinChunkGenerator>();
-				world.AddBiome<PlainsBiome>();
-				world.AddBiome<WeirdBiome>();
 
-				var startChunkSize = 4;
+				var worldLoader = All.OfType<VoxelWorldLoader>().FirstOrDefault();
 
-				for ( var x = 0; x < startChunkSize; x++ )
+				if ( worldLoader.IsValid() )
 				{
-					for ( var y = 0; y < startChunkSize; y++ )
+					world.SetChunkGenerator<ChunkGenerator>();
+
+					var result = await world.LoadFromFile( worldLoader.FileName );
+
+					if ( !result )
 					{
-						await GameTask.Delay( 100 );
+						throw new Exception( $"Unable to load the voxel world '{worldLoader.FileName}', file does not exist!" );
+					}
+				}
+				else
+				{
+					world.SetChunkGenerator<PerlinChunkGenerator>();
+					world.AddBiome<PlainsBiome>();
+					world.AddBiome<WeirdBiome>();
 
-						var chunk = world.GetOrCreateChunk(
-							x * world.ChunkSize.x,
-							y * world.ChunkSize.y,
-							0
-						);
+					var startChunkSize = 4;
 
-						_ = chunk.Initialize();
+					for ( var x = 0; x < startChunkSize; x++ )
+					{
+						for ( var y = 0; y < startChunkSize; y++ )
+						{
+							await GameTask.Delay( 100 );
+
+							var chunk = world.GetOrCreateChunk(
+								x * world.ChunkSize.x,
+								y * world.ChunkSize.y,
+								0
+							);
+
+							_ = chunk.Initialize();
+						}
 					}
 				}
 			}
@@ -172,7 +190,7 @@ namespace Facepunch.CoreWars
 				world.AddBiome<EditorBiome>();
 
 				var state = StateSystem.Active as EditorState;
-				await state.LoadInitialChunks( world );
+				await state.LoadInitialChunks( world, "editor.voxels" );
 			}
 
 			await GameTask.Delay( 500 );
