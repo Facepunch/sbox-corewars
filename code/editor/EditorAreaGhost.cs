@@ -1,4 +1,5 @@
-﻿using Facepunch.Voxels;
+﻿using Facepunch.CoreWars.Utility;
+using Facepunch.Voxels;
 using Sandbox;
 
 namespace Facepunch.CoreWars.Editor
@@ -42,7 +43,7 @@ namespace Facepunch.CoreWars.Editor
 
 		private void DrawBox( VertexBuffer vb, Vector3 center, Vector3 size )
 		{
-			vb.AddCube( center, size, Rotation.Identity );
+			vb.AddCube( center, size + new Vector3( 0.5f ), Rotation.Identity, default, size / VoxelWorld.Current.VoxelSize );
 
 			Render.Attributes.Set( "GhostColor", Color );
 			Render.Attributes.Set( "Opacity", 0.8f );
