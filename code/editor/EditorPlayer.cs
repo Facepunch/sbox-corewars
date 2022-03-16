@@ -17,6 +17,7 @@ namespace Facepunch.CoreWars.Editor
 		[Net, Change( nameof( OnToolChanged ) )] public EditorTool Tool { get; private set; }
 
 		public byte SelectedBlockId => HotbarBlockIds[CurrentHotbarIndex];
+		public EditorCamera Camera => CameraMode as EditorCamera;
 
 		private EditorBounds EditorBounds { get; set; }
 
@@ -106,7 +107,7 @@ namespace Facepunch.CoreWars.Editor
 			EnableAllCollisions = false;
 			EnableDrawing = true;
 
-			CameraMode = new FirstPersonCamera();
+			CameraMode = new EditorCamera();
 
 			Controller = new FlyController
 			{
