@@ -163,6 +163,13 @@ namespace Facepunch.CoreWars.Editor
 				Color = Color.Green
 			};
 
+			var state = Game.GetStateAs<EditorState>();
+
+			if ( string.IsNullOrEmpty( state.CurrentFileName ) )
+			{
+				EditorLoadDialog.Open();
+			}
+
 			base.ClientSpawn();
 		}
 
@@ -220,11 +227,17 @@ namespace Facepunch.CoreWars.Editor
 
 				CurrentHotbarIndex = (ushort)currentSlotIndex;
 
-				if ( IsServer && Input.Down( InputButton.Duck ) && Input.Pressed( InputButton.Back ) )
+				if ( IsClient && Input.Down( InputButton.Duck ) && Input.Pressed( InputButton.Back ) )
 				{
-					if ( Game.Current.StateSystem.Active is EditorState state )
+					var state = Game.GetStateAs<EditorState>();
+
+					if ( !string.IsNullOrEmpty( state.CurrentFileName ) )
 					{
-						state.SaveChunksToDisk( VoxelWorld.Current );
+						Game.SaveEditorMapCmd( state.CurrentFileName );
+					}
+					else
+					{
+						EditorSaveDialog.Open();
 					}
 				}
 

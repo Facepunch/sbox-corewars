@@ -5,6 +5,7 @@ using Sandbox;
 using Sandbox.UI;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Facepunch.CoreWars
 {
@@ -18,6 +19,11 @@ namespace Facepunch.CoreWars
 
 		[ServerVar( "cw_editor", Saved = true )]
 		public static bool EditorModeConVar { get; set; }
+
+		public static T GetStateAs<T>() where T : BaseState
+		{
+			return Current.StateSystem.Active as T;
+		}
 
 		public Game()
 		{
@@ -38,12 +44,35 @@ namespace Facepunch.CoreWars
 		}
 
 		[ServerCmd( "cw_editor_save" )]
-		public static void SaveEditorMapToDisk()
+		public static void SaveEditorMapCmd( string fileName )
 		{
-			if ( Current.StateSystem.Active is EditorState state )
+			Log.Info( $"Saving voxel world to disk ({fileName})..." );
+			VoxelWorld.Current.SaveToFile( FileSystem.Data, fileName );
+
+			var state = GetStateAs<EditorState>();
+			state.CurrentFileName = fileName;
+		}
+
+		[ServerCmd( "cw_editor_load" )]
+		public static void LoadEditorMapCmd( string fileName )
+		{
+			_ = LoadEditorMapTask( fileName );
+		}
+
+		private static async Task LoadEditorMapTask( string fileName )
+		{
+			Log.Info( $"Loading voxel world from disk ({fileName})..." );
+
+			var success = await VoxelWorld.Current.LoadFromFile( FileSystem.Data, fileName );
+
+			if ( !success )
 			{
-				state.SaveChunksToDisk( VoxelWorld.Current );
+				Log.Error( $"Unable to load world from disk ({fileName}), file does not exist!" );
+				return;
 			}
+
+			var state = GetStateAs<EditorState>();
+			state.CurrentFileName = fileName;
 		}
 
 		public virtual void PlayerRespawned( Player player )
@@ -185,18 +214,16 @@ namespace Facepunch.CoreWars
 			}
 			else
 			{
+				world.SetMinimumLoadedChunks( 4 );
 				world.SetChunkRenderDistance( 4 );
 				world.SetChunkUnloadDistance( 8 );
 				world.SetChunkGenerator<EditorChunkGenerator>();
 				world.AddBiome<EditorBiome>();
-
-				var state = StateSystem.Active as EditorState;
-				await state.LoadInitialChunks( world, "editor.voxels" );
 			}
 
 			await GameTask.Delay( 500 );
 
-			world.Init();
+			world.Initialize();
 		}
 
 		private void OnMapInitialized()

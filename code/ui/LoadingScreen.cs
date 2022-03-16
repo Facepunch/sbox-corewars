@@ -13,22 +13,9 @@ namespace Facepunch.CoreWars
 
 		public override void Tick()
 		{
-			if ( !VoxelWorld.Current.IsValid() ) return;
-
-			var viewer = Local.Client.GetChunkViewer();
-			if ( !viewer.IsValid() ) return;
-
-			if ( viewer.HasLoadedMinimumChunks() )
-				DidWorldLoad = true;
+			SetClass( "hidden", HasWorldLoaded() );
 
 			base.Tick();
-		}
-
-		protected override void PostTemplateApplied()
-		{
-			BindClass( "hidden", HasWorldLoaded );
-
-			base.PostTemplateApplied();
 		}
 
 		private string GetChunksLoaded()
@@ -55,15 +42,21 @@ namespace Facepunch.CoreWars
 					return $"Spawning Player...";
 			}
 
-			return string.Empty;
+			return "Loading...";
 		}
 
 		private bool HasWorldLoaded()
 		{
+			var viewer = Local.Client.GetChunkViewer();
+			if ( !viewer.IsValid() ) return false;
+
 			if ( VoxelWorld.Current == null || !VoxelWorld.Current.Initialized )
 				return false;
 
-			return DidWorldLoad;
+			if ( viewer.TimeSinceLastReset < 1f )
+				return false;
+
+			return viewer.HasLoadedMinimumChunks();
 		}
 	}
 }

@@ -8,17 +8,9 @@ using System.Threading.Tasks;
 
 namespace Facepunch.CoreWars.Editor
 {
-	public class EditorState : BaseState
+	public partial class EditorState : BaseState
 	{
-		public virtual async Task LoadInitialChunks( VoxelWorld world, string fileName )
-		{
-			await world.LoadFromFile( FileSystem.Data, "editor.voxels" );
-		}
-
-		public virtual void SaveChunksToDisk( VoxelWorld world )
-		{
-			world.SaveToFile( FileSystem.Data, "editor.voxels" );
-		}
+		[Net] public string CurrentFileName { get; set; }
 
 		public override void OnEnter()
 		{
