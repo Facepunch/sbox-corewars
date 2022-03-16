@@ -33,7 +33,7 @@ namespace Facepunch.CoreWars.Editor
 			Viewer = pawn;
 			Rotation = pawn.EyeRotation;
 			LastPosition = Position;
-			FieldOfView = 60f + (20f * ZoomOut);
+			FieldOfView = 80f + (20f * ZoomOut);
 		}
 	}
 }
