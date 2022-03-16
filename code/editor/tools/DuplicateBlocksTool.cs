@@ -26,7 +26,7 @@ namespace Facepunch.CoreWars.Editor
 
 			if ( IsClient && currentMap.IsValid() )
 			{
-				var aimVoxelPosition = GetAimVoxelPosition( 4f );
+				var aimVoxelPosition = GetAimVoxelPosition( 6f );
 				var aimSourcePosition = VoxelWorld.Current.ToSourcePosition( aimVoxelPosition );
 
 				if ( Stage == DuplicateStage.Copy )
@@ -69,6 +69,7 @@ namespace Facepunch.CoreWars.Editor
 					Color = Color.Orange
 				};
 
+				Player.Camera.ZoomOut = 1f;
 			}
 
 			StartPosition = null;
@@ -80,6 +81,7 @@ namespace Facepunch.CoreWars.Editor
 		{
 			if ( IsClient )
 			{
+				Player.Camera.ZoomOut = 0f;
 				VoxelWorld.Current.GlobalOpacity = 1f;
 				AreaGhost?.Delete();
 			}
@@ -89,7 +91,7 @@ namespace Facepunch.CoreWars.Editor
 		{
 			if ( NextBlockPlace )
 			{
-				var aimVoxelPosition = GetAimVoxelPosition( 4f );
+				var aimVoxelPosition = GetAimVoxelPosition( 6f );
 				var aimSourcePosition = VoxelWorld.Current.ToSourcePosition( aimVoxelPosition );
 
 				if ( Stage == DuplicateStage.Copy )

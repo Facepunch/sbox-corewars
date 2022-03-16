@@ -6,6 +6,8 @@ namespace Facepunch.CoreWars.Editor
 	{
 		private Vector3 LastPosition { get; set; }
 
+		public float ZoomOut { get; set; } = 0f;
+
 		public override void Activated()
 		{
 			var pawn = Local.Pawn;
@@ -13,7 +15,6 @@ namespace Facepunch.CoreWars.Editor
 
 			Position = pawn.EyePosition;
 			Rotation = pawn.EyeRotation;
-
 			LastPosition = Position;
 		}
 
@@ -22,16 +23,17 @@ namespace Facepunch.CoreWars.Editor
 			var pawn = Local.Pawn;
 			if ( pawn == null ) return;
 
-			var eyePos = pawn.EyePosition;
+			var targetPosition = pawn.EyePosition;
 
-			if ( eyePos.Distance( LastPosition ) < 300f )
-				Position = Vector3.Lerp( eyePos.WithZ( LastPosition.z ), eyePos, 20f * Time.Delta );
+			if ( targetPosition.Distance( LastPosition ) < 300f )
+				Position = Vector3.Lerp( targetPosition.WithZ( LastPosition.z ), targetPosition, 20f * Time.Delta );
 			else
-				Position = eyePos;
+				Position = targetPosition;
 
 			Viewer = pawn;
 			Rotation = pawn.EyeRotation;
 			LastPosition = Position;
+			FieldOfView = 60f + (20f * ZoomOut);
 		}
 	}
 }
