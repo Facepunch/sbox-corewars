@@ -23,7 +23,7 @@ namespace Facepunch.CoreWars
 		{
 			if ( IsServer )
 			{
-				IsEditorMode = EditorModeConVar;
+				IsEditorMode = EditorModeConVar || Global.MapName == "facepunch.cw_editor_map";
 				StateSystem = new();
 			}
 
