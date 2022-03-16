@@ -136,13 +136,9 @@ namespace Facepunch.CoreWars.Editor
 		{
 			if ( NextBlockPlace )
 			{
-				if ( Stage == DuplicateStage.Paste )
-				{
-					StartPosition = null;
-					Stage = DuplicateStage.Copy;
-				}
-
 				NextBlockPlace = 0.1f;
+				StartPosition = null;
+				Stage = DuplicateStage.Copy;
 			}
 		}
 	}
