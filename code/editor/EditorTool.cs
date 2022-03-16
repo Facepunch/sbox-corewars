@@ -1,4 +1,5 @@
-﻿using Sandbox;
+﻿using Facepunch.Voxels;
+using Sandbox;
 
 namespace Facepunch.CoreWars.Editor
 {
@@ -33,6 +34,25 @@ namespace Facepunch.CoreWars.Editor
 		public virtual void OnDeselected()
 		{
 
+		}
+
+		protected IntVector3 GetAimVoxelPosition( float range )
+		{
+			var distance = VoxelWorld.Current.VoxelSize * range;
+			var aimVoxelPosition = VoxelWorld.Current.ToVoxelPosition( Input.Position + Input.Rotation.Forward * distance );
+
+			if ( Input.Down( InputButton.Run ) )
+			{
+				var face = VoxelWorld.Current.Trace( Input.Position * (1.0f / VoxelWorld.Current.VoxelSize), Input.Rotation.Forward, distance, out var endPosition, out _ );
+
+				if ( face != BlockFace.Invalid && VoxelWorld.Current.GetBlock( endPosition ) != 0 )
+				{
+					var oppositePosition = VoxelWorld.GetAdjacentPosition( endPosition, (int)face );
+					aimVoxelPosition = oppositePosition;
+				}
+			}
+
+			return aimVoxelPosition;
 		}
 
 		protected virtual void OnPrimary( Client client )
