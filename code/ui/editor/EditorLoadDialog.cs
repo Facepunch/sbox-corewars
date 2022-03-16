@@ -49,7 +49,7 @@ namespace Facepunch.CoreWars.Editor
 
 		protected virtual void OpenFile( string fileName )
 		{
-			Game.LoadEditorMapCmd( Input.Text );
+			Game.LoadEditorMapCmd( fileName );
 			Delete();
 		}
 
