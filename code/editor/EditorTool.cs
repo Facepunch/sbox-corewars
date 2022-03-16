@@ -41,7 +41,7 @@ namespace Facepunch.CoreWars.Editor
 			var distance = VoxelWorld.Current.VoxelSize * range;
 			var aimVoxelPosition = VoxelWorld.Current.ToVoxelPosition( Input.Position + Input.Rotation.Forward * distance );
 
-			if ( Input.Down( InputButton.Run ) )
+			if ( Input.Down( InputButton.Use ) )
 			{
 				var face = VoxelWorld.Current.Trace( Input.Position * (1.0f / VoxelWorld.Current.VoxelSize), Input.Rotation.Forward, distance, out var endPosition, out _ );
 
