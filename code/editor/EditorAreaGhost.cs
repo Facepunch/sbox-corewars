@@ -29,7 +29,7 @@ namespace Facepunch.CoreWars.Editor
 		public void MoveStartBlock( BBox block )
 		{
 			var endBlockMinsDelta = (EndBlock.Mins - StartBlock.Mins);
-			var endBlockMaxsDelta = (EndBlock.Mins - StartBlock.Maxs);
+			var endBlockMaxsDelta = (EndBlock.Maxs - StartBlock.Maxs);
 
 			StartBlock = block;
 			EndBlock = new BBox( block.Mins + endBlockMinsDelta, block.Maxs + endBlockMaxsDelta );
