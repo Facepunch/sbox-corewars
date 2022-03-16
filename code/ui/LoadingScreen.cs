@@ -42,7 +42,7 @@ namespace Facepunch.CoreWars
 					return $"Spawning Player...";
 			}
 
-			return "Loading...";
+			return "...";
 		}
 
 		private bool HasWorldLoaded()

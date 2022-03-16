@@ -11,6 +11,7 @@
     .modal {
         background-color: rgba( 0 0 0 0.8 );
         border-radius: 16px;
+        padding: 16px;
         width: 40%;
         height: 30%;
         display: flex;
@@ -20,19 +21,20 @@
 
         .title {
             margin-bottom: 32px;
-            font-size: 32px;
+            font-family: Roboto;
+            font-size: 64px;
             color: white;
         }
 
         .container {
             .input {
                 background-color: rgba( 0 0 0 0.8 );
-                border-radius: 16px;
+                border-radius: 8px;
                 color: white;
-                padding: 15px;
-                font-size: 24px;
+                padding: 24px;
+                font-size: 40px;
                 width: 80%;
-                height: 60px;
+                height: 100px;
             }
         }
     }

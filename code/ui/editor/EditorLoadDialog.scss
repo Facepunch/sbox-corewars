@@ -11,8 +11,8 @@
     .modal {
         background-color: rgba( 0 0 0 0.8 );
         border-radius: 16px;
-        width: 40%;
-        height: 30%;
+        padding: 16px;
+        width: 60%;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -20,19 +20,40 @@
 
         .title {
             margin-bottom: 32px;
-            font-size: 32px;
+            font-family: Roboto;
+            font-size: 64px;
             color: white;
         }
 
         .container {
             .input {
                 background-color: rgba( 0 0 0 0.8 );
-                border-radius: 16px;
+                border-radius: 8px;
                 color: white;
-                padding: 15px;
-                font-size: 24px;
+                padding: 24px;
+                font-size: 40px;
                 width: 80%;
-                height: 60px;
+                height: 100px;
+            }
+
+            margin-bottom: 32px;
+        }
+
+        .items {
+            display: flex;
+            flex-direction: row;
+            padding: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+
+            .item {
+                margin-right: 16px;
+                margin-top: 16px;
+            }
+
+            &:last-child {
+                margin-right: 0px;
             }
         }
     }

@@ -11,6 +11,7 @@ namespace Facepunch.CoreWars.Editor
 		private static EditorLoadDialog Current { get; set; }
 
 		public TextEntry Input { get; set; }
+		public Panel Items { get; set; }
 
 		public static void Open()
 		{
@@ -20,6 +21,11 @@ namespace Facepunch.CoreWars.Editor
 			Game.Hud.AddChild( Current );
 		}
 
+		public EditorLoadDialog()
+		{
+			PopulateItems();
+		}
+
 		public override void Tick()
 		{
 			if ( !VoxelWorld.Current.IsValid() ) return;
@@ -27,9 +33,29 @@ namespace Facepunch.CoreWars.Editor
 			base.Tick();
 		}
 
-		protected virtual void HandleSubmit()
+		protected void PopulateItems()
+		{
+			Items.DeleteChildren();
+
+			var files = FileSystem.Data.FindFile( "", "*" );
+
+			foreach ( var file in files )
+			{
+				var item = Items.AddChild<EditorLoadDialogItem>( "item" );
+				item.FileName = file;
+				item.OnSelect = () => OpenFile( item.FileName );
+			}
+		}
+
+		protected virtual void OpenFile( string fileName )
 		{
 			Game.LoadEditorMapCmd( Input.Text );
+			Delete();
+		}
+
+		protected virtual void HandleSubmit()
+		{
+			OpenFile( Input.Text );
 		}
 
 		protected virtual void HandleClose()
@@ -44,11 +70,14 @@ namespace Facepunch.CoreWars.Editor
 			if ( !string.IsNullOrEmpty( state.CurrentFileName ) )
 			{
 				Input.Text = state.CurrentFileName;
+				Input.CaretPosition = Input.TextLength;
 			}
 
 			Input.Focus();
 			Input.AddEventListener( "onsubmit", () => HandleSubmit() );
 			Input.AddEventListener( "onblur", () => HandleClose() );
+
+			PopulateItems();
 
 			base.PostTemplateApplied();
 		}

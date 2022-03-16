@@ -1,0 +1,20 @@
+﻿EditorLoadDialogItem {
+    background-color: rgb( 222, 220, 175 0.8 );
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.1s ease-in;
+
+    .fileName {
+        font-size: 32px;
+        font-family: Roboto;
+        color: rgb( 50 50 50 );
+    }
+
+    &:hover {
+        transition: all 0.1s ease-in;
+        background-color: rgb( 222, 220, 175 1 );
+    }
+}

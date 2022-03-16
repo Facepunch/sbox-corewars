@@ -44,6 +44,7 @@ namespace Facepunch.CoreWars.Editor
 			if ( !string.IsNullOrEmpty( state.CurrentFileName ) )
 			{
 				Input.Text = state.CurrentFileName;
+				Input.CaretPosition = Input.TextLength;
 			}
 
 			Input.Focus();
