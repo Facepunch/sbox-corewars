@@ -16,7 +16,7 @@
 //
 // Facepunch.CoreWars.VoxelWorldLoader
 //
-@PointClass base(BaseProperties_facepunch_corewars) iconsprite( "editor/rts_minimap.vmat" ) 
+@PointClass base(BaseProperties_facepunch_corewars) iconsprite( "materials/editor/voxel_world_loader.vmat" ) 
 metadata
 {
 	entity_tool_name = "Voxel World Loader"
