@@ -18,7 +18,7 @@ namespace Facepunch.CoreWars.Editor
 
 			if ( IsClient && currentMap.IsValid() )
 			{
-				var aimVoxelPosition = GetAimVoxelPosition();
+				var aimVoxelPosition = GetAimVoxelPosition( 4f );
 				var aimSourcePosition = VoxelWorld.Current.ToSourcePosition( aimVoxelPosition );
 
 				if ( StartPosition.HasValue )
@@ -59,26 +59,11 @@ namespace Facepunch.CoreWars.Editor
 			}
 		}
 
-		protected IntVector3 GetAimVoxelPosition()
-		{
-			var distance = VoxelWorld.Current.VoxelSize * 4f;
-			var aimVoxelPosition = VoxelWorld.Current.ToVoxelPosition( Input.Position + Input.Rotation.Forward * distance );
-			var face = VoxelWorld.Current.Trace( Input.Position * (1.0f / VoxelWorld.Current.VoxelSize), Input.Rotation.Forward, distance, out var endPosition, out _ );
-
-			if ( face != BlockFace.Invalid && VoxelWorld.Current.GetBlock( endPosition ) != 0 )
-			{
-				var oppositePosition = VoxelWorld.GetAdjacentPosition( endPosition, (int)face );
-				aimVoxelPosition = oppositePosition;
-			}
-
-			return aimVoxelPosition;
-		}
-
 		protected override void OnPrimary( Client client )
 		{
 			if ( NextBlockPlace )
 			{
-				var aimVoxelPosition = GetAimVoxelPosition();
+				var aimVoxelPosition = GetAimVoxelPosition( 4f );
 				var aimSourcePosition = VoxelWorld.Current.ToSourcePosition( aimVoxelPosition );
 
 				if ( StartPosition.HasValue )
@@ -109,7 +94,7 @@ namespace Facepunch.CoreWars.Editor
 		{
 			if ( NextBlockPlace )
 			{
-				var aimVoxelPosition = GetAimVoxelPosition();
+				var aimVoxelPosition = GetAimVoxelPosition( 4f );
 				var aimSourcePosition = VoxelWorld.Current.ToSourcePosition( aimVoxelPosition );
 
 				if ( StartPosition.HasValue )

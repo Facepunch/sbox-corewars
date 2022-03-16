@@ -16,16 +16,7 @@ namespace Facepunch.CoreWars.Editor
 
 			if ( IsClient && currentMap.IsValid() )
 			{
-				var distance = VoxelWorld.Current.VoxelSize * 4f;
-				var aimVoxelPosition = VoxelWorld.Current.ToVoxelPosition( Input.Position + Input.Rotation.Forward * distance );
-				var face = VoxelWorld.Current.Trace( Input.Position * (1.0f / VoxelWorld.Current.VoxelSize), Input.Rotation.Forward, distance, out var endPosition, out _ );
-
-				if ( face != BlockFace.Invalid && VoxelWorld.Current.GetBlock( endPosition ) != 0 )
-				{
-					var oppositePosition = VoxelWorld.GetAdjacentPosition( endPosition, (int)face );
-					aimVoxelPosition = oppositePosition;
-				}
-
+				var aimVoxelPosition = GetAimVoxelPosition( 4f );
 				var aimSourcePosition = VoxelWorld.Current.ToSourcePosition( aimVoxelPosition );
 
 				BlockGhost.Position = aimSourcePosition;
@@ -59,16 +50,7 @@ namespace Facepunch.CoreWars.Editor
 		{
 			if ( IsServer && NextBlockPlace )
 			{
-				var distance = VoxelWorld.Current.VoxelSize * 4f;
-				var aimVoxelPosition = VoxelWorld.Current.ToVoxelPosition( Input.Position + Input.Rotation.Forward * distance );
-				var face = VoxelWorld.Current.Trace( Input.Position * (1.0f / VoxelWorld.Current.VoxelSize), Input.Rotation.Forward, distance, out var endPosition, out _ );
-
-				if ( face != BlockFace.Invalid && VoxelWorld.Current.GetBlock( endPosition ) != 0 )
-				{
-					var oppositePosition = VoxelWorld.GetAdjacentPosition( endPosition, (int)face );
-					aimVoxelPosition = oppositePosition;
-				}
-
+				var aimVoxelPosition = GetAimVoxelPosition( 4f );
 				VoxelWorld.Current.SetBlockOnServer( aimVoxelPosition, Player.SelectedBlockId );
 				NextBlockPlace = 0.1f;
 			}
