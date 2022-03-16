@@ -49,7 +49,7 @@ namespace Facepunch.CoreWars.Utility
 		/// <summary>
 		/// Add a cube to the vertex buffer. Will include indices if they're enabled.
 		/// </summary>
-		public static void AddCube( this VertexBuffer self, Vector3 center, Vector3 size, Rotation rot, Color32 color, Vector3 uvScale )
+		public static void AddCube( this VertexBuffer self, Vector3 center, Vector3 size, Rotation rot, Color32 color, Vector3 uvScale, bool inverted = false )
 		{
 			var oldColor = self.Default.Color;
 			self.Default.Color = color;
@@ -57,6 +57,13 @@ namespace Facepunch.CoreWars.Utility
 			var f = rot.Forward * size.x * 0.5f;
 			var l = rot.Left * size.y * 0.5f;
 			var u = rot.Up * size.z * 0.5f;
+
+			if ( inverted )
+			{
+				f = rot.Backward * size.x * 0.5f;
+				l = rot.Right * size.y * 0.5f;
+				u = rot.Down * size.z * 0.5f;
+			}
 
 			// Forward/Back
 			AddQuad( self, new Ray( center + f, f.Normal ), l, u, new Vector2( uvScale.y, uvScale.z ) );
