@@ -60,19 +60,27 @@ namespace Facepunch.CoreWars.Editor
 		{
 			if ( IsClient )
 			{
+				VoxelWorld.Current.GlobalOpacity = 0.8f;
+
 				AreaGhost = new EditorAreaGhost
 				{
 					RenderBounds = new BBox( Vector3.One * -100f, Vector3.One * 100f ),
 					EnableDrawing = true,
 					Color = Color.Orange
 				};
+
 			}
+
+			StartPosition = null;
+			EndPosition = null;
+			Stage = DuplicateStage.Copy;
 		}
 
 		public override void OnDeselected()
 		{
 			if ( IsClient )
 			{
+				VoxelWorld.Current.GlobalOpacity = 1f;
 				AreaGhost?.Delete();
 			}
 		}

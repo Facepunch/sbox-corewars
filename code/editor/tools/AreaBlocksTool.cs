@@ -42,6 +42,8 @@ namespace Facepunch.CoreWars.Editor
 		{
 			if ( IsClient )
 			{
+				VoxelWorld.Current.GlobalOpacity = 0.8f;
+
 				AreaGhost = new EditorAreaGhost
 				{
 					RenderBounds = new BBox( Vector3.One * -100f, Vector3.One * 100f ),
@@ -55,6 +57,8 @@ namespace Facepunch.CoreWars.Editor
 		{
 			if ( IsClient )
 			{
+				VoxelWorld.Current.GlobalOpacity = 1f;
+
 				AreaGhost?.Delete();
 			}
 		}
