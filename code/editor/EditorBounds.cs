@@ -24,7 +24,7 @@ namespace Facepunch.CoreWars.Editor
 		{
 			vb.AddCube( center, size, Rotation.Identity );
 
-			Render.Attributes.Set( "Opacity", 0.2f );
+			Render.Attributes.Set( "Opacity", 0.5f );
 			Render.Attributes.Set( "Color", Color );
 
 			vb.Draw( BoxMaterial );
