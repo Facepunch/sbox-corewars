@@ -163,13 +163,6 @@ namespace Facepunch.CoreWars.Editor
 				Color = Color.Green
 			};
 
-			var state = Game.GetStateAs<EditorState>();
-
-			if ( string.IsNullOrEmpty( state.CurrentFileName ) )
-			{
-				EditorLoadDialog.Open();
-			}
-
 			base.ClientSpawn();
 		}
 
