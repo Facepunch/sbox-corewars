@@ -51,7 +51,13 @@ namespace Facepunch.CoreWars.Editor
 			if ( IsServer && NextBlockPlace )
 			{
 				var aimVoxelPosition = GetAimVoxelPosition( 4f );
-				VoxelWorld.Current.SetBlockOnServer( aimVoxelPosition, Player.SelectedBlockId );
+
+				var action = new PlaceBlockAction();
+				action.Initialize( aimVoxelPosition, Player.SelectedBlockId );
+
+				var state = Game.GetStateAs<EditorState>();
+				state.Perform( action );
+
 				NextBlockPlace = 0.1f;
 			}
 		}

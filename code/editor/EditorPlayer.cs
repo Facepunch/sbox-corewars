@@ -241,6 +241,20 @@ namespace Facepunch.CoreWars.Editor
 					}
 				}
 
+				if ( IsServer && Input.Down( InputButton.Duck ) )
+				{
+					if ( Input.Pressed( InputButton.Reload ) )
+					{
+						var state = Game.GetStateAs<EditorState>();
+						state.Redo();
+					}
+					else if ( Input.Pressed( InputButton.Drop ) )
+					{
+						var state = Game.GetStateAs<EditorState>();
+						state.Undo();
+					}
+				}
+
 				UpdateHotbarSlotKeys();
 			}
 

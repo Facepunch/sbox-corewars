@@ -12,6 +12,9 @@ namespace Facepunch.CoreWars.Editor
 	{
 		[Net] public string CurrentFileName { get; set; }
 
+		public Stack<EditorAction> UndoStack { get; private set; }
+		public Stack<EditorAction> RedoStack { get; private set; }
+
 		public override void OnEnter()
 		{
 			if ( Host.IsServer )
@@ -20,6 +23,38 @@ namespace Facepunch.CoreWars.Editor
 				{
 					player.Respawn();
 				}
+
+				UndoStack = new();
+				RedoStack = new();
+			}
+		}
+
+		public void Perform( EditorAction action )
+		{
+			Host.AssertServer();
+			UndoStack.Push( action );
+			action.Perform();
+		}
+
+		public void Undo()
+		{
+			Host.AssertServer();
+
+			if ( UndoStack.TryPop( out var action ) )
+			{
+				RedoStack.Push( action );
+				action.Undo();
+			}
+		}
+
+		public void Redo()
+		{
+			Host.AssertServer();
+
+			if ( RedoStack.TryPop( out var action ) )
+			{
+				UndoStack.Push( action );
+				action.Perform();
 			}
 		}
 
