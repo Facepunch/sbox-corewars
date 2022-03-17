@@ -248,7 +248,7 @@ namespace Facepunch.CoreWars.Editor
 						var state = Game.GetStateAs<EditorState>();
 						state.Redo();
 					}
-					else if ( Input.Pressed( InputButton.Drop ) )
+					else if ( Input.Pressed( InputButton.Menu ) )
 					{
 						var state = Game.GetStateAs<EditorState>();
 						state.Undo();

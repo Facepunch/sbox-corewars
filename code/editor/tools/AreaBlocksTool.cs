@@ -79,10 +79,11 @@ namespace Facepunch.CoreWars.Editor
 						var startVoxelPosition = VoxelWorld.Current.ToVoxelPosition( StartPosition.Value );
 						var endVoxelPosition = aimVoxelPosition;
 
-						foreach ( var position in VoxelWorld.Current.GetPositionsInBox( startVoxelPosition, endVoxelPosition ) )
-						{
-							VoxelWorld.Current.SetBlockOnServer( position, Player.SelectedBlockId );
-						}
+						var action = new AreaBlocksAction();
+						action.Initialize( startVoxelPosition, endVoxelPosition, Player.SelectedBlockId );
+
+						var state = Game.GetStateAs<EditorState>();
+						state.Perform( action );
 					}
 
 					StartPosition = null;
@@ -110,10 +111,11 @@ namespace Facepunch.CoreWars.Editor
 						var startVoxelPosition = VoxelWorld.Current.ToVoxelPosition( StartPosition.Value );
 						var endVoxelPosition = aimVoxelPosition;
 
-						foreach ( var position in VoxelWorld.Current.GetPositionsInBox( startVoxelPosition, endVoxelPosition ) )
-						{
-							VoxelWorld.Current.SetBlockOnServer( position, 0 );
-						}
+						var action = new AreaBlocksAction();
+						action.Initialize( startVoxelPosition, endVoxelPosition, 0 );
+
+						var state = Game.GetStateAs<EditorState>();
+						state.Perform( action );
 					}
 
 					StartPosition = null;
