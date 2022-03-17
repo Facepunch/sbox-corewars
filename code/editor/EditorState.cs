@@ -12,8 +12,8 @@ namespace Facepunch.CoreWars.Editor
 	{
 		[Net] public string CurrentFileName { get; set; }
 
-		public Stack<EditorAction> UndoStack { get; private set; }
-		public Stack<EditorAction> RedoStack { get; private set; }
+		public ActionHistory<EditorAction> UndoStack { get; private set; }
+		public ActionHistory<EditorAction> RedoStack { get; private set; }
 
 		public override void OnEnter()
 		{
@@ -24,8 +24,8 @@ namespace Facepunch.CoreWars.Editor
 					player.Respawn();
 				}
 
-				UndoStack = new();
-				RedoStack = new();
+				UndoStack = new( 20 );
+				RedoStack = new( 20 );
 			}
 		}
 
