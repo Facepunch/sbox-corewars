@@ -113,20 +113,11 @@ namespace Facepunch.CoreWars.Editor
 						var startSourceVoxelPosition = VoxelWorld.Current.ToVoxelPosition( StartPosition.Value );
 						var endSourceVoxelPosition = VoxelWorld.Current.ToVoxelPosition( EndPosition.Value );
 
-						foreach ( var position in VoxelWorld.Current.GetPositionsInBox( startSourceVoxelPosition, endSourceVoxelPosition ) )
-						{
-							var localPosition = position - startSourceVoxelPosition;
-							var blockId = VoxelWorld.Current.GetBlock( position );
-							var blockState = VoxelWorld.Current.GetState<BlockState>( position );
-							var newPosition = aimVoxelPosition + localPosition;
+						var action = new DuplicateBlocksAction();
+						action.Initialize( startSourceVoxelPosition, endSourceVoxelPosition, aimVoxelPosition );
 
-							VoxelWorld.Current.SetBlockOnServer( newPosition, blockId );
-
-							if ( blockState.IsValid() )
-							{
-								VoxelWorld.Current.SetState( newPosition, blockState.Copy() );
-							}
-						}
+						var state = Game.GetStateAs<EditorState>();
+						state.Perform( action );
 					}
 				}
 
