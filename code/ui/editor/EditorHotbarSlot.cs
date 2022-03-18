@@ -7,7 +7,7 @@ using System.Linq;
 namespace Facepunch.CoreWars.Editor
 {
 	[UseTemplate]
-	public partial class EditorHotbarSlot : Panel
+	public partial class EditorHotbarSlot : Panel, IDroppable
 	{
 		public ushort Slot { get; set; }
 		public byte BlockId { get; set; }
@@ -38,6 +38,19 @@ namespace Facepunch.CoreWars.Editor
 		{
 			BindClass( "selected", () => IsSelected );
 			base.PostTemplateApplied();
+		}
+
+		public bool CanDrop( IDraggable draggable )
+		{
+			return draggable is EditorBlockItem;
+		}
+
+		public void OnDrop( IDraggable draggable )
+		{
+			if ( draggable is EditorBlockItem item )
+			{
+				EditorPlayer.SetHotbarBlockId( Slot, (int)item.BlockId );
+			}
 		}
 	}
 }

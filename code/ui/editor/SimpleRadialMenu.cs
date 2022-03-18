@@ -40,6 +40,8 @@ namespace Facepunch.CoreWars.Editor
 				AddTool( attribute );
 			}
 
+			AddAction( "Block List", "View available blocks", "textures/ui/blocklist.png", () => EditorBlockList.Open() );
+
 			if ( Local.Client.IsListenServerHost )
 			{
 				AddAction( "Save World", "Save world to disk", "textures/ui/save.png", () => EditorSaveDialog.Open() );
