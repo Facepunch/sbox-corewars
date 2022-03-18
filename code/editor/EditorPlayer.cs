@@ -66,13 +66,13 @@ namespace Facepunch.CoreWars.Editor
 		}
 
 		[ServerCmd]
-		public static void SetHotbarBlockId( int slot, byte blockId )
+		public static void SetHotbarBlockId( int slot, int blockId )
 		{
 			var client = ConsoleSystem.Caller;
 
 			if ( client.Pawn is EditorPlayer player )
 			{
-				player.HotbarBlockIds[slot] = blockId;
+				player.HotbarBlockIds[slot] = (byte)blockId;
 			}
 		}
 
