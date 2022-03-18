@@ -4,7 +4,8 @@
     <div class="modal">
         <label class="title">Load World</label>
         <div class="container">
-            <TextEntry @ref="Input" class="input">maps/map.voxels</TextEntry>
+            <AutoCompleteInput @ref="Input" class="input">maps/map.voxels</AutoCompleteInput>
+            <AutoCompleteList @ref="Suggestions"></AutoCompleteList>
         </div>
         <div @ref="Items" class="items"></div>
     </div>

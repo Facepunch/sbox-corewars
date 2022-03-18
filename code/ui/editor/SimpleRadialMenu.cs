@@ -40,8 +40,11 @@ namespace Facepunch.CoreWars.Editor
 				AddTool( attribute );
 			}
 
-			AddAction( "Save World", "Save world to disk", "textures/ui/save.png", () => EditorSaveDialog.Open() );
-			AddAction( "Load World", "Load world from disk", "textures/ui/load.png", () => EditorLoadDialog.Open() );
+			if ( Local.Client.IsListenServerHost )
+			{
+				AddAction( "Save World", "Save world to disk", "textures/ui/save.png", () => EditorSaveDialog.Open() );
+				AddAction( "Load World", "Load world from disk", "textures/ui/load.png", () => EditorLoadDialog.Open() );
+			}
 		}
 
 		public void AddTool( EditorToolLibraryAttribute attribute )

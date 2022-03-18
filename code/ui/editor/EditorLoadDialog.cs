@@ -2,6 +2,7 @@
 using Sandbox;
 using Sandbox.UI;
 using System;
+using System.Linq;
 
 namespace Facepunch.CoreWars.Editor
 {
@@ -10,7 +11,8 @@ namespace Facepunch.CoreWars.Editor
 	{
 		private static EditorLoadDialog Current { get; set; }
 
-		public TextEntry Input { get; set; }
+		public AutoCompleteInput Input { get; set; }
+		public AutoCompleteList Suggestions { get; set; }
 		public Panel Items { get; set; }
 
 		public static void Open()
@@ -37,12 +39,14 @@ namespace Facepunch.CoreWars.Editor
 		{
 			Items.DeleteChildren();
 
-			var files = FileSystem.Data.FindFile( "", "*" );
+			FileSystem.Data.CreateDirectory( "worlds" );
+
+			var files = FileSystem.Data.FindFile( "worlds", "*.voxels" );
 
 			foreach ( var file in files )
 			{
 				var item = Items.AddChild<EditorLoadDialogItem>( "item" );
-				item.FileName = file;
+				item.FileName = file.Replace( ".voxels", "" );
 				item.OnSelect = () => OpenFile( item.FileName );
 			}
 		}
@@ -67,9 +71,12 @@ namespace Facepunch.CoreWars.Editor
 		{
 			var state = Game.GetStateAs<EditorState>();
 
+			Input.SetAutoCompleteList( Suggestions );
+			Input.AutoCompleteHandler = DoAutoComplete;
+
 			if ( !string.IsNullOrEmpty( state.CurrentFileName ) )
 			{
-				Input.Text = state.CurrentFileName;
+				Input.Text = state.CurrentFileName.Replace( "worlds/", "" ).Replace( ".voxels", "" );
 				Input.CaretPosition = Input.TextLength;
 			}
 
@@ -80,6 +87,19 @@ namespace Facepunch.CoreWars.Editor
 			PopulateItems();
 
 			base.PostTemplateApplied();
+		}
+
+		private string[] DoAutoComplete( string arg )
+		{
+			if ( string.IsNullOrEmpty( arg ) ) return null;
+
+			FileSystem.Data.CreateDirectory( "worlds" );
+
+			var files = FileSystem.Data.FindFile( "worlds", "*.voxels" );
+
+			return files
+				.Select( f => f.Replace( ".voxels", "" ) )
+				.Where( f => f != arg && f.StartsWith( arg ) ).ToArray();
 		}
 	}
 }
