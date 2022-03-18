@@ -46,6 +46,14 @@ namespace Facepunch.CoreWars
 		[ServerCmd( "cw_editor_save" )]
 		public static void SaveEditorMapCmd( string fileName )
 		{
+			if ( !fileName.StartsWith( "worlds/" ) )
+				fileName = $"worlds/{fileName}";
+
+			if ( !fileName.EndsWith( ".voxels" ) )
+				fileName += ".voxels";
+
+			FileSystem.Data.CreateDirectory( "worlds" );
+
 			Log.Info( $"Saving voxel world to disk ({fileName})..." );
 			VoxelWorld.Current.SaveToFile( FileSystem.Data, fileName );
 
@@ -61,7 +69,15 @@ namespace Facepunch.CoreWars
 
 		private static async Task LoadEditorMapTask( string fileName )
 		{
+			if ( !fileName.StartsWith( "worlds/" ) )
+				fileName = $"worlds/{fileName}";
+
+			if ( !fileName.EndsWith( ".voxels" ) )
+				fileName += ".voxels";
+
 			Log.Info( $"Loading voxel world from disk ({fileName})..." );
+
+			FileSystem.Data.CreateDirectory( "worlds" );
 
 			var success = await VoxelWorld.Current.LoadFromFile( FileSystem.Data, fileName );
 
