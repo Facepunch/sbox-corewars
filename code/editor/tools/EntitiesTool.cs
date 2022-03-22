@@ -63,7 +63,7 @@ namespace Facepunch.CoreWars.Editor
 		{
 			if ( IsClient )
 			{
-				
+				DestroyGhostEntity();
 			}
 		}
 
@@ -97,7 +97,7 @@ namespace Facepunch.CoreWars.Editor
 				return;
 
 			GhostEntity = new ModelEntity( CurrentEntityAttribute.EditorModel );
-			GhostEntity.RenderColor = Color.White.WithAlpha( 0.8f );
+			GhostEntity.RenderColor = Color.White.WithAlpha( 0.5f );
 		}
 	}
 }
