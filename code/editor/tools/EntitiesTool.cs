@@ -1,5 +1,6 @@
 ﻿using Facepunch.Voxels;
 using Sandbox;
+using System.Linq;
 
 namespace Facepunch.CoreWars.Editor
 {
@@ -8,7 +9,8 @@ namespace Facepunch.CoreWars.Editor
 	{
 		public enum EntitiesToolMode
 		{
-			PlaceAndRemove,
+			Place,
+			Remove,
 			MoveAndRotate,
 			DataEditor
 		}
@@ -16,6 +18,8 @@ namespace Facepunch.CoreWars.Editor
 		private static EditorEntityLibraryAttribute CurrentEntityAttribute { get; set; }
 
 		[Net] public EntitiesToolMode Mode { get; set; }
+
+		private ModelEntity GhostEntity { get; set; }
 
 		public override void Simulate( Client client )
 		{
@@ -25,6 +29,14 @@ namespace Facepunch.CoreWars.Editor
 			{
 				var aimVoxelPosition = GetAimVoxelPosition( 4f );
 				var aimSourcePosition = VoxelWorld.Current.ToSourcePosition( aimVoxelPosition );
+
+				if ( Mode == EntitiesToolMode.Place )
+				{
+					if ( GhostEntity.IsValid() )
+					{
+						GhostEntity.Position = aimSourcePosition;
+					}
+				}
 			}
 
 			base.Simulate( client );
@@ -32,9 +44,18 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void OnSelected()
 		{
+			if ( IsServer )
+			{
+				Mode = EntitiesToolMode.Place;
+			}
+
 			if ( IsClient )
 			{
-				
+				if ( Mode == EntitiesToolMode.Place )
+				{
+					CurrentEntityAttribute = Library.GetAttributes<EditorEntityLibraryAttribute>().FirstOrDefault();
+					CreateGhostEntity();
+				}
 			}
 		}
 
@@ -60,6 +81,23 @@ namespace Facepunch.CoreWars.Editor
 			{
 				
 			}
+		}
+
+		private void DestroyGhostEntity()
+		{
+			GhostEntity?.Delete();
+			GhostEntity = null;
+		}
+
+		private void CreateGhostEntity()
+		{
+			DestroyGhostEntity();
+
+			if ( CurrentEntityAttribute == null )
+				return;
+
+			GhostEntity = new ModelEntity( CurrentEntityAttribute.EditorModel );
+			GhostEntity.RenderColor = Color.White.WithAlpha( 0.8f );
 		}
 	}
 }
