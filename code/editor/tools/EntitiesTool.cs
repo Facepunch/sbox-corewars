@@ -4,8 +4,19 @@ using Sandbox;
 namespace Facepunch.CoreWars.Editor
 {
 	[EditorToolLibrary( Title = "Entities", Description = "Add or manipulate entities", Icon = "textures/ui/tools/entities.png" )]
-	public class EntitiesTool : EditorTool
+	public partial class EntitiesTool : EditorTool
 	{
+		public enum EntitiesToolMode
+		{
+			PlaceAndRemove,
+			MoveAndRotate,
+			DataEditor
+		}
+
+		private static EditorEntityLibraryAttribute CurrentEntityAttribute { get; set; }
+
+		[Net] public EntitiesToolMode Mode { get; set; }
+
 		public override void Simulate( Client client )
 		{
 			var currentMap = VoxelWorld.Current;
