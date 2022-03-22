@@ -28,7 +28,7 @@ namespace Facepunch.CoreWars.Editor
 			if ( IsClient && currentMap.IsValid() )
 			{
 				var aimVoxelPosition = GetAimVoxelPosition( 4f );
-				var aimSourcePosition = VoxelWorld.Current.ToSourcePosition( aimVoxelPosition );
+				var aimSourcePosition = VoxelWorld.Current.ToSourcePositionCenter( aimVoxelPosition, true, true, false );
 
 				if ( Mode == EntitiesToolMode.Place )
 				{
