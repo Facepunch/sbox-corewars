@@ -1,11 +1,12 @@
-﻿using Facepunch.Voxels;
+﻿using Facepunch.CoreWars.Editor;
+using Facepunch.Voxels;
 using Sandbox;
 using System;
 using System.IO;
 
 namespace Facepunch.CoreWars
 {
-	[Library]
+	[EditorEntityLibrary( EditorModel = "models/editor/playerstart.vmdl" )]
 	public class PlayerSpawnpoint : ModelEntity, ISourceEntity
 	{
 		public Team Team { get; set; }
