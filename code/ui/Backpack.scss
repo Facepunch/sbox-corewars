@@ -1,0 +1,56 @@
+﻿Backpack {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    pointer-events: none;
+
+    .modal {
+        backdrop-filter-blur: 32px;
+        background-color: rgba( 0 0 0 0.8 );
+        border: 4px solid white;
+        border-radius: 16px;
+        padding: 16px;
+        width: 40%;
+        height: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        pointer-events: all;
+
+        .title {
+            margin-bottom: 32px;
+            font-family: Roboto;
+            font-size: 64px;
+            color: white;
+        }
+
+        .slots {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+
+            InventorySlot {
+                margin-right: 8px;
+                margin-top: 8px;
+            }
+
+            &:last-child {
+                margin-right: 0px;
+            }
+        }
+    }
+
+    &.hidden {
+        display: none;
+
+        .modal {
+            pointer-events: none;
+        }
+    }
+}
