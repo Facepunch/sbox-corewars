@@ -458,7 +458,7 @@ namespace Facepunch.CoreWars
 		{
 			if ( instance is WeaponItem weapon )
 			{
-				if ( weapon.Weapon.IsValid() )
+				if ( weapon.Weapon.IsValid() && instance.Container != HotbarInventory.Container )
 				{
 					weapon.Weapon.Delete();
 					weapon.Weapon = null;
