@@ -21,11 +21,11 @@ namespace Facepunch.CoreWars
 
 		public static void Stop( IDraggable draggable )
 		{
-			if ( Current.Draggable == draggable )
+			if ( Current?.Draggable == draggable )
 			{
 				Current.UpdateDroppable();
 
-				if ( Current.Droppable != null )
+				if ( Current.Droppable?.CanDrop( draggable ) ?? false )
 				{
 					Current.Droppable.OnDrop( Current.Draggable );
 				}
