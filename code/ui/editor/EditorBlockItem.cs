@@ -11,7 +11,7 @@ namespace Facepunch.CoreWars.Editor
 	public partial class EditorBlockItem : Panel, IDraggable
 	{
 		public byte BlockId { get; set; }
-		public float IconSize => Box.Rect.width;
+		public float IconSize => Box.Rect.Size.Length;
 
 		public EditorBlockItem() { }
 
