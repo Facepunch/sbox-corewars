@@ -15,6 +15,7 @@ namespace Facepunch.CoreWars
 	{
 		[Net, Change( nameof( OnTeamChanged ) )] public Team Team { get; private set; }
 		[Net, Predicted] public ushort CurrentHotbarIndex { get; private set; }
+		[Net] public NetInventory BackpackInventory { get; private set; }
 		[Net] public NetInventory HotbarInventory { get; private set; }
 		public ProjectileSimulator Projectiles { get; private set; }
 		public DamageInfo LastDamageTaken { get; private set; }
@@ -36,7 +37,11 @@ namespace Facepunch.CoreWars
 		{
 			var item = InventorySystem.CreateItem<WeaponItem>();
 			item.WeaponName = weaponName;
-			return HotbarInventory.Container.Give( item );
+			
+			if ( HotbarInventory.Container.Give( item ) )
+				return true;
+
+			return BackpackInventory.Container.Give( item );
 		}
 
 		public void TryGiveAmmo( AmmoType type, ushort amount )
@@ -45,7 +50,13 @@ namespace Facepunch.CoreWars
 			item.AmmoType = type;
 			item.StackSize = amount;
 			item.MaxStackSize = 60;
-			HotbarInventory.Container.Stack( item );
+
+			var remaining = HotbarInventory.Container.Stack( item );
+
+			if ( remaining > 0 )
+			{
+				BackpackInventory.Container.Stack( item );
+			}
 		}
 
 		public void TryGiveBlock( byte blockId, ushort amount )
@@ -54,12 +65,22 @@ namespace Facepunch.CoreWars
 			item.BlockId = blockId;
 			item.StackSize = amount;
 			item.MaxStackSize = 1000;
-			HotbarInventory.Container.Stack( item );
+
+			var remaining = HotbarInventory.Container.Stack( item );
+
+			if ( remaining > 0 )
+			{
+				BackpackInventory.Container.Stack( item );
+			}
 		}
 
 		public ushort TakeAmmo( AmmoType type, ushort count )
 		{
-			var items = HotbarInventory.Container.FindItems<AmmoItem>();
+			var items = new List<AmmoItem>();
+
+			items.AddRange( HotbarInventory.Container.FindItems<AmmoItem>() );
+			items.AddRange( BackpackInventory.Container.FindItems<AmmoItem>() );
+
 			var amountLeftToTake = count;
 			ushort totalAmountTaken = 0;
 
@@ -84,7 +105,7 @@ namespace Facepunch.CoreWars
 						item.StackSize = 0;
 					}
 
-					HotbarInventory.Container.Remove( item.ItemId );
+					item.Container.Remove( item.ItemId );
 				}
 			}
 
@@ -93,7 +114,11 @@ namespace Facepunch.CoreWars
 
 		public int GetAmmoCount( AmmoType type )
 		{
-			var items = HotbarInventory.Container.FindItems<AmmoItem>();
+			var items = new List<AmmoItem>();
+
+			items.AddRange( HotbarInventory.Container.FindItems<AmmoItem>() );
+			items.AddRange( BackpackInventory.Container.FindItems<AmmoItem>() );
+
 			var output = 0;
 
 			foreach ( var item in items )
@@ -147,6 +172,7 @@ namespace Facepunch.CoreWars
 			if ( IsLocalPawn )
 			{
 				Hotbar.Current?.SetContainer( HotbarInventory.Container );
+				Backpack.Current?.SetContainer( BackpackInventory.Container );
 			}
 
 			base.ClientSpawn();
@@ -255,7 +281,7 @@ namespace Facepunch.CoreWars
 						}
 					}
 				}
-				else if ( Input.Pressed( InputButton.Score ) )
+				else if ( Input.Pressed( InputButton.Drop ) )
 				{
 					if ( Controller is MoveController )
 					{
@@ -270,6 +296,13 @@ namespace Facepunch.CoreWars
 						};
 					}
 				}
+			}
+			else
+			{
+				if ( Input.Down( InputButton.Score ) )
+					Backpack.Current?.Open();
+				else
+					Backpack.Current?.Close();
 			}
 
 			if ( Prediction.FirstTime )
@@ -369,14 +402,23 @@ namespace Facepunch.CoreWars
 
 		public virtual void CreateInventories()
 		{
-			var container = new InventoryContainer( this );
-			container.SetSlotLimit( 8 );
-			container.AddConnection( Client );
-			container.OnItemTaken += OnHotbarItemTaken;
-			container.OnItemGiven += OnHotbarItemGiven;
-			InventorySystem.Register( container );
+			var hotbar = new InventoryContainer( this );
+			hotbar.SetSlotLimit( 8 );
+			hotbar.AddConnection( Client );
+			hotbar.OnItemTaken += OnHotbarItemTaken;
+			hotbar.OnItemGiven += OnHotbarItemGiven;
+			InventorySystem.Register( hotbar );
 
-			HotbarInventory = new NetInventory( container );
+			HotbarInventory = new NetInventory( hotbar );
+
+			var backpack = new InventoryContainer( this );
+			backpack.SetSlotLimit( 24 );
+			backpack.AddConnection( Client );
+			backpack.OnItemTaken += OnBackpackItemTaken;
+			backpack.OnItemGiven += OnBackpackItemGiven;
+			InventorySystem.Register( backpack );
+
+			BackpackInventory = new NetInventory( backpack );
 		}
 
 		protected override void OnDestroy()
@@ -384,9 +426,20 @@ namespace Facepunch.CoreWars
 			if ( IsServer )
 			{
 				InventorySystem.Remove( HotbarInventory.Container, true );
+				InventorySystem.Remove( BackpackInventory.Container, true );
 			}
 
 			base.OnDestroy();
+		}
+
+		private void OnBackpackItemGiven( ushort slot, InventoryItem instance )
+		{
+
+		}
+
+		private void OnBackpackItemTaken( ushort slot, InventoryItem instance )
+		{
+
 		}
 
 		private void OnHotbarItemGiven( ushort slot, InventoryItem instance )
