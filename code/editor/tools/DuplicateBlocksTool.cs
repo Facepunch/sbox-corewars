@@ -116,8 +116,7 @@ namespace Facepunch.CoreWars.Editor
 						var action = new DuplicateBlocksAction();
 						action.Initialize( startSourceVoxelPosition, endSourceVoxelPosition, aimVoxelPosition );
 
-						var state = Game.GetStateAs<EditorState>();
-						state.Perform( action );
+						Player.Perform( action );
 					}
 				}
 

@@ -82,8 +82,7 @@ namespace Facepunch.CoreWars.Editor
 						var action = new AreaBlocksAction();
 						action.Initialize( startVoxelPosition, endVoxelPosition, Player.SelectedBlockId );
 
-						var state = Game.GetStateAs<EditorState>();
-						state.Perform( action );
+						Player.Perform( action );
 					}
 
 					StartPosition = null;
@@ -114,8 +113,7 @@ namespace Facepunch.CoreWars.Editor
 						var action = new AreaBlocksAction();
 						action.Initialize( startVoxelPosition, endVoxelPosition, 0 );
 
-						var state = Game.GetStateAs<EditorState>();
-						state.Perform( action );
+						Player.Perform( action );
 					}
 
 					StartPosition = null;

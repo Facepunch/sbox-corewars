@@ -55,8 +55,7 @@ namespace Facepunch.CoreWars.Editor
 				var action = new PlaceBlockAction();
 				action.Initialize( aimVoxelPosition, Player.SelectedBlockId );
 
-				var state = Game.GetStateAs<EditorState>();
-				state.Perform( action );
+				Player.Perform( action );
 
 				NextBlockPlace = 0.1f;
 			}
