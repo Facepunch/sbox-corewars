@@ -517,8 +517,8 @@ namespace Facepunch.CoreWars.Inventory
 			var instance = reader.ReadInventoryItem();
 			var slot = reader.ReadUInt16();
 
-			instance.SlotId = slot;
 			instance.Container = this;
+			instance.SlotId = slot;
 
 			ItemList[slot] = instance;
 			HandleSlotChanged( slot );
@@ -532,8 +532,11 @@ namespace Facepunch.CoreWars.Inventory
 
 			if ( instance != null )
 			{
-				instance.SlotId = 0;
-				instance.Container = null;
+				if ( instance.Container == this && instance.SlotId == slot )
+				{
+					instance.Container = null;
+					instance.SlotId = 0;
+				}
 
 				ItemList[slot] = null;
 				HandleSlotChanged( slot );
