@@ -25,4 +25,16 @@
         border-width: 4px;
         opacity: 1;
     }
+
+    &:hover {
+        border-color: white;
+    }
+
+    &.valid-drag {
+        border-color: green;
+    }
+
+    &.invalid-drag {
+        border-color: red;
+    }
 }
