@@ -1,4 +1,5 @@
 ﻿using Sandbox;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -177,7 +178,7 @@ namespace Facepunch.CoreWars.Inventory
 					writer.Write( from.InventoryId );
 					writer.Write( toSlot );
 					writer.Write( to.InventoryId );
-					SendEventDataToServer( NetworkEvent.MoveInventory, Encoding.UTF8.GetString( stream.ToArray() ) );
+					SendEventDataToServer( NetworkEvent.MoveInventory, Convert.ToBase64String( stream.ToArray() ) );
 				}
 			}
 		}
@@ -189,7 +190,7 @@ namespace Facepunch.CoreWars.Inventory
 				using ( var writer = new BinaryWriter( stream ) )
 				{
 					writer.Write( container.InventoryId );
-					SendEventDataToServer( NetworkEvent.CloseInventory, Encoding.UTF8.GetString( stream.ToArray() ) );
+					SendEventDataToServer( NetworkEvent.CloseInventory, Convert.ToBase64String( stream.ToArray() ) );
 				}
 			}
 		}
@@ -336,7 +337,7 @@ namespace Facepunch.CoreWars.Inventory
 		[ServerCmd]
 		public static void SendEventDataToServer( NetworkEvent type, string data )
 		{
-			var decoded = Encoding.UTF8.GetBytes( data );
+			var decoded = Convert.FromBase64String( data );
 
 			using ( var stream = new MemoryStream( decoded ) )
 			{
