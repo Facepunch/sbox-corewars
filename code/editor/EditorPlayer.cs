@@ -19,6 +19,9 @@ namespace Facepunch.CoreWars.Editor
 		public byte SelectedBlockId => HotbarBlockIds[CurrentHotbarIndex];
 		public EditorCamera Camera => CameraMode as EditorCamera;
 
+		public ActionHistory<EditorAction> UndoStack { get; private set; }
+		public ActionHistory<EditorAction> RedoStack { get; private set; }
+
 		private EditorBounds EditorBounds { get; set; }
 
 		public EditorPlayer() : base()
@@ -52,6 +55,9 @@ namespace Facepunch.CoreWars.Editor
 				Log.Warning( e );
 			}
 
+			UndoStack = new( 20 );
+			RedoStack = new( 20 );
+
 			client.Pawn = this;
 		}
 
@@ -73,6 +79,35 @@ namespace Facepunch.CoreWars.Editor
 			if ( client.Pawn is EditorPlayer player )
 			{
 				player.HotbarBlockIds[slot] = (byte)blockId;
+			}
+		}
+
+		public void Perform( EditorAction action )
+		{
+			Host.AssertServer();
+			UndoStack.Push( action );
+			action.Perform();
+		}
+
+		public void Undo()
+		{
+			Host.AssertServer();
+
+			if ( UndoStack.TryPop( out var action ) )
+			{
+				RedoStack.Push( action );
+				action.Undo();
+			}
+		}
+
+		public void Redo()
+		{
+			Host.AssertServer();
+
+			if ( RedoStack.TryPop( out var action ) )
+			{
+				UndoStack.Push( action );
+				action.Perform();
 			}
 		}
 
@@ -238,13 +273,11 @@ namespace Facepunch.CoreWars.Editor
 				{
 					if ( Input.Pressed( InputButton.Reload ) )
 					{
-						var state = Game.GetStateAs<EditorState>();
-						state.Redo();
+						Redo();
 					}
 					else if ( Input.Pressed( InputButton.Menu ) )
 					{
-						var state = Game.GetStateAs<EditorState>();
-						state.Undo();
+						Undo();
 					}
 				}
 
