@@ -11,5 +11,10 @@
   ],
   "HasCode": true,
   "CodePath": "code",
-  "RootNamespace": "Facepunch.CoreWars"
+  "RootNamespace": "Facepunch.CoreWars",
+  "Metadata": {
+    "MapList": [],
+    "MinPlayers": 1,
+    "MapSelect": 2
+  }
 }
