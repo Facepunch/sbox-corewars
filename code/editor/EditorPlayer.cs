@@ -22,6 +22,8 @@ namespace Facepunch.CoreWars.Editor
 		public ActionHistory<EditorAction> UndoStack { get; private set; }
 		public ActionHistory<EditorAction> RedoStack { get; private set; }
 
+		public Dictionary<int,EditorTool> Tools { get; private set; }
+
 		private EditorBounds EditorBounds { get; set; }
 
 		public EditorPlayer() : base()
@@ -57,6 +59,7 @@ namespace Facepunch.CoreWars.Editor
 
 			UndoStack = new( 20 );
 			RedoStack = new( 20 );
+			Tools = new();
 
 			client.Pawn = this;
 		}
@@ -66,7 +69,12 @@ namespace Facepunch.CoreWars.Editor
 		{
 			if ( ConsoleSystem.Caller.Pawn is EditorPlayer player )
 			{
-				var tool = Library.TryCreate<EditorTool>( libraryId );
+				if ( !player.Tools.TryGetValue( libraryId, out var tool ) )
+				{
+					tool = Library.TryCreate<EditorTool>( libraryId );
+					player.Tools[libraryId] = tool;
+				}
+
 				player.SetActiveTool( tool );
 			}
 		}
