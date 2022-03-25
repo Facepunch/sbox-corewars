@@ -2,21 +2,25 @@
     transition: all 0.1s ease-in;
     background-color: #f5deb363;
     border-color: wheat;
-    border-width: 4px;
-    padding: 16px;
+    border-width: 2px;
+    border-radius: 8px;
+    padding: 8px;
     opacity: 0.8;
 
     .name {
-        font-size: 32px;
+        font-size: 24px;
         color: white;
     }
 
     &:hover {
         transition: all 0.1s ease-out;
-        box-shadow: 0px 10px 13px -7px #000000, 0px 0px 27px 3px rgba(97,223,41,0.81);
-        transform: scale( 1.1 1.1 );
+        background-color: #92c287;
         border-color: green;
-        border-width: 4px;
+        border-width: 2px;
         opacity: 1;
+
+        .name {
+            color: green;
+        }
     }
 }
