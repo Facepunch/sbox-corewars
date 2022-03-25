@@ -11,6 +11,8 @@ namespace Facepunch.CoreWars.Editor
 	[UseTemplate]
 	public partial class SimpleRadialMenu : Panel
 	{
+		public virtual InputButton Button => InputButton.Score;
+
 		public List<RadialMenuItem> Items { get; private set; }
 		public RadialMenuItem Hovered { get; private set; }
 		public Panel ItemContainer { get; set; }
@@ -33,20 +35,7 @@ namespace Facepunch.CoreWars.Editor
 
 			Items.Clear();
 
-			var available = Library.GetAttributes<EditorToolLibraryAttribute>();
-
-			foreach ( var attribute in available )
-			{
-				AddTool( attribute );
-			}
-
-			AddAction( "Block List", "View available blocks", "textures/ui/blocklist.png", () => EditorBlockList.Open() );
-
-			if ( Local.Client.IsListenServerHost )
-			{
-				AddAction( "Save World", "Save world to disk", "textures/ui/save.png", () => EditorSaveDialog.Open() );
-				AddAction( "Load World", "Load world from disk", "textures/ui/load.png", () => EditorLoadDialog.Open() );
-			}
+			Populate();
 		}
 
 		public void AddTool( EditorToolLibraryAttribute attribute )
@@ -69,66 +58,18 @@ namespace Facepunch.CoreWars.Editor
 			Items.Add( item );
 		}
 
-		public override void Tick()
-		{
-			if ( !VoxelWorld.Current.IsValid() ) return;
-
-			foreach ( var item in Items )
-			{
-				item.IsSelected = (Hovered == item);
-
-				var fItemCount = (float)Items.Count;
-				var maxItemScale = 1.3f;
-				var minItemScale = 0.9f - fItemCount.Remap( 4f, 8f, 0f, 0.2f );
-				var distanceToMouse = item.Box.Rect.Center.Distance( VirtualMouse );
-				var distanceToScale = distanceToMouse.Remap( 0f, item.Box.Rect.Size.Length * 1.5f, maxItemScale, minItemScale ).Clamp( minItemScale, maxItemScale );
-
-				var tx = new PanelTransform();
-				tx.AddScale( distanceToScale );
-				item.Style.Transform = tx;
-			}
-
-			base.Tick();
-		}
-
-		protected override void PostTemplateApplied()
-		{
-			BindClass( "hidden", IsHidden );
-			Initialize();
-			base.PostTemplateApplied();
-		}
-
-		private bool IsHidden() => !IsOpen;
-
-		protected override void FinalLayoutChildren()
-		{
-			var radius = Box.Rect.Size.x * 0.5f;
-			var center = Box.Rect.WithoutPosition.Center;
-
-			for ( var i = 0; i < Items.Count; i++ )
-			{
-				var theta = (i * 2f * Math.PI / Items.Count) - Math.PI;
-				var x = (float)Math.Sin( theta ) * radius;
-				var y = (float)Math.Cos( theta ) * radius;
-				var item = Items[i];
-
-				item.Style.Left = Length.Pixels( (center.x + x) * ScaleFromScreen );
-				item.Style.Top = Length.Pixels( (center.y + y) * ScaleFromScreen );
-			}
-
-			base.FinalLayoutChildren();
-		}
-
 		[Event.BuildInput]
-		private void BuildInput( InputBuilder builder )
+		public void BuildInput( InputBuilder builder )
 		{
-			if ( builder.Pressed( InputButton.Score ) )
+			var shouldOpen = ShouldOpen();
+
+			if ( builder.Pressed( Button ) && shouldOpen )
 			{
 				VirtualMouse = Screen.Size * 0.5f;
 				IsOpen = true;
 			}
 
-			if ( builder.Released( InputButton.Score ) )
+			if ( builder.Released( Button ) || !shouldOpen )
 			{
 				IsOpen = false;
 			}
@@ -178,5 +119,65 @@ namespace Facepunch.CoreWars.Editor
 				builder.ClearButton( InputButton.Attack2 );
 			}
 		}
+
+		public virtual void Populate()
+		{
+
+		}
+
+		public override void Tick()
+		{
+			if ( !VoxelWorld.Current.IsValid() ) return;
+
+			foreach ( var item in Items )
+			{
+				item.IsSelected = (Hovered == item);
+
+				var fItemCount = (float)Items.Count;
+				var maxItemScale = 1.3f;
+				var minItemScale = 0.9f - fItemCount.Remap( 4f, 8f, 0f, 0.2f );
+				var distanceToMouse = item.Box.Rect.Center.Distance( VirtualMouse );
+				var distanceToScale = distanceToMouse.Remap( 0f, item.Box.Rect.Size.Length * 1.5f, maxItemScale, minItemScale ).Clamp( minItemScale, maxItemScale );
+
+				var tx = new PanelTransform();
+				tx.AddScale( distanceToScale );
+				item.Style.Transform = tx;
+			}
+
+			base.Tick();
+		}
+
+		protected override void PostTemplateApplied()
+		{
+			BindClass( "hidden", IsHidden );
+			Initialize();
+			base.PostTemplateApplied();
+		}
+
+		protected virtual bool ShouldOpen()
+		{
+			return true;
+		}
+
+		protected override void FinalLayoutChildren()
+		{
+			var radius = Box.Rect.Size.x * 0.5f;
+			var center = Box.Rect.WithoutPosition.Center;
+
+			for ( var i = 0; i < Items.Count; i++ )
+			{
+				var theta = (i * 2f * Math.PI / Items.Count) - Math.PI;
+				var x = (float)Math.Sin( theta ) * radius;
+				var y = (float)Math.Cos( theta ) * radius;
+				var item = Items[i];
+
+				item.Style.Left = Length.Pixels( (center.x + x) * ScaleFromScreen );
+				item.Style.Top = Length.Pixels( (center.y + y) * ScaleFromScreen );
+			}
+
+			base.FinalLayoutChildren();
+		}
+
+		private bool IsHidden() => !IsOpen;
 	}
 }
