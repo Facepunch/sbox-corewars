@@ -19,6 +19,7 @@ namespace Facepunch.CoreWars.Editor
 			AddAction( "Edit Data", "Edit the data of an entity", "textures/ui/blocklist.png", () => SetToolMode( EntitiesToolMode.DataEditor ) );
 			AddAction( "Remove", "Remove an entity", "textures/ui/blocklist.png", () => SetToolMode( EntitiesToolMode.Remove ) );
 			AddAction( "Move/Rotate", "Move or rotate an entity", "textures/ui/blocklist.png", () => SetToolMode( EntitiesToolMode.MoveAndRotate ) );
+			AddAction( "Entity List", "View available entities", "textures/ui/blocklist.png", () => EditorEntityList.Open() );
 
 			base.Populate();
 		}
