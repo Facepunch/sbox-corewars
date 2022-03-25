@@ -4,22 +4,41 @@ using System.Linq;
 
 namespace Facepunch.CoreWars.Editor
 {
+	public enum EntitiesToolMode
+	{
+		Place,
+		Remove,
+		MoveAndRotate,
+		DataEditor
+	}
+
 	[EditorToolLibrary( Title = "Entities", Description = "Add or manipulate entities", Icon = "textures/ui/tools/entities.png" )]
 	public partial class EntitiesTool : EditorTool
 	{
-		public enum EntitiesToolMode
+		[ServerCmd]
+		public static void ChangeModeCmd( int mode )
 		{
-			Place,
-			Remove,
-			MoveAndRotate,
-			DataEditor
+			if ( ConsoleSystem.Caller.Pawn is not EditorPlayer player )
+				return;
+
+			if ( player.Tool is not EntitiesTool tool )
+				return;
+			
+			tool.SetMode( (EntitiesToolMode)mode );
 		}
 
 		private static EditorEntityLibraryAttribute CurrentEntityAttribute { get; set; }
 
-		[Net] public EntitiesToolMode Mode { get; set; }
+		[Net, Change( nameof( OnModeChanged ))] public EntitiesToolMode Mode { get; private set; }
 
 		private ModelEntity GhostEntity { get; set; }
+
+		public void SetMode( EntitiesToolMode mode )
+		{
+			Host.AssertServer();
+			Mode = mode;
+			OnModeChanged( mode );
+		}
 
 		public override void Simulate( Client client )
 		{
@@ -46,22 +65,31 @@ namespace Facepunch.CoreWars.Editor
 		{
 			if ( IsServer )
 			{
-				Mode = EntitiesToolMode.Place;
+				SetMode( EntitiesToolMode.Place );
 			}
 
 			if ( IsClient )
 			{
-				if ( Mode == EntitiesToolMode.Place )
-				{
-					CurrentEntityAttribute = Library.GetAttributes<EditorEntityLibraryAttribute>().FirstOrDefault();
-					CreateGhostEntity();
-				}
+				OnModeChanged( Mode );
 			}
 		}
 
 		public override void OnDeselected()
 		{
 			if ( IsClient )
+			{
+				DestroyGhostEntity();
+			}
+		}
+
+		protected virtual void OnModeChanged( EntitiesToolMode mode )
+		{
+			if ( Mode == EntitiesToolMode.Place )
+			{
+				CurrentEntityAttribute = Library.GetAttributes<EditorEntityLibraryAttribute>().FirstOrDefault();
+				CreateGhostEntity();
+			}
+			else
 			{
 				DestroyGhostEntity();
 			}
