@@ -39,8 +39,6 @@ namespace Facepunch.CoreWars.Editor
 			tool.SetMode( (EntitiesToolMode)mode );
 		}
 
-		private static EditorEntityLibraryAttribute CurrentEntityAttribute { get; set; }
-
 		[Net, Change( nameof( OnModeChanged ))] public EntitiesToolMode Mode { get; private set; }
 		[Net, Change( nameof( OnLibraryTypeChanged ))] public string CurrentLibraryType { get; private set; }
 
@@ -96,6 +94,12 @@ namespace Facepunch.CoreWars.Editor
 		{
 			if ( IsServer )
 			{
+				if ( string.IsNullOrEmpty( CurrentLibraryType ) )
+				{
+					var attribute = Library.GetAttributes<EditorEntityLibraryAttribute>().FirstOrDefault();
+					SetLibraryAttribute( attribute );
+				}
+
 				SetMode( EntitiesToolMode.Place );
 			}
 
@@ -103,6 +107,8 @@ namespace Facepunch.CoreWars.Editor
 			{
 				OnModeChanged( Mode );
 			}
+
+			NextActionTime = 0.1f;
 		}
 
 		public override void OnDeselected()
@@ -135,14 +141,9 @@ namespace Facepunch.CoreWars.Editor
 			if ( IsClient )
 			{
 				if ( Mode == EntitiesToolMode.Place )
-				{
-					CurrentEntityAttribute = Library.GetAttributes<EditorEntityLibraryAttribute>().FirstOrDefault();
 					CreateGhostEntity();
-				}
 				else
-				{
 					DestroyGhostEntity();
-				}
 			}
 		}
 
@@ -155,8 +156,9 @@ namespace Facepunch.CoreWars.Editor
 					var aimVoxelPosition = GetAimVoxelPosition( 4f );
 					var aimSourcePosition = VoxelWorld.Current.ToSourcePositionCenter( aimVoxelPosition, true, true, false );
 
-					var entity = Library.Create<ModelEntity>( CurrentEntityAttribute.Name );
-					entity.Position = aimSourcePosition;
+					var action = new PlaceEntityAction();
+					action.Initialize( CurrentLibraryAttribute, aimSourcePosition, Rotation.Identity );
+					Player.Perform( action );
 
 					NextActionTime = 0.1f;
 				}
@@ -181,10 +183,10 @@ namespace Facepunch.CoreWars.Editor
 		{
 			DestroyGhostEntity();
 
-			if ( CurrentEntityAttribute == null )
+			if ( CurrentLibraryAttribute == null )
 				return;
 
-			GhostEntity = new ModelEntity( CurrentEntityAttribute.EditorModel );
+			GhostEntity = new ModelEntity( CurrentLibraryAttribute.EditorModel );
 			GhostEntity.RenderColor = Color.White.WithAlpha( 0.5f );
 		}
 	}
