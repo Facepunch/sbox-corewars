@@ -15,11 +15,11 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void Populate()
 		{
-			AddAction( "Place", "Place an entity in the world", "textures/ui/blocklist.png", () => SetToolMode( EntitiesToolMode.Place ) );
-			AddAction( "Edit Data", "Edit the data of an entity", "textures/ui/blocklist.png", () => SetToolMode( EntitiesToolMode.DataEditor ) );
-			AddAction( "Remove", "Remove an entity", "textures/ui/blocklist.png", () => SetToolMode( EntitiesToolMode.Remove ) );
-			AddAction( "Move/Rotate", "Move or rotate an entity", "textures/ui/blocklist.png", () => SetToolMode( EntitiesToolMode.MoveAndRotate ) );
-			AddAction( "Entity List", "View available entities", "textures/ui/blocklist.png", () => EditorEntityList.Open() );
+			AddAction( "Place", "Place an entity in the world", "textures/ui/tools/entities/place.png", () => SetToolMode( EntitiesToolMode.Place ) );
+			AddAction( "Edit Data", "Edit the data of an entity", "textures/ui/tools/entities/edit.png", () => SetToolMode( EntitiesToolMode.DataEditor ) );
+			AddAction( "Remove", "Remove an entity", "textures/ui/tools/entities/remove.png", () => SetToolMode( EntitiesToolMode.Remove ) );
+			AddAction( "Move/Rotate", "Move or rotate an entity", "textures/ui/tools/entities/move.png", () => SetToolMode( EntitiesToolMode.MoveAndRotate ) );
+			AddAction( "Entity List", "View available entities", "textures/ui/tools/entities/list.png", () => EditorEntityList.Open() );
 
 			base.Populate();
 		}
