@@ -46,6 +46,7 @@ namespace Facepunch.CoreWars.Editor
 
 		private EditorEntityLibraryAttribute CurrentLibraryAttribute { get; set; }
 		private ModelEntity GhostEntity { get; set; }
+		private TimeUntil NextActionTime { get; set; }
 
 		public void SetLibraryAttribute( EditorEntityLibraryAttribute attribute )
 		{
@@ -147,9 +148,18 @@ namespace Facepunch.CoreWars.Editor
 
 		protected override void OnPrimary( Client client )
 		{
-			if ( IsServer )
+			if ( IsServer && NextActionTime )
 			{
-				
+				if ( Mode == EntitiesToolMode.Place )
+				{
+					var aimVoxelPosition = GetAimVoxelPosition( 4f );
+					var aimSourcePosition = VoxelWorld.Current.ToSourcePositionCenter( aimVoxelPosition, true, true, false );
+
+					var entity = Library.Create<ModelEntity>( CurrentEntityAttribute.Name );
+					entity.Position = aimSourcePosition;
+
+					NextActionTime = 0.1f;
+				}
 			}
 		}
 
