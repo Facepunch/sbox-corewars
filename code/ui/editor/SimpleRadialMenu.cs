@@ -61,7 +61,7 @@ namespace Facepunch.CoreWars.Editor
 		[Event.BuildInput]
 		public void BuildInput( InputBuilder builder )
 		{
-			var shouldOpen = ShouldOpen();
+			var shouldOpen = ShouldOpen( builder );
 
 			if ( builder.Pressed( Button ) && shouldOpen )
 			{
@@ -154,7 +154,7 @@ namespace Facepunch.CoreWars.Editor
 			base.PostTemplateApplied();
 		}
 
-		protected virtual bool ShouldOpen()
+		protected virtual bool ShouldOpen( InputBuilder builder )
 		{
 			return true;
 		}
