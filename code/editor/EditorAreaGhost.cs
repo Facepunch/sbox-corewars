@@ -6,7 +6,7 @@ namespace Facepunch.CoreWars.Editor
 {
 	public partial class EditorAreaGhost : RenderEntity
 	{
-		public Material BoxMaterial = Material.Load( "materials/editor/place_block.vmat" );
+		public Material Material = Material.Load( "materials/editor/place_block.vmat" );
 		public BBox StartBlock { get; set; }
 		public BBox EndBlock { get; set; }
 		public Color Color { get; set; }
@@ -56,10 +56,10 @@ namespace Facepunch.CoreWars.Editor
 		{
 			vb.AddCube( center, size + new Vector3( 0.5f ), Rotation.Identity, default, size / VoxelWorld.Current.VoxelSize );
 
-			Render.Attributes.Set( "GhostColor", Color );
+			Render.Attributes.Set( "TintColor", Color );
 			Render.Attributes.Set( "Opacity", 0.8f );
 
-			vb.Draw( BoxMaterial );
+			vb.Draw( Material );
 		}
 	}
 }
