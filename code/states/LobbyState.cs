@@ -1,5 +1,6 @@
 ﻿using Facepunch.Voxels;
 using Sandbox;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,7 +14,6 @@ namespace Facepunch.CoreWars
 			{
 				foreach ( var player in Entity.All.OfType<Player>() )
 				{
-					Log.Info( player.LifeState );
 					SpawnPlayerWhenReady( player );
 				}
 			}
@@ -31,19 +31,20 @@ namespace Facepunch.CoreWars
 
 		private async void SpawnPlayerWhenReady( Player player )
 		{
-			while ( VoxelWorld.Current.SuitableSpawnPositions.Count == 0 )
+			while ( !VoxelWorld.Current.Initialized )
 			{
 				try
 				{
 					await GameTask.Delay( 50 );
 				}
-				catch ( TaskCanceledException )
+				catch ( Exception )
 				{
 					break;
 				}
 			}
 
-			if ( player.LifeState == LifeState.Alive ) return;
+			if ( player.LifeState == LifeState.Alive )
+				return;
 
 			player.Respawn();
 		}
