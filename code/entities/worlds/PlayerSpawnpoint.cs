@@ -20,6 +20,12 @@ namespace Facepunch.CoreWars
 			EnableDrawing = isEditorMode;
 			Transmit = isEditorMode ? TransmitType.Always : TransmitType.Never;
 
+			if ( isEditorMode )
+			{
+				SetupPhysicsFromAABB( PhysicsMotionType.Keyframed, Model.Bounds.Mins, Model.Bounds.Maxs );
+				EnableSolidCollisions = false;
+			}
+
 			base.Spawn();
 		}
 
