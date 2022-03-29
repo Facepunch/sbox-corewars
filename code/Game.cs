@@ -113,9 +113,18 @@ namespace Facepunch.CoreWars
 					return;
 				}
 
-				var spawnpoint = Rand.FromList( VoxelWorld.Current.SuitableSpawnPositions );
-				pawn.Position = spawnpoint;
-				return;
+				var spawnpoints = All.OfType<PlayerSpawnpoint>().ToList();
+
+				if ( spawnpoints.Count == 0 )
+				{
+					var spawnpoint = Rand.FromList( VoxelWorld.Current.SuitableSpawnPositions );
+					pawn.Position = spawnpoint;
+					return;
+				}
+
+				var randomSpawnpoint = Rand.FromList( spawnpoints );
+				pawn.Position = randomSpawnpoint.Position;
+				pawn.Rotation = randomSpawnpoint.Rotation;
 			}
 		}
 
