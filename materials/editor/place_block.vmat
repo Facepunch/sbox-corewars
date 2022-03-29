@@ -46,7 +46,7 @@ Layer0
 
 	DynamicParams
 	{
-		g_vColorTint "GhostColor"
+		g_vColorTint "TintColor"
 		g_flOpacityScale "Opacity"
 	}
 }
