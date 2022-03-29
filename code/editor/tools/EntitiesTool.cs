@@ -246,16 +246,19 @@ namespace Facepunch.CoreWars.Editor
 				}
 				else if ( Mode == EntitiesToolMode.Remove )
 				{
-					var trace = Trace.Ray( Input.Position, Input.Position + Input.Rotation.Forward * 5000f )
-						.EntitiesOnly()
-						.Run();
-
-					if ( trace.Entity.IsValid() && trace.Entity is ISourceEntity entity )
+					if ( IsServer )
 					{
-						var action = new RemoveEntityAction();
-						action.Initialize( entity );
+						var trace = Trace.Ray( Input.Position, Input.Position + Input.Rotation.Forward * 5000f )
+							.EntitiesOnly()
+							.Run();
 
-						Player.Perform( action );
+						if ( trace.Entity.IsValid() && trace.Entity is ISourceEntity entity )
+						{
+							var action = new RemoveEntityAction();
+							action.Initialize( entity );
+
+							Player.Perform( action );
+						}
 					}
 				}
 			}
