@@ -154,15 +154,31 @@ namespace Facepunch.CoreWars.Editor
 		[Event.Tick.Client]
 		protected virtual void ClientTick()
 		{
-			if ( Mode == EntitiesToolMode.Remove )
-			{
-				var trace = Trace.Ray( Input.Position, Input.Position + Input.Rotation.Forward * 5000f )
-					.EntitiesOnly()
-					.Run();
+			var trace = Trace.Ray( Input.Position, Input.Position + Input.Rotation.Forward * 5000f )
+				.EntitiesOnly()
+				.Run();
 
-				if ( trace.Entity.IsValid() && trace.Entity is ISourceEntity target )
+			if ( trace.Entity.IsValid() && trace.Entity is ISourceEntity target )
+			{
+				var outlineColor = Color.White;
+
+				if ( Mode == EntitiesToolMode.Remove )
 				{
-					DebugOverlay.Box( trace.Entity.WorldSpaceBounds.Mins, trace.Entity.WorldSpaceBounds.Maxs, Color.Red, Time.Delta, false );
+					outlineColor = Color.Red;
+				}
+
+				var entityType = trace.Entity.GetType();
+				var worldBounds = trace.Entity.WorldSpaceBounds;
+
+				DebugOverlay.Box( worldBounds.Mins, worldBounds.Maxs, outlineColor, Time.Delta, false );
+
+				if ( Mode == EntitiesToolMode.Remove )
+				{
+					DebugOverlay.Text( trace.EndPosition, $"Delete {entityType.Name}", Color.Red, Time.Delta );
+				}
+				else
+				{
+					DebugOverlay.Text( trace.EndPosition, entityType.Name, Time.Delta );
 				}
 			}
 		}
