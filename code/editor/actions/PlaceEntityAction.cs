@@ -10,7 +10,7 @@ namespace Facepunch.CoreWars.Editor
 		private EditorEntityLibraryAttribute Attribute { get; set; }
 		private Vector3 Position { get; set; }
 		private Rotation Rotation { get; set; }
-		private Entity Entity { get; set; }
+		private int EntityId { get; set; }
 
 		public void Initialize( EditorEntityLibraryAttribute attribute, Vector3 position, Rotation rotation )
 		{
@@ -21,19 +21,23 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void Perform()
 		{
-			Entity = Library.Create<Entity>( Attribute.Name );
-			Entity.Position = Position;
-			Entity.Rotation = Rotation;
+			var entity = Library.Create<ISourceEntity>( Attribute.Name );
+			entity.Position = Position;
+			entity.Rotation = Rotation;
+
+			if ( EntityId > 0 )
+				UpdateObject( EntityId, entity );
+			else
+				EntityId = AddObject( entity );
 
 			base.Perform();
 		}
 
 		public override void Undo()
 		{
-			if ( Entity.IsValid() )
+			if ( FindObject<ISourceEntity>( EntityId, out var entity ) && entity.IsValid() )
 			{
-				Entity.Delete();
-				Entity = null;
+				entity.Delete();
 			}
 
 			base.Undo();

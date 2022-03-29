@@ -10,7 +10,7 @@ namespace Facepunch.CoreWars.Editor
 		private EditorEntityLibraryAttribute Attribute { get; set; }
 		private Vector3 Mins { get; set; }
 		private Vector3 Maxs { get; set; }
-		private Entity Entity { get; set; }
+		private int EntityId  { get; set; }
 
 		public void Initialize( EditorEntityLibraryAttribute attribute, Vector3 mins, Vector3 maxs )
 		{
@@ -26,17 +26,19 @@ namespace Facepunch.CoreWars.Editor
 			volume.Position = Mins;
 			volume.SetVolume( Mins, Maxs );
 
-			Entity = (volume as Entity);
+			if ( EntityId > 0 )
+				UpdateObject( EntityId, volume as ISourceEntity );
+			else
+				EntityId = AddObject( volume as ISourceEntity );
 
 			base.Perform();
 		}
 
 		public override void Undo()
 		{
-			if ( Entity.IsValid() )
+			if ( FindObject<ISourceEntity>( EntityId, out var entity ) && entity.IsValid() )
 			{
-				Entity.Delete();
-				Entity = null;
+				entity.Delete();
 			}
 
 			base.Undo();

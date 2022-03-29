@@ -12,22 +12,31 @@ namespace Facepunch.CoreWars.Editor
 		private Transform Transform { get; set; }
 		private ISourceEntity Entity { get; set; }
 		private byte[] Data { get; set; }
+		private int EntityId { get; set; }
 
 		public void Initialize( ISourceEntity entity )
 		{
 			Attribute = Library.GetAttribute( entity.GetType() ) as EditorEntityLibraryAttribute;
-			Entity = entity;
+			
+			if ( FindObjectId( entity, out var id ) )
+			{
+				EntityId = id;
+			}
 		}
 
 		public override void Perform()
 		{
-			var entity = (Entity as Entity);
+			if ( !FindObject<ISourceEntity>( EntityId, out var entity ) )
+				return;
+
+			if ( !entity.IsValid() )
+				return;
 
 			using ( var stream = new MemoryStream() )
 			{
 				using ( var writer = new BinaryWriter( stream ) )
 				{
-					Entity.Serialize( writer );
+					entity.Serialize( writer );
 				}
 
 				Data = stream.ToArray();
@@ -45,9 +54,10 @@ namespace Facepunch.CoreWars.Editor
 			{
 				using ( var reader = new BinaryReader( stream ) )
 				{
-					Entity = Library.Create<ISourceEntity>( Attribute.Name );
-					Entity.Transform = Transform;
-					Entity.Deserialize( reader );
+					var entity = Library.Create<ISourceEntity>( Attribute.Name );
+					entity.Transform = Transform;
+					entity.Deserialize( reader );
+					UpdateObject( EntityId, entity );
 				}
 			}
 
