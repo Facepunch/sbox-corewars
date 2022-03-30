@@ -1,0 +1,143 @@
+﻿$primary: #1F85DE !default;
+$primary-fg: white !default;
+
+@import "/styles/base.scss";
+@import "/styles/form.scss";
+
+$field-bg: mix( $primary, #222, 80% );
+$field-fg: white;
+
+.popup-container {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    right: 0px;
+    left: 0px;
+    flex-direction: column;
+    align-items: stretch;
+    pointer-events: none;
+    display: none;
+    margin: 0px;
+
+    &.open {
+        pointer-events: all;
+        display: flex;
+    }
+}
+
+.field-group {
+    margin-bottom: 30px;
+}
+
+.field {
+    flex-direction: row;
+    padding: 5px;
+    font-family: Poppins;
+    margin-bottom: 16px;
+
+    > .label {
+        color: rgba( white, 1 );
+        font-weight: 600;
+        font-size: 16px;
+        margin-bottom: 5px;
+        align-items: center;
+        height: 100%;
+        width: 40%;
+    }
+
+    > .control {
+        flex-direction: column;
+    }
+}
+
+.dropdown_indicator {
+    font-size: 17px;
+    right: 4px;
+    top: 0px;
+    bottom: 0px;
+    align-items: center;
+}
+
+.field .control .textentry,
+.field .control .button,
+.field .control .popupbutton.button.dropdown {
+    background-color: rgba( $field-bg, 0.3 );
+    font-size: 16px;
+    font-weight: normal;
+    color: $field-fg;
+    border-radius: 8px;
+    min-height: 20px;
+    border: 1px solid rgba( lighten( $field-bg, 70% ), 0.2 );
+
+    &:hover {
+        border-color: lighten( $field-bg, 110% );
+        background-color: lighten( $field-bg, 10% );
+    }
+
+    &:focus {
+        border-color: mix( $primary, #fff, 20% );
+        background-color: mix( $field-bg, $primary, 30% );
+        color: white;
+    }
+}
+
+.field .control .popupbutton.button.dropdown {
+    padding: 8px;
+}
+
+.field > .button {
+    margin: 5px 0;
+    background-color: rgba( white, 0.02 );
+    font-size: 14px;
+    padding: 8px 12px;
+    color: #fff;
+    border-radius: 5px;
+    min-height: 20px;
+}
+
+.field-header {
+    color: white;
+    font-size: 17px;
+    align-items: center;
+
+    > .iconpanel {
+        margin-right: 10px;
+        opacity: 0.2;
+    }
+
+    > .label {
+        font-weight: normal;
+    }
+
+    padding: 10px;
+    background-color: rgba( $field-bg, 0.1 );
+    border-radius: 10px 10px 0 0;
+    border: 1px solid $field-bg;
+    border-bottom: 0px;
+}
+
+.field-group {
+    padding: 10px;
+    background-color: rgba( $field-bg, 0.3 );
+    border-radius: 10px 10px 10px 10px;
+    border: 1px solid $field-bg;
+}
+
+
+.field .button.is-save {
+    background-color: $primary;
+
+    &.disabled {
+        background-color: desaturate( $primary, 80% );
+        opacity: 0.02;
+    }
+
+    &.working {
+        background-color: desaturate( $primary, 20% );
+        opacity: 0.1;
+
+        > .button-label {
+            content: 'Saving..';
+        }
+    }
+}
