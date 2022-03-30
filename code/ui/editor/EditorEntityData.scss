@@ -1,0 +1,34 @@
+﻿EditorEntityData {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    pointer-events: none;
+
+    .modal {
+        backdrop-filter-blur: 32px;
+        background-color: rgba( 0 0 0 0.8 );
+        padding: 16px;
+        width: 30%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        pointer-events: all;
+
+        .title {
+            margin-bottom: 64px;
+            font-family: Roboto;
+            font-size: 48px;
+            color: white;
+        }
+
+        .items {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+}
