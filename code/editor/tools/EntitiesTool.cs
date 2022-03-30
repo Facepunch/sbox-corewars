@@ -154,32 +154,26 @@ namespace Facepunch.CoreWars.Editor
 		[Event.Tick.Client]
 		protected virtual void ClientTick()
 		{
-			var trace = Trace.Ray( Input.Position, Input.Position + Input.Rotation.Forward * 5000f )
-				.EntitiesOnly()
-				.Run();
-
-			if ( trace.Entity.IsValid() && trace.Entity is ISourceEntity target )
+			if ( TryGetTargetEntity( out var target, out var trace ) )
 			{
 				var outlineColor = Color.White;
 
 				if ( Mode == EntitiesToolMode.Remove )
-				{
 					outlineColor = Color.Red;
-				}
+				else if ( Mode == EntitiesToolMode.DataEditor )
+					outlineColor = Color.Cyan;
 
-				var entityType = trace.Entity.GetType();
-				var worldBounds = trace.Entity.WorldSpaceBounds;
+				var entityType = target.GetType();
+				var worldBounds = target.WorldSpaceBounds;
 
 				DebugOverlay.Box( worldBounds.Mins, worldBounds.Maxs, outlineColor, Time.Delta, false );
 
 				if ( Mode == EntitiesToolMode.Remove )
-				{
 					DebugOverlay.Text( trace.EndPosition, $"Delete {entityType.Name}", Color.Red, Time.Delta );
-				}
+				else if ( Mode == EntitiesToolMode.DataEditor )
+					DebugOverlay.Text( trace.EndPosition, $"Edit {entityType.Name}", Color.Cyan, Time.Delta );
 				else
-				{
 					DebugOverlay.Text( trace.EndPosition, entityType.Name, Time.Delta );
-				}
 			}
 		}
 
@@ -248,16 +242,21 @@ namespace Facepunch.CoreWars.Editor
 				{
 					if ( IsServer )
 					{
-						var trace = Trace.Ray( Input.Position, Input.Position + Input.Rotation.Forward * 5000f )
-							.EntitiesOnly()
-							.Run();
-
-						if ( trace.Entity.IsValid() && trace.Entity is ISourceEntity entity )
+						if ( TryGetTargetEntity( out var target, out _ ) )
 						{
 							var action = new RemoveEntityAction();
-							action.Initialize( entity );
-
+							action.Initialize( target );
 							Player.Perform( action );
+						}
+					}
+				}
+				else if ( Mode == EntitiesToolMode.DataEditor )
+				{
+					if ( IsClient )
+					{
+						if ( TryGetTargetEntity( out var target, out _ ) )
+						{
+							EditorEntityData.Open( target );
 						}
 					}
 				}
@@ -270,6 +269,22 @@ namespace Facepunch.CoreWars.Editor
 			{
 				
 			}
+		}
+
+		private bool TryGetTargetEntity( out ISourceEntity target, out TraceResult trace )
+		{
+			 trace = Trace.Ray( Input.Position, Input.Position + Input.Rotation.Forward * 5000f )
+				.EntitiesOnly()
+				.Run();
+
+			if ( trace.Entity.IsValid() && trace.Entity is ISourceEntity )
+			{
+				target = trace.Entity as ISourceEntity;
+				return true;
+			}
+
+			target = default;
+			return false;
 		}
 
 		private BBox GetVolumeBBox( Vector3 startPosition, Vector3 endPosition )
