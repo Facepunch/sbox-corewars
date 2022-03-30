@@ -6,8 +6,8 @@ namespace Facepunch.CoreWars.Editor
 {
 	public abstract class EditorAction
 	{
-		public static Dictionary<int, object> ObjectLookup { get; private set; } = new();
-		public static int NextObjectId { get; private set; }
+		private static Dictionary<int, object> ObjectLookup { get; set; } = new();
+		private static int NextObjectId { get; set; }
 
 		public static int AddObject( object item )
 		{
