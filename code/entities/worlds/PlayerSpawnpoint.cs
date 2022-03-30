@@ -9,6 +9,7 @@ namespace Facepunch.CoreWars
 	[EditorEntityLibrary( EditorModel = "models/editor/playerstart.vmdl" )]
 	public class PlayerSpawnpoint : ModelEntity, ISourceEntity
 	{
+		[EditorEntityProperty]
 		public Team Team { get; set; }
 
 		public override void Spawn()

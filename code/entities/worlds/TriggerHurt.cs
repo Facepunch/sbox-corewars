@@ -9,7 +9,7 @@ namespace Facepunch.CoreWars
 	[EditorEntityLibrary( IsVolume = true, VolumeMaterial = "materials/tools/toolstrigger.vmat" )]
 	public partial class TriggerHurt : BaseTrigger
 	{
-		[Property, Range( 1f, 100f, 1f )]
+		[EditorEntityProperty, Range( 1f, 100f, 1f )]
 		public float DamagePerSecond { get; set; }
 
 		private HashSet<Player> Touching { get; set; } = new();
