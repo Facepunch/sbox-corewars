@@ -1,4 +1,26 @@
-﻿rootpanel {
+﻿@import "SimpleForms.scss";
+
+.editor-button {
+    width: 100%;
+    border-radius: 8px;
+    background-color: $primary;
+    min-height: 40px;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border: 2px solid white;
+
+    .label {
+        font-size: 24px;
+        color: white;
+    }
+
+    &:hover {
+        background-color: mix( $primary, #222, 0.1 );
+    }
+}
+
+rootpanel {
     &.devcamera {
         display: none;
     }
