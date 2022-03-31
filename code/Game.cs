@@ -103,31 +103,6 @@ namespace Facepunch.CoreWars
 			StateSystem.Active?.OnPlayerKilled( player, player.LastDamageTaken );
 		}
 
-		public override void MoveToSpawnpoint( Entity pawn )
-		{
-			if ( VoxelWorld.Current.IsValid() )
-			{
-				if ( IsEditorMode )
-				{
-					pawn.Position = (VoxelWorld.Current.MaxSize * VoxelWorld.Current.VoxelSize * 0.5f);
-					return;
-				}
-
-				var spawnpoints = All.OfType<PlayerSpawnpoint>().ToList();
-
-				if ( spawnpoints.Count == 0 )
-				{
-					var spawnpoint = Rand.FromList( VoxelWorld.Current.SuitableSpawnPositions );
-					pawn.Position = spawnpoint;
-					return;
-				}
-
-				var randomSpawnpoint = Rand.FromList( spawnpoints );
-				pawn.Position = randomSpawnpoint.Position;
-				pawn.Rotation = randomSpawnpoint.Rotation;
-			}
-		}
-
 		public override bool CanHearPlayerVoice( Client sourceClient, Client destinationClient )
 		{
 			return false;
