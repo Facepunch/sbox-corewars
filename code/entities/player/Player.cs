@@ -140,6 +140,26 @@ namespace Facepunch.CoreWars
 			OnTeamChanged( team );
 		}
 
+		public virtual Transform? GetSpawnpoint()
+		{
+			var world = VoxelWorld.Current;
+			if ( !world.IsValid() ) return null;
+
+			var spawnpoints = All.OfType<PlayerSpawnpoint>().ToList();
+
+			if ( spawnpoints.Count == 0 )
+			{
+				if ( world.Spawnpoints.Count == 0 )
+					return null;
+
+				var spawnpoint = Rand.FromList( world.Spawnpoints );
+				return new Transform( spawnpoint );
+			}
+
+			var randomSpawnpoint = Rand.FromList( spawnpoints );
+			return randomSpawnpoint.Transform;
+		}
+
 		public virtual void OnMapLoaded()
 		{
 			EnableHideInFirstPerson = true;
@@ -180,9 +200,22 @@ namespace Facepunch.CoreWars
 
 		public override void Respawn()
 		{
+			var spawnpoint = GetSpawnpoint();
+
+			if ( spawnpoint.HasValue )
+			{
+				Transform = spawnpoint.Value;
+			}
+
 			Game.Current?.PlayerRespawned( this );
 
-			base.Respawn();
+			LifeState = LifeState.Alive;
+			Health = 100f;
+			Velocity = Vector3.Zero;
+			WaterLevel = 0f;
+
+			CreateHull();
+			ResetInterpolation();
 		}
 
 		public override void BuildInput( InputBuilder input )

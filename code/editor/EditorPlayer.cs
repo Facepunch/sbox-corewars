@@ -144,6 +144,13 @@ namespace Facepunch.CoreWars.Editor
 			}
 		}
 
+		public virtual Transform? GetSpawnpoint()
+		{
+			var world = VoxelWorld.Current;
+			if ( !world.IsValid() ) return null;
+			return new Transform( world.MaxSize * world.VoxelSize * 0.5f );
+		}
+
 		public virtual void OnMapLoaded()
 		{
 			EnableHideInFirstPerson = true;
@@ -211,7 +218,20 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void Respawn()
 		{
-			base.Respawn();
+			var spawnpoint = GetSpawnpoint();
+
+			if ( spawnpoint.HasValue )
+			{
+				Transform = spawnpoint.Value;
+			}
+
+			LifeState = LifeState.Alive;
+			Health = 100f;
+			Velocity = Vector3.Zero;
+			WaterLevel = 0f;
+
+			CreateHull();
+			ResetInterpolation();
 		}
 
 		public override void BuildInput( InputBuilder input )
