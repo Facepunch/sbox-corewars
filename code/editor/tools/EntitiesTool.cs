@@ -256,7 +256,7 @@ namespace Facepunch.CoreWars.Editor
 					{
 						if ( TryGetTargetEntity( out var target, out _ ) )
 						{
-							EditorEntityData.Open( target );
+							EditorEntityData.SendOpenRequest( target.NetworkIdent );
 						}
 					}
 				}

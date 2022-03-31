@@ -2,36 +2,114 @@
 using Sandbox;
 using Sandbox.UI;
 using Sandbox.UI.Construct;
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace Facepunch.CoreWars.Editor
 {
-	public class EditorEntityDataForm : Form
-	{
-		public EditorEntityDataForm() : base() {
-
-		}
-
-		public void StartGroup()
-		{
-			currentGroup = Add.Panel( "field-group" );
-		}
-
-		public void EndGroup()
-		{
-			currentGroup = null;
-		}
-	}
-
 	[UseTemplate]
 	public partial class EditorEntityData : Panel
 	{
+		private static object ConvertPropertyValue( PropertyInfo property, string value )
+		{
+			object convertedValue;
+
+			if ( property.PropertyType.IsEnum )
+				convertedValue = Enum.Parse( property.PropertyType, value );
+			else if ( property.PropertyType == typeof( float ) )
+				convertedValue = Convert.ToSingle( value );
+			else if ( property.PropertyType == typeof( int ) )
+				convertedValue = Convert.ToInt32( value );
+			else if ( property.PropertyType == typeof( bool ) )
+				convertedValue = Convert.ToBoolean( value );
+			else
+				convertedValue = value;
+
+			return convertedValue;
+		}
+
+		[ServerCmd]
+		public static void SaveEntityKeyValue( int entityId, string key, string value )
+		{
+			var entity = Sandbox.Entity.FindByIndex( entityId );
+			if ( !entity.IsValid() ) return;
+
+			var properties = Reflection.GetProperties( entity );
+
+			foreach ( var property in properties )
+			{
+				if ( property.Name != key ) continue;
+				if ( property.GetCustomAttribute<EditorEntityPropertyAttribute>() == null ) continue;
+
+				property.SetValue( entity, ConvertPropertyValue( property, value ) );
+			}
+		}
+
+		[ServerCmd]
+		public static void SendOpenRequest( int entityId )
+		{
+			var entity = Sandbox.Entity.FindByIndex( entityId );
+			if ( !entity.IsValid() ) return;
+
+			using ( var stream = new MemoryStream() )
+			{
+				using ( var writer = new BinaryWriter( stream ) )
+				{
+					var properties = Reflection.GetProperties( entity )
+						.Where( property => property.GetCustomAttribute<EditorEntityPropertyAttribute>() != null );
+
+					writer.Write( properties.Count() );
+
+					foreach ( var property in properties )
+					{
+						var value = property.GetValue( entity );
+						writer.Write( property.Name );
+						writer.Write( value.ToString() );
+					}
+				}
+
+				OpenWithValues( To.Single( ConsoleSystem.Caller ), entityId, stream.ToArray() );
+			}
+		}
+
+		[ClientRpc]
+		public static void OpenWithValues( int entityId, byte[] data )
+		{
+			var entity = Sandbox.Entity.FindByIndex( entityId );
+			if ( !entity.IsValid() ) return;
+
+			var values = new Dictionary<string, object>();
+
+			using ( var stream = new MemoryStream( data ) )
+			{
+				using ( var reader = new BinaryReader( stream ) )
+				{
+					var propertyCount = reader.ReadInt32();
+					var properties = Reflection.GetProperties( entity );
+
+					for ( var i = 0; i < propertyCount; i++ )
+					{
+						var name = reader.ReadString();
+						var value = reader.ReadString();
+						var property = properties.FirstOrDefault( p => p.Name == name );
+						property.SetValue( entity, ConvertPropertyValue( property, value ) );
+					}
+				}
+			}
+
+			Open( (ISourceEntity)entity );
+		}
+
 		public static EditorEntityData Current { get; private set; }
 
-		public EditorEntityDataForm PropertyForm { get; set; }
+		public SimpleForm PropertyForm { get; set; }
 		public string Title => Entity.GetType().Name;
 		public ISourceEntity Entity { get; private set; }
+
+		private Dictionary<string, object> ChangedValues { get; set; } = new();
 
 		public static void Open( ISourceEntity entity )
 		{
@@ -52,11 +130,20 @@ namespace Facepunch.CoreWars.Editor
 			PropertyForm.Clear();
 			PropertyForm.StartGroup();
 
-			foreach ( var p in Reflection.GetProperties( Entity ) )
+			ChangedValues.Clear();
+
+			var properties = Reflection.GetProperties( Entity );
+
+			for ( int i = 0; i < properties.Length; i++ )
 			{
-				if ( p.GetCustomAttribute<EditorEntityPropertyAttribute>() != null )
+				var property = properties[i];
+
+				if ( property.GetCustomAttribute<EditorEntityPropertyAttribute>() != null )
 				{
-					PropertyForm.AddRow( p, Entity, CreateControlFor( p ) );
+					PropertyForm.AddRowWithCallback( property, Entity, PropertyForm.CreateControlFor( property ), ( value ) =>
+					{
+						ChangedValues[property.Name] = value;
+					} );
 				}
 			}
 
@@ -64,82 +151,19 @@ namespace Facepunch.CoreWars.Editor
 
 			var button = PropertyForm.Add.Button( "Save" );
 			button.AddClass( "editor-button" );
-			button.AddEventListener( "onclick", () => Delete() );
+			button.AddEventListener( "onclick", () => Save() );
 		}
 
-		private Panel CreateControlFor( PropertyInfo property )
+		protected virtual void Save()
 		{
-			if ( property.PropertyType.IsEnum )
+			foreach ( var kv in ChangedValues )
 			{
-				var control = new DropDown();
-				var names = property.PropertyType.GetEnumNames();
-				var values = property.PropertyType.GetEnumValues();
-
-				for ( int i = 0; i < names.Length; i++ )
-				{
-					control.Options.Add( new Option( names[i], values.GetValue( i ).ToString() ) );
-				}
-
-				return control;
+				SaveEntityKeyValue( Entity.NetworkIdent, kv.Key, kv.Value.ToString() );
 			}
-			else if ( property.PropertyType == typeof( float ) )
-			{
-				var range = property.GetCustomAttribute<RangeAttribute>();
 
-				if ( range != null )
-				{
-					var slider = new SliderEntry
-					{
-						MinValue = range.Min,
-						MaxValue = range.Max,
-						Step = range.Step
-					};
-					return slider;
-				}
+			ChangedValues.Clear();
 
-				var control = new TextEntry
-				{
-					Numeric = true,
-					NumberFormat = "0.###"
-				};
-
-				return control;
-			}
-			else if ( property.PropertyType == typeof( int ) )
-			{
-				var range = property.GetCustomAttribute<RangeAttribute>();
-
-				if ( range != null )
-				{
-					var slider = new SliderEntry
-					{
-						MinValue = range.Min,
-						MaxValue = range.Max,
-						Step = range.Step
-					};
-
-					if ( property.PropertyType == typeof( int ) || property.PropertyType == typeof( uint ) )
-					{
-						slider.TextEntry.NumberFormat = "0.";
-						slider.Slider.Step = 1;
-					}
-
-					return slider;
-				}
-
-				var control = new TextEntry();
-				control.Numeric = true;
-				control.NumberFormat = "0";
-				return control;
-			}
-			else if ( property.PropertyType == typeof( bool ) )
-			{
-				return new Checkbox();
-			}
-			else
-			{
-				return new TextEntry();
-			}
+			Delete();
 		}
 
 		protected override void PostTemplateApplied()
