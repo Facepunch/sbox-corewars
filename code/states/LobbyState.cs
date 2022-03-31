@@ -31,7 +31,7 @@ namespace Facepunch.CoreWars
 
 		private async void SpawnPlayerWhenReady( Player player )
 		{
-			while ( !VoxelWorld.Current.Initialized )
+			while ( !player.GetSpawnpoint().HasValue )
 			{
 				try
 				{
