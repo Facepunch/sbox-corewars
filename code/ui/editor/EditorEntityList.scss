@@ -17,22 +17,22 @@
         pointer-events: all;
 
         .title {
-            margin-bottom: 64px;
+            margin-bottom: 32px;
+            margin-top: 32px;
             font-family: Roboto;
-            font-size: 48px;
+            font-size: 32px;
             color: white;
         }
 
-        .items {
+        .container {
             display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
+            width: 90%;
+            height: 70%;
+            overflow: scroll;
 
-            EditorEntityItem {
-                margin-top: 8px;
-                margin-right: 8px;
+            .button {
+                margin-top: 16px;
             }
         }
     }

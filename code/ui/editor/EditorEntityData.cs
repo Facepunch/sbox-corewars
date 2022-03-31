@@ -142,12 +142,6 @@ namespace Facepunch.CoreWars.Editor
 			}
 		}
 
-		protected virtual void OnItemSelected( EditorEntityItem item )
-		{
-			EntitiesTool.ChangeLibraryAttributeCmd( item.Attribute.Name );
-			Delete();
-		}
-
 		protected override void PostTemplateApplied()
 		{
 			base.PostTemplateApplied();

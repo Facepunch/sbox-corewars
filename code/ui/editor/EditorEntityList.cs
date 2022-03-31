@@ -3,7 +3,9 @@ using Facepunch.CoreWars.Inventory;
 using Facepunch.Voxels;
 using Sandbox;
 using Sandbox.UI;
+using Sandbox.UI.Construct;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Facepunch.CoreWars.Editor
 {
@@ -12,7 +14,7 @@ namespace Facepunch.CoreWars.Editor
 	{
 		public static EditorEntityList Current { get; private set; }
 
-		public Panel Items { get; set; }
+		public Panel Container { get; set; }
 
 		public static void Open()
 		{
@@ -20,50 +22,33 @@ namespace Facepunch.CoreWars.Editor
 			Current = new EditorEntityList();
 			Current.PopulateItems();
 
-			Game.Hud.AddChild( Current );
-		}
-
-		public EditorEntityList()
-		{
-			AcceptsFocus = true;
-			Focus();
+			Game.Hud.FindPopupPanel().AddChild( Current );
 		}
 
 		public void PopulateItems()
 		{
-			Items.DeleteChildren();
+			Container.DeleteChildren();
 
-			var attributes = Library.GetAttributes<EditorEntityLibraryAttribute>();
+			var button = Container.Add.Button( "Close" );
+			button.AddClass( "editor-button" );
+			button.AddClass( "secondary" );
+			button.AddEventListener( "onclick", () => Delete() );
 
-			foreach ( var attribute in attributes )
+			var attributes = Library.GetAttributes<EditorEntityLibraryAttribute>().ToList();
+
+			for ( int i = 0; i < attributes.Count; i++ )
 			{
-				var item = Items.AddChild<EditorEntityItem>();
-				item.SetAttribute( attribute );
-				item.OnSelected = () => OnItemSelected( item );
+				var attribute = attributes[i];
+				button = Container.Add.Button( attribute.Name );
+				button.AddClass( "editor-button" );
+				button.AddEventListener( "onclick", () => OnItemSelected( attribute ) );
 			}
 		}
 
-		public override void OnButtonTyped( string button, KeyModifiers km )
+		protected virtual void OnItemSelected( EditorEntityLibraryAttribute attribute )
 		{
-			if ( button == "escape" )
-			{
-				Blur();
-			}
-
-			base.OnButtonTyped( button, km );
-		}
-
-		protected virtual void OnItemSelected( EditorEntityItem item )
-		{
-			EntitiesTool.ChangeLibraryAttributeCmd( item.Attribute.Name );
+			EntitiesTool.ChangeLibraryAttributeCmd( attribute.Name );
 			Delete();
-		}
-
-		protected override void OnBlur( PanelEvent e )
-		{
-			Delete();
-
-			base.OnBlur( e );
 		}
 
 		protected override void PostTemplateApplied()

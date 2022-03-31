@@ -4,19 +4,32 @@
     width: 100%;
     border-radius: 8px;
     background-color: $primary;
-    min-height: 40px;
+    height: 60px;
     align-items: center;
     justify-content: center;
     padding: 8px;
-    border: 2px solid white;
 
     .label {
         font-size: 24px;
         color: white;
     }
 
+    &.secondary {
+        background-color: #d4a625;
+
+        .label {
+            color: #4d452c;
+        }
+    }
+
     &:hover {
+        border: 2px solid white;
         background-color: mix( $primary, #222, 0.1 );
+
+        &.secondary {
+            background-color: mix( #d4a625, #222, 0.1 );
+            border: 2px solid #4d452c;
+        }
     }
 }
 
