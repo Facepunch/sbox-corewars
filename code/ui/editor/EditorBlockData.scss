@@ -1,0 +1,31 @@
+﻿EditorBlockData {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    pointer-events: none;
+
+    .modal {
+        backdrop-filter-blur: 32px;
+        background-color: rgba( 0 0 0 0.8 );
+        padding: 16px;
+        width: 30%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        pointer-events: all;
+
+        .title {
+            margin-bottom: 48px;
+            margin-top: 32px;
+            font-family: Roboto;
+            font-size: 32px;
+            color: white;
+        }
+
+        .form {
+            width: 90%;
+        }
+    }
+}
