@@ -5,7 +5,7 @@ using System;
 
 namespace Facepunch.CoreWars.Editor
 {
-	[EditorToolLibrary( Title = "Area Blocks", Description = "Create blocks in a defined area", Icon = "textures/ui/tools/areablocks.png" )]
+	[EditorTool( Title = "Area Blocks", Description = "Create blocks in a defined area", Icon = "textures/ui/tools/areablocks.png" )]
 	public class AreaBlocksTool : EditorTool
 	{
 		private EditorAreaGhost AreaGhost { get; set; }

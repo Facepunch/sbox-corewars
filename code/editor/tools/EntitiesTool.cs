@@ -13,7 +13,7 @@ namespace Facepunch.CoreWars.Editor
 		DataEditor
 	}
 
-	[EditorToolLibrary( Title = "Entities", Description = "Add or manipulate entities", Icon = "textures/ui/tools/entities.png" )]
+	[EditorTool( Title = "Entities", Description = "Add or manipulate entities", Icon = "textures/ui/tools/entities.png" )]
 	public partial class EntitiesTool : EditorTool
 	{
 		[ServerCmd]
@@ -25,7 +25,7 @@ namespace Facepunch.CoreWars.Editor
 			if ( player.Tool is not EntitiesTool tool )
 				return;
 
-			tool.SetLibraryAttribute( (EditorEntityLibraryAttribute)Library.GetAttribute( type ) );
+			tool.SetAttribute( (EditorEntityAttribute)Library.GetAttribute( type ) );
 		}
 
 		[ServerCmd]
@@ -41,23 +41,23 @@ namespace Facepunch.CoreWars.Editor
 		}
 
 		[Net, Change( nameof( OnModeChanged ))] public EntitiesToolMode Mode { get; private set; }
-		[Net, Change( nameof( OnLibraryTypeChanged ))] public string CurrentLibraryType { get; private set; }
+		[Net, Change( nameof( OnTypeChanged ))] public string CurrentType { get; private set; }
 
-		private EditorEntityLibraryAttribute CurrentLibraryAttribute { get; set; }
+		private EditorEntityAttribute CurrentAttribute { get; set; }
 		private VolumeEntity Volume { get; set; }
 		private ModelEntity GhostEntity { get; set; }
 		private TimeUntil NextActionTime { get; set; }
 		private Vector3? StartPosition { get; set; }
 
-		public void SetLibraryAttribute( EditorEntityLibraryAttribute attribute )
+		public void SetAttribute( EditorEntityAttribute attribute )
 		{
 			Host.AssertServer();
 
-			if ( CurrentLibraryType != attribute.Name )
+			if ( CurrentType != attribute.Name )
 			{
-				CurrentLibraryType = attribute.Name;
-				CurrentLibraryAttribute = attribute;
-				OnLibraryAttributeChanged( CurrentLibraryAttribute );
+				CurrentType = attribute.Name;
+				CurrentAttribute = attribute;
+				OnAttributeChanged( CurrentAttribute );
 			}
 		}
 
@@ -82,7 +82,7 @@ namespace Facepunch.CoreWars.Editor
 
 				if ( Mode == EntitiesToolMode.Place )
 				{
-					if ( CurrentLibraryAttribute.IsVolume )
+					if ( CurrentAttribute.IsVolume )
 					{
 						var aimSourcePosition = VoxelWorld.Current.ToSourcePosition( aimVoxelPosition );
 						var volumeBBox = GetVolumeBBox( StartPosition.HasValue ? StartPosition.Value : aimSourcePosition, aimSourcePosition );
@@ -105,10 +105,10 @@ namespace Facepunch.CoreWars.Editor
 		{
 			if ( IsServer )
 			{
-				if ( string.IsNullOrEmpty( CurrentLibraryType ) )
+				if ( string.IsNullOrEmpty( CurrentType ) )
 				{
-					var attribute = Library.GetAttributes<EditorEntityLibraryAttribute>().FirstOrDefault();
-					SetLibraryAttribute( attribute );
+					var attribute = Library.GetAttributes<EditorEntityAttribute>().FirstOrDefault();
+					SetAttribute( attribute );
 				}
 
 				SetMode( EntitiesToolMode.Place );
@@ -134,13 +134,13 @@ namespace Facepunch.CoreWars.Editor
 			Event.Unregister( this );
 		}
 
-		protected virtual void OnLibraryTypeChanged( string type )
+		protected virtual void OnTypeChanged( string type )
 		{
-			CurrentLibraryAttribute = (EditorEntityLibraryAttribute)Library.GetAttribute( type );
-			OnLibraryAttributeChanged( CurrentLibraryAttribute );
+			CurrentAttribute = (EditorEntityAttribute)Library.GetAttribute( type );
+			OnAttributeChanged( CurrentAttribute );
 		}
 
-		protected virtual void OnLibraryAttributeChanged( EditorEntityLibraryAttribute attribute )
+		protected virtual void OnAttributeChanged( EditorEntityAttribute attribute )
 		{
 			if ( IsClient )
 			{
@@ -196,7 +196,7 @@ namespace Facepunch.CoreWars.Editor
 				{
 					var aimVoxelPosition = GetAimVoxelPosition( 4f );
 
-					if ( CurrentLibraryAttribute.IsVolume )
+					if ( CurrentAttribute.IsVolume )
 					{
 						var aimSourcePosition = VoxelWorld.Current.ToSourcePosition( aimVoxelPosition );
 
@@ -213,7 +213,7 @@ namespace Facepunch.CoreWars.Editor
 								);
 
 								var action = new PlaceVolumeAction();
-								action.Initialize( CurrentLibraryAttribute, bbox.Mins, bbox.Maxs );
+								action.Initialize( CurrentAttribute, bbox.Mins, bbox.Maxs );
 
 								Player.Perform( action );
 							}
@@ -232,7 +232,7 @@ namespace Facepunch.CoreWars.Editor
 						var aimSourcePosition = VoxelWorld.Current.ToSourcePositionCenter( aimVoxelPosition, true, true, false );
 
 						var action = new PlaceEntityAction();
-						action.Initialize( CurrentLibraryAttribute, aimSourcePosition, Rotation.Identity );
+						action.Initialize( CurrentAttribute, aimSourcePosition, Rotation.Identity );
 						Player.Perform( action );
 					}
 
@@ -312,10 +312,10 @@ namespace Facepunch.CoreWars.Editor
 		{
 			DestroyGhostEntity();
 
-			if ( CurrentLibraryAttribute == null )
+			if ( CurrentAttribute == null )
 				return;
 
-			if ( CurrentLibraryAttribute.IsVolume )
+			if ( CurrentAttribute.IsVolume )
 			{
 				Volume = new VolumeEntity
 				{
@@ -324,14 +324,14 @@ namespace Facepunch.CoreWars.Editor
 					Color = Color.White
 				};
 
-				if ( !string.IsNullOrEmpty( CurrentLibraryAttribute.VolumeMaterial ) )
+				if ( !string.IsNullOrEmpty( CurrentAttribute.VolumeMaterial ) )
 				{
-					Volume.Material = Material.Load( CurrentLibraryAttribute.VolumeMaterial );
+					Volume.Material = Material.Load( CurrentAttribute.VolumeMaterial );
 				}
 			}
 			else
 			{
-				GhostEntity = new ModelEntity( CurrentLibraryAttribute.EditorModel );
+				GhostEntity = new ModelEntity( CurrentAttribute.EditorModel );
 				GhostEntity.RenderColor = Color.White.WithAlpha( 0.5f );
 			}
 		}

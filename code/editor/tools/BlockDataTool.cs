@@ -4,7 +4,7 @@ using Sandbox;
 
 namespace Facepunch.CoreWars.Editor
 {
-	[EditorToolLibrary( Title = "Block Data", Description = "Edit the data of a block", Icon = "textures/ui/tools/blockdata.png" )]
+	[EditorTool( Title = "Block Data", Description = "Edit the data of a block", Icon = "textures/ui/tools/blockdata.png" )]
 	public class BlockDataTool : EditorTool
 	{
 		private TimeUntil NextActionTime { get; set; }

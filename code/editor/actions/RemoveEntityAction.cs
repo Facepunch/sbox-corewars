@@ -8,7 +8,7 @@ namespace Facepunch.CoreWars.Editor
 	{
 		public override string Name => "Remove Entity";
 
-		private EditorEntityLibraryAttribute Attribute { get; set; }
+		private EditorEntityAttribute Attribute { get; set; }
 		private Transform Transform { get; set; }
 		private ISourceEntity Entity { get; set; }
 		private byte[] Data { get; set; }
@@ -16,7 +16,7 @@ namespace Facepunch.CoreWars.Editor
 
 		public void Initialize( ISourceEntity entity )
 		{
-			Attribute = Library.GetAttribute( entity.GetType() ) as EditorEntityLibraryAttribute;
+			Attribute = Library.GetAttribute( entity.GetType() ) as EditorEntityAttribute;
 			
 			if ( FindObjectId( entity, out var id ) )
 			{

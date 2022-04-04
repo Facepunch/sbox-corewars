@@ -7,12 +7,12 @@ namespace Facepunch.CoreWars.Editor
 	{
 		public override string Name => "Place Volume";
 
-		private EditorEntityLibraryAttribute Attribute { get; set; }
+		private EditorEntityAttribute Attribute { get; set; }
 		private Vector3 Mins { get; set; }
 		private Vector3 Maxs { get; set; }
 		private int EntityId  { get; set; }
 
-		public void Initialize( EditorEntityLibraryAttribute attribute, Vector3 mins, Vector3 maxs )
+		public void Initialize( EditorEntityAttribute attribute, Vector3 mins, Vector3 maxs )
 		{
 			Attribute = attribute;
 			Mins = mins;
