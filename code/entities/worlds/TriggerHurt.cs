@@ -6,10 +6,10 @@ using System.IO;
 
 namespace Facepunch.CoreWars
 {
-	[EditorEntityLibrary( IsVolume = true, VolumeMaterial = "materials/tools/toolstrigger.vmat" )]
+	[EditorEntity( IsVolume = true, VolumeMaterial = "materials/tools/toolstrigger.vmat" )]
 	public partial class TriggerHurt : BaseTrigger
 	{
-		[EditorEntityProperty, Range( 1f, 100f, 1f )]
+		[Property, Range( 1f, 100f, 1f )]
 		public float DamagePerSecond { get; set; }
 
 		private HashSet<Player> Touching { get; set; } = new();
