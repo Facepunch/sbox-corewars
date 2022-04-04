@@ -15,7 +15,7 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void Populate()
 		{
-			var available = Library.GetAttributes<EditorToolLibraryAttribute>();
+			var available = Library.GetAttributes<EditorToolAttribute>();
 
 			foreach ( var attribute in available )
 			{

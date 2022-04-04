@@ -2,7 +2,7 @@
 
 namespace Facepunch.CoreWars.Editor
 {
-	public class EditorToolLibraryAttribute : LibraryAttribute
+	public class EditorToolAttribute : LibraryAttribute
 	{
 		
 	}

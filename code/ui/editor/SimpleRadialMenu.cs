@@ -38,7 +38,7 @@ namespace Facepunch.CoreWars.Editor
 			Populate();
 		}
 
-		public void AddTool( EditorToolLibraryAttribute attribute )
+		public void AddTool( EditorToolAttribute attribute )
 		{
 			var item = ItemContainer.AddChild<RadialMenuItem>();
 			item.Title = attribute.Title;

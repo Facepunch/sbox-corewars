@@ -34,7 +34,7 @@ namespace Facepunch.CoreWars.Editor
 			button.AddClass( "secondary" );
 			button.AddEventListener( "onclick", () => Delete() );
 
-			var attributes = Library.GetAttributes<EditorEntityLibraryAttribute>().ToList();
+			var attributes = Library.GetAttributes<EditorEntityAttribute>().ToList();
 
 			for ( int i = 0; i < attributes.Count; i++ )
 			{
@@ -45,7 +45,7 @@ namespace Facepunch.CoreWars.Editor
 			}
 		}
 
-		protected virtual void OnItemSelected( EditorEntityLibraryAttribute attribute )
+		protected virtual void OnItemSelected( EditorEntityAttribute attribute )
 		{
 			EntitiesTool.ChangeLibraryAttributeCmd( attribute.Name );
 			Delete();
