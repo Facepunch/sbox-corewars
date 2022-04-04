@@ -267,13 +267,7 @@ namespace Facepunch.CoreWars
 				}
 				else if ( Input.Down( InputButton.Attack2 ) && NextBlockPlace )
 				{
-					if ( Input.Down( InputButton.Run ) )
-					{
-						var environmentLight = Entity.All.OfType<EnvironmentLightEntity>().FirstOrDefault();
-						environmentLight.Color = Color.Black;
-						environmentLight.SkyColor = Color.Black;
-					}
-					else if ( VoxelWorld.Current.GetBlockInDirection( Input.Position, Input.Rotation.Forward, out var blockPosition ) )
+					if ( VoxelWorld.Current.GetBlockInDirection( Input.Position, Input.Rotation.Forward, out var blockPosition ) )
 					{
 						var voxel = VoxelWorld.Current.GetVoxel( blockPosition );
 
@@ -287,47 +281,6 @@ namespace Facepunch.CoreWars
 					}
 
 					NextBlockPlace = 0.1f;
-				}
-
-				if ( Input.Pressed( InputButton.Flashlight ) )
-				{
-					VoxelWorld.Current.GetBlockInDirection( Input.Position, Input.Rotation.Forward, out var position );
-
-					var radius = 8;
-
-					for ( var x = -radius; x < radius; x++ )
-					{
-						for ( var y = -radius; y < radius; y++ )
-						{
-							for ( var z = -radius; z < radius; z++ )
-							{
-								var blockPosition = position + new IntVector3( x, y, z );
-
-								if ( position.Distance( blockPosition ) <= radius )
-								{
-									if ( Input.Down( InputButton.Duck ) )
-										VoxelWorld.Current.SetBlockOnServer( blockPosition, VoxelWorld.Current.FindBlockId<WaterBlock>(), 0 );
-									else
-										VoxelWorld.Current.SetBlockOnServer( blockPosition, 0, 0 );
-								}
-							}
-						}
-					}
-				}
-				else if ( Input.Pressed( InputButton.Drop ) )
-				{
-					if ( Controller is MoveController )
-					{
-						Controller = new FlyController();
-					}
-					else
-					{
-						Controller = new MoveController
-						{
-							WalkSpeed = 195f,
-							SprintSpeed = 375f
-						};
-					}
 				}
 			}
 			else
@@ -372,15 +325,7 @@ namespace Facepunch.CoreWars
 
 			var currentMap = VoxelWorld.Current;
 
-			if ( IsServer )
-			{
-				if ( Input.Released( InputButton.Use) )
-				{
-					byte blockId = currentMap.FindBlockId<WhiteTorchBlock>();
-					currentMap.SetBlockInDirection( Input.Position, Input.Rotation.Forward, blockId );
-				}
-			}
-			else if ( currentMap.IsValid() )
+			if ( IsClient  &&  currentMap.IsValid() )
 			{
 				var position = currentMap.ToVoxelPosition( Input.Position );
 				var voxel = currentMap.GetVoxel( position );

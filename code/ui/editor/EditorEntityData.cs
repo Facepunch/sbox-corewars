@@ -42,7 +42,7 @@ namespace Facepunch.CoreWars.Editor
 			foreach ( var property in properties )
 			{
 				if ( property.Name != key ) continue;
-				if ( property.GetCustomAttribute<EditorEntityPropertyAttribute>() == null ) continue;
+				if ( property.GetCustomAttribute<PropertyAttribute>() == null ) continue;
 
 				property.SetValue( entity, ConvertPropertyValue( property, value ) );
 			}
@@ -59,7 +59,7 @@ namespace Facepunch.CoreWars.Editor
 				using ( var writer = new BinaryWriter( stream ) )
 				{
 					var properties = Reflection.GetProperties( entity )
-						.Where( property => property.GetCustomAttribute<EditorEntityPropertyAttribute>() != null );
+						.Where( property => property.GetCustomAttribute<PropertyAttribute>() != null );
 
 					writer.Write( properties.Count() );
 
@@ -136,7 +136,7 @@ namespace Facepunch.CoreWars.Editor
 			{
 				var property = properties[i];
 
-				if ( property.GetCustomAttribute<EditorEntityPropertyAttribute>() == null )
+				if ( property.GetCustomAttribute<PropertyAttribute>() == null )
 					continue;
 
 				PropertyForm.AddRowWithCallback( property, Entity, PropertyForm.CreateControlFor( property ), ( value ) =>

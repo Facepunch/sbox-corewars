@@ -189,27 +189,7 @@ namespace Facepunch.CoreWars
 				}
 				else
 				{
-					world.SetChunkGenerator<PerlinChunkGenerator>();
-					world.AddBiome<PlainsBiome>();
-					world.AddBiome<WeirdBiome>();
-
-					var startChunkSize = 4;
-
-					for ( var x = 0; x < startChunkSize; x++ )
-					{
-						for ( var y = 0; y < startChunkSize; y++ )
-						{
-							await GameTask.Delay( 100 );
-
-							var chunk = world.GetOrCreateChunk(
-								x * world.ChunkSize.x,
-								y * world.ChunkSize.y,
-								0
-							);
-
-							_ = chunk.Initialize();
-						}
-					}
+					throw new Exception( "Unable to locate a Voxel World Loader in this map!" );
 				}
 			}
 			else
