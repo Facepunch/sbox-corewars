@@ -29,7 +29,7 @@ namespace Facepunch.CoreWars
 
 			if ( isEditorMode )
 			{
-				var attribute = Library.GetAttribute( GetType() ) as EditorEntityLibraryAttribute;
+				var attribute = Library.GetAttribute( GetType() ) as EditorEntityAttribute;
 
 				Volume = new VolumeEntity
 				{
