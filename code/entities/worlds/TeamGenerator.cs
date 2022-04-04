@@ -7,7 +7,7 @@ using System.IO;
 namespace Facepunch.CoreWars
 {
 	[EditorEntity( EditorModel = "models/editor/playerstart.vmdl" )]
-	public class PlayerSpawnpoint : ModelEntity, ISourceEntity
+	public class TeamGenerator : ModelEntity, ISourceEntity
 	{
 		[Property] public Team Team { get; set; }
 
@@ -15,16 +15,8 @@ namespace Facepunch.CoreWars
 		{
 			SetModel( "models/editor/playerstart.vmdl" );
 
-			var isEditorMode = Game.Current.IsEditorMode;
-
-			EnableDrawing = isEditorMode;
-			Transmit = isEditorMode ? TransmitType.Always : TransmitType.Never;
-
-			if ( isEditorMode )
-			{
-				SetupPhysicsFromAABB( PhysicsMotionType.Keyframed, Model.Bounds.Mins, Model.Bounds.Maxs );
-				EnableSolidCollisions = false;
-			}
+			Transmit = TransmitType.Always;
+			SetupPhysicsFromAABB( PhysicsMotionType.Static, Model.Bounds.Mins, Model.Bounds.Maxs );
 
 			base.Spawn();
 		}
