@@ -16,6 +16,29 @@ namespace Facepunch.CoreWars.Inventory
 		public virtual string WorldModel => string.Empty;
 		public virtual bool IsStackable => false;
 
+		public static InventoryItem Deserialize( byte[] data )
+		{
+			using ( var stream = new MemoryStream( data ) )
+			{
+				using ( var reader = new BinaryReader( stream ) )
+				{
+					return reader.ReadInventoryItem();
+				}
+			}
+		}
+
+		public byte[] Serialize()
+		{
+			using ( var stream = new MemoryStream() )
+			{
+				using ( var writer = new BinaryWriter( stream ) )
+				{
+					writer.WriteInventoryItem( this );
+					return stream.ToArray();
+				}
+			}
+		}
+
 		private ushort InternalStackSize;
 		private bool InternalIsDirty;
 

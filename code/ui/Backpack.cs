@@ -80,7 +80,7 @@ namespace Facepunch.CoreWars
 		{
 			if ( Local.Pawn is Player player && player.BackpackInventory.IsValid() )
 			{
-				SetContainer( player.BackpackInventory.Container );
+				SetContainer( player.BackpackInventory.Instance );
 			}
 
 			BindClass( "hidden", () => !IsOpen );

@@ -4,24 +4,9 @@ using System.IO;
 
 namespace Facepunch.CoreWars.Inventory
 {
-	public class ItemEntity : ModelEntity, INetworkSerializer
+	public partial class ItemEntity : ModelEntity
 	{
-		public InventoryItem Item { get; private set; }
-
-		public void Read( ref NetRead read )
-		{
-			var data = new byte[read.Remaining];
-
-			using ( var stream = new MemoryStream( read.ReadUnmanagedArray( data ) ) )
-			{
-				using ( var reader = new BinaryReader( stream ) )
-				{
-					Item = reader.ReadInventoryItem();
-				}
-			}
-
-			Log.Info( "Received: " + Item.GetName() );
-		}
+		[Net] public NetInventoryItem Item { get; private set; }
 
 		public void SetItem( InventoryItem item )
 		{
@@ -33,39 +18,33 @@ namespace Facepunch.CoreWars.Inventory
 			SetModel( item.WorldModel );
 			SetupPhysicsFromModel( PhysicsMotionType.Dynamic );
 
-			Item = item;
-			Item.WorldEntity = this;
-
-			WriteNetworkData();
+			Item = new NetInventoryItem( item );
+			item.WorldEntity = this;
 		}
 
 		public InventoryItem Take()
 		{
-			if ( Item.IsValid() && Item.WorldEntity == this )
+			if ( Item.Instance.IsValid() && Item.Instance.WorldEntity == this )
 			{
-				Item.WorldEntity = null;
+				Item.Instance.WorldEntity = null;
 				Delete();
 			}
 
-			return Item;
+			return Item.Instance;
+		}
+
+		[Event.Tick.Client]
+		protected virtual void ClientTick()
+		{
+			if ( Item.Instance.IsValid() )
+			{
+				Log.Info( Item.Instance.GetName() );
+			}
 		}
 
 		public override void Spawn()
 		{
 			base.Spawn();
-		}
-
-		public void Write( NetWrite write )
-		{
-			using ( var stream = new MemoryStream() )
-			{
-				using ( var writer = new BinaryWriter( stream ) )
-				{
-					writer.WriteInventoryItem( Item );
-				}
-
-				write.WriteUnmanagedArray( stream.ToArray() );
-			}
 		}
 	}
 }

@@ -15,8 +15,8 @@ namespace Facepunch.CoreWars
 	{
 		[Net, Change( nameof( OnTeamChanged ) )] public Team Team { get; private set; }
 		[Net, Predicted] public ushort CurrentHotbarIndex { get; private set; }
-		[Net] public NetInventory BackpackInventory { get; private set; }
-		[Net] public NetInventory HotbarInventory { get; private set; }
+		[Net] public NetInventoryContainer BackpackInventory { get; private set; }
+		[Net] public NetInventoryContainer HotbarInventory { get; private set; }
 		public ProjectileSimulator Projectiles { get; private set; }
 		public DamageInfo LastDamageTaken { get; private set; }
 		public TimeUntil NextBlockPlace { get; private set; }
@@ -40,10 +40,10 @@ namespace Facepunch.CoreWars
 			var item = InventorySystem.CreateItem<WeaponItem>();
 			item.WeaponName = weaponName;
 			
-			if ( HotbarInventory.Container.Give( item ) )
+			if ( HotbarInventory.Instance.Give( item ) )
 				return true;
 
-			return BackpackInventory.Container.Give( item );
+			return BackpackInventory.Instance.Give( item );
 		}
 
 		public void TryGiveAmmo( AmmoType type, ushort amount )
@@ -52,11 +52,11 @@ namespace Facepunch.CoreWars
 			item.AmmoType = type;
 			item.StackSize = amount;
 
-			var remaining = HotbarInventory.Container.Stack( item );
+			var remaining = HotbarInventory.Instance.Stack( item );
 
 			if ( remaining > 0 )
 			{
-				BackpackInventory.Container.Stack( item );
+				BackpackInventory.Instance.Stack( item );
 			}
 		}
 
@@ -66,11 +66,11 @@ namespace Facepunch.CoreWars
 			item.BlockId = blockId;
 			item.StackSize = amount;
 
-			var remaining = HotbarInventory.Container.Stack( item );
+			var remaining = HotbarInventory.Instance.Stack( item );
 
 			if ( remaining > 0 )
 			{
-				BackpackInventory.Container.Stack( item );
+				BackpackInventory.Instance.Stack( item );
 			}
 		}
 
@@ -78,8 +78,8 @@ namespace Facepunch.CoreWars
 		{
 			var items = new List<AmmoItem>();
 
-			items.AddRange( HotbarInventory.Container.FindItems<AmmoItem>() );
-			items.AddRange( BackpackInventory.Container.FindItems<AmmoItem>() );
+			items.AddRange( HotbarInventory.Instance.FindItems<AmmoItem>() );
+			items.AddRange( BackpackInventory.Instance.FindItems<AmmoItem>() );
 
 			var amountLeftToTake = count;
 			ushort totalAmountTaken = 0;
@@ -116,8 +116,8 @@ namespace Facepunch.CoreWars
 		{
 			var items = new List<AmmoItem>();
 
-			items.AddRange( HotbarInventory.Container.FindItems<AmmoItem>() );
-			items.AddRange( BackpackInventory.Container.FindItems<AmmoItem>() );
+			items.AddRange( HotbarInventory.Instance.FindItems<AmmoItem>() );
+			items.AddRange( BackpackInventory.Instance.FindItems<AmmoItem>() );
 
 			var output = 0;
 
@@ -196,8 +196,8 @@ namespace Facepunch.CoreWars
 		{
 			if ( IsLocalPawn )
 			{
-				Hotbar.Current?.SetContainer( HotbarInventory.Container );
-				Backpack.Current?.SetContainer( BackpackInventory.Container );
+				Hotbar.Current?.SetContainer( HotbarInventory.Instance );
+				Backpack.Current?.SetContainer( BackpackInventory.Instance );
 			}
 
 			base.ClientSpawn();
@@ -205,8 +205,6 @@ namespace Facepunch.CoreWars
 
 		public override void Respawn()
 		{
-			Log.Info( "Respawning" );
-
 			Game.Current?.PlayerRespawned( this );
 
 			LifeState = LifeState.Alive;
@@ -220,7 +218,6 @@ namespace Facepunch.CoreWars
 
 			if ( spawnpoint.HasValue )
 			{
-				Log.Info( "Got a spawnpoint: " + spawnpoint );
 				Transform = spawnpoint.Value;
 			}
 
@@ -252,6 +249,7 @@ namespace Facepunch.CoreWars
 
 					var item = InventorySystem.CreateItem<AmmoItem>();
 					item.StackSize = 30;
+					item.AmmoType = AmmoType.Explosive;
 
 					var ent = new ItemEntity();
 					ent.Position = tr.EndPosition;
@@ -268,7 +266,7 @@ namespace Facepunch.CoreWars
 					}
 					else
 					{
-						var container = HotbarInventory.Container;
+						var container = HotbarInventory.Instance;
 						var item = container.GetFromSlot( CurrentHotbarIndex );
 
 						if ( item.IsValid() && item is BlockItem blockItem )
@@ -324,7 +322,7 @@ namespace Facepunch.CoreWars
 				else if ( Input.MouseWheel < 0 )
 					currentSlotIndex--;
 
-				var maxSlotIndex = HotbarInventory.Container.SlotLimit - 1;
+				var maxSlotIndex = HotbarInventory.Instance.SlotLimit - 1;
 
 				if ( currentSlotIndex < 0 )
 					currentSlotIndex = maxSlotIndex;
@@ -338,7 +336,7 @@ namespace Facepunch.CoreWars
 
 				if ( IsServer )
 				{
-					var item = HotbarInventory.Container.GetFromSlot( CurrentHotbarIndex );
+					var item = HotbarInventory.Instance.GetFromSlot( CurrentHotbarIndex );
 
 					if ( item is WeaponItem weaponItem )
 						ActiveChild = weaponItem.Weapon;
@@ -411,7 +409,7 @@ namespace Facepunch.CoreWars
 			hotbar.OnItemGiven += OnHotbarItemGiven;
 			InventorySystem.Register( hotbar );
 
-			HotbarInventory = new NetInventory( hotbar );
+			HotbarInventory = new NetInventoryContainer( hotbar );
 
 			var backpack = new InventoryContainer( this );
 			backpack.SetSlotLimit( 24 );
@@ -420,7 +418,7 @@ namespace Facepunch.CoreWars
 			backpack.OnItemGiven += OnBackpackItemGiven;
 			InventorySystem.Register( backpack );
 
-			BackpackInventory = new NetInventory( backpack );
+			BackpackInventory = new NetInventoryContainer( backpack );
 		}
 
 		[Event.Tick.Server]
@@ -429,12 +427,7 @@ namespace Facepunch.CoreWars
 			if ( IsWaitingToRespawn )
 			{
 				var spawnpoint = GetSpawnpoint();
-				if ( !spawnpoint.HasValue )
-				{
-					Log.Info( "No spawn" );
-					return;
-				}
-
+				if ( !spawnpoint.HasValue ) return;
 				IsWaitingToRespawn = false;
 				Respawn();
 			}
@@ -444,8 +437,8 @@ namespace Facepunch.CoreWars
 		{
 			if ( IsServer )
 			{
-				InventorySystem.Remove( HotbarInventory.Container, true );
-				InventorySystem.Remove( BackpackInventory.Container, true );
+				InventorySystem.Remove( HotbarInventory.Instance, true );
+				InventorySystem.Remove( BackpackInventory.Instance, true );
 			}
 
 			base.OnDestroy();
@@ -477,7 +470,7 @@ namespace Facepunch.CoreWars
 		{
 			if ( instance is WeaponItem weapon )
 			{
-				if ( weapon.Weapon.IsValid() && instance.Container != HotbarInventory.Container )
+				if ( weapon.Weapon.IsValid() && instance.Container != HotbarInventory.Instance )
 				{
 					weapon.Weapon.Delete();
 					weapon.Weapon = null;
@@ -488,28 +481,28 @@ namespace Facepunch.CoreWars
 		private void UpdateHotbarSlotKeys()
 		{
 			if ( Input.Pressed( InputButton.Slot0 ) )
-				CurrentHotbarIndex = (ushort)Math.Min( 1, HotbarInventory.Container.SlotLimit - 1 );
+				CurrentHotbarIndex = (ushort)Math.Min( 1, HotbarInventory.Instance.SlotLimit - 1 );
 
 			if ( Input.Pressed( InputButton.Slot1 ) )
-				CurrentHotbarIndex = (ushort)Math.Min( 2, HotbarInventory.Container.SlotLimit - 1 );
+				CurrentHotbarIndex = (ushort)Math.Min( 2, HotbarInventory.Instance.SlotLimit - 1 );
 
 			if ( Input.Pressed( InputButton.Slot2 ) )
-				CurrentHotbarIndex = (ushort)Math.Min( 3, HotbarInventory.Container.SlotLimit - 1 );
+				CurrentHotbarIndex = (ushort)Math.Min( 3, HotbarInventory.Instance.SlotLimit - 1 );
 
 			if ( Input.Pressed( InputButton.Slot3 ) )
-				CurrentHotbarIndex = (ushort)Math.Min( 4, HotbarInventory.Container.SlotLimit - 1 );
+				CurrentHotbarIndex = (ushort)Math.Min( 4, HotbarInventory.Instance.SlotLimit - 1 );
 
 			if ( Input.Pressed( InputButton.Slot4 ) )
-				CurrentHotbarIndex = (ushort)Math.Min( 5, HotbarInventory.Container.SlotLimit - 1 );
+				CurrentHotbarIndex = (ushort)Math.Min( 5, HotbarInventory.Instance.SlotLimit - 1 );
 
 			if ( Input.Pressed( InputButton.Slot5 ) )
-				CurrentHotbarIndex = (ushort)Math.Min( 6, HotbarInventory.Container.SlotLimit - 1 );
+				CurrentHotbarIndex = (ushort)Math.Min( 6, HotbarInventory.Instance.SlotLimit - 1 );
 
 			if ( Input.Pressed( InputButton.Slot6 ) )
-				CurrentHotbarIndex = (ushort)Math.Min( 7, HotbarInventory.Container.SlotLimit - 1 );
+				CurrentHotbarIndex = (ushort)Math.Min( 7, HotbarInventory.Instance.SlotLimit - 1 );
 
 			if ( Input.Pressed( InputButton.Slot7 ) )
-				CurrentHotbarIndex = (ushort)Math.Min( 8, HotbarInventory.Container.SlotLimit - 1 );
+				CurrentHotbarIndex = (ushort)Math.Min( 8, HotbarInventory.Instance.SlotLimit - 1 );
 		}
 	}
 }

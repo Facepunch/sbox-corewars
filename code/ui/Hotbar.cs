@@ -61,7 +61,7 @@ namespace Facepunch.CoreWars
 		{
 			if ( Local.Pawn is Player player && player.HotbarInventory.IsValid() )
 			{
-				SetContainer( player.HotbarInventory.Container );
+				SetContainer( player.HotbarInventory.Instance );
 			}
 
 			base.PostTemplateApplied();
