@@ -10,7 +10,6 @@ namespace Facepunch.CoreWars.Editor
 
 		private EditorEntityAttribute Attribute { get; set; }
 		private Transform Transform { get; set; }
-		private ISourceEntity Entity { get; set; }
 		private byte[] Data { get; set; }
 		private int EntityId { get; set; }
 
