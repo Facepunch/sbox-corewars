@@ -4,10 +4,10 @@ using Sandbox;
 namespace Facepunch.CoreWars.Blocks
 {
 	[Library]
-	public class TeamBlock_Red : BlockType
+	public class RedPlastic : BlockType
 	{
 		public override string DefaultTexture => "teamcolour_red_01_color";
-		public override string FriendlyName => "Teamcolour Red";
+		public override string FriendlyName => "Red Plastic";
 	}
 }
 
