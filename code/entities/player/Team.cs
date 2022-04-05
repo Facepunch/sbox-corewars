@@ -9,7 +9,7 @@
 		Green,
 		Purple,
 		Pink,
-		White,
+		Cyan,
 		Yellow
 	}
 }
