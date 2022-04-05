@@ -17,11 +17,11 @@ namespace Facepunch.CoreWars.Editor
 		public void Initialize( ISourceEntity entity )
 		{
 			Attribute = Library.GetAttribute( entity.GetType() ) as EditorEntityAttribute;
-			
+
 			if ( FindObjectId( entity, out var id ) )
-			{
 				EntityId = id;
-			}
+			else
+				EntityId = AddObject( entity );
 		}
 
 		public override void Perform()
