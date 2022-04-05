@@ -10,12 +10,14 @@ namespace Facepunch.CoreWars
 	{
 		public byte BlockId { get; set; }
 
+		public override ushort MaxStackSize => 60;
+		public override bool IsStackable => true;
+
 		public override string GetName()
 		{
-			if ( VoxelWorld.Current.IsValid() )
-				return VoxelWorld.Current.GetBlockType( BlockId ).FriendlyName;
-			else
-				return "INVALID_BLOCK";
+			var world = VoxelWorld.Current;
+			if ( !world.IsValid() ) return "Invalid";
+			return world.GetBlockType( BlockId ).FriendlyName;
 		}
 
 		public override bool CanStackWith( InventoryItem other )
@@ -25,9 +27,10 @@ namespace Facepunch.CoreWars
 
 		public override string GetIcon()
 		{
-			if ( VoxelWorld.Current == null ) return string.Empty;
+			var world = VoxelWorld.Current;
+			if ( !world.IsValid() ) return string.Empty;
 
-			var block = VoxelWorld.Current.GetBlockType( BlockId );
+			var block = world.GetBlockType( BlockId );
 			if ( string.IsNullOrEmpty( block.DefaultTexture ) ) return string.Empty;
 
 			return $"textures/blocks/color/{ block.DefaultTexture }.png";

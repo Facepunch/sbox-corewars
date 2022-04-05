@@ -9,6 +9,10 @@ namespace Facepunch.CoreWars
 	{
 		public AmmoType AmmoType { get; set; }
 
+		public override string WorldModel => "models/weapons/w_shotblast.vmdl";
+		public override ushort MaxStackSize => 60;
+		public override bool IsStackable => true;
+
 		public override string GetName()
 		{
 			return AmmoType.ToString();
