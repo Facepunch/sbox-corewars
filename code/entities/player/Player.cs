@@ -21,6 +21,8 @@ namespace Facepunch.CoreWars
 		public DamageInfo LastDamageTaken { get; private set; }
 		public TimeUntil NextBlockPlace { get; private set; }
 
+		private bool IsWaitingToRespawn { get; set; }
+
 		public Player() : base()
 		{
 			Projectiles = new( this );
@@ -49,7 +51,6 @@ namespace Facepunch.CoreWars
 			var item = InventorySystem.CreateItem<AmmoItem>();
 			item.AmmoType = type;
 			item.StackSize = amount;
-			item.MaxStackSize = 60;
 
 			var remaining = HotbarInventory.Container.Stack( item );
 
@@ -64,7 +65,6 @@ namespace Facepunch.CoreWars
 			var item = InventorySystem.CreateItem<BlockItem>();
 			item.BlockId = blockId;
 			item.StackSize = amount;
-			item.MaxStackSize = 1000;
 
 			var remaining = HotbarInventory.Container.Stack( item );
 
@@ -140,6 +140,11 @@ namespace Facepunch.CoreWars
 			OnTeamChanged( team );
 		}
 
+		public void RespawnWhenAvailable()
+		{
+			IsWaitingToRespawn = true;
+		}
+
 		public virtual Transform? GetSpawnpoint()
 		{
 			var world = VoxelWorld.Current;
@@ -200,12 +205,7 @@ namespace Facepunch.CoreWars
 
 		public override void Respawn()
 		{
-			var spawnpoint = GetSpawnpoint();
-
-			if ( spawnpoint.HasValue )
-			{
-				Transform = spawnpoint.Value;
-			}
+			Log.Info( "Respawning" );
 
 			Game.Current?.PlayerRespawned( this );
 
@@ -215,6 +215,15 @@ namespace Facepunch.CoreWars
 			WaterLevel = 0f;
 
 			CreateHull();
+
+			var spawnpoint = GetSpawnpoint();
+
+			if ( spawnpoint.HasValue )
+			{
+				Log.Info( "Got a spawnpoint: " + spawnpoint );
+				Transform = spawnpoint.Value;
+			}
+
 			ResetInterpolation();
 		}
 
@@ -234,6 +243,21 @@ namespace Facepunch.CoreWars
 
 			if ( IsServer )
 			{
+				if ( Input.Released( InputButton.Flashlight ) )
+				{
+					var tr = Trace.Ray( Input.Position, Input.Position + Input.Rotation.Forward * 500f )
+						.WorldAndEntities()
+						.Ignore( this )
+						.Run();
+
+					var item = InventorySystem.CreateItem<AmmoItem>();
+					item.StackSize = 30;
+
+					var ent = new ItemEntity();
+					ent.Position = tr.EndPosition;
+					ent.SetItem( item );
+				}
+
 				if ( Input.Down( InputButton.Attack1 ) && NextBlockPlace )
 				{
 					if ( Input.Down( InputButton.Run ) )
@@ -397,6 +421,23 @@ namespace Facepunch.CoreWars
 			InventorySystem.Register( backpack );
 
 			BackpackInventory = new NetInventory( backpack );
+		}
+
+		[Event.Tick.Server]
+		protected virtual void ServerTick()
+		{
+			if ( IsWaitingToRespawn )
+			{
+				var spawnpoint = GetSpawnpoint();
+				if ( !spawnpoint.HasValue )
+				{
+					Log.Info( "No spawn" );
+					return;
+				}
+
+				IsWaitingToRespawn = false;
+				Respawn();
+			}
 		}
 
 		protected override void OnDestroy()
