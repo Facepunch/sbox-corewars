@@ -6,12 +6,15 @@ namespace Facepunch.CoreWars.Inventory
 	public class InventoryItem : IValid
 	{
 		public ItemSlot ItemSlot { get; set; } = ItemSlot.Everything;
-		public bool IsStackable { get; set; }
-		public ushort MaxStackSize { get; set; } = 1;
-		public ushort DefaultStackSize { get; set; } = 1;
 		public InventoryContainer Container { get; set; }
+		public ItemEntity WorldEntity { get; set; }
 		public string LibraryName { get; set; }
 		public int LibraryId { get; set; }
+
+		public virtual ushort DefaultStackSize => 1;
+		public virtual ushort MaxStackSize => 1;
+		public virtual string WorldModel => string.Empty;
+		public virtual bool IsStackable => false;
 
 		private ushort InternalStackSize;
 		private bool InternalIsDirty;

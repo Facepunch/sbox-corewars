@@ -406,10 +406,12 @@ namespace Facepunch.CoreWars.Inventory
 		{
 			foreach ( var kv in Items )
 			{
-				if ( !kv.Value.Container.IsValid() )
+				var item = kv.Value;
+
+				if ( !item.Container.IsValid() && !item.WorldEntity.IsValid() )
 				{
 					OrphanedItems.Enqueue( kv.Key );
-					kv.Value.IsValid = false;
+					item.IsValid = false;
 				}
 			}
 
