@@ -7,7 +7,8 @@ namespace Facepunch.CoreWars.Inventory
 	{
 		public ItemSlot ItemSlot { get; set; } = ItemSlot.Everything;
 		public InventoryContainer Container { get; set; }
-		public ItemEntity WorldEntity { get; set; }
+		public ItemEntity WorldEntity { get; private set; }
+		public bool IsWorldEntity { get; private set; }
 		public string LibraryName { get; set; }
 		public int LibraryId { get; set; }
 
@@ -90,6 +91,20 @@ namespace Facepunch.CoreWars.Inventory
 		public ulong ItemId { get; set; }
 		public ushort SlotId { get; set; }
 
+		public void SetWorldEntity( ItemEntity entity )
+		{
+			WorldEntity = entity;
+			IsWorldEntity = entity.IsValid();
+			IsDirty = true;
+		}
+
+		public void ClearWorldEntity()
+		{
+			WorldEntity = null;
+			IsWorldEntity = false;
+			IsDirty = true;
+		}
+
 		public virtual string GetIcon()
 		{
 			return string.Empty;
@@ -112,12 +127,26 @@ namespace Facepunch.CoreWars.Inventory
 
 		public virtual void Write( BinaryWriter writer )
 		{
+			if ( WorldEntity.IsValid() )
+			{
+				writer.Write( true );
+				writer.Write( WorldEntity.NetworkIdent );
+			}
+			else
+			{
+				writer.Write( false );
+			}
 
 		}
 
 		public virtual void Read( BinaryReader reader )
 		{
+			IsWorldEntity = reader.ReadBoolean();
 
+			if ( IsWorldEntity )
+			{
+				WorldEntity = (Entity.FindByIndex( reader.ReadInt32() ) as ItemEntity);
+			}
 		}
 
 		public virtual void OnRemoved()

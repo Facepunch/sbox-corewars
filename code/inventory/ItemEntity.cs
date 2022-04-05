@@ -19,14 +19,16 @@ namespace Facepunch.CoreWars.Inventory
 			SetupPhysicsFromModel( PhysicsMotionType.Dynamic );
 
 			Item = new NetInventoryItem( item );
-			item.WorldEntity = this;
+			item.SetWorldEntity( this );
 		}
 
 		public InventoryItem Take()
 		{
-			if ( Item.Instance.IsValid() && Item.Instance.WorldEntity == this )
+			var item = Item.Instance;
+
+			if ( item.IsValid() && item.WorldEntity == this )
 			{
-				Item.Instance.WorldEntity = null;
+				item.ClearWorldEntity();
 				Delete();
 			}
 
