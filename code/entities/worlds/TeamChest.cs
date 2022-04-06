@@ -1,4 +1,5 @@
 ﻿using Facepunch.CoreWars.Editor;
+using Facepunch.CoreWars.Inventory;
 using Facepunch.Voxels;
 using Sandbox;
 using System;
@@ -7,19 +8,11 @@ using System.IO;
 namespace Facepunch.CoreWars
 {
 	[EditorEntity( Title = "Team Chest", Group = "Team Entities", EditorModel = "models/editor/playerstart.vmdl" )]
-	public class TeamChest : ModelEntity, ISourceEntity
+	public partial class TeamChest : ModelEntity, ISourceEntity, IResettable
 	{
 		[Property] public Team Team { get; set; }
 
-		public override void Spawn()
-		{
-			SetModel( "models/editor/playerstart.vmdl" );
-
-			Transmit = TransmitType.Always;
-			SetupPhysicsFromAABB( PhysicsMotionType.Static, Model.Bounds.Mins, Model.Bounds.Maxs );
-
-			base.Spawn();
-		}
+		[Net] public NetInventoryContainer Inventory { get; private set; }
 
 		public virtual void Serialize( BinaryWriter writer )
 		{
@@ -30,5 +23,28 @@ namespace Facepunch.CoreWars
 		{
 			Team = (Team)reader.ReadByte();
 		}
+
+		public virtual void Reset()
+		{
+			Inventory.Instance.RemoveAll();
+		}
+
+		public override void Spawn()
+		{
+			SetModel( "models/editor/playerstart.vmdl" );
+
+			Transmit = TransmitType.Always;
+			SetupPhysicsFromAABB( PhysicsMotionType.Static, Model.Bounds.Mins, Model.Bounds.Maxs );
+
+			var inventory = new InventoryContainer( this );
+			inventory.SetSlotLimit( 24 );
+			InventorySystem.Register( inventory );
+
+			Inventory = new NetInventoryContainer( inventory );
+
+			base.Spawn();
+		}
+
+		public override void TakeDamage( DamageInfo info ) { }
 	}
 }
