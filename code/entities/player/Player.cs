@@ -74,6 +74,16 @@ namespace Facepunch.CoreWars
 			}
 		}
 
+		public void TryGiveItem( InventoryItem item )
+		{
+			var remaining = HotbarInventory.Instance.Stack( item );
+
+			if ( remaining > 0 )
+			{
+				BackpackInventory.Instance.Stack( item );
+			}
+		}
+
 		public ushort TakeAmmo( AmmoType type, ushort count )
 		{
 			var items = new List<AmmoItem>();
@@ -188,7 +198,6 @@ namespace Facepunch.CoreWars
 		{
 			EnableHideInFirstPerson = true;
 			EnableAllCollisions = true;
-			EnableDrawing = true;
 
 			CameraMode = new FirstPersonCamera();
 
@@ -211,6 +220,27 @@ namespace Facepunch.CoreWars
 			base.Spawn();
 		}
 
+		public override void OnKilled()
+		{
+			if ( LastDamageTaken.Attacker is Player attacker )
+			{
+				var resources = HotbarInventory.Instance.FindItems<ResourceItem>();
+				resources.AddRange( BackpackInventory.Instance.FindItems<ResourceItem>() );
+
+				foreach ( var resource in resources )
+				{
+					resource.Container.Remove( resource );
+					attacker.TryGiveItem( resource );
+				}
+			}
+
+			EnableDrawing = false;
+
+			RespawnWhenAvailable();
+
+			base.OnKilled();
+		}
+
 		public override void ClientSpawn()
 		{
 			if ( IsLocalPawn )
@@ -226,6 +256,7 @@ namespace Facepunch.CoreWars
 		{
 			Game.Current?.PlayerRespawned( this );
 
+			EnableDrawing = true;
 			LifeState = LifeState.Alive;
 			Health = 100f;
 			Velocity = Vector3.Zero;
@@ -277,29 +308,20 @@ namespace Facepunch.CoreWars
 
 				if ( Input.Down( InputButton.Attack1 ) && NextBlockPlace )
 				{
-					if ( Input.Down( InputButton.Run ) )
-					{
-						var environmentLight = Entity.All.OfType<EnvironmentLightEntity>().FirstOrDefault();
-						environmentLight.Color = Color.Red;
-						environmentLight.SkyColor = Color.Red;
-					}
-					else
-					{
-						var container = HotbarInventory.Instance;
-						var item = container.GetFromSlot( CurrentHotbarIndex );
+					var container = HotbarInventory.Instance;
+					var item = container.GetFromSlot( CurrentHotbarIndex );
 
-						if ( item.IsValid() && item is BlockItem blockItem )
+					if ( item.IsValid() && item is BlockItem blockItem )
+					{
+						var success = VoxelWorld.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, blockItem.BlockId, true );
+
+						if ( success )
 						{
-							var success = VoxelWorld.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, blockItem.BlockId, true );
+							item.StackSize--;
 
-							if ( success )
+							if ( item.StackSize <= 0 )
 							{
-								item.StackSize--;
-
-								if ( item.StackSize <= 0 )
-								{
-									InventorySystem.RemoveItem( item );
-								}
+								InventorySystem.RemoveItem( item );
 							}
 						}
 					}
@@ -400,6 +422,12 @@ namespace Facepunch.CoreWars
 
 		public override void TakeDamage( DamageInfo info )
 		{
+			if ( info.Attacker is Player attacker )
+			{
+				if ( Team != Team.None && attacker.Team == Team )
+					return;
+			}
+
 			LastDamageTaken = info;
 
 			base.TakeDamage( info );
@@ -417,6 +445,10 @@ namespace Facepunch.CoreWars
 
 			TryGiveWeapon( "weapon_boomer" );
 			TryGiveAmmo( AmmoType.Explosive, 200 );
+
+			var iron = InventorySystem.CreateItem<IronItem>();
+			iron.StackSize = 16;
+			TryGiveItem( iron );
 		}
 
 		public virtual void CreateInventories()
