@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Facepunch.CoreWars
 {
-	public partial class Player : Sandbox.Player
+	public partial class Player : Sandbox.Player, IResettable
 	{
 		[Net, Change( nameof( OnTeamChanged ) )] public Team Team { get; private set; }
 		[Net, Predicted] public ushort CurrentHotbarIndex { get; private set; }
@@ -140,9 +140,28 @@ namespace Facepunch.CoreWars
 			OnTeamChanged( team );
 		}
 
+		public void AssignRandomTeam()
+		{
+			var teams = Enum.GetValues( typeof( Team ) )
+				.OfType<Team>()
+				.Except( new Team[] { Team.None } )
+				.ToList();
+
+			var team = Rand.FromList( teams );
+
+			SetTeam( team );
+		}
+
 		public void RespawnWhenAvailable()
 		{
 			IsWaitingToRespawn = true;
+		}
+
+		public virtual void Reset()
+		{
+			BackpackInventory.Instance.RemoveAll();
+			HotbarInventory.Instance.RemoveAll();
+			GiveInitialItems();
 		}
 
 		public virtual Transform? GetSpawnpoint()
