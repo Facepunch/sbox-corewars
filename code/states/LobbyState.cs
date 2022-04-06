@@ -1,8 +1,5 @@
-﻿using Facepunch.Voxels;
-using Sandbox;
-using System;
+﻿using Sandbox;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Facepunch.CoreWars
 {
@@ -12,6 +9,8 @@ namespace Facepunch.CoreWars
 		{
 			if ( Host.IsServer )
 			{
+				IResettable.ResetAll();
+
 				foreach ( var player in Entity.All.OfType<Player>() )
 				{
 					player.RespawnWhenAvailable();

@@ -125,13 +125,17 @@ namespace Facepunch.CoreWars
 
 			if ( IsEditorMode )
 			{
-				var player = new EditorPlayer( client );
-				player.LifeState = LifeState.Dead;
+				var player = new EditorPlayer( client )
+				{
+					LifeState = LifeState.Dead
+				};
 			}
 			else
 			{
-				var player = new Player( client );
-				player.LifeState = LifeState.Dead;
+				var player = new Player( client )
+				{
+					LifeState = LifeState.Dead
+				};
 			}
 
 			VoxelWorld.Current.AddViewer( client );
