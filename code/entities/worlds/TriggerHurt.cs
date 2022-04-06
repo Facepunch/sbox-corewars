@@ -6,7 +6,7 @@ using System.IO;
 
 namespace Facepunch.CoreWars
 {
-	[EditorEntity( Title = "Trigger Hurt", Group = "Triggers", IsVolume = true, VolumeMaterial = "materials/tools/toolstrigger.vmat" )]
+	[EditorEntity( Title = "Trigger Hurt", Group = "Triggers", IsVolume = true, VolumeMaterial = "materials/editor/trigger_hurt.vmat" )]
 	public partial class TriggerHurt : BaseTrigger
 	{
 		[Property, Range( 1f, 100f, 1f )]
