@@ -6,7 +6,7 @@ using System.IO;
 
 namespace Facepunch.CoreWars
 {
-	[EditorEntity( EditorModel = "models/editor/playerstart.vmdl" )]
+	[EditorEntity( Title = "Gold Generator", Group = "Generators", EditorModel = "models/editor/playerstart.vmdl" )]
 	public class GoldGenerator : ModelEntity, ISourceEntity
 	{
 		[Property] public Team Team { get; set; }

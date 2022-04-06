@@ -6,7 +6,7 @@ using System.IO;
 
 namespace Facepunch.CoreWars
 {
-	[EditorEntity( EditorModel = "models/editor/playerstart.vmdl" )]
+	[EditorEntity( Title = "Team Chest", Group = "Team Entities", EditorModel = "models/editor/playerstart.vmdl" )]
 	public class TeamChest : ModelEntity, ISourceEntity
 	{
 		[Property] public Team Team { get; set; }
