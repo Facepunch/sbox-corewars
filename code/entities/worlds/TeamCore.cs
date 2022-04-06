@@ -7,9 +7,25 @@ using System.IO;
 namespace Facepunch.CoreWars
 {
 	[EditorEntity( Title = "Team Core", Group = "Team Entities", EditorModel = "models/editor/playerstart.vmdl" )]
-	public class TeamCore : ModelEntity, ISourceEntity
+	public class TeamCore : ModelEntity, ISourceEntity, IResettable
 	{
 		[Property] public Team Team { get; set; }
+
+		public virtual void Reset()
+		{
+			LifeState = LifeState.Alive;
+			Health = 100f;
+		}
+
+		public virtual void Serialize( BinaryWriter writer )
+		{
+			writer.Write( (byte)Team );
+		}
+
+		public virtual void Deserialize( BinaryReader reader )
+		{
+			Team = (Team)reader.ReadByte();
+		}
 
 		public override void Spawn()
 		{
@@ -21,14 +37,20 @@ namespace Facepunch.CoreWars
 			base.Spawn();
 		}
 
-		public virtual void Serialize( BinaryWriter writer )
+		public override void TakeDamage( DamageInfo info )
 		{
-			writer.Write( (byte)Team );
+			if ( !info.Attacker.IsValid() || info.Attacker is not Player attacker )
+				return;
+
+			if ( attacker.Team == Team )
+				return;
+
+			base.TakeDamage( info );
 		}
 
-		public virtual void Deserialize( BinaryReader reader )
+		public override void OnKilled()
 		{
-			Team = (Team)reader.ReadByte();
+			LifeState = LifeState.Dead;
 		}
 	}
 }

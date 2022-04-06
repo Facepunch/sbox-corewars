@@ -9,7 +9,9 @@ namespace Facepunch.CoreWars
 	[EditorEntity( Title = "Crystal Generator", Group = "Generators", EditorModel = "models/editor/playerstart.vmdl" )]
 	public class CrystalGenerator : ModelEntity, ISourceEntity
 	{
-		[Property] public Team Team { get; set; }
+		public virtual void Serialize( BinaryWriter writer ) { }
+
+		public virtual void Deserialize( BinaryReader reader ) { }
 
 		public override void Spawn()
 		{
@@ -21,14 +23,6 @@ namespace Facepunch.CoreWars
 			base.Spawn();
 		}
 
-		public virtual void Serialize( BinaryWriter writer )
-		{
-			writer.Write( (byte)Team );
-		}
-
-		public virtual void Deserialize( BinaryReader reader )
-		{
-			Team = (Team)reader.ReadByte();
-		}
+		public override void TakeDamage( DamageInfo info ) { }
 	}
 }
