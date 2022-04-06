@@ -286,6 +286,11 @@ namespace Facepunch.CoreWars.Inventory
 			return true;
 		}
 
+		public InventoryItem Remove( InventoryItem item )
+		{
+			return Remove( item.ItemId );
+		}
+
 		public InventoryItem Remove( ulong itemId )
 		{
 			if ( itemId == 0 )
