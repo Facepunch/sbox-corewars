@@ -16,7 +16,7 @@
         flex-direction: column;
         pointer-events: all;
 
-        .title {
+        > .title {
             margin-bottom: 32px;
             margin-top: 32px;
             font-family: Roboto;
@@ -31,8 +31,25 @@
             height: 70%;
             overflow: scroll;
 
-            .button {
-                margin-top: 16px;
+            .category {
+                margin-top: 24px;
+                border-radius: 8px;
+                background-color: rgba( 0 0 0.2 0.8 );
+                flex-direction: column;
+                padding: 8px;
+                display: flex;
+                align-items: center;
+
+                .title {
+                    font-family: Roboto;
+                    margin-bottom: 16px;
+                    font-size: 24px;
+                    color: white;
+                }
+
+                .editor-button {
+                    margin-top: 8px;
+                }
             }
         }
     }

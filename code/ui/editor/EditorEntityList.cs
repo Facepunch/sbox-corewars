@@ -35,13 +35,36 @@ namespace Facepunch.CoreWars.Editor
 			button.AddEventListener( "onclick", () => Delete() );
 
 			var attributes = Library.GetAttributes<EditorEntityAttribute>().ToList();
+			var categories = new Dictionary<string, List<EditorEntityAttribute>>();
 
 			for ( int i = 0; i < attributes.Count; i++ )
 			{
 				var attribute = attributes[i];
-				button = Container.Add.Button( attribute.Name );
-				button.AddClass( "editor-button" );
-				button.AddEventListener( "onclick", () => OnItemSelected( attribute ) );
+				var group = string.IsNullOrEmpty( attribute.Group ) ? "Other" : attribute.Group;
+				
+				if ( !categories.TryGetValue( group, out var list ) )
+				{
+					list = new List<EditorEntityAttribute>();
+					categories.Add( group, list );
+				}
+
+				list.Add( attribute );
+			}
+
+			foreach ( var kv in categories )
+			{
+				var category = kv.Key;
+				var values = kv.Value;
+				var container = Container.Add.Panel( "category" );
+				var label = container.Add.Label( category, "title" );
+
+				for ( int i = 0; i < values.Count; i++ )
+				{
+					var attribute = values[i];
+					button = container.Add.Button( attribute.Title );
+					button.AddClass( "editor-button" );
+					button.AddEventListener( "onclick", () => OnItemSelected( attribute ) );
+				}
 			}
 		}
 
