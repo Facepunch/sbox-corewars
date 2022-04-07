@@ -17,9 +17,6 @@ namespace Facepunch.CoreWars
 		public static new Game Current { get; private set; }
 		public static RootPanel Hud { get; private set; }
 
-		[ServerVar( "cw_editor", Saved = true )]
-		public static bool EditorModeConVar { get; set; }
-
 		public static T GetStateAs<T>() where T : BaseState
 		{
 			return Current.StateSystem.Active as T;
@@ -40,7 +37,7 @@ namespace Facepunch.CoreWars
 		{
 			if ( IsServer )
 			{
-				IsEditorMode = EditorModeConVar || Global.MapName == "facepunch.cw_editor_map";
+				IsEditorMode = Global.MapName == "facepunch.cw_editor_map";
 				StateSystem = new();
 			}
 
