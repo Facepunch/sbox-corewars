@@ -10,16 +10,6 @@
 			m_name = "preview"
 		},
 	]
-	m_PreEmissionOperators = 
-	[
-		{
-			_class = "C_OP_SetSingleControlPointPosition"
-			m_bUseWorldLocation = true
-			m_bSetOnce = true
-			m_nCP1 = 6
-			m_vecCP1Pos = [ 0.0, 255.0, 0.0 ]
-		},
-	]
 	m_Emitters = 
 	[
 		{
