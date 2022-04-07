@@ -39,7 +39,6 @@ namespace Facepunch.CoreWars
 		protected Vector3 Maxs { get; set; }
 		protected bool IsTouchingLadder { get; set; }
 		protected Vector3 LadderNormal { get; set; }
-		protected Player Player { get; set; }
 
 		public MoveDuck Duck;
 
@@ -85,14 +84,11 @@ namespace Facepunch.CoreWars
 
 		public override void Simulate()
 		{
-			if ( Pawn is not Player player ) return;
-
 			EyeLocalPosition = Vector3.Up * Scale( EyeHeight );
 			UpdateBBox();
 
 			EyeLocalPosition += TraceOffset;
 			EyeRotation = Input.Rotation;
-			Player = player;
 
 			if ( Unstuck.TestAndFix() )
 			{
@@ -277,6 +273,18 @@ namespace Facepunch.CoreWars
 			mover.MaxStandableAngle = GroundAngle;
 			mover.TryMoveWithStep( Time.Delta, StepSize );
 
+			var world = VoxelWorld.Current;
+
+			if ( world.IsValid() )
+			{
+				var position = world.ToVoxelPosition( mover.Position );
+				if ( !world.IsInBounds( position ) )
+				{
+					Velocity = Vector3.Zero;
+					return;
+				}
+			}
+
 			Position = mover.Position;
 			Velocity = mover.Velocity;
 		}
@@ -287,6 +295,18 @@ namespace Facepunch.CoreWars
 			mover.Trace = mover.Trace.Size( Mins, Maxs ).Ignore( Pawn );
 			mover.MaxStandableAngle = GroundAngle;
 			mover.TryMove( Time.Delta );
+
+			var world = VoxelWorld.Current;
+
+			if ( world.IsValid() )
+			{
+				var position = world.ToVoxelPosition( mover.Position );
+				if ( !world.IsInBounds( position ) )
+				{
+					Velocity = Vector3.Zero;
+					return;
+				}
+			}
 
 			Position = mover.Position;
 			Velocity = mover.Velocity;

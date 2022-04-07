@@ -131,6 +131,23 @@ namespace Facepunch.CoreWars.Editor
 			Tool.OnSelected();
 		}
 
+		public void EnterFlyMode()
+		{
+			Controller = new FlyController
+			{
+				EnableCollisions = false
+			};
+		}
+
+		public void EnterWalkMode()
+		{
+			Controller = new MoveController
+			{
+				WalkSpeed = 195f,
+				SprintSpeed = 375f
+			};
+		}
+
 		protected virtual void OnToolChanged( EditorTool previous, EditorTool next )
 		{
 			if ( previous.IsValid() )
@@ -158,16 +175,11 @@ namespace Facepunch.CoreWars.Editor
 			EnableDrawing = true;
 
 			CameraMode = new EditorCamera();
-
-			Controller = new FlyController
-			{
-				EnableCollisions = false
-			};
-
 			Animator = new PlayerAnimator();
 
-			SetModel( "models/citizen/citizen.vmdl" );
+			EnterFlyMode();
 
+			SetModel( "models/citizen/citizen.vmdl" );
 			SetActiveTool( new PlaceBlockTool() );
 
 			var validBlocks = new List<BlockType>();
@@ -307,6 +319,14 @@ namespace Facepunch.CoreWars.Editor
 					{
 						Undo();
 					}
+				}
+
+				if ( Input.Released( InputButton.Drop ) )
+				{
+					if ( Controller is FlyController )
+						EnterWalkMode();
+					else
+						EnterFlyMode();
 				}
 
 				UpdateHotbarSlotKeys();
