@@ -8,45 +8,95 @@ namespace Facepunch.CoreWars.Inventory
 	{
 		[Net] public NetInventoryItem Item { get; private set; }
 
+		public TimeUntil TimeUntilCanPickup { get; set; }
+
+		private ItemWorldIcon Icon { get; set; }
+
 		public void SetItem( InventoryItem item )
 		{
-			if ( string.IsNullOrEmpty( item.WorldModel ) )
+			if ( !string.IsNullOrEmpty( item.WorldModel ) )
 			{
-				throw new Exception( "Unable to create an item entity without a world model!" );
+				SetModel( item.WorldModel );
+				SetupPhysicsFromModel( PhysicsMotionType.Dynamic );
 			}
-
-			SetModel( item.WorldModel );
-			SetupPhysicsFromModel( PhysicsMotionType.Dynamic );
+			else
+			{
+				SetupPhysicsFromSphere( PhysicsMotionType.Dynamic, Vector3.Zero, 4f );
+			}
 
 			Item = new NetInventoryItem( item );
 			item.SetWorldEntity( this );
+
+			CollisionGroup = CollisionGroup.Weapon;
+			SetInteractsAs( CollisionLayer.Debris );
+			EnableTouch = true;
 		}
 
 		public InventoryItem Take()
 		{
+			if ( !IsValid )
+				return null;
+
+			Delete();
+
 			var item = Item.Instance;
 
 			if ( item.IsValid() && item.WorldEntity == this )
 			{
 				item.ClearWorldEntity();
-				Delete();
+				return item;
 			}
 
-			return Item.Instance;
+			return null;
+		}
+
+		public override void Spawn()
+		{
+			TimeUntilCanPickup = 1f;
+
+			base.Spawn();
+		}
+
+		public override void ClientSpawn()
+		{
+			if ( Item.Instance.IsValid() )
+			{
+				Icon = new ItemWorldIcon( this );
+			}
+
+			base.ClientSpawn();
+		}
+
+		public override void StartTouch( Entity other )
+		{
+			if ( IsServer && other is Player player )
+			{
+				if ( TimeUntilCanPickup )
+				{
+					var item = Take();
+
+					if ( item.IsValid() )
+					{
+						player.TryGiveItem( item );
+					}
+				}
+			}
+
+			base.StartTouch( other );
 		}
 
 		[Event.Tick.Client]
 		protected virtual void ClientTick()
 		{
-			if ( Item.Instance.IsValid() )
-			{
-				Log.Info( Item.Instance.GetName() );
-			}
+			
 		}
 
-		public override void Spawn()
+		protected override void OnDestroy()
 		{
-			base.Spawn();
+			Icon?.Delete();
+			Icon = null;
+
+			base.OnDestroy();
 		}
 	}
 }
