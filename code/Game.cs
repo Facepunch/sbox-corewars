@@ -25,7 +25,12 @@ namespace Facepunch.CoreWars
 			return Current.StateSystem.Active as T;
 		}
 
-		public static bool TryGetState<T>( out T state )
+		public static bool IsState<T>() where T : BaseState
+		{
+			return Current.StateSystem.Active is T;
+		}
+
+		public static bool TryGetState<T>( out T state ) where T : BaseState
 		{
 			state = GetStateAs<T>();
 			return (state != null);
