@@ -133,12 +133,12 @@ namespace Facepunch.CoreWars
 
 			if ( IsEditorMode )
 			{
-				var player = new EditorPlayer( client )
+				var player = new EditorPlayer( client );
 				player.LifeState = LifeState.Dead;
 			}
 			else
 			{
-				var player = new Player( client )
+				var player = new Player( client );
 				player.LifeState = LifeState.Dead;
 			}
 
