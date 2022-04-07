@@ -7,9 +7,9 @@ using System.IO;
 namespace Facepunch.CoreWars
 {
 	[EditorEntity( Title = "Team Generator", Group = "Generators", EditorModel = "models/gameplay/resource_pool/resource_pool.vmdl" )]
-	public class TeamGenerator : ModelEntity, ISourceEntity
+	public partial class TeamGenerator : ModelEntity, ISourceEntity
 	{
-		[Property] public Team Team { get; set; }
+		[EditorProperty, Net] public Team Team { get; set; }
 
 		private TimeUntil NextGeneration { get; set; }
 

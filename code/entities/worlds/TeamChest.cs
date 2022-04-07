@@ -10,7 +10,7 @@ namespace Facepunch.CoreWars
 	[EditorEntity( Title = "Team Chest", Group = "Team Entities", EditorModel = "models/editor/playerstart.vmdl" )]
 	public partial class TeamChest : ModelEntity, ISourceEntity, IResettable
 	{
-		[Property] public Team Team { get; set; }
+		[EditorProperty, Net] public Team Team { get; set; }
 
 		[Net] public NetInventoryContainer Inventory { get; private set; }
 

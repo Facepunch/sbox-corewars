@@ -7,9 +7,9 @@ using System.IO;
 namespace Facepunch.CoreWars
 {
 	[EditorEntity( Title = "Team Core", Group = "Team Entities", EditorModel = "models/editor/playerstart.vmdl" )]
-	public class TeamCore : ModelEntity, ISourceEntity, IResettable
+	public partial class TeamCore : ModelEntity, ISourceEntity, IResettable
 	{
-		[Property] public Team Team { get; set; }
+		[EditorProperty, Net] public Team Team { get; set; }
 
 		public virtual void Reset()
 		{
