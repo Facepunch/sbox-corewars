@@ -43,6 +43,7 @@ namespace Facepunch.CoreWars.Editor
 		[Net, Change( nameof( OnModeChanged ) )] public EntitiesToolMode Mode { get; private set; }
 		[Net, Change( nameof( OnTypeChanged ) )] public string CurrentType { get; private set; }
 		[Net, Change( nameof( OnEntityChanged ) )] public ModelEntity SelectedEntity { get; private set; }
+		[Net] public Rotation CurrentRotation { get; private set; }
 
 		private EditorEntityAttribute CurrentAttribute { get; set; }
 		private VolumeEntity Volume { get; set; }
@@ -96,6 +97,7 @@ namespace Facepunch.CoreWars.Editor
 						var shouldCenterOnXY = !Input.Down( InputButton.Run );
 						var aimSourcePosition = VoxelWorld.Current.ToSourcePositionCenter( aimVoxelPosition, shouldCenterOnXY, shouldCenterOnXY, false );
 						GhostEntity.Position = aimSourcePosition;
+						GhostEntity.Rotation = CurrentRotation;
 					}
 				}
 			}
@@ -135,16 +137,15 @@ namespace Facepunch.CoreWars.Editor
 
 			Event.Unregister( this );
 
-			SelectedEntity = null;
+			if ( IsServer && SelectedEntity.IsValid() )
+			{
+				SelectedEntity.EnableDrawing = true;
+				SelectedEntity = null;
+			}
 		}
 
 		protected virtual void OnEntityChanged( ModelEntity oldEntity, ModelEntity newEntity )
 		{
-			if ( oldEntity.IsValid() )
-			{
-				oldEntity.EnableDrawing = true;
-			}
-
 			CreateMoveGhostEntity();
 		}
 
@@ -210,8 +211,9 @@ namespace Facepunch.CoreWars.Editor
 					DestroyGhostEntity();
 			}
 
-			if ( IsServer )
+			if ( IsServer && SelectedEntity.IsValid() )
 			{
+				SelectedEntity.EnableDrawing = true;
 				SelectedEntity = null;
 			}
 		}
@@ -261,7 +263,7 @@ namespace Facepunch.CoreWars.Editor
 						var aimSourcePosition = VoxelWorld.Current.ToSourcePositionCenter( aimVoxelPosition, shouldCenterOnXY, shouldCenterOnXY, false );
 
 						var action = new PlaceEntityAction();
-						action.Initialize( CurrentAttribute, aimSourcePosition, Rotation.Identity );
+						action.Initialize( CurrentAttribute, aimSourcePosition, CurrentRotation );
 						Player.Perform( action );
 					}
 
@@ -277,9 +279,10 @@ namespace Facepunch.CoreWars.Editor
 							var aimSourcePosition = VoxelWorld.Current.ToSourcePositionCenter( aimVoxelPosition, shouldCenterOnXY, shouldCenterOnXY, false );
 
 							var action = new MoveEntityAction();
-							action.Initialize( SelectedEntity, aimSourcePosition, Rotation.Identity );
+							action.Initialize( SelectedEntity, aimSourcePosition, CurrentRotation );
 							Player.Perform( action );
 
+							SelectedEntity.EnableDrawing = true;
 							SelectedEntity = null;
 						}
 						else
@@ -287,6 +290,8 @@ namespace Facepunch.CoreWars.Editor
 							if ( TryGetTargetEntity( out var target, out _ ) && target is not IVolumeEntity )
 							{
 								SelectedEntity = target as ModelEntity;
+								SelectedEntity.EnableDrawing = false;
+								CurrentRotation = SelectedEntity.Rotation;
 							}
 						}
 					}
@@ -320,7 +325,7 @@ namespace Facepunch.CoreWars.Editor
 		{
 			if ( IsServer )
 			{
-				
+				CurrentRotation = CurrentRotation.RotateAroundAxis( Vector3.Up, 90f );
 			}
 		}
 
@@ -398,11 +403,6 @@ namespace Facepunch.CoreWars.Editor
 			{
 				GhostEntity = new ModelEntity( CurrentAttribute.EditorModel );
 				GhostEntity.RenderColor = Color.White.WithAlpha( 0.5f );
-
-				if ( Mode == EntitiesToolMode.MoveAndRotate && SelectedEntity.IsValid() )
-				{
-					GhostEntity.Transform = SelectedEntity.Transform;
-				}
 			}
 		}
 	}
