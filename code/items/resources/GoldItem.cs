@@ -5,7 +5,7 @@ using System.IO;
 namespace Facepunch.CoreWars
 {
 	[Library( "item_gold" )]
-	public class GoldItem : InventoryItem
+	public class GoldItem : ResourceItem
 	{
 		public override string GetName()
 		{
@@ -19,7 +19,7 @@ namespace Facepunch.CoreWars
 
 		public override string GetIcon()
 		{
-			return string.Empty;
+			return "textures/items/gold.png";
 		}
 	}
 }
