@@ -297,20 +297,12 @@ namespace Facepunch.CoreWars
 						.Ignore( this )
 						.Run();
 
-					/*
-					var item = InventorySystem.CreateItem<AmmoItem>();
+					var item = InventorySystem.CreateItem<IronItem>();
 					item.StackSize = 30;
-					item.AmmoType = AmmoType.Explosive;
 
 					var ent = new ItemEntity();
 					ent.Position = tr.EndPosition;
 					ent.SetItem( item );
-					*/
-
-					if ( tr.Entity is Player target )
-					{
-						target.TakeDamage( DamageInfo.Generic( 1000f ).WithAttacker( this ) );
-					}
 				}
 
 				if ( Input.Down( InputButton.Attack1 ) && NextBlockPlace )
