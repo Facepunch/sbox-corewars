@@ -6,7 +6,7 @@ using System.IO;
 
 namespace Facepunch.CoreWars
 {
-	[EditorEntity( Title = "Crystal Generator", Group = "Generators", EditorModel = "models/editor/playerstart.vmdl" )]
+	[EditorEntity( Title = "Crystal Generator", Group = "Generators", EditorModel = "models/gameplay/resource_pool/resource_pool_crystal.vmdl" )]
 	public class CrystalGenerator : ModelEntity, ISourceEntity
 	{
 		public virtual void Serialize( BinaryWriter writer ) { }
@@ -15,10 +15,10 @@ namespace Facepunch.CoreWars
 
 		public override void Spawn()
 		{
-			SetModel( "models/editor/playerstart.vmdl" );
+			SetModel( "models/gameplay/resource_pool/resource_pool_crystal.vmdl" );
 
 			Transmit = TransmitType.Always;
-			SetupPhysicsFromAABB( PhysicsMotionType.Static, Model.Bounds.Mins, Model.Bounds.Maxs );
+			SetupPhysicsFromModel( PhysicsMotionType.Static );
 
 			base.Spawn();
 		}

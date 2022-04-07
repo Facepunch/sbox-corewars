@@ -6,7 +6,7 @@ using System.IO;
 
 namespace Facepunch.CoreWars
 {
-	[EditorEntity( Title = "Team Generator", Group = "Generators", EditorModel = "models/editor/playerstart.vmdl" )]
+	[EditorEntity( Title = "Team Generator", Group = "Generators", EditorModel = "models/gameplay/resource_pool/resource_pool.vmdl" )]
 	public class TeamGenerator : ModelEntity, ISourceEntity
 	{
 		[Property] public Team Team { get; set; }
@@ -15,10 +15,10 @@ namespace Facepunch.CoreWars
 
 		public override void Spawn()
 		{
-			SetModel( "models/editor/playerstart.vmdl" );
+			SetModel( "models/gameplay/resource_pool/resource_pool.vmdl" );
 
 			Transmit = TransmitType.Always;
-			SetupPhysicsFromAABB( PhysicsMotionType.Static, Model.Bounds.Mins, Model.Bounds.Maxs );
+			SetupPhysicsFromModel( PhysicsMotionType.Static );
 
 			base.Spawn();
 		}
@@ -33,13 +33,16 @@ namespace Facepunch.CoreWars
 			Team = (Team)reader.ReadByte();
 		}
 
+		[Event.Tick.Client]
+		protected virtual void ClientTick()
+		{
+			RenderColor = Team.GetColor();
+		}
+
 		[Event.Tick.Server]
 		protected virtual void ServerTick()
 		{
-			if ( !Game.TryGetState<GameState>( out var state ) )
-			{
-				return;
-			}
+			if ( !Game.IsState<GameState>() ) return;
 
 			if ( NextGeneration )
 			{

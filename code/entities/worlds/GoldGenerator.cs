@@ -6,7 +6,7 @@ using System.IO;
 
 namespace Facepunch.CoreWars
 {
-	[EditorEntity( Title = "Gold Generator", Group = "Generators", EditorModel = "models/editor/playerstart.vmdl" )]
+	[EditorEntity( Title = "Gold Generator", Group = "Generators", EditorModel = "models/gameplay/resource_pool/resource_pool_gold.vmdl" )]
 	public class GoldGenerator : ModelEntity, ISourceEntity
 	{
 		public virtual void Serialize( BinaryWriter writer ) { }
@@ -15,10 +15,10 @@ namespace Facepunch.CoreWars
 
 		public override void Spawn()
 		{
-			SetModel( "models/editor/playerstart.vmdl" );
+			SetModel( "models/gameplay/resource_pool/resource_pool_gold.vmdl" );
 
 			Transmit = TransmitType.Always;
-			SetupPhysicsFromAABB( PhysicsMotionType.Static, Model.Bounds.Mins, Model.Bounds.Maxs );
+			SetupPhysicsFromModel( PhysicsMotionType.Static );
 
 			base.Spawn();
 		}
