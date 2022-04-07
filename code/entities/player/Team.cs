@@ -2,6 +2,7 @@
 using Facepunch.CoreWars.Inventory;
 using Facepunch.Voxels;
 using Sandbox;
+using System.Collections.Generic;
 
 namespace Facepunch.CoreWars
 {
@@ -20,6 +21,19 @@ namespace Facepunch.CoreWars
 
 	public static class TeamExtensions
 	{
+		private static Dictionary<Team, Color> ColorMap = new()
+		{
+			{ Team.None, Color.White },
+			{ Team.Blue, Color.Blue },
+			{ Team.Red, Color.Red },
+			{ Team.Orange, Color.Orange },
+			{ Team.Green, Color.Green },
+			{ Team.Purple, new Color( 0x6603fc ) },
+			{ Team.Pink, new Color( 0xce03fc ) },
+			{ Team.Cyan, Color.Cyan },
+			{ Team.Yellow, Color.Yellow }
+		};
+
 		public static BlockType GetPlasticBlock( this Team team )
 		{
 			var world = VoxelWorld.Current;
@@ -39,6 +53,16 @@ namespace Facepunch.CoreWars
 			};
 
 			return world.GetBlockType( blockId );
+		}
+
+		public static Color GetColor( this Team team )
+		{
+			if ( ColorMap.TryGetValue( team, out var color ) )
+			{
+				return color;
+			}
+
+			return default;
 		}
 
 		public static BlockItem CreatePlasticBlockItem( this Team team )
