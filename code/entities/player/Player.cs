@@ -74,14 +74,16 @@ namespace Facepunch.CoreWars
 			}
 		}
 
-		public void TryGiveItem( InventoryItem item )
+		public ushort TryGiveItem( InventoryItem item )
 		{
 			var remaining = HotbarInventory.Instance.Stack( item );
 
 			if ( remaining > 0 )
 			{
-				BackpackInventory.Instance.Stack( item );
+				remaining = BackpackInventory.Instance.Stack( item );
 			}
+
+			return remaining;
 		}
 
 		public ushort TakeAmmo( AmmoType type, ushort count )

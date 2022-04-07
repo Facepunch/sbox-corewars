@@ -34,16 +34,14 @@ namespace Facepunch.CoreWars.Inventory
 
 		public InventoryItem Take()
 		{
-			if ( !IsValid )
-				return null;
-
-			Delete();
-
-			var item = Item.Instance;
-
-			if ( item.IsValid() && item.WorldEntity == this )
+			if ( IsValid )
 			{
+				var item = Item.Instance;
+
 				item.ClearWorldEntity();
+				Item = null;
+				Delete();
+
 				return item;
 			}
 
@@ -71,13 +69,15 @@ namespace Facepunch.CoreWars.Inventory
 		{
 			if ( IsServer && other is Player player )
 			{
-				if ( TimeUntilCanPickup )
+				if ( TimeUntilCanPickup && Item.IsValid() )
 				{
-					var item = Take();
+					var remaining = player.TryGiveItem( Item.Instance );
 
-					if ( item.IsValid() )
+					if ( remaining == 0 )
 					{
-						player.TryGiveItem( item );
+						Item.Instance.ClearWorldEntity();
+						Item = null;
+						Delete();
 					}
 				}
 			}
