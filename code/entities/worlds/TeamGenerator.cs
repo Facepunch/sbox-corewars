@@ -12,6 +12,7 @@ namespace Facepunch.CoreWars
 		[EditorProperty, Net] public Team Team { get; set; }
 
 		private TimeUntil NextGeneration { get; set; }
+		private Particles Effect { get; set; }
 
 		public override void Spawn()
 		{
@@ -19,6 +20,9 @@ namespace Facepunch.CoreWars
 
 			Transmit = TransmitType.Always;
 			SetupPhysicsFromModel( PhysicsMotionType.Static );
+
+			Effect = Particles.Create( "particles/gameplay/resource_pool/resource_pool.vpcf", this );
+			Effect.SetEntity( 0, this );
 
 			base.Spawn();
 		}

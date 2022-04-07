@@ -379,7 +379,6 @@ namespace Facepunch.CoreWars.Inventory
 		{
 			if ( !FindFreeSlot( out var slot ) )
 			{
-				Log.Error( "Unable to give an item to this inventory because there is no space!" );
 				return false;
 			}
 
