@@ -6,7 +6,7 @@ using System.IO;
 
 namespace Facepunch.CoreWars
 {
-	[EditorEntity( Title = "Team Core", Group = "Team Entities", EditorModel = "models/editor/playerstart.vmdl" )]
+	[EditorEntity( Title = "Team Core", Group = "Team Entities", EditorModel = "models/gameplay/base_core/base_core.vmdl" )]
 	public partial class TeamCore : ModelEntity, ISourceEntity, IResettable
 	{
 		[EditorProperty, Net] public Team Team { get; set; }
@@ -29,7 +29,7 @@ namespace Facepunch.CoreWars
 
 		public override void Spawn()
 		{
-			SetModel( "models/editor/playerstart.vmdl" );
+			SetModel( "models/gameplay/base_core/base_core.vmdl" );
 
 			Transmit = TransmitType.Always;
 			SetupPhysicsFromAABB( PhysicsMotionType.Static, Model.Bounds.Mins, Model.Bounds.Maxs );
@@ -51,6 +51,12 @@ namespace Facepunch.CoreWars
 		public override void OnKilled()
 		{
 			LifeState = LifeState.Dead;
+		}
+
+		[Event.Tick.Client]
+		protected virtual void ClientTick()
+		{
+			RenderColor = Team.GetColor();
 		}
 	}
 }
