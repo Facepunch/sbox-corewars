@@ -11,6 +11,8 @@ namespace Facepunch.CoreWars
 	{
 		[Property] public Team Team { get; set; }
 
+		private TimeUntil NextGeneration { get; set; }
+
 		public override void Spawn()
 		{
 			SetModel( "models/editor/playerstart.vmdl" );
@@ -29,6 +31,20 @@ namespace Facepunch.CoreWars
 		public virtual void Deserialize( BinaryReader reader )
 		{
 			Team = (Team)reader.ReadByte();
+		}
+
+		[Event.Tick.Server]
+		protected virtual void ServerTick()
+		{
+			if ( !Game.TryGetState<GameState>( out var state ) )
+			{
+				return;
+			}
+
+			if ( NextGeneration )
+			{
+				NextGeneration = 10f;
+			}
 		}
 	}
 }

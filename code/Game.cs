@@ -25,6 +25,12 @@ namespace Facepunch.CoreWars
 			return Current.StateSystem.Active as T;
 		}
 
+		public static bool TryGetState<T>( out T state )
+		{
+			state = GetStateAs<T>();
+			return (state != null);
+		}
+
 		public Game()
 		{
 			if ( IsServer )
