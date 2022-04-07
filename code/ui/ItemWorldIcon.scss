@@ -1,0 +1,16 @@
+﻿ItemWorldIcon {
+    align-items: center;
+    justify-content: center;
+
+    .container {
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        padding: 16px;
+
+        .icon {
+            width: 80px;
+            height: 80px;
+        }
+    }
+}
