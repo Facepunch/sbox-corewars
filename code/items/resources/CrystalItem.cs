@@ -7,6 +7,8 @@ namespace Facepunch.CoreWars
 	[Library( "item_crystal" )]
 	public class CrystalItem : ResourceItem
 	{
+		public override ushort MaxStackSize => 32;
+
 		public override string GetName()
 		{
 			return "Crystal";
@@ -14,7 +16,7 @@ namespace Facepunch.CoreWars
 
 		public override bool CanStackWith( InventoryItem other )
 		{
-			return (other is CrystalItem);
+			return true;
 		}
 
 		public override string GetIcon()
