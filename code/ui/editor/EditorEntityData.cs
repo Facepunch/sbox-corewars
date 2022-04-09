@@ -45,6 +45,11 @@ namespace Facepunch.CoreWars.Editor
 				if ( property.GetCustomAttribute<EditorPropertyAttribute>() == null ) continue;
 
 				property.SetValue( entity, ConvertPropertyValue( property, value ) );
+
+				if ( entity is IEditorCallbacks callbacks )
+				{
+					callbacks.OnPropertyChanged( key );
+				}
 			}
 		}
 
