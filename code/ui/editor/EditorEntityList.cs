@@ -25,14 +25,14 @@ namespace Facepunch.CoreWars.Editor
 			Game.Hud.FindPopupPanel().AddChild( Current );
 		}
 
+		public void Close()
+		{
+			Delete();
+		}
+
 		public void PopulateItems()
 		{
 			Container.DeleteChildren();
-
-			var button = Container.Add.Button( "Close" );
-			button.AddClass( "editor-button" );
-			button.AddClass( "secondary" );
-			button.AddEventListener( "onclick", () => Delete() );
 
 			var attributes = Library.GetAttributes<EditorEntityAttribute>().ToList();
 			var categories = new Dictionary<string, List<EditorEntityAttribute>>();
@@ -61,7 +61,7 @@ namespace Facepunch.CoreWars.Editor
 				for ( int i = 0; i < values.Count; i++ )
 				{
 					var attribute = values[i];
-					button = container.Add.Button( attribute.Title );
+					var button = container.Add.Button( attribute.Title );
 					button.AddClass( "editor-button" );
 					button.AddEventListener( "onclick", () => OnItemSelected( attribute ) );
 				}
