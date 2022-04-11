@@ -4,6 +4,7 @@ using Facepunch.Voxels;
 using Sandbox;
 using Sandbox.UI;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,6 +17,8 @@ namespace Facepunch.CoreWars
 
 		public static new Game Current { get; private set; }
 		public static RootPanel Hud { get; private set; }
+
+		private static HashSet<Team> ValidTeamSet = new();
 
 		public static T GetStateAs<T>() where T : BaseState
 		{
@@ -31,6 +34,21 @@ namespace Facepunch.CoreWars
 		{
 			state = GetStateAs<T>();
 			return (state != null);
+		}
+
+		public static IReadOnlySet<Team> GetValidTeams()
+		{
+			if ( ValidTeamSet.Count == 0 )
+			{
+				var cores = Entity.All.OfType<TeamCore>();
+
+				foreach ( var core in cores )
+				{
+					ValidTeamSet.Add( core.Team );
+				}
+			}
+
+			return ValidTeamSet;
 		}
 
 		public Game()

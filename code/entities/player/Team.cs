@@ -35,8 +35,6 @@ namespace Facepunch.CoreWars
 			{ Team.Yellow, Color.Yellow }
 		};
 
-		private static HashSet<Team> ValidTeamSet = new();
-
 		public static BlockType GetPlasticBlock( this Team team )
 		{
 			var world = VoxelWorld.Current;
@@ -58,19 +56,9 @@ namespace Facepunch.CoreWars
 			return world.GetBlockType( blockId );
 		}
 
-		public static IReadOnlySet<Team> GetValidTeams()
+		public static TeamCore GetCore( this Team team )
 		{
-			if ( ValidTeamSet.Count == 0 )
-			{
-				var cores = Entity.All.OfType<TeamCore>();
-
-				foreach ( var core in cores )
-				{
-					ValidTeamSet.Add( core.Team );
-				}
-			}
-
-			return ValidTeamSet;
+			return Entity.All.OfType<TeamCore>().FirstOrDefault( t => t.Team == team );
 		}
 
 		public static Color GetColor( this Team team )
