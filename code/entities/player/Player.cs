@@ -86,6 +86,21 @@ namespace Facepunch.CoreWars
 			return remaining;
 		}
 
+		public bool CanBuildAt( Vector3 position )
+		{
+			var positionToBBox = new BBox( position );
+
+			foreach ( var trigger in All.OfType<BuildExclusionZone>() )
+			{
+				if ( trigger.WorldSpaceBounds.Contains( positionToBBox ) )
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
+
 		public ushort TakeAmmo( AmmoType type, ushort count )
 		{
 			var items = new List<AmmoItem>();
@@ -288,25 +303,12 @@ namespace Facepunch.CoreWars
 
 		public override void Simulate( Client client )
 		{
-			if ( !VoxelWorld.Current.IsValid() ) return;
+			var world = VoxelWorld.Current;
+
+			if ( !world.IsValid() ) return;
 
 			if ( IsServer )
 			{
-				if ( !client.IsBot && Input.Released( InputButton.Flashlight ) )
-				{
-					var tr = Trace.Ray( Input.Position, Input.Position + Input.Rotation.Forward * 500f )
-						.WorldAndEntities()
-						.Ignore( this )
-						.Run();
-
-					var item = InventorySystem.CreateItem<IronItem>();
-					item.StackSize = 30;
-
-					var ent = new ItemEntity();
-					ent.Position = tr.EndPosition;
-					ent.SetItem( item );
-				}
-
 				if ( Input.Down( InputButton.Attack1 ) && NextBlockPlace )
 				{
 					var container = HotbarInventory.Instance;
@@ -314,7 +316,11 @@ namespace Facepunch.CoreWars
 
 					if ( item.IsValid() && item is BlockItem blockItem )
 					{
-						var success = VoxelWorld.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, blockItem.BlockId, true );
+						var success = world.SetBlockInDirection( Input.Position, Input.Rotation.Forward, blockItem.BlockId, true, 200f, ( position ) =>
+						{
+							var sourcePosition = world.ToSourcePosition( position );
+							return CanBuildAt( sourcePosition );
+						} );
 
 						if ( success )
 						{
@@ -331,13 +337,13 @@ namespace Facepunch.CoreWars
 				}
 				else if ( Input.Down( InputButton.Attack2 ) && NextBlockPlace )
 				{
-					if ( VoxelWorld.Current.GetBlockInDirection( Input.Position, Input.Rotation.Forward, out var blockPosition ) )
+					if ( world.GetBlockInDirection( Input.Position, Input.Rotation.Forward, out var blockPosition, 200f ) )
 					{
-						var voxel = VoxelWorld.Current.GetVoxel( blockPosition );
+						var voxel = world.GetVoxel( blockPosition );
 
 						if ( voxel.IsValid )
 						{
-							if ( VoxelWorld.Current.SetBlockInDirection( Input.Position, Input.Rotation.Forward, 0 ) )
+							if ( world.SetBlockInDirection( Input.Position, Input.Rotation.Forward, 0 ) )
 							{
 								TryGiveBlock( voxel.BlockId, 1 );
 							}
@@ -387,12 +393,10 @@ namespace Facepunch.CoreWars
 				}
 			}
 
-			var currentMap = VoxelWorld.Current;
-
-			if ( IsClient  &&  currentMap.IsValid() )
+			if ( IsClient && world.IsValid() )
 			{
-				var position = currentMap.ToVoxelPosition( Input.Position );
-				var voxel = currentMap.GetVoxel( position );
+				var position = world.ToVoxelPosition( Input.Position );
+				var voxel = world.GetVoxel( position );
 
 				if ( voxel.IsValid )
 				{
