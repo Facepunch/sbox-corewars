@@ -40,7 +40,7 @@ namespace Facepunch.CoreWars
 		{
 			if ( ValidTeamSet.Count == 0 )
 			{
-				var cores = Entity.All.OfType<TeamCore>();
+				var cores = All.OfType<TeamCore>();
 
 				foreach ( var core in cores )
 				{

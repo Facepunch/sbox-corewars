@@ -1,4 +1,5 @@
 ﻿using Facepunch.CoreWars.Editor;
+using Facepunch.CoreWars.Inventory;
 using Facepunch.Voxels;
 using Sandbox;
 using System;
@@ -7,11 +8,12 @@ using System.IO;
 namespace Facepunch.CoreWars
 {
 	[EditorEntity( Title = "Team Generator", Group = "Generators", EditorModel = "models/gameplay/resource_pool/resource_pool.vmdl" )]
-	public partial class TeamGenerator : ModelEntity, ISourceEntity
+	public partial class TeamGenerator : BaseGenerator
 	{
 		[EditorProperty, Net] public Team Team { get; set; }
 
-		private TimeUntil NextGeneration { get; set; }
+		[Net] public int UpgradeLevel { get; private set; }
+
 		private Particles Effect { get; set; }
 
 		public override void Spawn()
@@ -24,15 +26,17 @@ namespace Facepunch.CoreWars
 			Effect = Particles.Create( "particles/gameplay/resource_pool/resource_pool.vpcf", this );
 			Effect.SetEntity( 0, this );
 
+			UpgradeLevel = 0;
+
 			base.Spawn();
 		}
 
-		public virtual void Serialize( BinaryWriter writer )
+		public override void Serialize( BinaryWriter writer )
 		{
 			writer.Write( (byte)Team );
 		}
 
-		public virtual void Deserialize( BinaryReader reader )
+		public override void Deserialize( BinaryReader reader )
 		{
 			Team = (Team)reader.ReadByte();
 		}
@@ -43,15 +47,28 @@ namespace Facepunch.CoreWars
 			RenderColor = Team.GetColor();
 		}
 
-		[Event.Tick.Server]
-		protected virtual void ServerTick()
+		protected override void ServerTick()
 		{
-			if ( !Game.IsState<GameState>() ) return;
+			base.ServerTick();
+		}
 
-			if ( NextGeneration )
-			{
-				NextGeneration = 10f;
-			}
+		protected override void GenerateItems()
+		{
+			var item = InventorySystem.CreateItem<IronItem>();
+			item.StackSize = 4;
+
+			var entity = new ItemEntity();
+			entity.Position = WorldSpaceBounds.Center + Vector3.Up * 64f;
+			entity.SetItem( item );
+			entity.ApplyLocalImpulse( Vector3.Random * 100f );
+		}
+
+		protected override float CalculateNextGenerationTime()
+		{
+			if ( UpgradeLevel == 0 ) return 10f;
+			if ( UpgradeLevel == 1 ) return 8f;
+			if ( UpgradeLevel == 2 ) return 6f;
+			return 4f;
 		}
 	}
 }
