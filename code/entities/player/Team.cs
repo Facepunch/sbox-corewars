@@ -3,6 +3,7 @@ using Facepunch.CoreWars.Inventory;
 using Facepunch.Voxels;
 using Sandbox;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Facepunch.CoreWars
 {
@@ -34,6 +35,8 @@ namespace Facepunch.CoreWars
 			{ Team.Yellow, Color.Yellow }
 		};
 
+		private static HashSet<Team> ValidTeamSet = new();
+
 		public static BlockType GetPlasticBlock( this Team team )
 		{
 			var world = VoxelWorld.Current;
@@ -53,6 +56,21 @@ namespace Facepunch.CoreWars
 			};
 
 			return world.GetBlockType( blockId );
+		}
+
+		public static IReadOnlySet<Team> GetValidTeams()
+		{
+			if ( ValidTeamSet.Count == 0 )
+			{
+				var cores = Entity.All.OfType<TeamCore>();
+
+				foreach ( var core in cores )
+				{
+					ValidTeamSet.Add( core.Team );
+				}
+			}
+
+			return ValidTeamSet;
 		}
 
 		public static Color GetColor( this Team team )
