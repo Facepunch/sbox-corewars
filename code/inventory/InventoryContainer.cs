@@ -18,6 +18,7 @@ namespace Facepunch.CoreWars.Inventory
 		public event Action<Client> OnClientClosed;
 		public event Action<Client> OnConnectionRemoved;
 		public event Action<Client> OnConnectionAdded;
+		public event Action OnServerOpened;
 		public event Action OnServerClosed;
 
 		private bool InternalIsDirty;
@@ -85,6 +86,11 @@ namespace Facepunch.CoreWars.Inventory
 		public void InvokePlayerClosed( Client client )
 		{
 			OnClientClosed?.Invoke( client );
+		}
+
+		public void InvokeServerOpened()
+		{
+			OnServerOpened?.Invoke();
 		}
 
 		public void InvokeServerClosed()

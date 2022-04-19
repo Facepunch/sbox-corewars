@@ -150,7 +150,9 @@ namespace Facepunch.CoreWars.Inventory
 			{
 				using ( var writer = new BinaryWriter( stream ) )
 				{
-					writer.Write( container.InventoryId );
+					var serialized = container.Serialize();
+					writer.Write( serialized.Length );
+					writer.Write( serialized );
 					SendEventDataToClient( to, NetworkEvent.OpenInventory, stream.ToArray() );
 				}
 			}
@@ -261,10 +263,12 @@ namespace Facepunch.CoreWars.Inventory
 			}
 		}
 
-		private static void ProcessOpenInventoryEvent( BinaryReader reader )
+		private static void ProcessOpenInventoryEvent( BinaryReader reader, Client client = null )
 		{
-			// TODO: Open the inventory UI.
-			// var container = Find( reader.ReadUInt64() );
+			var dataLength = reader.ReadInt32();
+			var data = reader.ReadBytes( dataLength );
+			var container = InventoryContainer.Deserialize( data );
+			container?.InvokeServerOpened();
 		}
 
 		private static void ProcessTakeItemEvent( BinaryReader reader )
