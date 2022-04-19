@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Facepunch.CoreWars
 {
-	[EditorEntity( Title = "Personal Chest", Group = "Gameplay", EditorModel = "models/editor/playerstart.vmdl" )]
+	[EditorEntity( Title = "Personal Chest", Group = "Gameplay", EditorModel = "models/gameplay/personal_chest/personal_chest.vmdl" )]
 	public partial class PersonalChest : ModelEntity, ISourceEntity, IResettable
 	{
 		[Net] public NetInventoryContainer Inventory { get; private set; }
@@ -23,7 +23,7 @@ namespace Facepunch.CoreWars
 
 		public override void Spawn()
 		{
-			SetModel( "models/editor/playerstart.vmdl" );
+			SetModel( "models/gameplay/personal_chest/personal_chest.vmdl" );
 
 			Transmit = TransmitType.Always;
 			SetupPhysicsFromAABB( PhysicsMotionType.Static, Model.Bounds.Mins, Model.Bounds.Maxs );

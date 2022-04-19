@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Facepunch.CoreWars
 {
-	[EditorEntity( Title = "Team Chest", Group = "Team Entities", EditorModel = "models/editor/playerstart.vmdl" )]
+	[EditorEntity( Title = "Team Chest", Group = "Team Entities", EditorModel = "models/gameplay/team_chest/team_chest.vmdl" )]
 	public partial class TeamChest : ModelEntity, ISourceEntity, IResettable
 	{
 		[EditorProperty, Net] public Team Team { get; set; }
@@ -31,7 +31,7 @@ namespace Facepunch.CoreWars
 
 		public override void Spawn()
 		{
-			SetModel( "models/editor/playerstart.vmdl" );
+			SetModel( "models/gameplay/team_chest/team_chest.vmdl" );
 
 			Transmit = TransmitType.Always;
 			SetupPhysicsFromAABB( PhysicsMotionType.Static, Model.Bounds.Mins, Model.Bounds.Maxs );
@@ -46,5 +46,11 @@ namespace Facepunch.CoreWars
 		}
 
 		public override void TakeDamage( DamageInfo info ) { }
+
+		[Event.Tick.Client]
+		protected virtual void ClientTick()
+		{
+			RenderColor = Team.GetColor();
+		}
 	}
 }
