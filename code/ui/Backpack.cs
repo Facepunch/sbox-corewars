@@ -21,21 +21,19 @@ namespace Facepunch.CoreWars
 		{
 			Slots = new();
 			Current = this;
-			AcceptsFocus = true;
 		}
 
-		public void Open()
+		public void Open( bool withStorage = false )
 		{
 			if ( IsOpen ) return;
+			SetClass( "storage", withStorage );
 			IsOpen = true;
-			Focus();
 		}
 
 		public void Close()
 		{
 			if ( !IsOpen ) return;
 			IsOpen = false;
-			Blur();
 		}
 
 		public void SetContainer( InventoryContainer container )
@@ -55,32 +53,25 @@ namespace Facepunch.CoreWars
 
 		public override void Tick()
 		{
-			if ( Local.Pawn is Player player )
-			{
-				for ( ushort i = 0; i < Slots.Count; i++)
-				{
-					var item = Container.GetFromSlot( i );
+			if ( Local.Pawn is not Player player )
+				return;
 
-					Slots[i].SetItem( item );
-					Slots[i].IsSelected = false;
-				}
+			for ( ushort i = 0; i < Slots.Count; i++)
+			{
+				var item = Container.GetFromSlot( i );
+
+				Slots[i].SetItem( item );
+				Slots[i].IsSelected = false;
 			}
 
 			base.Tick();
 		}
 
-		protected override void OnBlur( PanelEvent e )
-		{
-			IsOpen = false;
-
-			base.OnBlur( e );
-		}
-
 		protected override void PostTemplateApplied()
 		{
-			if ( Local.Pawn is Player player && player.BackpackInventory.IsValid() )
+			if ( Local.Pawn is Player player && Container.IsValid() )
 			{
-				SetContainer( player.BackpackInventory.Instance );
+				SetContainer( Container );
 			}
 
 			BindClass( "hidden", () => !IsOpen );
