@@ -17,6 +17,7 @@ namespace Facepunch.CoreWars
 		[Net, Predicted] public ushort CurrentHotbarIndex { get; private set; }
 		[Net] public NetInventoryContainer BackpackInventory { get; private set; }
 		[Net] public NetInventoryContainer HotbarInventory { get; private set; }
+		[Net] public NetInventoryContainer ChestInventory { get; private set; }
 		public ProjectileSimulator Projectiles { get; private set; }
 		public DamageInfo LastDamageTaken { get; private set; }
 		public TimeUntil NextBlockPlace { get; private set; }
@@ -26,6 +27,23 @@ namespace Facepunch.CoreWars
 		public Player() : base()
 		{
 			Projectiles = new( this );
+		}
+
+		[ServerCmd]
+		public static void UseEntityCmd( int index )
+		{
+			if ( ConsoleSystem.Caller.Pawn is not Player player )
+				return;
+
+			var entity = FindByIndex( index );
+
+			if ( entity is IUsable usable && usable.IsUsable( player ) )
+			{
+				if ( entity.Position.Distance( player.Position ) <= usable.MaxUseDistance )
+				{
+					usable.OnUsed( player );
+				}
+			}
 		}
 
 		public Player( Client client ) : this()
@@ -188,6 +206,7 @@ namespace Facepunch.CoreWars
 		{
 			BackpackInventory.Instance.RemoveAll();
 			HotbarInventory.Instance.RemoveAll();
+			ChestInventory.Instance.RemoveAll();
 			GiveInitialItems();
 		}
 
@@ -355,10 +374,13 @@ namespace Facepunch.CoreWars
 			}
 			else
 			{
-				if ( Input.Down( InputButton.Score ) )
-					Backpack.Current?.Open();
-				else
-					Backpack.Current?.Close();
+				if ( !Storage.Current.IsOpen )
+				{
+					if ( Input.Down( InputButton.Score ) )
+						Backpack.Current?.Open();
+					else
+						Backpack.Current?.Close();
+				}
 			}
 
 			if ( Prediction.FirstTime )
@@ -390,6 +412,29 @@ namespace Facepunch.CoreWars
 						ActiveChild = weaponItem.Weapon;
 					else
 						ActiveChild = null;
+				}
+				else
+				{
+					if ( Input.Released( InputButton.Use ) )
+					{
+						if ( !Storage.Current.IsOpen )
+						{
+							var trace = Trace.Ray( Input.Position, Input.Position + Input.Rotation.Forward * 10000f )
+								.EntitiesOnly()
+								.Ignore( this )
+								.Ignore( ActiveChild )
+								.Run();
+
+							if ( trace.Entity is IUsable usable )
+							{
+								UseEntityCmd( trace.Entity.NetworkIdent );
+							}
+						}
+						else
+						{
+							Storage.Current.Close();
+						}
+					}
 				}
 			}
 
@@ -475,6 +520,13 @@ namespace Facepunch.CoreWars
 			InventorySystem.Register( backpack );
 
 			BackpackInventory = new NetInventoryContainer( backpack );
+
+			var chest = new InventoryContainer( this );
+			chest.SetSlotLimit( 24 );
+			chest.AddConnection( Client );
+			InventorySystem.Register( chest );
+
+			ChestInventory = new NetInventoryContainer( chest );
 		}
 
 		[Event.Tick.Server]

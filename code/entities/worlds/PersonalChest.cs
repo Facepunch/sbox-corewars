@@ -8,14 +8,9 @@ using System.IO;
 namespace Facepunch.CoreWars
 {
 	[EditorEntity( Title = "Personal Chest", Group = "Gameplay", EditorModel = "models/gameplay/personal_chest/personal_chest.vmdl" )]
-	public partial class PersonalChest : ModelEntity, ISourceEntity, IResettable
+	public partial class PersonalChest : ModelEntity, ISourceEntity, IUsable
 	{
-		[Net] public NetInventoryContainer Inventory { get; private set; }
-
-		public virtual void Reset()
-		{
-			Inventory.Instance.RemoveAll();
-		}
+		public virtual float MaxUseDistance => 300f;
 
 		public virtual void Serialize( BinaryWriter writer ) { }
 
@@ -26,17 +21,35 @@ namespace Facepunch.CoreWars
 			SetModel( "models/gameplay/personal_chest/personal_chest.vmdl" );
 
 			Transmit = TransmitType.Always;
-			SetupPhysicsFromAABB( PhysicsMotionType.Static, Model.Bounds.Mins, Model.Bounds.Maxs );
-
-			var inventory = new InventoryContainer( this );
-			inventory.SetSlotLimit( 24 );
-			InventorySystem.Register( inventory );
-
-			Inventory = new NetInventoryContainer( inventory );
+			SetupPhysicsFromModel( PhysicsMotionType.Static );
 
 			base.Spawn();
 		}
 
 		public override void TakeDamage( DamageInfo info ) { }
+
+		public void OnUsed( Player player )
+		{
+			OpenForClient( To.Single( player ) );
+		}
+
+		public bool IsUsable( Player player )
+		{
+			return true;
+		}
+
+		[ClientRpc]
+		private void OpenForClient()
+		{
+			if ( Local.Pawn is not Player player )
+				return;
+
+			var storage = Storage.Current;
+
+			storage.SetName( "Personal Chest" );
+			storage.SetEntity( this );
+			storage.SetContainer( player.ChestInventory.Instance );
+			storage.Open();
+		}
 	}
 }
