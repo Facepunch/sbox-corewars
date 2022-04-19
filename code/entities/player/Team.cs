@@ -29,8 +29,8 @@ namespace Facepunch.CoreWars
 			{ Team.Red, Color.Red },
 			{ Team.Orange, Color.Orange },
 			{ Team.Green, Color.Green },
-			{ Team.Purple, new Color( 0x6603fc ) },
-			{ Team.Pink, new Color( 0xce03fc ) },
+			{ Team.Purple, new Color( 0x6603fc ).WithAlpha( 1f ) },
+			{ Team.Pink, new Color( 0xce03fc ).WithAlpha( 1f ) },
 			{ Team.Cyan, Color.Cyan },
 			{ Team.Yellow, Color.Yellow }
 		};
