@@ -1,9 +1,15 @@
 ﻿<link rel="stylesheet" href="./Storage.scss" />
 
 <div>
-    <div class="modal">
+    <div class="backpack">
+        <label class="title">Backpack</label>
+        <div @ref="BackpackSlotContainer" class="slots">
+
+        </div>
+    </div>
+    <div class="storage">
         <label @text="Name" class="title">Storage</label>
-        <div @ref="SlotContainer" class="slots">
+        <div @ref="StorageSlotContainer" class="slots">
 
         </div>
     </div>

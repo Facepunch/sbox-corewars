@@ -13,29 +13,31 @@ namespace Facepunch.CoreWars
 		public static Storage Current { get; private set; }
 
 		public InventoryContainer Container { get; private set; }
-		public List<InventorySlot> Slots { get; private set; }
-		public Panel SlotContainer { get; set; }
+		public InventoryContainer Backpack { get; private set; }
+		public List<InventorySlot> BackpackSlots { get; private set; }
+		public List<InventorySlot> StorageSlots { get; private set; }
+		public Panel BackpackSlotContainer { get; set; }
+		public Panel StorageSlotContainer { get; set; }
 		public bool IsOpen { get; set; }
 		public Entity Entity { get; private set; }
 		public string Name { get; private set; }
 
 		public Storage()
 		{
-			Slots = new();
+			BackpackSlots = new();
+			StorageSlots = new();
 			Current = this;
 		}
 
 		public void Open()
 		{
 			if ( IsOpen ) return;
-			Backpack.Current.Open( true );
 			IsOpen = true;
 		}
 
 		public void Close()
 		{
 			if ( !IsOpen ) return;
-			Backpack.Current.Close();
 			IsOpen = false;
 		}
 
@@ -51,17 +53,35 @@ namespace Facepunch.CoreWars
 
 		public void SetContainer( InventoryContainer container )
 		{
-			Slots ??= new();
+			if ( Local.Pawn is not Player player )
+				return;
+
+			BackpackSlots ??= new();
+			StorageSlots ??= new();
+
+			BackpackSlotContainer.DeleteChildren( true );
+			StorageSlotContainer.DeleteChildren( true );
+
+			BackpackSlots.Clear();
+			StorageSlots.Clear();
+
 			Container = container;
-			SlotContainer.DeleteChildren( true );
-			Slots.Clear();
+			Backpack = player.BackpackInventory.Instance;
 
 			for ( ushort i = 0; i < container.SlotLimit; i++ )
 			{
-				var slot = SlotContainer.AddChild<InventorySlot>();
+				var slot = StorageSlotContainer.AddChild<InventorySlot>();
 				slot.Container = container;
 				slot.Slot = i;
-				Slots.Add( slot );
+				StorageSlots.Add( slot );
+			}
+
+			for ( ushort i = 0; i < Backpack.SlotLimit; i++ )
+			{
+				var slot = BackpackSlotContainer.AddChild<InventorySlot>();
+				slot.Container = Backpack;
+				slot.Slot = i;
+				BackpackSlots.Add( slot );
 			}
 		}
 
@@ -70,12 +90,20 @@ namespace Facepunch.CoreWars
 			if ( Local.Pawn is not Player player )
 				return;
 
-			for ( ushort i = 0; i < Slots.Count; i++)
+			for ( ushort i = 0; i < BackpackSlots.Count; i++ )
+			{
+				var item = Backpack.GetFromSlot( i );
+
+				BackpackSlots[i].SetItem( item );
+				BackpackSlots[i].IsSelected = false;
+			}
+
+			for ( ushort i = 0; i < StorageSlots.Count; i++)
 			{
 				var item = Container.GetFromSlot( i );
 
-				Slots[i].SetItem( item );
-				Slots[i].IsSelected = false;
+				StorageSlots[i].SetItem( item );
+				StorageSlots[i].IsSelected = false;
 			}
 
 			if ( Entity.IsValid() && Entity is IUsable usable )

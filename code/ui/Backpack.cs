@@ -23,10 +23,9 @@ namespace Facepunch.CoreWars
 			Current = this;
 		}
 
-		public void Open( bool withStorage = false )
+		public void Open()
 		{
 			if ( IsOpen ) return;
-			SetClass( "storage", withStorage );
 			IsOpen = true;
 		}
 
