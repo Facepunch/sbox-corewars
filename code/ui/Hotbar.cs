@@ -23,6 +23,7 @@ namespace Facepunch.CoreWars
 
 		public void SetContainer( InventoryContainer container )
 		{
+			Slots ??= new();
 			Container = container;
 
 			foreach ( var slot in Slots )

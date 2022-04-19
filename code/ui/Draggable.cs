@@ -21,13 +21,13 @@ namespace Facepunch.CoreWars
 
 		public static void Stop( IDraggable draggable )
 		{
-			if ( Current?.Draggable == draggable )
+			if ( Current?.ActiveDraggable == draggable )
 			{
 				Current.UpdateDroppable();
 
-				if ( Current.Droppable?.CanDrop( draggable ) ?? false )
+				if ( Current.ActiveDroppable?.CanDrop( draggable ) ?? false )
 				{
-					Current.Droppable.OnDrop( Current.Draggable );
+					Current.ActiveDroppable.OnDrop( Current.ActiveDraggable );
 				}
 
 				Current.Delete();
@@ -35,9 +35,9 @@ namespace Facepunch.CoreWars
 			}
 		}
 
-		public IDraggable Draggable { get; private set; }
+		public IDraggable ActiveDraggable { get; private set; }
 
-		private IDroppable Droppable { get; set; }
+		private IDroppable ActiveDroppable { get; set; }
 
 		public Draggable()
 		{
@@ -53,7 +53,7 @@ namespace Facepunch.CoreWars
 
 		public void SetDraggable( IDraggable draggable )
 		{
-			Draggable = draggable;
+			ActiveDraggable = draggable;
 			Style.SetBackgroundImage( draggable.GetIconTexture() );
 			Style.Width = Length.Pixels( draggable.IconSize * ScaleFromScreen );
 			Style.Height = Length.Pixels( draggable.IconSize * ScaleFromScreen );
@@ -77,8 +77,8 @@ namespace Facepunch.CoreWars
 
 		public override void OnDeleted()
 		{
-			Droppable?.RemoveClass( "valid-drag" );
-			Droppable?.RemoveClass( "invalid-drag" );
+			ActiveDroppable?.RemoveClass( "valid-drag" );
+			ActiveDroppable?.RemoveClass( "invalid-drag" );
 
 			base.OnDeleted();
 		}
@@ -92,20 +92,20 @@ namespace Facepunch.CoreWars
 		{
 			var droppable = FindDroppable();
 
-			if ( Droppable != null && droppable != Droppable )
+			if ( ActiveDroppable != null && droppable != ActiveDroppable )
 			{
-				Droppable.RemoveClass( "valid-drag" );
-				Droppable.RemoveClass( "invalid-drag" );
+				ActiveDroppable.RemoveClass( "valid-drag" );
+				ActiveDroppable.RemoveClass( "invalid-drag" );
 			}
 
-			Droppable = droppable;
+			ActiveDroppable = droppable;
 
-			if ( Droppable != null )
+			if ( ActiveDroppable != null )
 			{
-				if ( Droppable.CanDrop( Draggable ) )
-					Droppable.AddClass( "valid-drag" );
+				if ( ActiveDroppable.CanDrop( ActiveDraggable ) )
+					ActiveDroppable.AddClass( "valid-drag" );
 				else
-					Droppable.AddClass( "invalid-drag" );
+					ActiveDroppable.AddClass( "invalid-drag" );
 			}
 		}
 

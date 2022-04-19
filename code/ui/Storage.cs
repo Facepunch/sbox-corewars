@@ -51,6 +51,7 @@ namespace Facepunch.CoreWars
 
 		public void SetContainer( InventoryContainer container )
 		{
+			Slots ??= new();
 			Container = container;
 			SlotContainer.DeleteChildren( true );
 			Slots.Clear();
@@ -90,14 +91,14 @@ namespace Facepunch.CoreWars
 
 		protected override void PostTemplateApplied()
 		{
+			base.PostTemplateApplied();
+
 			if ( Local.Pawn is Player player && Container.IsValid() )
 			{
 				SetContainer( Container );
 			}
 
 			BindClass( "hidden", () => !IsOpen );
-
-			base.PostTemplateApplied();
 		}
 	}
 }
