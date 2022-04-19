@@ -417,20 +417,17 @@ namespace Facepunch.CoreWars
 				{
 					if ( Input.Released( InputButton.Use ) )
 					{
-						if ( !Storage.Current.IsOpen )
+						if ( !Storage.Current.IsOpen && !Backpack.Current.IsOpen )
 						{
-							if ( !Backpack.Current.IsOpen )
-							{
-								var trace = Trace.Ray( Input.Position, Input.Position + Input.Rotation.Forward * 10000f )
-									.EntitiesOnly()
-									.Ignore( this )
-									.Ignore( ActiveChild )
-									.Run();
+							var trace = Trace.Ray( Input.Position, Input.Position + Input.Rotation.Forward * 10000f )
+								.EntitiesOnly()
+								.Ignore( this )
+								.Ignore( ActiveChild )
+								.Run();
 
-								if ( trace.Entity is IUsable usable )
-								{
-									UseEntityCmd( trace.Entity.NetworkIdent );
-								}
+							if ( trace.Entity is IUsable usable )
+							{
+								UseEntityCmd( trace.Entity.NetworkIdent );
 							}
 						}
 						else
