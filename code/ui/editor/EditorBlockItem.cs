@@ -36,13 +36,13 @@ namespace Facepunch.CoreWars.Editor
 
 		protected override void OnMouseDown( MousePanelEvent e )
 		{
-			ActiveDraggable.Start( this );
+			Draggable.Start( this );
 			base.OnMouseDown( e );
 		}
 
 		protected override void OnMouseUp( MousePanelEvent e )
 		{
-			ActiveDraggable.Stop( this );
+			Draggable.Stop( this );
 			base.OnMouseUp( e );
 		}
 

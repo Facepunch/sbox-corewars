@@ -419,15 +419,18 @@ namespace Facepunch.CoreWars
 					{
 						if ( !Storage.Current.IsOpen )
 						{
-							var trace = Trace.Ray( Input.Position, Input.Position + Input.Rotation.Forward * 10000f )
-								.EntitiesOnly()
-								.Ignore( this )
-								.Ignore( ActiveChild )
-								.Run();
-
-							if ( trace.Entity is IUsable usable )
+							if ( !Backpack.Current.IsOpen )
 							{
-								UseEntityCmd( trace.Entity.NetworkIdent );
+								var trace = Trace.Ray( Input.Position, Input.Position + Input.Rotation.Forward * 10000f )
+									.EntitiesOnly()
+									.Ignore( this )
+									.Ignore( ActiveChild )
+									.Run();
+
+								if ( trace.Entity is IUsable usable )
+								{
+									UseEntityCmd( trace.Entity.NetworkIdent );
+								}
 							}
 						}
 						else

@@ -52,7 +52,7 @@ namespace Facepunch.CoreWars
 		public void SetContainer( InventoryContainer container )
 		{
 			Container = container;
-			SlotContainer.DeleteChildren();
+			SlotContainer.DeleteChildren( true );
 			Slots.Clear();
 
 			for ( ushort i = 0; i < container.SlotLimit; i++ )

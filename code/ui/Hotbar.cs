@@ -59,7 +59,10 @@ namespace Facepunch.CoreWars
 
 		protected override void PostTemplateApplied()
 		{
-			if ( Local.Pawn is Player player && player.HotbarInventory.IsValid() )
+			if ( Local.Pawn is not Player player )
+				return;
+
+			if ( player.HotbarInventory.IsValid() )
 			{
 				SetContainer( player.HotbarInventory.Instance );
 			}

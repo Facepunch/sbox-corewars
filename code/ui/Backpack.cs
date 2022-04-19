@@ -39,7 +39,7 @@ namespace Facepunch.CoreWars
 		public void SetContainer( InventoryContainer container )
 		{
 			Container = container;
-			SlotContainer.DeleteChildren();
+			SlotContainer.DeleteChildren( true );
 			Slots.Clear();
 
 			for ( ushort i = 0; i < container.SlotLimit; i++ )
@@ -69,9 +69,12 @@ namespace Facepunch.CoreWars
 
 		protected override void PostTemplateApplied()
 		{
-			if ( Local.Pawn is Player player && Container.IsValid() )
+			if ( Local.Pawn is not Player player )
+				return;
+
+			if ( player.BackpackInventory.IsValid() )
 			{
-				SetContainer( Container );
+				SetContainer( player.BackpackInventory.Instance );
 			}
 
 			BindClass( "hidden", () => !IsOpen );

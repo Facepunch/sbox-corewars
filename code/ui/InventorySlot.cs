@@ -45,13 +45,13 @@ namespace Facepunch.CoreWars
 		protected override void OnMouseDown( MousePanelEvent e )
 		{
 			if ( !Item.IsValid() ) return;
-			ActiveDraggable.Start( this );
+			Draggable.Start( this );
 			base.OnMouseDown( e );
 		}
 
 		protected override void OnMouseUp( MousePanelEvent e )
 		{
-			ActiveDraggable.Stop( this );
+			Draggable.Stop( this );
 			base.OnMouseUp( e );
 		}
 

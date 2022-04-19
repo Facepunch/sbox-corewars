@@ -8,13 +8,13 @@ using System.Linq;
 namespace Facepunch.CoreWars
 {
 	[UseTemplate]
-	public partial class ActiveDraggable : Panel
+	public partial class Draggable : Panel
 	{
-		public static ActiveDraggable Current { get; private set; }
+		public static Draggable Current { get; private set; }
 
 		public static void Start( IDraggable draggable )
 		{
-			var active = Game.Hud.AddChild<ActiveDraggable>();
+			var active = Game.Hud.AddChild<Draggable>();
 			active.SetDraggable( draggable );
 			active.UpdatePosition();
 		}
@@ -39,7 +39,7 @@ namespace Facepunch.CoreWars
 
 		private IDroppable Droppable { get; set; }
 
-		public ActiveDraggable()
+		public Draggable()
 		{
 			Current?.Delete( true );
 			Current = this;
