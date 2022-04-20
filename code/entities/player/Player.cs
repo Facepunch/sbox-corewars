@@ -18,6 +18,7 @@ namespace Facepunch.CoreWars
 		[Net] public NetInventoryContainer BackpackInventory { get; private set; }
 		[Net] public NetInventoryContainer HotbarInventory { get; private set; }
 		[Net] public NetInventoryContainer ChestInventory { get; private set; }
+		[Net] public NetInventoryContainer EquipmentInventory { get; private set; }
 		public ProjectileSimulator Projectiles { get; private set; }
 		public DamageInfo LastDamageTaken { get; private set; }
 		public TimeUntil NextBlockPlace { get; private set; }
@@ -53,10 +54,9 @@ namespace Facepunch.CoreWars
 			CreateInventories();
 		}
 
-		public bool TryGiveWeapon( string weaponName )
+		public bool TryGiveWeapon<T>() where T : WeaponItem
 		{
-			var item = InventorySystem.CreateItem<WeaponItem>();
-			item.WeaponName = weaponName;
+			var item = InventorySystem.CreateItem<T>();
 			
 			if ( HotbarInventory.Instance.Give( item ) )
 				return true;
@@ -204,6 +204,7 @@ namespace Facepunch.CoreWars
 
 		public virtual void Reset()
 		{
+			EquipmentInventory.Instance.RemoveAll();
 			BackpackInventory.Instance.RemoveAll();
 			HotbarInventory.Instance.RemoveAll();
 			ChestInventory.Instance.RemoveAll();
@@ -282,7 +283,8 @@ namespace Facepunch.CoreWars
 			if ( IsLocalPawn )
 			{
 				Hotbar.Current?.SetContainer( HotbarInventory.Instance );
-				Backpack.Current?.SetContainer( BackpackInventory.Instance );
+				Backpack.Current?.SetBackpack( BackpackInventory.Instance );
+				Backpack.Current?.SetEquipment( EquipmentInventory.Instance );
 			}
 
 			base.ClientSpawn();
@@ -493,12 +495,20 @@ namespace Facepunch.CoreWars
 			TryGiveBlock( VoxelWorld.Current.FindBlockId<GrassBlock>(), 1000 );
 			TryGiveBlock( VoxelWorld.Current.FindBlockId<WindowBlock>(), 500 );
 
-			TryGiveWeapon( "weapon_boomer" );
-			TryGiveAmmo( AmmoType.Explosive, 200 );
+			TryGiveWeapon<CrossbowItem>();
+			TryGiveAmmo( AmmoType.Bolt, 60 );
 
 			var iron = InventorySystem.CreateItem<IronItem>();
 			iron.StackSize = 16;
 			TryGiveItem( iron );
+
+			var chest = InventorySystem.CreateItem<ArmorChestTier1>();
+			var head = InventorySystem.CreateItem<ArmorHeadTier2>();
+			var legs = InventorySystem.CreateItem<ArmorLegsTier3>();
+
+			TryGiveItem( chest );
+			TryGiveItem( head );
+			TryGiveItem( legs );
 		}
 
 		public virtual void CreateInventories()
@@ -527,6 +537,16 @@ namespace Facepunch.CoreWars
 			InventorySystem.Register( chest );
 
 			ChestInventory = new NetInventoryContainer( chest );
+
+			var equipment = new InventoryContainer( this );
+			equipment.SetSlotLimit( 3 );
+			equipment.AddConnection( Client );
+			equipment.OnItemTaken += OnEquipmentItemTaken;
+			equipment.OnItemGiven += OnEquipmentItemGiven;
+			equipment.SetGiveCondition( CanGiveEquipmentItem );
+			InventorySystem.Register( equipment );
+
+			EquipmentInventory = new NetInventoryContainer( equipment );
 		}
 
 		[Event.Tick.Server]
@@ -547,9 +567,38 @@ namespace Facepunch.CoreWars
 			{
 				InventorySystem.Remove( HotbarInventory.Instance, true );
 				InventorySystem.Remove( BackpackInventory.Instance, true );
+				InventorySystem.Remove( EquipmentInventory.Instance, true );
+				InventorySystem.Remove( ChestInventory.Instance, true );
 			}
 
 			base.OnDestroy();
+		}
+
+		private bool CanGiveEquipmentItem( ushort slot, InventoryItem item )
+		{
+			if ( item is not ArmorItem armor )
+				return false;
+
+			if ( armor.ArmorSlot == ArmorSlot.Head )
+				return slot == 0;
+
+			if ( armor.ArmorSlot == ArmorSlot.Chest )
+				return slot == 1;
+
+			if ( armor.ArmorSlot == ArmorSlot.Legs )
+				return slot == 2;
+
+			return false;
+		}
+
+		private void OnEquipmentItemGiven( ushort slot, InventoryItem instance )
+		{
+
+		}
+
+		private void OnEquipmentItemTaken( ushort slot, InventoryItem instance )
+		{
+
 		}
 
 		private void OnBackpackItemGiven( ushort slot, InventoryItem instance )
