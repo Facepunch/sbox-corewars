@@ -40,12 +40,12 @@ namespace Facepunch.CoreWars.Editor
 			base.PostTemplateApplied();
 		}
 
-		public bool CanDrop( IDraggable draggable )
+		public bool CanDrop( IDraggable draggable, DraggableMode mode )
 		{
 			return draggable is EditorBlockItem;
 		}
 
-		public void OnDrop( IDraggable draggable )
+		public void OnDrop( IDraggable draggable, DraggableMode mode )
 		{
 			if ( draggable is EditorBlockItem item )
 			{

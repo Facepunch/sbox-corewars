@@ -36,7 +36,7 @@ namespace Facepunch.CoreWars.Editor
 
 		protected override void OnMouseDown( MousePanelEvent e )
 		{
-			Draggable.Start( this );
+			Draggable.Start( this, DraggableMode.Move );
 			base.OnMouseDown( e );
 		}
 

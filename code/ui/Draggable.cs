@@ -12,9 +12,10 @@ namespace Facepunch.CoreWars
 	{
 		public static Draggable Current { get; private set; }
 
-		public static void Start( IDraggable draggable )
+		public static void Start( IDraggable draggable, DraggableMode mode )
 		{
 			var active = Game.Hud.AddChild<Draggable>();
+			active.SetMode( mode );
 			active.SetDraggable( draggable );
 			active.UpdatePosition();
 		}
@@ -25,9 +26,9 @@ namespace Facepunch.CoreWars
 			{
 				Current.UpdateDroppable();
 
-				if ( Current.ActiveDroppable?.CanDrop( draggable ) ?? false )
+				if ( Current.ActiveDroppable?.CanDrop( draggable, Current.Mode ) ?? false )
 				{
-					Current.ActiveDroppable.OnDrop( Current.ActiveDraggable );
+					Current.ActiveDroppable.OnDrop( Current.ActiveDraggable, Current.Mode );
 				}
 
 				Current.Delete();
@@ -35,8 +36,8 @@ namespace Facepunch.CoreWars
 			}
 		}
 
+		public DraggableMode Mode { get; private set; }
 		public IDraggable ActiveDraggable { get; private set; }
-
 		private IDroppable ActiveDroppable { get; set; }
 
 		public Draggable()
@@ -49,6 +50,11 @@ namespace Facepunch.CoreWars
 		{
 			Style.Left = Length.Pixels( Mouse.Position.x * ScaleFromScreen );
 			Style.Top = Length.Pixels( Mouse.Position.y * ScaleFromScreen );
+		}
+
+		public void SetMode( DraggableMode mode )
+		{
+			Mode = mode;
 		}
 
 		public void SetDraggable( IDraggable draggable )
@@ -102,7 +108,7 @@ namespace Facepunch.CoreWars
 
 			if ( ActiveDroppable != null )
 			{
-				if ( ActiveDroppable.CanDrop( ActiveDraggable ) )
+				if ( ActiveDroppable.CanDrop( ActiveDraggable, Mode ) )
 					ActiveDroppable.AddClass( "valid-drag" );
 				else
 					ActiveDroppable.AddClass( "invalid-drag" );

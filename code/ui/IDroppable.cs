@@ -8,7 +8,7 @@ namespace Facepunch.CoreWars
 	{
 		void RemoveClass( string className );
 		void AddClass( string className );
-		bool CanDrop( IDraggable draggable );
-		void OnDrop( IDraggable draggable );
+		bool CanDrop( IDraggable draggable, DraggableMode mode );
+		void OnDrop( IDraggable draggable, DraggableMode mode );
 	}
 }
