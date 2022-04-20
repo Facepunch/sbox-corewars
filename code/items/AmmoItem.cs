@@ -12,20 +12,12 @@ namespace Facepunch.CoreWars
 		public override string WorldModel => "models/weapons/w_shotblast.vmdl";
 		public override ushort MaxStackSize => 60;
 		public override bool IsStackable => true;
-
-		public override string GetName()
-		{
-			return AmmoType.ToString();
-		}
+		public override string Name => AmmoType.ToString();
+		public override string Icon => $"textures/items/ammo_{AmmoType.ToString().ToLower()}.png";
 
 		public override bool CanStackWith( InventoryItem other )
 		{
 			return (other is AmmoItem item && item.AmmoType == AmmoType);
-		}
-
-		public override string GetIcon()
-		{
-			return string.Empty;
 		}
 
 		public override void Write( BinaryWriter writer )

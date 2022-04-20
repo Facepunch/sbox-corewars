@@ -4,22 +4,22 @@ using Sandbox;
 namespace Facepunch.CoreWars
 {
 	[Library]
-	public class BoomerConfig : WeaponConfig
+	public class CrossbowConfig : WeaponConfig
 	{
-		public override string Name => "Boomer";
-		public override string Description => "Short-range explosive projectile launcher";
-		public override string Icon => "ui/weapons/boomer.png";
-		public override string ClassName => "weapon_boomer";
-		public override AmmoType AmmoType => AmmoType.Explosive;
+		public override string Name => "Crossbow";
+		public override string Description => "Medium-range bolt launcher";
+		public override string Icon => "items/weapon_crossbow.png";
+		public override string ClassName => "weapon_crossbow";
+		public override AmmoType AmmoType => AmmoType.Bolt;
 		public override WeaponType Type => WeaponType.Projectile;
 		public override int Ammo => 10;
 		public override int Damage => 500;
 	}
 
-	[Library( "weapon_boomer", Title = "Boomer" )]
-	partial class Boomer : BulletDropWeapon<BulletDropProjectile>
+	[Library( "weapon_crossbow", Title = "Crossbow" )]
+	partial class Crossbow : BulletDropWeapon<BulletDropProjectile>
 	{
-		public override WeaponConfig Config => new BoomerConfig();
+		public override WeaponConfig Config => new CrossbowConfig();
 		public override string ImpactEffect => "particles/weapons/boomer/boomer_impact.vpcf";
 		public override string TrailEffect => "particles/weapons/boomer/boomer_projectile.vpcf";
 		public override string ViewModelPath => "models/weapons/v_shotblast.vmdl";
