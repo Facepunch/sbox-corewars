@@ -4,25 +4,15 @@ using System.IO;
 
 namespace Facepunch.CoreWars
 {
-	[Library( "item_weapon" )]
 	public class WeaponItem : InventoryItem
 	{
-		public string WeaponName { get; set; }
-		public Weapon Weapon { get; set; }
+		public virtual string WeaponName => string.Empty;
 
-		public override string GetName()
-		{
-			return Weapon.ToString();
-		}
+		public Weapon Weapon { get; set; }
 
 		public override bool CanStackWith( InventoryItem other )
 		{
 			return false;
-		}
-
-		public override string GetIcon()
-		{
-			return string.Empty;
 		}
 
 		public override void Write( BinaryWriter writer )

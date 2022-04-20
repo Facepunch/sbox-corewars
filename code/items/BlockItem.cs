@@ -13,27 +13,33 @@ namespace Facepunch.CoreWars
 		public override ushort MaxStackSize => 60;
 		public override bool IsStackable => true;
 
-		public override string GetName()
+		public override string Name
 		{
-			var world = VoxelWorld.Current;
-			if ( !world.IsValid() ) return "Invalid";
-			return world.GetBlockType( BlockId ).FriendlyName;
+			get
+			{
+				var world = VoxelWorld.Current;
+				if ( !world.IsValid() ) return "Invalid";
+				return world.GetBlockType( BlockId ).FriendlyName;
+			}
+		}
+
+		public override string Icon
+		{
+			get
+			{
+				var world = VoxelWorld.Current;
+				if ( !world.IsValid() ) return string.Empty;
+
+				var block = world.GetBlockType( BlockId );
+				if ( string.IsNullOrEmpty( block.DefaultTexture ) ) return string.Empty;
+
+				return $"textures/blocks/color/{ block.DefaultTexture }.png";
+			}
 		}
 
 		public override bool CanStackWith( InventoryItem other )
 		{
 			return (other is BlockItem item && item.BlockId == BlockId);
-		}
-
-		public override string GetIcon()
-		{
-			var world = VoxelWorld.Current;
-			if ( !world.IsValid() ) return string.Empty;
-
-			var block = world.GetBlockType( BlockId );
-			if ( string.IsNullOrEmpty( block.DefaultTexture ) ) return string.Empty;
-
-			return $"textures/blocks/color/{ block.DefaultTexture }.png";
 		}
 
 		public override void Write( BinaryWriter writer )

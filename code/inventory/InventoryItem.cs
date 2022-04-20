@@ -5,7 +5,6 @@ namespace Facepunch.CoreWars.Inventory
 {
 	public class InventoryItem : IValid
 	{
-		public ItemSlot ItemSlot { get; set; } = ItemSlot.Everything;
 		public InventoryContainer Container { get; set; }
 		public ItemEntity WorldEntity { get; private set; }
 		public bool IsWorldEntity { get; private set; }
@@ -16,6 +15,9 @@ namespace Facepunch.CoreWars.Inventory
 		public virtual ushort MaxStackSize => 1;
 		public virtual string WorldModel => string.Empty;
 		public virtual bool IsStackable => false;
+		public virtual string Description => string.Empty;
+		public virtual string Name => string.Empty;
+		public virtual string Icon => string.Empty;
 
 		public static InventoryItem Deserialize( byte[] data )
 		{
@@ -105,11 +107,6 @@ namespace Facepunch.CoreWars.Inventory
 			IsDirty = true;
 		}
 
-		public virtual string GetIcon()
-		{
-			return string.Empty;
-		}
-
 		public virtual bool IsSameType( InventoryItem other )
 		{
 			return (GetType() == other.GetType());
@@ -118,11 +115,6 @@ namespace Facepunch.CoreWars.Inventory
 		public virtual bool CanStackWith( InventoryItem other )
 		{
 			return true;
-		}
-
-		public virtual string GetName()
-		{
-			return string.Empty;
 		}
 
 		public virtual void Write( BinaryWriter writer )

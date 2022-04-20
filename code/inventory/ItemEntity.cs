@@ -21,7 +21,7 @@ namespace Facepunch.CoreWars.Inventory
 			}
 			else
 			{
-				SetupPhysicsFromSphere( PhysicsMotionType.Dynamic, Vector3.Zero, 4f );
+				SetupPhysicsFromSphere( PhysicsMotionType.Dynamic, Vector3.Zero, 8f );
 			}
 
 			Item = new NetInventoryItem( item );

@@ -8,20 +8,12 @@ namespace Facepunch.CoreWars
 	public class GoldItem : ResourceItem
 	{
 		public override ushort MaxStackSize => 32;
-
-		public override string GetName()
-		{
-			return "Gold";
-		}
+		public override string Name => "Gold";
+		public override string Icon => "textures/items/gold.png";
 
 		public override bool CanStackWith( InventoryItem other )
 		{
 			return true;
-		}
-
-		public override string GetIcon()
-		{
-			return "textures/items/gold.png";
 		}
 	}
 }
