@@ -10,6 +10,8 @@ namespace Facepunch.CoreWars.Inventory
 		public delegate void ItemTakenCallback( ushort slot, InventoryItem instance );
 		public delegate void ItemGivenCallback( ushort slot, InventoryItem instance );
 		public delegate void SlotChangedCallback( ushort slot );
+		public delegate bool GiveConditionCallback( ushort slot, InventoryItem instance );
+		public delegate bool TakeConditionCallback( ushort slot, InventoryItem instance );
 
 		public event SlotChangedCallback OnSlotChanged;
 		public event SlotChangedCallback OnDataChanged;
@@ -47,6 +49,8 @@ namespace Facepunch.CoreWars.Inventory
 			}
 		}
 
+		public GiveConditionCallback GiveCondition { get; private set; }
+		public TakeConditionCallback TakeCondition { get; private set; }
 		public InventoryContainer TransferTarget { get; private set; }
 		public ulong InventoryId { get; private set; }
 		public Entity Entity { get; }
@@ -97,6 +101,16 @@ namespace Facepunch.CoreWars.Inventory
 		public void InvokeServerClosed()
 		{
 			OnServerClosed?.Invoke();
+		}
+
+		public void SetGiveCondition( GiveConditionCallback condition )
+		{
+			GiveCondition = condition;
+		}
+
+		public void SetTakeCondition( TakeConditionCallback condition )
+		{
+			TakeCondition = condition;
 		}
 
 		public void SetTransferTarget( InventoryContainer container )
@@ -243,13 +257,19 @@ namespace Facepunch.CoreWars.Inventory
 				return false;
 			}
 
+			var item = GetFromSlot( fromSlot );
+
+			if ( TakeCondition != null && !TakeCondition( fromSlot, item ) )
+				return false;
+
+			if ( target.GiveCondition != null && !target.GiveCondition( toSlot, item ) )
+				return false;
+
 			if ( IsClient )
 			{
 				InventorySystem.SendSplitInventoryEvent( this, target, fromSlot, toSlot );
 				return true;
 			}
-
-			var item = GetFromSlot( fromSlot );
 
 			if ( item.StackSize == 1 )
 			{
@@ -290,6 +310,14 @@ namespace Facepunch.CoreWars.Inventory
 				return false;
 			}
 
+			var fromInstance = ItemList[fromSlot];
+
+			if ( TakeCondition != null && !TakeCondition( fromSlot, fromInstance ) )
+				return false;
+
+			if ( target.GiveCondition != null && !target.GiveCondition( toSlot, fromInstance ) )
+				return false;
+
 			if ( IsClient )
 			{
 				InventorySystem.SendMoveInventoryEvent( this, target, fromSlot, toSlot );
@@ -298,7 +326,6 @@ namespace Facepunch.CoreWars.Inventory
 
 			if ( target.IsOccupied( toSlot ) )
 			{
-				var fromInstance = ItemList[fromSlot];
 				var toInstance = target.ItemList[toSlot];
 				var canStack = false;
 
@@ -355,8 +382,6 @@ namespace Facepunch.CoreWars.Inventory
 			}
 			else
 			{
-				var fromInstance = ItemList[fromSlot];
-
 				fromInstance.SlotId = toSlot;
 				fromInstance.Container = target;
 
@@ -504,6 +529,9 @@ namespace Facepunch.CoreWars.Inventory
 			var amount = instance.StackSize;
 			var item = ItemList[slot];
 
+			if ( GiveCondition != null && !GiveCondition( slot, item ) )
+				return amount;
+
 			if ( item != null && item.IsSameType( instance ) && item.CanStackWith( instance ) )
 			{
 				var amountCanStack = (ushort)Math.Max( item.MaxStackSize - item.StackSize, 0 );
@@ -541,6 +569,9 @@ namespace Facepunch.CoreWars.Inventory
 			for ( int i = 0; i < ItemList.Count; i++ )
 			{
 				var item = ItemList[i];
+
+				if ( GiveCondition != null && !GiveCondition( (ushort)i, instance ) )
+					continue;
 
 				if ( item != null && item.IsSameType( instance ) && item.CanStackWith( instance ) )
 				{
