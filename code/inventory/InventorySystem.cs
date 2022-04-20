@@ -368,7 +368,15 @@ namespace Facepunch.CoreWars.Inventory
 
 				if ( item.IsValid() )
 				{
-					toInventory.Stack( item );
+					var remaining = toInventory.Stack( item );
+
+					if ( remaining > 0 )
+					{
+						item.StackSize = remaining;
+						return;
+					}
+
+					fromInventory.ClearSlot( fromSlot );
 				}
 			}
 		}

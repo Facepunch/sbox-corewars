@@ -47,7 +47,7 @@ namespace Facepunch.CoreWars.Inventory
 			}
 		}
 
-		public InventoryContainer TransferContainer { get; private set; }
+		public InventoryContainer TransferTarget { get; private set; }
 		public ulong InventoryId { get; private set; }
 		public Entity Entity { get; }
 		public List<Client> Connections { get; }
@@ -99,14 +99,14 @@ namespace Facepunch.CoreWars.Inventory
 			OnServerClosed?.Invoke();
 		}
 
-		public void SetTransferContainer( InventoryContainer container )
+		public void SetTransferTarget( InventoryContainer container )
 		{
-			TransferContainer = container;
+			TransferTarget = container;
 		}
 
-		public void ClearTransferContainer()
+		public void ClearTransferTarget()
 		{
-			TransferContainer = null;
+			TransferTarget = null;
 		}
 
 		public void SendCloseEvent( Client player )
@@ -319,9 +319,15 @@ namespace Facepunch.CoreWars.Inventory
 
 					if ( amountCanStack > 0 )
 					{
-						toInstance.StackSize += amountCanStack;
+						var amountToTake = fromInstance.StackSize;
 
-						if ( amountCanStack >= fromInstance.StackSize )
+						if ( amountCanStack < amountToTake )
+							amountToTake = amountCanStack;
+
+						if ( amountToTake >= 0 )
+							toInstance.StackSize += amountToTake;
+
+						if ( amountToTake >= fromInstance.StackSize )
 							fromInstance.StackSize = 0;
 						else
 							fromInstance.StackSize -= amountCanStack;
@@ -557,9 +563,9 @@ namespace Facepunch.CoreWars.Inventory
 
 			if ( amount > 0 )
 			{
-				var item = Give( instance );
+				var success = Give( instance );
 
-				if ( item )
+				if ( success )
 				{
 					instance.StackSize = amount;
 					return 0;

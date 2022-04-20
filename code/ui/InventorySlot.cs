@@ -47,7 +47,7 @@ namespace Facepunch.CoreWars
 			if ( !Item.IsValid() ) return;
 
 			var container = Item.Container;
-			var transferContainer = container.TransferContainer;
+			var transferContainer = container.TransferTarget;
 			
 			if ( transferContainer.IsValid() )
 			{
