@@ -25,13 +25,9 @@ namespace Facepunch.CoreWars
 		{
 			Slots ??= new();
 			Container = container;
-
-			foreach ( var slot in Slots )
-			{
-				slot.Delete();
-			}
-
 			Slots.Clear();
+
+			DeleteChildren( true );
 
 			for ( ushort i = 0; i < container.SlotLimit; i++ )
 			{
