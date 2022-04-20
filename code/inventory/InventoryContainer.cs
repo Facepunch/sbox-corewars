@@ -315,12 +315,25 @@ namespace Facepunch.CoreWars.Inventory
 
 				if ( canStack )
 				{
-					toInstance.StackSize += fromInstance.StackSize;
+					var amountCanStack = (ushort)Math.Max( toInstance.MaxStackSize - toInstance.StackSize, 0 );
+
+					if ( amountCanStack > 0 )
+					{
+						toInstance.StackSize += amountCanStack;
+
+						if ( amountCanStack >= fromInstance.StackSize )
+							fromInstance.StackSize = 0;
+						else
+							fromInstance.StackSize -= amountCanStack;
+					}
 
 					target.ItemList[toSlot] = toInstance;
 					target.SendGiveEvent( toSlot, toInstance );
 
-					ClearSlot( fromSlot );
+					if ( fromInstance.StackSize == 0 )
+					{
+						ClearSlot( fromSlot );
+					}
 				}
 				else
 				{
