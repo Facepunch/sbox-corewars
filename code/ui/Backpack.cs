@@ -12,14 +12,18 @@ namespace Facepunch.CoreWars
 	{
 		public static Backpack Current { get; private set; }
 
-		public InventoryContainer Container { get; private set; }
-		public List<InventorySlot> Slots { get; private set; }
-		public Panel SlotContainer { get; set; }
+		public InventoryContainer BackpackContainer { get; private set; }
+		public InventoryContainer EquipmentContainer { get; private set; }
+		public List<InventorySlot> BackpackSlots { get; private set; }
+		public List<InventorySlot> EquipmentSlots { get; private set; }
+		public Panel BackpackSlotRoot { get; set; }
+		public Panel EquipmentSlotRoot { get; set; }
 		public bool IsOpen { get; set; }
 
 		public Backpack()
 		{
-			Slots = new();
+			BackpackSlots = new();
+			EquipmentSlots = new();
 			Current = this;
 		}
 
@@ -35,33 +39,74 @@ namespace Facepunch.CoreWars
 			IsOpen = false;
 		}
 
-		public void SetContainer( InventoryContainer container )
+		public void SetBackpack( InventoryContainer backpack )
 		{
-			Slots ??= new();
-			Container = container;
-			SlotContainer.DeleteChildren( true );
-			Slots.Clear();
+			BackpackSlots ??= new();
+			BackpackContainer = backpack;
+			BackpackSlotRoot.DeleteChildren( true );
+			BackpackSlots.Clear();
 
-			for ( ushort i = 0; i < container.SlotLimit; i++ )
+			for ( ushort i = 0; i < backpack.SlotLimit; i++ )
 			{
-				var slot = SlotContainer.AddChild<InventorySlot>();
-				slot.Container = container;
+				var slot = BackpackSlotRoot.AddChild<InventorySlot>();
+				slot.Container = backpack;
 				slot.Slot = i;
-				Slots.Add( slot );
+				BackpackSlots.Add( slot );
+			}
+		}
+
+		public void SetEquipment( InventoryContainer equipment )
+		{
+			EquipmentSlots ??= new();
+			EquipmentContainer = equipment;
+			EquipmentSlotRoot.DeleteChildren( true );
+			EquipmentSlots.Clear();
+
+			for ( ushort i = 0; i < equipment.SlotLimit; i++ )
+			{
+				var slot = EquipmentSlotRoot.AddChild<InventorySlot>();
+
+				slot.Container = equipment;
+				slot.Slot = i;
+
+				if ( i == 0 )
+				{
+					slot.SetDefaultIcon( "textures/ui/armor_slot_head.png" );
+					slot.SetArmorSlot( ArmorSlot.Head );
+				}
+				else if ( i == 1 )
+				{
+					slot.SetDefaultIcon( "textures/ui/armor_slot_chest.png" );
+					slot.SetArmorSlot( ArmorSlot.Chest );
+				}
+				else if ( i == 2 )
+				{
+					slot.SetDefaultIcon( "textures/ui/armor_slot_legs.png" );
+					slot.SetArmorSlot( ArmorSlot.Legs );
+				}
+
+				EquipmentSlots.Add( slot );
 			}
 		}
 
 		public override void Tick()
 		{
-			if ( Local.Pawn is not Player player )
-				return;
+			if ( Local.Pawn is not Player ) return;
 
-			for ( ushort i = 0; i < Slots.Count; i++)
+			for ( ushort i = 0; i < BackpackSlots.Count; i++)
 			{
-				var item = Container.GetFromSlot( i );
+				var item = BackpackContainer.GetFromSlot( i );
 
-				Slots[i].SetItem( item );
-				Slots[i].IsSelected = false;
+				BackpackSlots[i].SetItem( item );
+				BackpackSlots[i].IsSelected = false;
+			}
+
+			for ( ushort i = 0; i < EquipmentSlots.Count; i++ )
+			{
+				var item = EquipmentContainer.GetFromSlot( i );
+
+				EquipmentSlots[i].SetItem( item );
+				EquipmentSlots[i].IsSelected = false;
 			}
 
 			base.Tick();
@@ -71,12 +116,13 @@ namespace Facepunch.CoreWars
 		{
 			base.PostTemplateApplied();
 
-			if ( Local.Pawn is not Player player )
-				return;
-
-			if ( player.BackpackInventory.IsValid() )
+			if ( Local.Pawn is Player player )
 			{
-				SetContainer( player.BackpackInventory.Instance );
+				if ( player.BackpackInventory.IsValid() )
+					SetBackpack( player.BackpackInventory.Instance );
+
+				if ( player.EquipmentInventory.IsValid() )
+					SetBackpack( player.EquipmentInventory.Instance );
 			}
 
 			BindClass( "hidden", () => !IsOpen );

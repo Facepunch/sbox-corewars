@@ -12,12 +12,12 @@ namespace Facepunch.CoreWars
 	{
 		public static Storage Current { get; private set; }
 
-		public InventoryContainer Container { get; private set; }
-		public InventoryContainer Backpack { get; private set; }
+		public InventoryContainer StorageContainer { get; private set; }
+		public InventoryContainer BackpackContainer { get; private set; }
 		public List<InventorySlot> BackpackSlots { get; private set; }
 		public List<InventorySlot> StorageSlots { get; private set; }
-		public Panel BackpackSlotContainer { get; set; }
-		public Panel StorageSlotContainer { get; set; }
+		public Panel BackpackSlotRoot { get; set; }
+		public Panel StorageSlotRoot { get; set; }
 		public bool IsOpen { get; set; }
 		public Entity Entity { get; private set; }
 		public string Name { get; private set; }
@@ -59,27 +59,27 @@ namespace Facepunch.CoreWars
 			BackpackSlots ??= new();
 			StorageSlots ??= new();
 
-			BackpackSlotContainer.DeleteChildren( true );
-			StorageSlotContainer.DeleteChildren( true );
+			BackpackSlotRoot.DeleteChildren( true );
+			StorageSlotRoot.DeleteChildren( true );
 
 			BackpackSlots.Clear();
 			StorageSlots.Clear();
 
-			Container = container;
-			Backpack = player.BackpackInventory.Instance;
+			StorageContainer = container;
+			BackpackContainer = player.BackpackInventory.Instance;
 
 			for ( ushort i = 0; i < container.SlotLimit; i++ )
 			{
-				var slot = StorageSlotContainer.AddChild<InventorySlot>();
+				var slot = StorageSlotRoot.AddChild<InventorySlot>();
 				slot.Container = container;
 				slot.Slot = i;
 				StorageSlots.Add( slot );
 			}
 
-			for ( ushort i = 0; i < Backpack.SlotLimit; i++ )
+			for ( ushort i = 0; i < BackpackContainer.SlotLimit; i++ )
 			{
-				var slot = BackpackSlotContainer.AddChild<InventorySlot>();
-				slot.Container = Backpack;
+				var slot = BackpackSlotRoot.AddChild<InventorySlot>();
+				slot.Container = BackpackContainer;
 				slot.Slot = i;
 				BackpackSlots.Add( slot );
 			}
@@ -92,7 +92,7 @@ namespace Facepunch.CoreWars
 
 			for ( ushort i = 0; i < BackpackSlots.Count; i++ )
 			{
-				var item = Backpack.GetFromSlot( i );
+				var item = BackpackContainer.GetFromSlot( i );
 
 				BackpackSlots[i].SetItem( item );
 				BackpackSlots[i].IsSelected = false;
@@ -100,7 +100,7 @@ namespace Facepunch.CoreWars
 
 			for ( ushort i = 0; i < StorageSlots.Count; i++)
 			{
-				var item = Container.GetFromSlot( i );
+				var item = StorageContainer.GetFromSlot( i );
 
 				StorageSlots[i].SetItem( item );
 				StorageSlots[i].IsSelected = false;
@@ -121,9 +121,9 @@ namespace Facepunch.CoreWars
 		{
 			base.PostTemplateApplied();
 
-			if ( Local.Pawn is Player player && Container.IsValid() )
+			if ( Local.Pawn is Player player && StorageContainer.IsValid() )
 			{
-				SetContainer( Container );
+				SetContainer( StorageContainer );
 			}
 
 			BindClass( "hidden", () => !IsOpen );

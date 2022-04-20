@@ -15,6 +15,8 @@ namespace Facepunch.CoreWars
 		public bool IsSelected { get; set; }
 		public string StackSize => (Item.IsValid() && Item.StackSize > 1) ? Item.StackSize.ToString() : string.Empty;
 		public float IconSize => Box.Rect.Size.Length;
+		public string DefaultIcon { get; private set; }
+		public ArmorSlot ArmorSlot { get; private set; }
 
 		public InventorySlot() { }
 
@@ -24,11 +26,21 @@ namespace Facepunch.CoreWars
 
 			if ( !item.IsValid() )
 			{
-				Style.BackgroundImage = null;
+				if ( !string.IsNullOrEmpty( DefaultIcon ) )
+				{
+					Style.SetBackgroundImage( DefaultIcon );
+					Style.BackgroundSizeX = Length.Cover;
+					Style.BackgroundSizeY = Length.Cover;
+				}
+				else
+				{
+					Style.BackgroundImage = null;
+				}
+
 				return;
 			}
 
-			var icon = item.GetIcon();
+			var icon = item.Icon;
 
 			if ( !string.IsNullOrEmpty( icon ) )
 			{
@@ -42,13 +54,55 @@ namespace Facepunch.CoreWars
 			}
 		}
 
+		public void SetArmorSlot( ArmorSlot slot )
+		{
+			ArmorSlot = slot;
+		}
+
+		public void SetDefaultIcon( string icon )
+		{
+			DefaultIcon = icon;
+		}
+
+		public string GetIconTexture()
+		{
+			return Item.IsValid() ? Item.Icon : null;
+		}
+
+		public bool CanDrop( IDraggable draggable, DraggableMode mode )
+		{
+			if ( draggable is not InventorySlot slot ) return false;
+			if ( slot.Item == Item ) return false;
+
+			if ( ArmorSlot != ArmorSlot.None )
+			{
+				if ( slot.Item is not ArmorItem armor )
+					return false;
+
+				if ( armor.ArmorSlot != ArmorSlot )
+					return false;
+			}
+
+			return true;
+		}
+
+		public void OnDrop( IDraggable draggable, DraggableMode mode )
+		{
+			if ( draggable is not InventorySlot slot ) return;
+
+			if ( mode == DraggableMode.Move )
+				InventorySystem.SendMoveInventoryEvent( slot.Container, Container, slot.Slot, Slot );
+			else
+				InventorySystem.SendSplitInventoryEvent( slot.Container, Container, slot.Slot, Slot );
+		}
+
 		protected override void OnRightClick( MousePanelEvent e )
 		{
 			if ( !Item.IsValid() ) return;
 
 			var container = Item.Container;
 			var transferContainer = container.TransferTarget;
-			
+
 			if ( transferContainer.IsValid() )
 			{
 				InventorySystem.SendTransferInventoryEvent( container, transferContainer, Item.SlotId );
@@ -78,28 +132,6 @@ namespace Facepunch.CoreWars
 		{
 			BindClass( "selected", () => IsSelected );
 			base.PostTemplateApplied();
-		}
-
-		public string GetIconTexture()
-		{
-			return Item.IsValid() ? Item.GetIcon() : null;
-		}
-
-		public bool CanDrop( IDraggable draggable, DraggableMode mode )
-		{
-			if ( draggable is not InventorySlot slot ) return false;
-			if ( slot.Item == Item ) return false;
-			return true;
-		}
-
-		public void OnDrop( IDraggable draggable, DraggableMode mode )
-		{
-			if ( draggable is not InventorySlot slot ) return;
-
-			if ( mode == DraggableMode.Move )
-				InventorySystem.SendMoveInventoryEvent( slot.Container, Container, slot.Slot, Slot );
-			else
-				InventorySystem.SendSplitInventoryEvent( slot.Container, Container, slot.Slot, Slot );
 		}
 	}
 }

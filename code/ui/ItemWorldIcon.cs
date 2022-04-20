@@ -19,7 +19,7 @@ namespace Facepunch.CoreWars
 			StyleSheet.Load( "/ui/ItemWorldIcon.scss" );
 			Container = Add.Panel( "container" );
 			Entity = entity;
-			Icon = Container.Add.Image( entity.Item.Instance.GetIcon(), "icon" );
+			Icon = Container.Add.Image( entity.Item.Instance.Icon, "icon" );
 		}
 
 		public override void Tick()
