@@ -14,6 +14,8 @@ namespace Facepunch.CoreWars.Inventory
 			CloseInventory,
 			OpenInventory,
 			MoveInventory,
+			SplitInventory,
+			TransferInventory,
 			GiveItem,
 			TakeItem
 		}
@@ -103,6 +105,32 @@ namespace Facepunch.CoreWars.Inventory
 			}
 		}
 
+		public static InventoryItem CreateDuplicateItem( InventoryItem item )
+		{
+			var attribute = Library.GetAttribute( item.GetType() );
+			var duplicate = CreateItem( attribute.Identifier );
+			
+			using ( var writeStream = new MemoryStream() )
+			{
+				using ( var writer = new BinaryWriter( writeStream ) )
+				{
+					item.Write( writer );
+				}
+
+				var data = writeStream.ToArray();
+
+				using ( var readStream = new MemoryStream( data ) )
+				{
+					using ( var reader = new BinaryReader( readStream ) )
+					{
+						duplicate.Read( reader );
+					}
+				}
+			}
+
+			return duplicate;
+		}
+
 		public static T CreateItem<T>( ulong itemId = 0 ) where T : InventoryItem
 		{
 			var attribute = Library.GetAttribute( typeof( T ) );
@@ -166,6 +194,35 @@ namespace Facepunch.CoreWars.Inventory
 				{
 					writer.Write( container.InventoryId );
 					SendEventDataToClient( to, NetworkEvent.CloseInventory, stream.ToArray() );
+				}
+			}
+		}
+
+		public static void SendTransferInventoryEvent( InventoryContainer from, InventoryContainer to, ushort fromSlot )
+		{
+			using ( var stream = new MemoryStream() )
+			{
+				using ( var writer = new BinaryWriter( stream ) )
+				{
+					writer.Write( fromSlot );
+					writer.Write( from.InventoryId );
+					writer.Write( to.InventoryId );
+					SendEventDataToServer( NetworkEvent.TransferInventory, Convert.ToBase64String( stream.ToArray() ) );
+				}
+			}
+		}
+
+		public static void SendSplitInventoryEvent( InventoryContainer from, InventoryContainer to, ushort fromSlot, ushort toSlot )
+		{
+			using ( var stream = new MemoryStream() )
+			{
+				using ( var writer = new BinaryWriter( stream ) )
+				{
+					writer.Write( fromSlot );
+					writer.Write( from.InventoryId );
+					writer.Write( toSlot );
+					writer.Write( to.InventoryId );
+					SendEventDataToServer( NetworkEvent.SplitInventory, Convert.ToBase64String( stream.ToArray() ) );
 				}
 			}
 		}
@@ -285,6 +342,64 @@ namespace Facepunch.CoreWars.Inventory
 			container?.ProcessGiveItemEvent( reader );
 		}
 
+		private static void ProcessTransferInventoryEvent( BinaryReader reader )
+		{
+			var fromSlot = reader.ReadUInt16();
+			var fromId = reader.ReadUInt64();
+			var toId = reader.ReadUInt64();
+			var fromInventory = Find( fromId );
+			var toInventory = Find( toId );
+
+			if ( fromInventory == null )
+			{
+				Log.Error( "Unable to locate inventory by Id #" + fromId );
+				return;
+			}
+
+			if ( toInventory == null )
+			{
+				Log.Error( "Unable to locate inventory by Id #" + toId );
+				return;
+			}
+
+			if ( IsServer )
+			{
+				var item = fromInventory.GetFromSlot( fromSlot );
+
+				if ( item.IsValid() )
+				{
+					toInventory.Stack( item );
+				}
+			}
+		}
+
+		private static void ProcessSplitInventoryEvent( BinaryReader reader )
+		{
+			var fromSlot = reader.ReadUInt16();
+			var fromId = reader.ReadUInt64();
+			var toSlot = reader.ReadUInt16();
+			var toId = reader.ReadUInt64();
+			var fromInventory = Find( fromId );
+			var toInventory = Find( toId );
+
+			if ( fromInventory == null )
+			{
+				Log.Error( "Unable to locate inventory by Id #" + fromId );
+				return;
+			}
+
+			if ( toInventory == null )
+			{
+				Log.Error( "Unable to locate inventory by Id #" + toId );
+				return;
+			}
+
+			if ( IsServer )
+			{
+				fromInventory.Split( toInventory, fromSlot, toSlot );
+			}
+		}
+
 		private static void ProcessMoveInventoryEvent( BinaryReader reader )
 		{
 			var fromSlot = reader.ReadUInt16();
@@ -351,6 +466,12 @@ namespace Facepunch.CoreWars.Inventory
 					{
 						case NetworkEvent.CloseInventory:
 							ProcessCloseInventoryEvent( reader, ConsoleSystem.Caller );
+							break;
+						case NetworkEvent.TransferInventory:
+							ProcessTransferInventoryEvent( reader );
+							break;
+						case NetworkEvent.SplitInventory:
+							ProcessSplitInventoryEvent( reader );
 							break;
 						case NetworkEvent.MoveInventory:
 							ProcessMoveInventoryEvent( reader );

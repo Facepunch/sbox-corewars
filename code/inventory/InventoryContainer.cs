@@ -47,6 +47,7 @@ namespace Facepunch.CoreWars.Inventory
 			}
 		}
 
+		public InventoryContainer TransferContainer { get; private set; }
 		public ulong InventoryId { get; private set; }
 		public Entity Entity { get; }
 		public List<Client> Connections { get; }
@@ -96,6 +97,16 @@ namespace Facepunch.CoreWars.Inventory
 		public void InvokeServerClosed()
 		{
 			OnServerClosed?.Invoke();
+		}
+
+		public void SetTransferContainer( InventoryContainer container )
+		{
+			TransferContainer = container;
+		}
+
+		public void ClearTransferContainer()
+		{
+			TransferContainer = null;
 		}
 
 		public void SendCloseEvent( Client player )
@@ -223,6 +234,53 @@ namespace Facepunch.CoreWars.Inventory
 			}
 
 			return output;
+		}
+
+		public bool Split( InventoryContainer target, ushort fromSlot, ushort toSlot )
+		{
+			if ( !IsOccupied( fromSlot ) )
+			{
+				return false;
+			}
+
+			if ( IsClient )
+			{
+				InventorySystem.SendSplitInventoryEvent( this, target, fromSlot, toSlot );
+				return true;
+			}
+
+			var item = GetFromSlot( fromSlot );
+
+			if ( item.StackSize == 1 )
+			{
+				return Move( target, fromSlot, toSlot );
+			}
+
+			var splitStackSize = item.StackSize / 2;
+
+			if ( item.StackSize - splitStackSize <= 0 )
+			{
+				return Move( target, fromSlot, toSlot );
+			}
+
+			var splitItem = InventorySystem.CreateDuplicateItem( item );
+			splitItem.StackSize = (ushort)splitStackSize;
+
+			var targetItem = target.GetFromSlot( toSlot );
+
+			if ( targetItem.IsValid() )
+			{
+				var remaining = target.Stack( splitItem, toSlot );
+				splitStackSize -= remaining;
+				item.StackSize -= (ushort)splitStackSize;
+			}
+			else
+			{
+				target.Give( splitItem, toSlot );
+				item.StackSize -= (ushort)splitStackSize;
+			}
+
+			return true;
 		}
 
 		public bool Move( InventoryContainer target, ushort fromSlot, ushort toSlot )
@@ -420,6 +478,41 @@ namespace Facepunch.CoreWars.Inventory
 			SendGiveEvent( slot, instance );
 
 			return true;
+		}
+
+		public ushort Stack( InventoryItem instance, ushort slot )
+		{
+			var amount = instance.StackSize;
+			var item = ItemList[slot];
+
+			if ( item != null && item.IsSameType( instance ) && item.CanStackWith( instance ) )
+			{
+				var amountCanStack = (ushort)Math.Max( item.MaxStackSize - item.StackSize, 0 );
+
+				if ( amountCanStack >= amount )
+				{
+					item.StackSize += amount;
+					amount = 0;
+				}
+				else
+				{
+					item.StackSize += amountCanStack;
+					amount = (ushort)Math.Max( amount - amountCanStack, 0 );
+				}
+
+				if ( amount == 0 ) return 0;
+			}
+
+			if ( amount > 0 )
+			{
+				if ( Give( instance, slot ) )
+				{
+					instance.StackSize = amount;
+					return 0;
+				}
+			}
+
+			return amount;
 		}
 
 		public ushort Stack( InventoryItem instance )
