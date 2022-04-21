@@ -14,10 +14,13 @@ namespace Facepunch.CoreWars
 
 		public InventoryContainer StorageContainer { get; private set; }
 		public InventoryContainer BackpackContainer { get; private set; }
+		public InventoryContainer HotbarContainer { get; private set; }
 		public List<InventorySlot> BackpackSlots { get; private set; }
 		public List<InventorySlot> StorageSlots { get; private set; }
+		public List<InventorySlot> HotbarSlots { get; private set; }
 		public Panel BackpackSlotRoot { get; set; }
 		public Panel StorageSlotRoot { get; set; }
+		public Panel HotbarSlotRoot { get; set; }
 		public bool IsOpen { get; set; }
 		public Entity Entity { get; private set; }
 		public string Name { get; private set; }
@@ -26,6 +29,7 @@ namespace Facepunch.CoreWars
 		{
 			BackpackSlots = new();
 			StorageSlots = new();
+			HotbarSlots = new();
 			Current = this;
 		}
 
@@ -58,15 +62,19 @@ namespace Facepunch.CoreWars
 
 			BackpackSlots ??= new();
 			StorageSlots ??= new();
+			HotbarSlots ??= new();
 
 			BackpackSlotRoot.DeleteChildren( true );
 			StorageSlotRoot.DeleteChildren( true );
+			HotbarSlotRoot.DeleteChildren( true );
 
 			BackpackSlots.Clear();
 			StorageSlots.Clear();
+			HotbarSlots.Clear();
 
 			StorageContainer = container;
 			BackpackContainer = player.BackpackInventory.Instance;
+			HotbarContainer = player.HotbarInventory.Instance;
 
 			for ( ushort i = 0; i < container.SlotLimit; i++ )
 			{
@@ -83,6 +91,14 @@ namespace Facepunch.CoreWars
 				slot.Slot = i;
 				BackpackSlots.Add( slot );
 			}
+
+			for ( ushort i = 0; i < HotbarContainer.SlotLimit; i++ )
+			{
+				var slot = HotbarSlotRoot.AddChild<InventorySlot>();
+				slot.Container = HotbarContainer;
+				slot.Slot = i;
+				HotbarSlots.Add( slot );
+			}
 		}
 
 		public override void Tick()
@@ -96,6 +112,14 @@ namespace Facepunch.CoreWars
 
 				BackpackSlots[i].SetItem( item );
 				BackpackSlots[i].IsSelected = false;
+			}
+
+			for ( ushort i = 0; i < HotbarSlots.Count; i++ )
+			{
+				var item = HotbarContainer.GetFromSlot( i );
+
+				HotbarSlots[i].SetItem( item );
+				HotbarSlots[i].IsSelected = false;
 			}
 
 			for ( ushort i = 0; i < StorageSlots.Count; i++)
