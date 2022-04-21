@@ -14,7 +14,6 @@ namespace Facepunch.CoreWars.Inventory
 		public virtual ushort DefaultStackSize => 1;
 		public virtual ushort MaxStackSize => 1;
 		public virtual string WorldModel => string.Empty;
-		public virtual bool IsStackable => false;
 		public virtual string Description => string.Empty;
 		public virtual string Name => string.Empty;
 		public virtual string Icon => string.Empty;

@@ -4,6 +4,7 @@ using Facepunch.Voxels;
 using Sandbox;
 using System;
 using System.IO;
+using System.Linq;
 
 namespace Facepunch.CoreWars
 {
@@ -54,6 +55,13 @@ namespace Facepunch.CoreWars
 
 		protected override void GenerateItems()
 		{
+			var itemsInArea = FindInSphere( Position, CollisionBounds.Size.Length * 2f )
+				.OfType<ItemEntity>()
+				.Where( entity => entity.Item.Instance is IronItem )
+				.Count();
+
+			if ( itemsInArea >= 16 ) return;
+
 			var item = InventorySystem.CreateItem<IronItem>();
 			item.StackSize = 4;
 
