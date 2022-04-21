@@ -2,6 +2,7 @@
 using Facepunch.Voxels;
 using Sandbox;
 using Sandbox.UI;
+using System;
 using System.Linq;
 
 namespace Facepunch.CoreWars
@@ -17,6 +18,7 @@ namespace Facepunch.CoreWars
 		public float IconSize => Box.Rect.Size.Length;
 		public string DefaultIcon { get; private set; }
 		public ArmorSlot ArmorSlot { get; private set; }
+		public Action<InventorySlot> OnSelected { get; set; }
 		public Panel Icon { get; set; }
 
 		public InventorySlot() { }
@@ -83,6 +85,12 @@ namespace Facepunch.CoreWars
 				InventorySystem.SendMoveInventoryEvent( slot.Container, Container, slot.Slot, Slot );
 			else
 				InventorySystem.SendSplitInventoryEvent( slot.Container, Container, slot.Slot, Slot );
+		}
+
+		protected override void OnClick( MousePanelEvent e )
+		{
+			OnSelected?.Invoke( this );
+			base.OnClick( e );
 		}
 
 		protected override void OnRightClick( MousePanelEvent e )
