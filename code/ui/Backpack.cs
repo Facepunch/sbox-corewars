@@ -122,7 +122,7 @@ namespace Facepunch.CoreWars
 					SetBackpack( player.BackpackInventory.Instance );
 
 				if ( player.EquipmentInventory.IsValid() )
-					SetBackpack( player.EquipmentInventory.Instance );
+					SetEquipment( player.EquipmentInventory.Instance );
 			}
 
 			BindClass( "hidden", () => !IsOpen );

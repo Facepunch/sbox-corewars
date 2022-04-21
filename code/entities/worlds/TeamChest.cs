@@ -70,8 +70,7 @@ namespace Facepunch.CoreWars
 		[ClientRpc]
 		private void OpenForClient( byte[] data )
 		{
-			if ( Local.Pawn is not Player player )
-				return;
+			if ( Local.Pawn is not Player ) return;
 
 			var container = InventoryContainer.Deserialize( data );
 			var storage = Storage.Current;
