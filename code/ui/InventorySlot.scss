@@ -1,11 +1,11 @@
 ﻿InventorySlot {
     transition: all 0.1s ease-in;
-    background-color: #f5deb363;
+    background-color: rgba( 50 50 50 0.4 );
     justify-content: center;
     align-items: center;
     width: 80px;
     height: 80px;
-    opacity: 0.8;
+    border-radius: 2px;
 
     .icon {
         width: 80%;
@@ -27,10 +27,8 @@
 
     &.selected {
         transition: all 0.1s ease-out;
-        background-color: #b6e074;
+        background-color: rgba( #7cd8ef 0.3 );
         transform: scale( 1.1 1.1 );
-        border-color: green;
-        border-width: 2px;
         opacity: 1;
     }
 
@@ -41,13 +39,13 @@
 
     &.valid-drag {
         transition: all 0.1s ease-out;
-        background-color: #b6e074;
+        background-color: rgba( #b6e074 0.3 );
         transform: scale( 1.1 1.1 );
     }
 
     &.invalid-drag {
         transition: all 0.1s ease-out;
-        background-color: #e07474;
+        background-color: rgba( #e07474 0.3 );
         transform: scale( 1.1 1.1 );
     }
 }

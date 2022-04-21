@@ -7,10 +7,9 @@
     display: flex;
     pointer-events: none;
     backdrop-filter-blur: 24px;
+    background-color: rgba( 50 35 25 0.8 );
 
     .backpack, .storage {
-        background-color: rgba( 0 0 0 0.7 );
-        border-radius: 8px;
         padding: 32px;
         width: 30%;
         display: flex;
@@ -30,8 +29,6 @@
             display: flex;
             flex-direction: row;
             flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
 
             InventorySlot {
                 margin-right: 10px;
