@@ -64,7 +64,20 @@ namespace Facepunch.CoreWars
 				SetContainer( player.HotbarInventory.Instance );
 			}
 
+			BindClass( "hidden", IsHidden );
+
 			base.PostTemplateApplied();
+		}
+
+		private bool IsHidden()
+		{
+			if ( Backpack.Current?.IsOpen ?? false )
+				return true;
+
+			if ( Storage.Current?.IsOpen ?? false )
+				return true;
+
+			return false;
 		}
 	}
 }
