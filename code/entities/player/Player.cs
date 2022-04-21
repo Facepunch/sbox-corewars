@@ -282,9 +282,11 @@ namespace Facepunch.CoreWars
 		{
 			if ( IsLocalPawn )
 			{
-				Hotbar.Current?.SetContainer( HotbarInventory.Instance );
 				Backpack.Current?.SetBackpack( BackpackInventory.Instance );
 				Backpack.Current?.SetEquipment( EquipmentInventory.Instance );
+				Backpack.Current?.SetHotbar( HotbarInventory.Instance );
+
+				Hotbar.Current?.SetContainer( HotbarInventory.Instance );
 			}
 
 			base.ClientSpawn();
