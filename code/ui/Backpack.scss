@@ -10,7 +10,7 @@
     flex-direction: column;
     background-color: rgba( 50 35 25 0.8 );
 
-    .backpack, .equipment {
+    .backpack, .equipment, .hotbar {
         padding: 32px;
         width: 40%;
         display: flex;
@@ -42,14 +42,14 @@
         }
     }
 
-    .equipment {
+    .equipment, .backpack {
         margin-bottom: 32px;
     }
 
     &.hidden {
         display: none;
 
-        .equipment, .backpack {
+        .equipment, .backpack, .hotbar {
             pointer-events: none;
         }
     }
