@@ -24,11 +24,14 @@ namespace Facepunch.CoreWars
 		{
 			if ( Current?.ActiveDraggable == draggable )
 			{
-				Current.UpdateDroppable();
-
-				if ( Current.ActiveDroppable?.CanDrop( draggable, Current.Mode ) ?? false )
+				if ( Current.IsActive )
 				{
-					Current.ActiveDroppable.OnDrop( Current.ActiveDraggable, Current.Mode );
+					Current.UpdateDroppable();
+
+					if ( Current.ActiveDroppable?.CanDrop( draggable, Current.Mode ) ?? false )
+					{
+						Current.ActiveDroppable.OnDrop( Current.ActiveDraggable, Current.Mode );
+					}
 				}
 
 				Current.Delete();
@@ -38,10 +41,18 @@ namespace Facepunch.CoreWars
 
 		public DraggableMode Mode { get; private set; }
 		public IDraggable ActiveDraggable { get; private set; }
+
+		private TimeSince TimeSinceStarted { get; set; }
+		private Vector3 StartPosition { get; set; }
 		private IDroppable ActiveDroppable { get; set; }
+		private bool IsActive { get; set; }
 
 		public Draggable()
 		{
+			TimeSinceStarted = 0f;
+			StartPosition = Mouse.Position;
+			IsActive = false;
+
 			Current?.Delete( true );
 			Current = this;
 		}
@@ -67,6 +78,18 @@ namespace Facepunch.CoreWars
 
 		public override void Tick()
 		{
+			SetClass( "active", IsActive );
+
+			if ( !IsActive )
+			{
+				if ( TimeSinceStarted > 0.3f || Mouse.Position.Distance( StartPosition ) > 4f )
+				{
+					IsActive = true;
+				}
+
+				return;
+			}
+
 			UpdatePosition();
 			UpdateDroppable();
 
