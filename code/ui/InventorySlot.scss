@@ -1,40 +1,53 @@
 ﻿InventorySlot {
     transition: all 0.1s ease-in;
     background-color: #f5deb363;
-    border-color: wheat;
-    border-width: 2px;
+    justify-content: center;
+    align-items: center;
     width: 80px;
     height: 80px;
     opacity: 0.8;
 
+    .icon {
+        width: 80%;
+        height: 80%;
+        background-position: center;
+        background-size: cover;
+    }
+
     .stacksize {
+        text-stroke: 4px black;
         position: absolute;
-        bottom: 8px;
-        right: 8px;
+        bottom: 4px;
+        right: 4px;
         font-family: Roboto;
         font-weight: bold;
-        font-size: 24px;
+        font-size: 20px;
         color: white;
     }
 
     &.selected {
         transition: all 0.1s ease-out;
-        box-shadow: 0px 10px 13px -7px #000000, 0px 0px 27px 3px rgba(97,223,41,0.81);
+        background-color: #b6e074;
         transform: scale( 1.1 1.1 );
         border-color: green;
-        border-width: 4px;
+        border-width: 2px;
         opacity: 1;
     }
 
     &:hover {
-        border-color: white;
+        transition: all 0.1s ease-out;
+        transform: scale( 1.1 1.1 );
     }
 
     &.valid-drag {
-        border-color: green;
+        transition: all 0.1s ease-out;
+        background-color: #b6e074;
+        transform: scale( 1.1 1.1 );
     }
 
     &.invalid-drag {
-        border-color: red;
+        transition: all 0.1s ease-out;
+        background-color: #e07474;
+        transform: scale( 1.1 1.1 );
     }
 }

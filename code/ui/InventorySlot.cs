@@ -17,6 +17,7 @@ namespace Facepunch.CoreWars
 		public float IconSize => Box.Rect.Size.Length;
 		public string DefaultIcon { get; private set; }
 		public ArmorSlot ArmorSlot { get; private set; }
+		public Panel Icon { get; set; }
 
 		public InventorySlot() { }
 
@@ -27,15 +28,9 @@ namespace Facepunch.CoreWars
 			if ( !item.IsValid() )
 			{
 				if ( !string.IsNullOrEmpty( DefaultIcon ) )
-				{
-					Style.SetBackgroundImage( DefaultIcon );
-					Style.BackgroundSizeX = Length.Cover;
-					Style.BackgroundSizeY = Length.Cover;
-				}
+					Icon.Style.SetBackgroundImage( DefaultIcon );
 				else
-				{
-					Style.BackgroundImage = null;
-				}
+					Icon.Style.BackgroundImage = null;
 
 				return;
 			}
@@ -43,15 +38,9 @@ namespace Facepunch.CoreWars
 			var icon = item.Icon;
 
 			if ( !string.IsNullOrEmpty( icon ) )
-			{
-				Style.SetBackgroundImage( icon );
-				Style.BackgroundSizeX = Length.Cover;
-				Style.BackgroundSizeY = Length.Cover;
-			}
+				Icon.Style.SetBackgroundImage( icon );
 			else
-			{
-				Style.BackgroundImage = null;
-			}
+				Icon.Style.BackgroundImage = null;
 		}
 
 		public void SetArmorSlot( ArmorSlot slot )
