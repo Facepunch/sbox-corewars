@@ -327,26 +327,16 @@ namespace Facepunch.CoreWars.Inventory
 			if ( target.IsOccupied( toSlot ) )
 			{
 				var toInstance = target.ItemList[toSlot];
-				var canStack = false;
-
-				fromInstance.Container = target;
-				fromInstance.SlotId = toSlot;
-
-				toInstance.Container = this;
-				toInstance.SlotId = fromSlot;
-
-				if ( fromInstance.IsSameType( toInstance ) && fromInstance.IsStackable )
-				{
-					canStack = fromInstance.CanStackWith( toInstance );
-				}
+				var canStack = fromInstance.IsSameType( toInstance ) && fromInstance.CanStackWith( toInstance );
 
 				if ( canStack )
 				{
-					var amountCanStack = (ushort)Math.Max( toInstance.MaxStackSize - toInstance.StackSize, 0 );
+					ushort amountCanStack = (ushort)Math.Max( toInstance.MaxStackSize - toInstance.StackSize, 0 );
+					ushort amountToTake = 0;
 
 					if ( amountCanStack > 0 )
 					{
-						var amountToTake = fromInstance.StackSize;
+						amountToTake = fromInstance.StackSize;
 
 						if ( amountCanStack < amountToTake )
 							amountToTake = amountCanStack;
@@ -355,30 +345,36 @@ namespace Facepunch.CoreWars.Inventory
 							toInstance.StackSize += amountToTake;
 
 						if ( amountToTake >= fromInstance.StackSize )
+						{
 							fromInstance.StackSize = 0;
+							ClearSlot( fromSlot );
+						}
 						else
+						{
 							fromInstance.StackSize -= amountCanStack;
+						}
 					}
 
-					target.ItemList[toSlot] = toInstance;
-					target.SendGiveEvent( toSlot, toInstance );
-
-					if ( fromInstance.StackSize == 0 )
+					if ( amountToTake > 0 )
 					{
-						ClearSlot( fromSlot );
+						return true;
 					}
 				}
-				else
-				{
-					SendTakeEvent( fromSlot, fromInstance );
-					target.SendTakeEvent( toSlot, toInstance );
 
-					target.ItemList[toSlot] = fromInstance;
-					target.SendGiveEvent( toSlot, fromInstance );
+				fromInstance.Container = target;
+				fromInstance.SlotId = toSlot;
 
-					ItemList[fromSlot] = toInstance;
-					SendGiveEvent( fromSlot, toInstance );
-				}
+				toInstance.Container = this;
+				toInstance.SlotId = fromSlot;
+
+				SendTakeEvent( fromSlot, fromInstance );
+				target.SendTakeEvent( toSlot, toInstance );
+
+				target.ItemList[toSlot] = fromInstance;
+				target.SendGiveEvent( toSlot, fromInstance );
+
+				ItemList[fromSlot] = toInstance;
+				SendGiveEvent( fromSlot, toInstance );
 			}
 			else
 			{

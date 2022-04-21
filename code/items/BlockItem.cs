@@ -11,7 +11,6 @@ namespace Facepunch.CoreWars
 		public byte BlockId { get; set; }
 
 		public override ushort MaxStackSize => 60;
-		public override bool IsStackable => true;
 
 		public override string Name
 		{
