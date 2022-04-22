@@ -1,6 +1,7 @@
 ﻿using Sandbox;
 using System;
 using System.IO;
+using System.Linq;
 
 namespace Facepunch.CoreWars.Inventory
 {
@@ -29,7 +30,6 @@ namespace Facepunch.CoreWars.Inventory
 
 			CollisionGroup = CollisionGroup.Weapon;
 			SetInteractsAs( CollisionLayer.Debris );
-			EnableTouch = true;
 		}
 
 		public InventoryItem Take()
@@ -65,11 +65,14 @@ namespace Facepunch.CoreWars.Inventory
 			base.ClientSpawn();
 		}
 
-		public override void StartTouch( Entity other )
+		[Event.Tick.Server]
+		protected virtual void ServerTick()
 		{
-			if ( IsServer && other is Player player )
+			if ( TimeUntilCanPickup && Item.IsValid() )
 			{
-				if ( TimeUntilCanPickup && Item.IsValid() )
+				var player = FindInSphere( Position, 32f ).OfType<Player>().FirstOrDefault();
+
+				if ( player.IsValid() )
 				{
 					var remaining = player.TryGiveItem( Item.Instance );
 
@@ -81,14 +84,6 @@ namespace Facepunch.CoreWars.Inventory
 					}
 				}
 			}
-
-			base.StartTouch( other );
-		}
-
-		[Event.Tick.Client]
-		protected virtual void ClientTick()
-		{
-			
 		}
 
 		protected override void OnDestroy()
