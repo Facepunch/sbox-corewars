@@ -11,6 +11,13 @@
   background-color: rgba(50 35 25 0.8);
 
   .backpack,
+  .storage {
+    .slots {
+      max-width: 472px;
+    }
+  }
+
+  .backpack,
   .storage,
   .hotbar {
     padding: 32px;
@@ -33,7 +40,6 @@
       flex-direction: row;
       flex-wrap: wrap;
       flex-shrink: 1;
-      max-width: 472px;
 
       InventorySlot {
         margin-left: 10px;
