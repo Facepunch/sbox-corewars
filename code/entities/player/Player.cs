@@ -256,6 +256,8 @@ namespace Facepunch.CoreWars
 		public override void Spawn()
 		{
 			EnableDrawing = false;
+			EnableTouch = true;
+
 			base.Spawn();
 		}
 
@@ -577,6 +579,23 @@ namespace Facepunch.CoreWars
 			InventorySystem.Register( equipment );
 
 			EquipmentInventory = new NetInventoryContainer( equipment );
+		}
+
+		public override void StartTouch( Entity other )
+		{
+			base.StartTouch( other );
+
+			if ( other is not ItemEntity itemEntity ) return;
+			if ( !itemEntity.TimeUntilCanPickup || !itemEntity.Item.IsValid() ) return;
+
+			var remaining = TryGiveItem( itemEntity.Item.Instance );
+
+			if ( remaining == 0 )
+			{
+				itemEntity.Take();
+			}
+
+			base.StartTouch( other );
 		}
 
 		[Event.Tick.Server]

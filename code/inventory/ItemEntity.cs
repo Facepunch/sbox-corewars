@@ -11,6 +11,7 @@ namespace Facepunch.CoreWars.Inventory
 
 		public TimeUntil TimeUntilCanPickup { get; set; }
 
+		private PickupTrigger PickupTrigger { get; set; }
 		private ItemWorldIcon Icon { get; set; }
 
 		public void SetItem( InventoryItem item )
@@ -24,6 +25,12 @@ namespace Facepunch.CoreWars.Inventory
 			{
 				SetupPhysicsFromSphere( PhysicsMotionType.Dynamic, Vector3.Zero, 8f );
 			}
+
+			PickupTrigger = new PickupTrigger
+			{
+				Parent = this,
+				Position = Position
+			};
 
 			Item = new NetInventoryItem( item );
 			item.SetWorldEntity( this );
@@ -63,27 +70,6 @@ namespace Facepunch.CoreWars.Inventory
 			}
 
 			base.ClientSpawn();
-		}
-
-		[Event.Tick.Server]
-		protected virtual void ServerTick()
-		{
-			if ( TimeUntilCanPickup && Item.IsValid() )
-			{
-				var player = FindInSphere( Position, 32f ).OfType<Player>().FirstOrDefault();
-
-				if ( player.IsValid() )
-				{
-					var remaining = player.TryGiveItem( Item.Instance );
-
-					if ( remaining == 0 )
-					{
-						Item.Instance.ClearWorldEntity();
-						Item = null;
-						Delete();
-					}
-				}
-			}
 		}
 
 		protected override void OnDestroy()
