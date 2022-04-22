@@ -12,16 +12,14 @@ namespace Facepunch.CoreWars.Inventory
 		public delegate void SlotChangedCallback( ushort slot );
 		public delegate bool GiveConditionCallback( ushort slot, InventoryItem instance );
 		public delegate bool TakeConditionCallback( ushort slot, InventoryItem instance );
+		public delegate InventoryContainer TransferTargetCallback( InventoryItem instance );
 
 		public event SlotChangedCallback OnSlotChanged;
 		public event SlotChangedCallback OnDataChanged;
 		public event ItemGivenCallback OnItemGiven;
 		public event ItemTakenCallback OnItemTaken;
-		public event Action<Client> OnClientClosed;
 		public event Action<Client> OnConnectionRemoved;
 		public event Action<Client> OnConnectionAdded;
-		public event Action OnServerOpened;
-		public event Action OnServerClosed;
 
 		private bool InternalIsDirty;
 
@@ -49,9 +47,9 @@ namespace Facepunch.CoreWars.Inventory
 			}
 		}
 
+		public TransferTargetCallback TransferTargetHandler { get; private set; }
 		public GiveConditionCallback GiveCondition { get; private set; }
 		public TakeConditionCallback TakeCondition { get; private set; }
-		public InventoryContainer TransferTarget { get; private set; }
 		public ulong InventoryId { get; private set; }
 		public Entity Entity { get; }
 		public List<Client> Connections { get; }
@@ -88,19 +86,9 @@ namespace Facepunch.CoreWars.Inventory
 			OnDataChanged?.Invoke( slot );
 		}
 
-		public void InvokePlayerClosed( Client client )
+		public void SetTransferTargetHandler( TransferTargetCallback callback )
 		{
-			OnClientClosed?.Invoke( client );
-		}
-
-		public void InvokeServerOpened()
-		{
-			OnServerOpened?.Invoke();
-		}
-
-		public void InvokeServerClosed()
-		{
-			OnServerClosed?.Invoke();
+			TransferTargetHandler = callback;
 		}
 
 		public void SetGiveCondition( GiveConditionCallback condition )
@@ -111,39 +99,6 @@ namespace Facepunch.CoreWars.Inventory
 		public void SetTakeCondition( TakeConditionCallback condition )
 		{
 			TakeCondition = condition;
-		}
-
-		public void SetTransferTarget( InventoryContainer container )
-		{
-			TransferTarget = container;
-		}
-
-		public void ClearTransferTarget()
-		{
-			TransferTarget = null;
-		}
-
-		public void SendCloseEvent( Client player )
-		{
-			if ( IsServer )
-			{
-				InventorySystem.SendCloseInventoryEvent( To.Single( player ), this );
-			}
-		}
-
-		public void SendCloseEvent()
-		{
-			if ( IsServer )
-			{
-				if ( Connections.Count > 0 )
-				{
-					InventorySystem.SendCloseInventoryEvent( To.Multiple( Connections ), this );
-				}
-			}
-			else
-			{
-				InventorySystem.SendCloseInventoryEvent( this );
-			}
 		}
 
 		public bool IsOccupied( ushort slot )

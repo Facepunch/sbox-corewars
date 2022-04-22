@@ -73,6 +73,8 @@ namespace Facepunch.CoreWars
 			HotbarSlots.Clear();
 
 			StorageContainer = container;
+			StorageContainer.SetTransferTargetHandler( GetStorageTransferTarget );
+
 			BackpackContainer = player.BackpackInventory.Instance;
 			HotbarContainer = player.HotbarInventory.Instance;
 
@@ -151,6 +153,11 @@ namespace Facepunch.CoreWars
 			}
 
 			BindClass( "hidden", () => !IsOpen );
+		}
+
+		private InventoryContainer GetStorageTransferTarget( InventoryItem item )
+		{
+			return BackpackContainer;
 		}
 	}
 }

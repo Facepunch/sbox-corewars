@@ -284,11 +284,19 @@ namespace Facepunch.CoreWars
 		{
 			if ( IsLocalPawn )
 			{
-				Backpack.Current?.SetBackpack( BackpackInventory.Instance );
-				Backpack.Current?.SetEquipment( EquipmentInventory.Instance );
-				Backpack.Current?.SetHotbar( HotbarInventory.Instance );
+				var backpack = BackpackInventory.Instance;
+				var equipment = EquipmentInventory.Instance;
+				var hotbar = HotbarInventory.Instance;
 
-				Hotbar.Current?.SetContainer( HotbarInventory.Instance );
+				backpack.SetTransferTargetHandler( GetBackpackTransferTarget );
+				equipment.SetTransferTargetHandler( GetEquipmentTransferTarget );
+				hotbar.SetTransferTargetHandler( GetHotbarTransferTarget );
+
+				Backpack.Current?.SetBackpack( backpack );
+				Backpack.Current?.SetEquipment( equipment );
+				Backpack.Current?.SetHotbar( hotbar );
+
+				Hotbar.Current?.SetContainer( hotbar );
 			}
 
 			base.ClientSpawn();
@@ -611,6 +619,21 @@ namespace Facepunch.CoreWars
 				return slot == 2;
 
 			return false;
+		}
+
+		private InventoryContainer GetBackpackTransferTarget( InventoryItem item )
+		{
+			return Storage.Current.IsOpen ? Storage.Current.StorageContainer : HotbarInventory.Instance;
+		}
+
+		private InventoryContainer GetEquipmentTransferTarget( InventoryItem item )
+		{
+			return Storage.Current.IsOpen ? Storage.Current.StorageContainer : BackpackInventory.Instance;
+		}
+
+		private InventoryContainer GetHotbarTransferTarget( InventoryItem item )
+		{
+			return Storage.Current.IsOpen ? Storage.Current.StorageContainer : BackpackInventory.Instance;
 		}
 
 		private void OnEquipmentItemGiven( ushort slot, InventoryItem instance )

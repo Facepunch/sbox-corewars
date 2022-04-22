@@ -11,8 +11,6 @@ namespace Facepunch.CoreWars.Inventory
 		public enum NetworkEvent
 		{
 			SendDirtyItems,
-			CloseInventory,
-			OpenInventory,
 			MoveInventory,
 			SplitInventory,
 			TransferInventory,
@@ -55,8 +53,6 @@ namespace Facepunch.CoreWars.Inventory
 
 			if ( Containers.Remove( inventoryId ) )
 			{
-				container.SendCloseEvent();
-
 				var itemList = container.RemoveAll();
 
 				if ( destroyItems )
@@ -172,32 +168,6 @@ namespace Facepunch.CoreWars.Inventory
 			}
 		}
 
-		public static void SendOpenInventoryEvent( To to, InventoryContainer container )
-		{
-			using ( var stream = new MemoryStream() )
-			{
-				using ( var writer = new BinaryWriter( stream ) )
-				{
-					var serialized = container.Serialize();
-					writer.Write( serialized.Length );
-					writer.Write( serialized );
-					SendEventDataToClient( to, NetworkEvent.OpenInventory, stream.ToArray() );
-				}
-			}
-		}
-
-		public static void SendCloseInventoryEvent( To to, InventoryContainer container )
-		{
-			using ( var stream = new MemoryStream() )
-			{
-				using ( var writer = new BinaryWriter( stream ) )
-				{
-					writer.Write( container.InventoryId );
-					SendEventDataToClient( to, NetworkEvent.CloseInventory, stream.ToArray() );
-				}
-			}
-		}
-
 		public static void SendTransferInventoryEvent( InventoryContainer from, InventoryContainer to, ushort fromSlot )
 		{
 			using ( var stream = new MemoryStream() )
@@ -238,18 +208,6 @@ namespace Facepunch.CoreWars.Inventory
 					writer.Write( toSlot );
 					writer.Write( to.InventoryId );
 					SendEventDataToServer( NetworkEvent.MoveInventory, Convert.ToBase64String( stream.ToArray() ) );
-				}
-			}
-		}
-
-		public static void SendCloseInventoryEvent( InventoryContainer container )
-		{
-			using ( var stream = new MemoryStream() )
-			{
-				using ( var writer = new BinaryWriter( stream ) )
-				{
-					writer.Write( container.InventoryId );
-					SendEventDataToServer( NetworkEvent.CloseInventory, Convert.ToBase64String( stream.ToArray() ) );
 				}
 			}
 		}
@@ -318,14 +276,6 @@ namespace Facepunch.CoreWars.Inventory
 					SendEventDataToClient( to, NetworkEvent.SendDirtyItems, stream.ToArray() );
 				}
 			}
-		}
-
-		private static void ProcessOpenInventoryEvent( BinaryReader reader, Client client = null )
-		{
-			var dataLength = reader.ReadInt32();
-			var data = reader.ReadBytes( dataLength );
-			var container = InventoryContainer.Deserialize( data );
-			container?.InvokeServerOpened();
 		}
 
 		private static void ProcessTakeItemEvent( BinaryReader reader )
@@ -433,16 +383,6 @@ namespace Facepunch.CoreWars.Inventory
 				fromInventory.Move( toInventory, fromSlot, toSlot );
 		}
 
-		private static void ProcessCloseInventoryEvent( BinaryReader reader, Client client = null )
-		{
-			var container = Find( reader.ReadUInt64() );
-
-			if ( IsServer )
-				container?.InvokePlayerClosed( client );
-			else
-				container?.InvokeServerClosed();
-		}
-
 		private static void ProcessSendDirtyItemsEvent( BinaryReader reader )
 		{
 			var container = Find( reader.ReadUInt64() );
@@ -472,9 +412,6 @@ namespace Facepunch.CoreWars.Inventory
 				{
 					switch ( type )
 					{
-						case NetworkEvent.CloseInventory:
-							ProcessCloseInventoryEvent( reader, ConsoleSystem.Caller );
-							break;
 						case NetworkEvent.TransferInventory:
 							ProcessTransferInventoryEvent( reader );
 							break;
@@ -500,12 +437,6 @@ namespace Facepunch.CoreWars.Inventory
 					{
 						case NetworkEvent.SendDirtyItems:
 							ProcessSendDirtyItemsEvent( reader );
-							break;
-						case NetworkEvent.CloseInventory:
-							ProcessCloseInventoryEvent( reader );
-							break;
-						case NetworkEvent.OpenInventory:
-							ProcessOpenInventoryEvent( reader );
 							break;
 						case NetworkEvent.MoveInventory:
 							ProcessMoveInventoryEvent( reader );

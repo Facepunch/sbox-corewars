@@ -98,7 +98,9 @@ namespace Facepunch.CoreWars
 			if ( !Item.IsValid() ) return;
 
 			var container = Item.Container;
-			var transferContainer = container.TransferTarget;
+			if ( container.TransferTargetHandler == null ) return;
+
+			var transferContainer = container.TransferTargetHandler.Invoke( Item );
 
 			if ( transferContainer.IsValid() )
 			{
