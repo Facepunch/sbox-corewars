@@ -23,6 +23,8 @@ namespace Facepunch.CoreWars
 		public DamageInfo LastDamageTaken { get; private set; }
 		public TimeUntil NextBlockPlace { get; private set; }
 
+		private TimeSince TimeSinceBackpackOpen { get; set; }
+		private bool IsBackpackToggleMode { get; set; }
 		private bool IsWaitingToRespawn { get; set; }
 
 		public Player() : base()
@@ -378,12 +380,30 @@ namespace Facepunch.CoreWars
 			}
 			else
 			{
-				if ( !Storage.Current.IsOpen )
+				if ( Input.Pressed( InputButton.Score ) )
 				{
-					if ( Input.Down( InputButton.Score ) )
-						Backpack.Current?.Open();
+					if ( !Backpack.Current.IsOpen )
+						TimeSinceBackpackOpen = 0f;
 					else
+						IsBackpackToggleMode = false;
+
+					if ( !Storage.Current.IsOpen )
+					{
+						Backpack.Current?.Open();
+					}
+				}
+
+				if ( Input.Released( InputButton.Score ) )
+				{
+					if ( TimeSinceBackpackOpen <= 0.2f )
+					{
+						IsBackpackToggleMode = true;
+					}
+
+					if ( !IsBackpackToggleMode )
+					{
 						Backpack.Current?.Close();
+					}
 				}
 			}
 
