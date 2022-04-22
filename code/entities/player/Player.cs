@@ -121,6 +121,14 @@ namespace Facepunch.CoreWars
 			return true;
 		}
 
+		public List<InventoryItem> FindItems( Type type )
+		{
+			var items = new List<InventoryItem>();
+			items.AddRange( HotbarInventory.Instance.FindItems( type ) );
+			items.AddRange( BackpackInventory.Instance.FindItems( type ) );
+			return items;
+		}
+
 		public ushort TakeAmmo( AmmoType type, ushort count )
 		{
 			var items = new List<AmmoItem>();

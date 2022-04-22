@@ -188,6 +188,21 @@ namespace Facepunch.CoreWars.Inventory
 			}
 		}
 
+		public List<InventoryItem> FindItems( Type type )
+		{
+			var output = new List<T>();
+
+			for ( int i = 0; i < ItemList.Count; i++ )
+			{
+				if ( ItemList[i].GetType() == type )
+				{
+					output.Add( ItemList[i] );
+				}
+			}
+
+			return output;
+		}
+
 		public List<T> FindItems<T>() where T : InventoryItem
 		{
 			var output = new List<T>();
