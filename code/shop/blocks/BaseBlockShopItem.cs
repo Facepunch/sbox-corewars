@@ -27,7 +27,7 @@ namespace Facepunch.CoreWars
 			var item = InventorySystem.CreateItem<BlockItem>();
 			var block = GetBlockType( player );
 
-			item.StackSize = Quantity;
+			item.StackSize = (ushort)Quantity;
 			item.BlockId = block.BlockId;
 
 			player.TryGiveItem( item );
