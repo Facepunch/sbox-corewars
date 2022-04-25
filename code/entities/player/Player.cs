@@ -535,7 +535,7 @@ namespace Facepunch.CoreWars
 			TryGiveBlock( VoxelWorld.Current.FindBlockId<GrassBlock>(), 1000 );
 			TryGiveBlock( VoxelWorld.Current.FindBlockId<WindowBlock>(), 500 );
 
-			TryGiveWeapon<CrossbowItem>();
+			TryGiveWeapon<CrossbowItemTier1>();
 			TryGiveAmmo( AmmoType.Bolt, 60 );
 
 			var iron = InventorySystem.CreateItem<IronItem>();
