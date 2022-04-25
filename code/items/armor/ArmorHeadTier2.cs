@@ -9,7 +9,7 @@ namespace Facepunch.CoreWars
 	{
 		public override float DamageMultiplier => 0.5f;
 		public override ArmorSlot ArmorSlot => ArmorSlot.Head;
-		public override string Name => "Security Head Armor";
+		public override string Name => "Medium Head Armor";
 		public override string Icon => "textures/items/armor_head_2.png";
 	}
 }
