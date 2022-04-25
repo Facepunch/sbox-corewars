@@ -3,7 +3,7 @@ using System;
 
 namespace Facepunch.CoreWars
 {
-	public class ArmorChestShopItemTier2 : BaseArmorShopItem<ArmorChestTier2>()
+	public class ArmorChestShopItemTier2 : BaseArmorShopItem<ArmorChestTier2>
 	{
 		public override string Name => "Kevlar Chest Armor";
 		public override string Description => "A medium protection chest armor piece.";

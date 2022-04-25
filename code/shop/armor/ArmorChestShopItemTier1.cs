@@ -2,7 +2,7 @@
 
 namespace Facepunch.CoreWars
 {
-	public class ArmorChestShopItemTier1 : BaseArmorShopItem<ArmorChestTier1>()
+	public class ArmorChestShopItemTier1 : BaseArmorShopItem<ArmorChestTier1>
 	{
 		public override string Name => "Leather Chest Armor";
 		public override string Description => "A low protection chest armor piece.";
