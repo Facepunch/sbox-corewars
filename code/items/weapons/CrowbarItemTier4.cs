@@ -4,11 +4,11 @@ using System.IO;
 
 namespace Facepunch.CoreWars
 {
-	[Library( "item_crowbar" )]
-	public class CrowbarItem : WeaponItem
+	[Library( "item_crowbar_4" )]
+	public class CrowbarItemTier4 : WeaponItem
 	{
 		public override string WeaponName => "weapon_crowbar";
 		public override string Icon => "textures/items/weapon_crowbar.png";
-		public override string Name => "Crowbar";
+		public override string Name => "Crystal Crowbar";
 	}
 }

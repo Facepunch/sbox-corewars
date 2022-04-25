@@ -4,11 +4,11 @@ using System.IO;
 
 namespace Facepunch.CoreWars
 {
-	[Library( "item_pickaxe" )]
-	public class PickaxeItem : WeaponItem
+	[Library( "item_pickaxe_2" )]
+	public class PickaxeItemTier2 : WeaponItem
 	{
 		public override string WeaponName => "weapon_pickaxe";
 		public override string Icon => "textures/items/weapon_pickaxe.png";
-		public override string Name => "Pickaxe";
+		public override string Name => "Medium Pickaxe";
 	}
 }
