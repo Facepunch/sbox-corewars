@@ -8,11 +8,13 @@ using System.IO;
 namespace Facepunch.CoreWars
 {
 	[EditorEntity( Title = "Item Store NPC", Group = "Gameplay", EditorModel = "models/citizen/citizen.vmdl" )]
-	public partial class ItemStoreNPC : AnimEntity, ISourceEntity
+	public partial class ItemStoreNPC : AnimEntity, ISourceEntity, IUsable
 	{
 		[EditorProperty] public Team Team { get; set; }
 
 		[Net] public List<BaseShopItem> Items { get; set; }
+
+		public float MaxUseDistance => 300f;
 
 		public override void Spawn()
 		{
@@ -57,6 +59,16 @@ namespace Facepunch.CoreWars
 			var clothes = new BaseClothing();
 			clothes.SetModel( modelName );
 			clothes.SetParent( this, true );
+		}
+
+		public bool IsUsable( Player player )
+		{
+			return true;
+		}
+
+		public void OnUsed( Player player )
+		{
+			
 		}
 	}
 }
