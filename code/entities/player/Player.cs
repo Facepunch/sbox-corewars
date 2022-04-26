@@ -126,6 +126,7 @@ namespace Facepunch.CoreWars
 			var items = new List<InventoryItem>();
 			items.AddRange( HotbarInventory.Instance.FindItems( type ) );
 			items.AddRange( BackpackInventory.Instance.FindItems( type ) );
+			items.AddRange( EquipmentInventory.Instance.FindItems( type ) );
 			return items;
 		}
 
