@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using Facepunch.CoreWars.Inventory;
+using Sandbox;
 
 namespace Facepunch.CoreWars
 {
-	public class PortalGrenadeShopItem : BasePurchasable
+	[Library]
+	public class PortalGrenadeShopItem : BaseShopItem
 	{
 		public override string Name => "Portal Grenade";
 		public override string Description => "Throwing it will transport you instantly to where it lands.";

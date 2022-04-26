@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using Facepunch.CoreWars.Inventory;
+using Sandbox;
 
 namespace Facepunch.CoreWars
 {
-	public class CrossbowBoltShopItem : BasePurchasable
+	[Library]
+	public class CrossbowBoltShopItem : BaseShopItem
 	{
 		public override string Name => "Crossbow Bolt";
 		public override string Description => "Ammo for Crossbow weapons.";
@@ -23,7 +25,7 @@ namespace Facepunch.CoreWars
 		{
 			var item = InventorySystem.CreateItem<AmmoItem>();
 			item.AmmoType = AmmoType.Bolt;
-			item.StackSize = Quantity;
+			item.StackSize = (ushort)Quantity;
 			player.TryGiveItem( item );
 		}
 	}

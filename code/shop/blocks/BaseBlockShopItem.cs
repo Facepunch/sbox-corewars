@@ -9,7 +9,7 @@ using Facepunch.CoreWars.Inventory;
 
 namespace Facepunch.CoreWars
 {
-	public abstract class BaseBlockShopItem : BasePurchasable
+	public abstract class BaseBlockShopItem : BaseShopItem
 	{
 		public virtual BlockType GetBlockType( Player player )
 		{

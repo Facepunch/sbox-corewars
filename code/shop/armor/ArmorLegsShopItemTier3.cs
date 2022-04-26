@@ -1,8 +1,11 @@
 ﻿using Facepunch.CoreWars.Inventory;
+using System.Collections.Generic;
+using Sandbox;
 using System;
 
 namespace Facepunch.CoreWars
 {
+	[Library]
 	public class ArmorLegsShopItemTier3 : BaseArmorShopItem<ArmorLegsTier3>
 	{
 		public override string Name => "Heavy Legs Armor";
