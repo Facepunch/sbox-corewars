@@ -20,7 +20,7 @@ namespace Facepunch.CoreWars.Editor
 			BlockId = blockId;
 
 			var block = VoxelWorld.Current.GetBlockType( blockId );
-			var icon = $"textures/blocks/color/{ block.DefaultTexture }.png";
+			var icon = $"textures/blocks/corewars/color/{ block.DefaultTexture }.png";
 
 			if ( !string.IsNullOrEmpty( icon ) )
 			{

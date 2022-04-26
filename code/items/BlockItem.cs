@@ -32,7 +32,7 @@ namespace Facepunch.CoreWars
 				var block = world.GetBlockType( BlockId );
 				if ( string.IsNullOrEmpty( block.DefaultTexture ) ) return string.Empty;
 
-				return $"textures/blocks/color/{ block.DefaultTexture }.png";
+				return $"textures/blocks/corewars/color/{ block.DefaultTexture }.png";
 			}
 		}
 

@@ -6,7 +6,7 @@ namespace Facepunch.CoreWars.Blocks
 	[Library]
 	public class RedPlasticBlock : BlockType
 	{
-		public override string DefaultTexture => "teamcolour_red_01_color";
+		public override string DefaultTexture => "plastic_red_01";
 		public override string FriendlyName => "Red Plastic";
 	}
 }

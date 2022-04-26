@@ -6,7 +6,7 @@ namespace Facepunch.CoreWars.Blocks
 	[Library]
 	public class CyanPlasticBlock : BlockType
 	{
-		public override string DefaultTexture => "teamcolour_cyan_01_color";
+		public override string DefaultTexture => "plastic_cyan_01";
 		public override string FriendlyName => "Cyan Plastic";
 	}
 }

@@ -185,15 +185,26 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
-            <key type="filename">../color/concrete_01_color.png</key>
-            <key type="filename">../color/dirt_02_color.png</key>
-            <key type="filename">../color/grass_01_color.png</key>
-            <key type="filename">../color/grass_dirt_01_color.png</key>
-            <key type="filename">../color/sand_01_color.png</key>
-            <key type="filename">../color/stone_01_color.png</key>
-            <key type="filename">../color/tree_01_color.png</key>
-            <key type="filename">../color/tree_top_01_color.png</key>
-            <key type="filename">../color/window_01_color.png</key>
+            <key type="filename">../color/concrete_01.png</key>
+            <key type="filename">../color/dirt_02.png</key>
+            <key type="filename">../color/grass_01.png</key>
+            <key type="filename">../color/grass_dirt_01.png</key>
+            <key type="filename">../color/hardened_metal_01.png</key>
+            <key type="filename">../color/planks_01.png</key>
+            <key type="filename">../color/plastic_blue_01.png</key>
+            <key type="filename">../color/plastic_cyan_01.png</key>
+            <key type="filename">../color/plastic_green_01.png</key>
+            <key type="filename">../color/plastic_orange_01.png</key>
+            <key type="filename">../color/plastic_pink_01.png</key>
+            <key type="filename">../color/plastic_purple_01.png</key>
+            <key type="filename">../color/plastic_red_01.png</key>
+            <key type="filename">../color/plastic_yellow_01.png</key>
+            <key type="filename">../color/sand_01.png</key>
+            <key type="filename">../color/steel_panel_01.png</key>
+            <key type="filename">../color/stone_01.png</key>
+            <key type="filename">../color/tree_01.png</key>
+            <key type="filename">../color/tree_top_01.png</key>
+            <key type="filename">../color/window_01.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
