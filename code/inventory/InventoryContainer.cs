@@ -190,7 +190,7 @@ namespace Facepunch.CoreWars.Inventory
 
 		public List<InventoryItem> FindItems( Type type )
 		{
-			var output = new List<T>();
+			var output = new List<InventoryItem>();
 
 			for ( int i = 0; i < ItemList.Count; i++ )
 			{
@@ -457,6 +457,39 @@ namespace Facepunch.CoreWars.Inventory
 			}
 
 			return Give( instance, slot );
+		}
+
+		public InventoryItem Replace( ushort slot, InventoryItem instance )
+		{
+			if ( IsClient )
+			{
+				return null;
+			}
+
+			var slotLimit = SlotLimit;
+
+			if ( slot >= slotLimit )
+			{
+				Log.Info( "Unable to give an item to this inventory because slot #" + slot + " is greater than the limit of " + slotLimit );
+				return null;
+			}
+
+			var oldItem = ItemList[slot];
+
+			if ( oldItem.IsValid() )
+			{
+				oldItem.Container = null;
+				oldItem.SlotId = 0;
+			}
+
+			instance.SlotId = slot;
+			instance.Container = this;
+
+			ItemList[slot] = instance;
+
+			SendGiveEvent( slot, instance );
+
+			return oldItem;
 		}
 
 		public bool Give( InventoryItem instance, ushort slot )

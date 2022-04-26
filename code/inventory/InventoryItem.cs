@@ -106,6 +106,22 @@ namespace Facepunch.CoreWars.Inventory
 			IsDirty = true;
 		}
 
+		public void Remove()
+		{
+			if ( Container.IsValid() )
+			{
+				Container.Remove( this );
+			}
+		}
+
+		public void Replace( InventoryItem other )
+		{
+			if ( Container.IsValid() )
+			{
+				Container.Replace( SlotId, other );
+			}
+		}
+
 		public virtual bool IsSameType( InventoryItem other )
 		{
 			return (GetType() == other.GetType());
