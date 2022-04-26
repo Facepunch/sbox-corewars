@@ -7,12 +7,12 @@ using System.IO;
 
 namespace Facepunch.CoreWars
 {
-	[EditorEntity( Title = "Item Store NPC", Group = "Gameplay", EditorModel = "models/citizen/citizen.vmdl" )]
-	public partial class ItemStoreNPC : AnimEntity, ISourceEntity
+	[EditorEntity( Title = "Team Upgrades NPC", Group = "Gameplay", EditorModel = "models/citizen/citizen.vmdl" )]
+	public partial class TeamUpgradesNPC : AnimEntity, ISourceEntity
 	{
 		[EditorProperty] public Team Team { get; set; }
 
-		[Net] public List<BaseShopItem> Items { get; set; }
+		[Net] public List<BaseTeamUpgrade> Upgrades { get; set; }
 
 		public override void Spawn()
 		{
@@ -28,15 +28,15 @@ namespace Facepunch.CoreWars
 			AddClothing( "models/citizen_clothes/glasses/stylish_glasses/models/stylish_glasses_gold.vmdl" );
 			AddClothing( "models/citizen_clothes/hair/hair_longbrown/models/hair_longbrown.vmdl" );
 
-			Items = new List<BaseShopItem>();
+			Upgrades = new List<BaseTeamUpgrade>();
 
-			var types = Library.GetAll<BaseShopItem>();
+			var types = Library.GetAll<BaseTeamUpgrade>();
 
 			foreach ( var type in types )
 			{
 				if ( type.IsAbstract || type.IsGenericType ) continue;
-				var item = Library.Create<BaseShopItem>( type );
-				Items.Add( item );
+				var upgrade = Library.Create<BaseTeamUpgrade>( type );
+				Upgrades.Add( upgrade );
 			}
 
 			base.Spawn();

@@ -1,4 +1,5 @@
 ﻿using Facepunch.CoreWars.Editor;
+using System.Collections.Generic;
 using Facepunch.Voxels;
 using Sandbox;
 using System;
@@ -11,9 +12,12 @@ namespace Facepunch.CoreWars
 	{
 		[EditorProperty, Net] public Team Team { get; set; }
 
+		[Net] public List<BaseTeamUpgrade> Upgrades { get; set; }
+
 		public virtual void Reset()
 		{
 			LifeState = LifeState.Alive;
+			Upgrades.Clear();
 			Health = 100f;
 		}
 
@@ -33,6 +37,8 @@ namespace Facepunch.CoreWars
 
 			Transmit = TransmitType.Always;
 			SetupPhysicsFromAABB( PhysicsMotionType.Static, Model.Bounds.Mins, Model.Bounds.Maxs );
+
+			Upgrades = new List<BaseTeamUpgrade>();
 
 			base.Spawn();
 		}
