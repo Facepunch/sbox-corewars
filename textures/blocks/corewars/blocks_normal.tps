@@ -34,7 +34,7 @@
         <key>dataFormat</key>
         <string>spritesheet-only</string>
         <key>textureFileName</key>
-        <filename>blocks_ao.png</filename>
+        <filename>blocks_normal.png</filename>
         <key>flipPVR</key>
         <false/>
         <key>pvrQualityLevel</key>
@@ -179,18 +179,26 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
-            <key type="filename">blocks/ao/dirt_ao.png</key>
-            <key type="filename">blocks/ao/dirt_grass_ao.png</key>
-            <key type="filename">blocks/ao/grass_ao.png</key>
-            <key type="filename">blocks/ao/leaf_ao.png</key>
-            <key type="filename">blocks/ao/log_side_ao.png</key>
-            <key type="filename">blocks/ao/log_top_ao.png</key>
-            <key type="filename">blocks/ao/metalgrate_ao.png</key>
-            <key type="filename">blocks/ao/sand_ao.png</key>
-            <key type="filename">blocks/ao/stone_ao.png</key>
-            <key type="filename">blocks/ao/water_ao.png</key>
-            <key type="filename">blocks/ao/window_ao.png</key>
-            <key type="filename">blocks/ao/woodplanks_ao.png</key>
+            <key type="filename">normal/concrete_01_normal.png</key>
+            <key type="filename">normal/dirt_02_normal.png</key>
+            <key type="filename">normal/grass_01_normal.png</key>
+            <key type="filename">normal/grass_dirt_01_normal.png</key>
+            <key type="filename">normal/hardened_metal_01_normal.png</key>
+            <key type="filename">normal/planks_01_normal.png</key>
+            <key type="filename">normal/plastic_blue_01_normal.png</key>
+            <key type="filename">normal/plastic_cyan_01_normal.png</key>
+            <key type="filename">normal/plastic_green_01_normal.png</key>
+            <key type="filename">normal/plastic_orange_01_normal.png</key>
+            <key type="filename">normal/plastic_pink_01_normal.png</key>
+            <key type="filename">normal/plastic_purple_01_normal.png</key>
+            <key type="filename">normal/plastic_red_01_normal.png</key>
+            <key type="filename">normal/plastic_yellow_01_normal.png</key>
+            <key type="filename">normal/sand_01_normal.png</key>
+            <key type="filename">normal/steel_panel_01_normal.png</key>
+            <key type="filename">normal/stone_01_normal.png</key>
+            <key type="filename">normal/tree_01_normal.png</key>
+            <key type="filename">normal/tree_top_01_normal.png</key>
+            <key type="filename">normal/window_01_normal.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -208,7 +216,7 @@
         </map>
         <key>fileList</key>
         <array>
-            <filename>blocks/ao</filename>
+            <filename>normal</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

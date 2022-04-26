@@ -179,26 +179,26 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
-            <key type="filename">../ao/concrete_01_ao.png</key>
-            <key type="filename">../ao/dirt_02_ao.png</key>
-            <key type="filename">../ao/grass_01_ao.png</key>
-            <key type="filename">../ao/grass_dirt_01_ao.png</key>
-            <key type="filename">../ao/hardened_metal_01_ao.png</key>
-            <key type="filename">../ao/planks_01_ao.png</key>
-            <key type="filename">../ao/plastic_blue_01_ao.png</key>
-            <key type="filename">../ao/plastic_cyan_01_ao.png</key>
-            <key type="filename">../ao/plastic_green_01_ao.png</key>
-            <key type="filename">../ao/plastic_orange_01_ao.png</key>
-            <key type="filename">../ao/plastic_pink_01_ao.png</key>
-            <key type="filename">../ao/plastic_purple_01_ao.png</key>
-            <key type="filename">../ao/plastic_red_01_ao.png</key>
-            <key type="filename">../ao/plastic_yellow_01_ao.png</key>
-            <key type="filename">../ao/sand_01_ao.png</key>
-            <key type="filename">../ao/steel_panel_01_ao.png</key>
-            <key type="filename">../ao/stone_01_ao.png</key>
-            <key type="filename">../ao/tree_01_ao.png</key>
-            <key type="filename">../ao/tree_top_01_ao.png</key>
-            <key type="filename">../ao/window_01_ao.png</key>
+            <key type="filename">ao/concrete_01_ao.png</key>
+            <key type="filename">ao/dirt_02_ao.png</key>
+            <key type="filename">ao/grass_01_ao.png</key>
+            <key type="filename">ao/grass_dirt_01_ao.png</key>
+            <key type="filename">ao/hardened_metal_01_ao.png</key>
+            <key type="filename">ao/planks_01_ao.png</key>
+            <key type="filename">ao/plastic_blue_01_ao.png</key>
+            <key type="filename">ao/plastic_cyan_01_ao.png</key>
+            <key type="filename">ao/plastic_green_01_ao.png</key>
+            <key type="filename">ao/plastic_orange_01_ao.png</key>
+            <key type="filename">ao/plastic_pink_01_ao.png</key>
+            <key type="filename">ao/plastic_purple_01_ao.png</key>
+            <key type="filename">ao/plastic_red_01_ao.png</key>
+            <key type="filename">ao/plastic_yellow_01_ao.png</key>
+            <key type="filename">ao/sand_01_ao.png</key>
+            <key type="filename">ao/steel_panel_01_ao.png</key>
+            <key type="filename">ao/stone_01_ao.png</key>
+            <key type="filename">ao/tree_01_ao.png</key>
+            <key type="filename">ao/tree_top_01_ao.png</key>
+            <key type="filename">ao/window_01_ao.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -216,7 +216,7 @@
         </map>
         <key>fileList</key>
         <array>
-            <filename>../ao</filename>
+            <filename>ao</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

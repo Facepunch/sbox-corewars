@@ -6,7 +6,7 @@ namespace Facepunch.CoreWars.Blocks
 	[Library]
 	public class GrassBlock : BlockType
 	{
-		public override string DefaultTexture => "dirt_grass";
+		public override string DefaultTexture => "grass_dirt_01";
 		public override string FriendlyName => "Dirt";
 
 		public override byte GetTextureId( BlockFace face, Chunk chunk, int x, int y, int z )
@@ -15,12 +15,12 @@ namespace Facepunch.CoreWars.Blocks
 			var sunlightLevel = World.GetSunLight( chunk.Offset + position + Chunk.BlockDirections[0] ) ;
 
 			if ( sunlightLevel < 5 )
-				return World.BlockAtlas.GetTextureId( "dirt" );
+				return World.BlockAtlas.GetTextureId( "dirt_02" );
 
 			if ( face == BlockFace.Top )
-				return World.BlockAtlas.GetTextureId( "grass" );
+				return World.BlockAtlas.GetTextureId( "grass_01" );
 			else if ( face == BlockFace.Bottom )
-				return World.BlockAtlas.GetTextureId( "dirt" );
+				return World.BlockAtlas.GetTextureId( "dirt_02" );
 
 			var adjacentBlockId = World.GetAdjacentBlock( chunk.Offset + position, (int)BlockFace.Top );
 			var adjacentBlock = World.GetBlockType( adjacentBlockId );
@@ -28,7 +28,7 @@ namespace Facepunch.CoreWars.Blocks
 			if ( adjacentBlock.IsTranslucent )
 				return World.BlockAtlas.GetTextureId( DefaultTexture );
 
-			return World.BlockAtlas.GetTextureId( "dirt" );
+			return World.BlockAtlas.GetTextureId( "dirt_02" );
 		}
 	}
 }

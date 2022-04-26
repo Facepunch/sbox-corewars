@@ -6,7 +6,7 @@ namespace Facepunch.CoreWars.Blocks
 	[Library]
 	public class StoneBlock : BlockType
 	{
-		public override string DefaultTexture => "stone";
+		public override string DefaultTexture => "stone_01";
 		public override string FriendlyName => "Stone";
 	}
 }

@@ -43,12 +43,12 @@ Layer0
 	g_flAntiAliasedEdgeStrength "1.000"
 
 	//---- Voxel Atlas ----
-	TextureAtlasAmbientOcclusion "textures/blocks_ao.png"
-	TextureAtlasColor "textures/blocks_color.png"
+	TextureAtlasAmbientOcclusion "textures/blocks/corewars/blocks_ao.png"
+	TextureAtlasColor "textures/blocks/corewars/blocks_color.png"
 	TextureAtlasEmission "[0.000000 0.000000 0.000000 0.000000]"
 	TextureAtlasMetalness "materials/default/default_metal.tga"
-	TextureAtlasNormal "textures/blocks_normal.png"
-	TextureAtlasRoughness "textures/blocks_rough.png"
+	TextureAtlasNormal "textures/blocks/corewars/blocks_normal.png"
+	TextureAtlasRoughness "textures/blocks/corewars/blocks_rough.png"
 	TextureLightmap "materials/default/default_lightmap.tga"
 	TextureLightmapBottom "materials/default/default_lightmap.tga"
 	TextureLightmapEast "materials/default/default_lightmap.tga"

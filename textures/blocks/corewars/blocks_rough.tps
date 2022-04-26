@@ -26,15 +26,15 @@
             </struct>
         </array>
         <key>allowRotation</key>
-        <false/>
+        <true/>
         <key>shapeDebug</key>
         <false/>
         <key>dpi</key>
         <uint>72</uint>
         <key>dataFormat</key>
-        <string>phaser-json-hash</string>
+        <string>spritesheet-only</string>
         <key>textureFileName</key>
-        <filename>blocks_color.png</filename>
+        <filename>blocks_rough.png</filename>
         <key>flipPVR</key>
         <false/>
         <key>pvrQualityLevel</key>
@@ -60,7 +60,7 @@
         <key>jxrCompressionLevel</key>
         <uint>0</uint>
         <key>ditherType</key>
-        <enum type="SettingsBase::DitherType">PngQuantLow</enum>
+        <enum type="SettingsBase::DitherType">NearestNeighbour</enum>
         <key>backgroundColor</key>
         <uint>0</uint>
         <key>libGdx</key>
@@ -132,13 +132,7 @@
             </struct>
         </struct>
         <key>dataFileNames</key>
-        <map type="GFileNameMap">
-            <key>data</key>
-            <struct type="DataFile">
-                <key>name</key>
-                <filename>blocks.json</filename>
-            </struct>
-        </map>
+        <map type="GFileNameMap"/>
         <key>multiPack</key>
         <false/>
         <key>forceIdenticalLayout</key>
@@ -155,7 +149,7 @@
         <key>autoAliasEnabled</key>
         <false/>
         <key>trimSpriteNames</key>
-        <true/>
+        <false/>
         <key>prependSmartFolderName</key>
         <false/>
         <key>autodetectAnimations</key>
@@ -185,26 +179,26 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
-            <key type="filename">../color/concrete_01.png</key>
-            <key type="filename">../color/dirt_02.png</key>
-            <key type="filename">../color/grass_01.png</key>
-            <key type="filename">../color/grass_dirt_01.png</key>
-            <key type="filename">../color/hardened_metal_01.png</key>
-            <key type="filename">../color/planks_01.png</key>
-            <key type="filename">../color/plastic_blue_01.png</key>
-            <key type="filename">../color/plastic_cyan_01.png</key>
-            <key type="filename">../color/plastic_green_01.png</key>
-            <key type="filename">../color/plastic_orange_01.png</key>
-            <key type="filename">../color/plastic_pink_01.png</key>
-            <key type="filename">../color/plastic_purple_01.png</key>
-            <key type="filename">../color/plastic_red_01.png</key>
-            <key type="filename">../color/plastic_yellow_01.png</key>
-            <key type="filename">../color/sand_01.png</key>
-            <key type="filename">../color/steel_panel_01.png</key>
-            <key type="filename">../color/stone_01.png</key>
-            <key type="filename">../color/tree_01.png</key>
-            <key type="filename">../color/tree_top_01.png</key>
-            <key type="filename">../color/window_01.png</key>
+            <key type="filename">rough/concrete_01_rough.png</key>
+            <key type="filename">rough/dirt_02_rough.png</key>
+            <key type="filename">rough/grass_01_rough.png</key>
+            <key type="filename">rough/grass_dirt_01_rough.png</key>
+            <key type="filename">rough/hardened_metal_01_rough.png</key>
+            <key type="filename">rough/planks_01_rough.png</key>
+            <key type="filename">rough/plastic_blue_01_rough.png</key>
+            <key type="filename">rough/plastic_cyan_01_rough.png</key>
+            <key type="filename">rough/plastic_green_01_rough.png</key>
+            <key type="filename">rough/plastic_orange_01_rough.png</key>
+            <key type="filename">rough/plastic_pink_01_rough.png</key>
+            <key type="filename">rough/plastic_purple_01_rough.png</key>
+            <key type="filename">rough/plastic_red_01_rough.png</key>
+            <key type="filename">rough/plastic_yellow_01_rough.png</key>
+            <key type="filename">rough/sand_01_rough.png</key>
+            <key type="filename">rough/steel_panel_01_rough.png</key>
+            <key type="filename">rough/stone_01_rough.png</key>
+            <key type="filename">rough/tree_01_rough.png</key>
+            <key type="filename">rough/tree_top_01_rough.png</key>
+            <key type="filename">rough/window_01_rough.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -222,7 +216,7 @@
         </map>
         <key>fileList</key>
         <array>
-            <filename>../color</filename>
+            <filename>rough</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>
@@ -245,17 +239,6 @@
         <key>normalMapSheetFileName</key>
         <filename></filename>
         <key>exporterProperties</key>
-        <map type="ExporterProperties">
-            <key>plain::bool-property</key>
-            <struct type="ExporterProperty">
-                <key>value</key>
-                <string>false</string>
-            </struct>
-            <key>plain::string-property</key>
-            <struct type="ExporterProperty">
-                <key>value</key>
-                <string>hello world</string>
-            </struct>
-        </map>
+        <map type="ExporterProperties"/>
     </struct>
 </data>

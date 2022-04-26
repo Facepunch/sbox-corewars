@@ -185,18 +185,26 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
-            <key type="filename">blocks/color/dirt.png</key>
-            <key type="filename">blocks/color/dirt_grass.png</key>
-            <key type="filename">blocks/color/grass.png</key>
-            <key type="filename">blocks/color/leaf.png</key>
-            <key type="filename">blocks/color/log_side.png</key>
-            <key type="filename">blocks/color/log_top.png</key>
-            <key type="filename">blocks/color/metalgrate.png</key>
-            <key type="filename">blocks/color/sand.png</key>
-            <key type="filename">blocks/color/stone.png</key>
-            <key type="filename">blocks/color/water.png</key>
-            <key type="filename">blocks/color/window.png</key>
-            <key type="filename">blocks/color/woodplanks.png</key>
+            <key type="filename">color/concrete_01.png</key>
+            <key type="filename">color/dirt_02.png</key>
+            <key type="filename">color/grass_01.png</key>
+            <key type="filename">color/grass_dirt_01.png</key>
+            <key type="filename">color/hardened_metal_01.png</key>
+            <key type="filename">color/planks_01.png</key>
+            <key type="filename">color/plastic_blue_01.png</key>
+            <key type="filename">color/plastic_cyan_01.png</key>
+            <key type="filename">color/plastic_green_01.png</key>
+            <key type="filename">color/plastic_orange_01.png</key>
+            <key type="filename">color/plastic_pink_01.png</key>
+            <key type="filename">color/plastic_purple_01.png</key>
+            <key type="filename">color/plastic_red_01.png</key>
+            <key type="filename">color/plastic_yellow_01.png</key>
+            <key type="filename">color/sand_01.png</key>
+            <key type="filename">color/steel_panel_01.png</key>
+            <key type="filename">color/stone_01.png</key>
+            <key type="filename">color/tree_01.png</key>
+            <key type="filename">color/tree_top_01.png</key>
+            <key type="filename">color/window_01.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -214,7 +222,7 @@
         </map>
         <key>fileList</key>
         <array>
-            <filename>blocks/color</filename>
+            <filename>color</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>
