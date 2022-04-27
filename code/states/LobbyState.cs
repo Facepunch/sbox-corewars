@@ -13,6 +13,7 @@ namespace Facepunch.CoreWars
 
 				foreach ( var player in Entity.All.OfType<Player>() )
 				{
+					player.AssignRandomTeam();
 					player.RespawnWhenAvailable();
 				}
 			}
@@ -25,6 +26,7 @@ namespace Facepunch.CoreWars
 
 		public override void OnPlayerJoined( Player player )
 		{
+			player.AssignRandomTeam();
 			player.RespawnWhenAvailable();
 		}
 	}

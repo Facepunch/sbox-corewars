@@ -68,7 +68,15 @@ namespace Facepunch.CoreWars
 
 		public void OnUsed( Player player )
 		{
-			
+			OpenForClient( To.Single( player ) );
+		}
+
+		[ClientRpc]
+		private void OpenForClient()
+		{
+			Log.Info( "RPC Called" );
+			ItemStore.Current.SetNPC( this );
+			ItemStore.Current.Open();
 		}
 	}
 }
