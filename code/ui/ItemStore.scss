@@ -1,0 +1,50 @@
+﻿ItemStore {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    display: flex;
+    pointer-events: none;
+    backdrop-filter-blur: 24px;
+    flex-direction: column;
+    background-color: rgba( 50 35 25 0.8 );
+
+    .modal {
+        padding: 32px;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        pointer-events: all;
+        width: 60%;
+        height: 90%;
+
+        .title {
+            margin-bottom: 32px;
+            font-family: Roboto;
+            font-size: 32px;
+            color: white;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            overflow: scroll;
+            width: 100%;
+
+            PurchasableItem {
+                margin-top: 10px;
+                flex-grow: 0;
+                flex-shrink: 0;
+            }
+        }
+    }
+
+    &.hidden {
+        display: none;
+
+        .modal {
+            pointer-events: none;
+        }
+    }
+}
