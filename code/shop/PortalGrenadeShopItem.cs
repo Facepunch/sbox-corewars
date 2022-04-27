@@ -15,6 +15,7 @@ namespace Facepunch.CoreWars
 		{
 			[typeof( CrystalItem )] = 1
 		};
+		public override Type RequiredUpgradeType => typeof( ArmoryUpgrade );
 
 		public override string GetIcon( Player player )
 		{
