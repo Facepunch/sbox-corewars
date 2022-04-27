@@ -19,7 +19,7 @@ namespace Facepunch.CoreWars
 		public override string GetIcon( Player player )
 		{
 			var block = GetBlockType( player );
-			return block.DefaultTexture;
+			return $"textures/blocks/corewars/color/{block.DefaultTexture}.png";
 		}
 
 		public override void OnPurchased( Player player )
