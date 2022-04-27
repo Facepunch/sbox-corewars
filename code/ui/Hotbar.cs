@@ -71,6 +71,9 @@ namespace Facepunch.CoreWars
 
 		private bool IsHidden()
 		{
+			if ( ItemStore.Current?.IsOpen ?? false )
+				return true;
+
 			if ( Backpack.Current?.IsOpen ?? false )
 				return true;
 
