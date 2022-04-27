@@ -67,7 +67,7 @@ namespace Facepunch.CoreWars
 
 		protected virtual void OnItemPurchased( BaseShopItem item )
 		{
-			Log.Info( "Called for parent" );
+
 		}
 
 		protected override void PostTemplateApplied()

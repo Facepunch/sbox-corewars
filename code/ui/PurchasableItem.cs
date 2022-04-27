@@ -49,8 +49,7 @@ namespace Facepunch.CoreWars
 
 		public void DoPurchase()
 		{
-			Log.Info( "Purchase clicked" );
-
+			if ( IsPurchaseDisabled() ) return;
 			OnPurchaseClicked?.Invoke( Item );
 		}
 
@@ -74,12 +73,12 @@ namespace Facepunch.CoreWars
 			return true;
 		}
 
-		protected override void PostTemplateApplied()
+		public override void Tick()
 		{
-			PurchaseButton.BindClass( "disabled", IsPurchaseDisabled );
-			BindClass( "hidden", IsHidden );
+			PurchaseButton.SetClass( "disabled", IsPurchaseDisabled() );
+			SetClass( "hidden", IsHidden() );
 
-			base.PostTemplateApplied();
+			base.Tick();
 		}
 	}
 }
