@@ -49,6 +49,29 @@ namespace Facepunch.CoreWars
 			}
 		}
 
+		[ServerCmd]
+		public static void BuyItemCmd( int index, string type )
+		{
+			if ( ConsoleSystem.Caller.Pawn is not Player player )
+				return;
+
+			var entity = FindByIndex( index );
+			if ( entity is not ItemStoreNPC npc ) return;
+			if ( npc.Position.Distance( player.Position ) > npc.MaxUseDistance ) return;
+
+			var item = npc.Items.FirstOrDefault( i => i.GetType().Name == type );
+			if ( item == null ) return;
+			if ( !item.CanAfford( player ) ) return;
+			if ( !item.CanPurchase( player ) ) return;
+
+			foreach ( var kv in item.Costs )
+			{
+				player.TakeResources( kv.Key, kv.Value );
+			}
+
+			item.OnPurchased( player );
+		}
+
 		public Player( Client client ) : this()
 		{
 			CurrentHotbarIndex = 0;
@@ -130,6 +153,45 @@ namespace Facepunch.CoreWars
 			return items;
 		}
 
+		public int TakeResources( Type type, int count )
+		{
+			var items = new List<ResourceItem>();
+
+			items.AddRange( HotbarInventory.Instance.FindItems<ResourceItem>() );
+			items.AddRange( BackpackInventory.Instance.FindItems<ResourceItem>() );
+
+			var amountLeftToTake = count;
+			var totalAmountTaken = 0;
+
+			for ( int i = items.Count - 1; i >= 0; i-- )
+			{
+				var item = items[i];
+
+				if ( item.GetType() == type )
+				{
+					if ( item.StackSize >= amountLeftToTake )
+					{
+						totalAmountTaken += amountLeftToTake;
+						item.StackSize -= (ushort)amountLeftToTake;
+
+						if ( item.StackSize > 0 )
+							return totalAmountTaken;
+					}
+					else
+					{
+						amountLeftToTake -= item.StackSize;
+						totalAmountTaken += item.StackSize;
+						item.StackSize = 0;
+						item.Remove();
+					}
+
+					item.Container.Remove( item.ItemId );
+				}
+			}
+
+			return totalAmountTaken;
+		}
+
 		public ushort TakeAmmo( AmmoType type, ushort count )
 		{
 			var items = new List<AmmoItem>();
@@ -159,6 +221,7 @@ namespace Facepunch.CoreWars
 						amountLeftToTake -= item.StackSize;
 						totalAmountTaken += item.StackSize;
 						item.StackSize = 0;
+						item.Remove();
 					}
 
 					item.Container.Remove( item.ItemId );
@@ -402,7 +465,7 @@ namespace Facepunch.CoreWars
 					else
 						IsBackpackToggleMode = false;
 
-					if ( !Storage.Current.IsOpen )
+					if ( !IDialog.IsActive() )
 					{
 						Backpack.Current?.Open();
 					}

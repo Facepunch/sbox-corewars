@@ -69,7 +69,7 @@ namespace Facepunch.CoreWars
 
 		protected virtual void OnItemPurchased( BaseShopItem item )
 		{
-
+			Player.BuyItemCmd( NPC.NetworkIdent, item.GetType().Name );
 		}
 
 		protected override void PostTemplateApplied()
