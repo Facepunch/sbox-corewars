@@ -456,7 +456,7 @@ namespace Facepunch.CoreWars
 				{
 					if ( Input.Released( InputButton.Use ) )
 					{
-						if ( !Storage.Current.IsOpen && !Backpack.Current.IsOpen && !ItemStore.Current.IsOpen )
+						if ( !IDialog.IsActive() )
 						{
 							var trace = Trace.Ray( Input.Position, Input.Position + Input.Rotation.Forward * 10000f )
 								.EntitiesOnly()
@@ -471,8 +471,7 @@ namespace Facepunch.CoreWars
 						}
 						else
 						{
-							ItemStore.Current.Close();
-							Storage.Current.Close();
+							IDialog.CloseActive();
 						}
 					}
 				}

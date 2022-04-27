@@ -8,7 +8,7 @@ using System.Linq;
 namespace Facepunch.CoreWars
 {
 	[UseTemplate]
-	public partial class Backpack : Panel
+	public partial class Backpack : Panel, IDialog
 	{
 		public static Backpack Current { get; private set; }
 
@@ -34,12 +34,14 @@ namespace Facepunch.CoreWars
 		public void Open()
 		{
 			if ( IsOpen ) return;
+			IDialog.Activate( this );
 			IsOpen = true;
 		}
 
 		public void Close()
 		{
 			if ( !IsOpen ) return;
+			IDialog.Deactivate( this );
 			IsOpen = false;
 		}
 
