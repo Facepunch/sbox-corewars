@@ -198,12 +198,8 @@ namespace Facepunch.CoreWars
 
 		public void AssignRandomTeam()
 		{
-			var teams = Enum.GetValues( typeof( Team ) )
-				.OfType<Team>()
-				.Except( new Team[] { Team.None } )
-				.ToList();
-
-			var team = Rand.FromList( teams );
+			var teams = Game.GetValidTeams().ToArray();
+			var team = Rand.FromArray( teams );
 
 			SetTeam( team );
 		}
