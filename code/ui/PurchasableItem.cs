@@ -18,6 +18,8 @@ namespace Facepunch.CoreWars
 		public Action<BaseShopItem> OnPurchaseClicked { get; set; }
 		public Button PurchaseButton { get; set; }
 
+		private TimeUntil NextCheckState { get; set; }
+
 		public void SetItem( BaseShopItem item )
 		{
 			Item = item;
@@ -45,6 +47,8 @@ namespace Facepunch.CoreWars
 					panel.Add.Label( $"x{itemCost}", "value" );
 				}
 			}
+
+			UpdateState();
 		}
 
 		public void DoPurchase()
@@ -75,10 +79,19 @@ namespace Facepunch.CoreWars
 
 		public override void Tick()
 		{
-			PurchaseButton.SetClass( "disabled", IsPurchaseDisabled() );
-			SetClass( "hidden", IsHidden() );
+			if ( NextCheckState )
+			{
+				NextCheckState = 1f;
+				UpdateState();
+			}
 
 			base.Tick();
+		}
+
+		private void UpdateState()
+		{
+			PurchaseButton.SetClass( "disabled", IsPurchaseDisabled() );
+			SetClass( "hidden", IsHidden() );
 		}
 	}
 }
