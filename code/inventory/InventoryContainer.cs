@@ -194,9 +194,11 @@ namespace Facepunch.CoreWars.Inventory
 
 			for ( int i = 0; i < ItemList.Count; i++ )
 			{
-				if ( ItemList[i].GetType() == type )
+				var item = ItemList[i];
+
+				if ( item.IsValid() && item.GetType().IsAssignableTo( type ) )
 				{
-					output.Add( ItemList[i] );
+					output.Add( item );
 				}
 			}
 
