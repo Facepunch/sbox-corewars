@@ -14,6 +14,7 @@ namespace Facepunch.CoreWars
 		{
 			[typeof( IronItem )] = 40
 		};
+		public override Type NextWeaponType => typeof( CrossbowItemTier1 );
 
 		public override string GetIcon( Player player )
 		{

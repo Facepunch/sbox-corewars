@@ -11,6 +11,7 @@ namespace Facepunch.CoreWars
 		public override string Name => "Medium Head Armor";
 		public override string Description => "A medium protection head armor piece.";
 		public override Type PreviousArmorType => typeof( ArmorHeadTier1 );
+		public override Type NextArmorType => typeof( ArmorHeadTier3 );
 		public override Dictionary<Type, int> Costs => new()
 		{
 			[typeof( IronItem )] = 40

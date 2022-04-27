@@ -8,10 +8,17 @@ namespace Facepunch.CoreWars
 	public abstract class BaseWeaponShopItem<T> : BaseShopItem where T : WeaponItem
 	{
 		public virtual Type PreviousWeaponType => null;
+		public virtual Type NextWeaponType => null;
 
 		public override bool CanPurchase( Player player )
 		{
 			if ( !base.CanPurchase( player ) ) return false;
+
+			if ( NextWeaponType != null )
+			{
+				var items = player.FindItems( NextWeaponType );
+				if ( items.Count > 0 ) return false;
+			}
 
 			if ( PreviousWeaponType != null )
 			{

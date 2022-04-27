@@ -11,6 +11,7 @@ namespace Facepunch.CoreWars
 		public override string Name => "Medium Legs Armor";
 		public override string Description => "A medium protection legs armor piece.";
 		public override Type PreviousArmorType => typeof( ArmorLegsTier1 );
+		public override Type NextArmorType => typeof( ArmorLegsTier3 );
 		public override Dictionary<Type, int> Costs => new()
 		{
 			[typeof( IronItem )] = 40
