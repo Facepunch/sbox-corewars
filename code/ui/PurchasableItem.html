@@ -1,0 +1,13 @@
+﻿<link rel="stylesheet" href="./PurchasableItem.scss" />
+
+<div>
+    <div @ref="Icon" class="icon"></div>
+    <div class="info">
+        <label @text="Item.Name" class="name"></label>
+        <label @text="Item.Description" class="description"></label>
+    </div>
+    <div class="costs">
+        <div @ref="CostContainer" class="container"></div>
+        <button onclick="DoPurchase()" @ref="PurchaseButton" class="purchase">Buy</button>
+    </div>
+</div>
