@@ -3,6 +3,7 @@
 	public enum WeaponType
 	{
 		None,
+		Melee,
 		Hitscan,
 		Projectile
 	}

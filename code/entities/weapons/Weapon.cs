@@ -15,6 +15,7 @@ namespace Facepunch.CoreWars
 		public virtual float AutoReloadDelay => 1.5f;
 		public virtual float ReloadTime => 3.0f;
 		public virtual bool IsMelee => false;
+		public virtual float MeleeRange => 100f;
 		public virtual float DamageFalloffStart => 0f;
 		public virtual float DamageFalloffEnd => 0f;
 		public virtual float BulletRange => 20000f;
@@ -23,11 +24,6 @@ namespace Facepunch.CoreWars
 		public virtual bool ReloadAnimation => true;
 		public virtual bool UnlimitedAmmo => false;
 		public virtual bool IsPassive => false;
-		public virtual float MeleeDuration => 0.4f;
-		public virtual float MeleeDamage => 80f;
-		public virtual float MeleeForce => 2f;
-		public virtual float MeleeRange => 200f;
-		public virtual float MeleeRate => 1f;
 		public virtual float ChargeAttackDuration => 2f;
 		public virtual DamageFlags DamageType => DamageFlags.Bullet;
 		public virtual int HoldType => 1;
@@ -192,9 +188,6 @@ namespace Facepunch.CoreWars
 			if ( ChargeAttackEndTime > 0f && Time.Now < ChargeAttackEndTime )
 				return false;
 
-			if ( TimeSinceMeleeAttack < MeleeDuration )
-				return false;
-
 			if ( TimeSinceDeployed < 0.3f )
 				return false;
 
@@ -273,9 +266,6 @@ namespace Facepunch.CoreWars
 				if ( !trace.Entity.IsValid() )
 					continue;
 
-				if ( !IsValidMeleeTarget( trace.Entity ) )
-					continue;
-
 				if ( IsServer )
 				{
 					using ( Prediction.Off() )
@@ -293,6 +283,8 @@ namespace Facepunch.CoreWars
 						trace.Entity.TakeDamage( damageInfo );
 					}
 				}
+
+				OnMeleeAttackHit( trace.Entity );
 			}
 		}
 
@@ -407,6 +399,8 @@ namespace Facepunch.CoreWars
 				.Run();
 		}
 
+		protected virtual void OnMeleeAttackHit( Entity victim ) { }
+
 		protected virtual void CreateMuzzleFlash()
 		{
 			if ( !string.IsNullOrEmpty( MuzzleFlashEffect ) )
@@ -437,11 +431,6 @@ namespace Facepunch.CoreWars
 		protected virtual ModelEntity GetEffectEntity()
 		{
 			return EffectEntity;
-		}
-
-		protected virtual bool IsValidMeleeTarget( Entity target )
-		{
-			return target is Player;
 		}
 
 		protected void DealDamage( Entity target, Vector3 position, Vector3 force )
