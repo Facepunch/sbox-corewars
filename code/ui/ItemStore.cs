@@ -67,7 +67,7 @@ namespace Facepunch.CoreWars
 			base.Tick();
 		}
 
-		protected virtual void OnItemPurchased( BaseShopItem item )
+		protected virtual void OnItemPurchased( IPurchasableItem item )
 		{
 			Player.BuyItemCmd( NPC.NetworkIdent, item.GetType().Name );
 		}
