@@ -11,6 +11,7 @@ namespace Facepunch.CoreWars
 		public Hud()
 		{
 			AddChild<ChatBox>();
+			AddChild<VoiceList>();
 		}
 	}
 }

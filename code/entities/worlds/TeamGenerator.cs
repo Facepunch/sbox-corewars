@@ -13,8 +13,6 @@ namespace Facepunch.CoreWars
 	{
 		[EditorProperty, Net] public Team Team { get; set; }
 
-		[Net] public int UpgradeLevel { get; private set; }
-
 		private Particles Effect { get; set; }
 
 		public override void Spawn()
@@ -26,8 +24,6 @@ namespace Facepunch.CoreWars
 
 			Effect = Particles.Create( "particles/gameplay/resource_pool/resource_pool.vpcf", this );
 			Effect.SetEntity( 0, this );
-
-			UpgradeLevel = 0;
 
 			base.Spawn();
 		}
@@ -63,7 +59,7 @@ namespace Facepunch.CoreWars
 			if ( itemsInArea >= 16 ) return;
 
 			var item = InventorySystem.CreateItem<IronItem>();
-			item.StackSize = 4;
+			item.StackSize = 1;
 
 			var entity = new ItemEntity();
 			entity.Position = WorldSpaceBounds.Center + Vector3.Up * 64f;
@@ -73,10 +69,7 @@ namespace Facepunch.CoreWars
 
 		protected override float CalculateNextGenerationTime()
 		{
-			if ( UpgradeLevel == 0 ) return 10f;
-			if ( UpgradeLevel == 1 ) return 8f;
-			if ( UpgradeLevel == 2 ) return 6f;
-			return 4f;
+			return 2f;
 		}
 	}
 }

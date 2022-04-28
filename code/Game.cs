@@ -131,7 +131,13 @@ namespace Facepunch.CoreWars
 
 		public override bool CanHearPlayerVoice( Client sourceClient, Client destinationClient )
 		{
-			return false;
+			if ( sourceClient.Pawn is not Player sourcePlayer )
+				return false;
+
+			if ( destinationClient.Pawn is not Player destinationPlayer )
+				return false;
+
+			return sourcePlayer.Team == destinationPlayer.Team;
 		}
 
 		public override void DoPlayerNoclip( Client client ) { }
