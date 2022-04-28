@@ -52,7 +52,7 @@ namespace Facepunch.CoreWars
 				if ( tier >= 3 )
 					return 10f;
 				else if ( tier >= 2 )
-					return 15f;
+					return 20f;
 			}
 
 			return 30f;
