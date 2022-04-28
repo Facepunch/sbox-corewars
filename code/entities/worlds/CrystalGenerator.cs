@@ -53,7 +53,7 @@ namespace Facepunch.CoreWars
 
 		protected override float CalculateNextGenerationTime()
 		{
-			return 10f;
+			return 30f;
 		}
 	}
 }

@@ -43,7 +43,7 @@ namespace Facepunch.CoreWars
 			if ( itemsInArea >= 16 ) return;
 
 			var item = InventorySystem.CreateItem<GoldItem>();
-			item.StackSize = 2;
+			item.StackSize = 1;
 
 			var entity = new ItemEntity();
 			entity.Position = WorldSpaceBounds.Center + Vector3.Up * 64f;
