@@ -15,6 +15,8 @@ namespace Facepunch.CoreWars.Inventory
 		public virtual ushort MaxStackSize => 1;
 		public virtual string WorldModel => string.Empty;
 		public virtual string Description => string.Empty;
+		public virtual bool RemoveOnDeath => false;
+		public virtual bool DropOnDeath => false;
 		public virtual string Name => string.Empty;
 		public virtual string Icon => string.Empty;
 
@@ -97,6 +99,7 @@ namespace Facepunch.CoreWars.Inventory
 			WorldEntity = entity;
 			IsWorldEntity = entity.IsValid();
 			IsDirty = true;
+			Remove();
 		}
 
 		public void ClearWorldEntity()
