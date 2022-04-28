@@ -1,10 +1,6 @@
-﻿using Facepunch.CoreWars.Inventory;
-using Facepunch.Voxels;
-using Sandbox;
+﻿using Sandbox;
 using Sandbox.UI;
 using System;
-using System.Linq;
-using System.Collections.Generic;
 using Sandbox.UI.Construct;
 
 namespace Facepunch.CoreWars
@@ -14,13 +10,14 @@ namespace Facepunch.CoreWars
 	{
 		public Panel Icon { get; set; }
 		public Panel CostContainer { get; set; }
-		public BaseShopItem Item { get; private set; }
-		public Action<BaseShopItem> OnPurchaseClicked { get; set; }
+		public IPurchasableItem Item { get; private set; }
+		public Action<IPurchasableItem> OnPurchaseClicked { get; set; }
 		public Button PurchaseButton { get; set; }
+		public string QuantityText => GetQuantityText();
 
 		private TimeUntil NextCheckState { get; set; }
 
-		public void SetItem( BaseShopItem item )
+		public void SetItem( IPurchasableItem item )
 		{
 			Item = item;
 
@@ -86,6 +83,16 @@ namespace Facepunch.CoreWars
 			}
 
 			base.Tick();
+		}
+
+		private string GetQuantityText()
+		{
+			if ( Item != null && Item.Quantity > 0 )
+			{
+				return $"x{Item.Quantity}";
+			}
+
+			return string.Empty;
 		}
 
 		private void UpdateState()
