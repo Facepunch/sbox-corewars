@@ -10,5 +10,6 @@ namespace Facepunch.CoreWars
 		public override string WeaponName => "weapon_pickaxe";
 		public override string Icon => "textures/items/weapon_pickaxe.png";
 		public override string Name => "Medium Pickaxe";
+		public override int WeaponTier => 2;
 	}
 }

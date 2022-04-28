@@ -11,5 +11,6 @@ namespace Facepunch.CoreWars
 		public override ArmorSlot ArmorSlot => ArmorSlot.Legs;
 		public override string Name => "Light Legs Armor";
 		public override string Icon => "textures/items/armor_legs_1.png";
+		public override int ArmorTier => 1;
 	}
 }

@@ -8,6 +8,7 @@ namespace Facepunch.CoreWars
 	{
 		public virtual float DamageMultiplier => 1f;
 		public virtual ArmorSlot ArmorSlot => ArmorSlot.None;
+		public virtual int ArmorTier => 0;
 
 		public override bool CanStackWith( InventoryItem other )
 		{

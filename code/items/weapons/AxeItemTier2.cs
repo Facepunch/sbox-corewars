@@ -10,5 +10,6 @@ namespace Facepunch.CoreWars
 		public override string WeaponName => "weapon_axe";
 		public override string Icon => "textures/items/weapon_axe.png";
 		public override string Name => "Medium Axe";
+		public override int WeaponTier => 2;
 	}
 }

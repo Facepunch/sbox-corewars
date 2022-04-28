@@ -10,5 +10,6 @@ namespace Facepunch.CoreWars
 		public override string WeaponName => "weapon_crowbar";
 		public override string Icon => "textures/items/weapon_crowbar.png";
 		public override string Name => "Light Crowbar";
+		public override int WeaponTier => 1;
 	}
 }

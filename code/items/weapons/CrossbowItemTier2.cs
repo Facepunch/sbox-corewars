@@ -10,5 +10,6 @@ namespace Facepunch.CoreWars
 		public override string WeaponName => "weapon_crossbow";
 		public override string Icon => "textures/items/weapon_crossbow.png";
 		public override string Name => "Heavy Crossbow";
+		public override int WeaponTier => 2;
 	}
 }
