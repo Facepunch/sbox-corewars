@@ -24,10 +24,9 @@ namespace Facepunch.CoreWars
 		public override string ViewModelPath => "models/weapons/v_crowbar.vmdl";
 		public override int ViewModelMaterialGroup => 1;
 		public override string MuzzleFlashEffect => "particles/weapons/boomer/boomer_muzzleflash.vpcf";
-		public override string CrosshairClass => "shotgun";
 		public override DamageFlags DamageType => DamageFlags.Blunt;
 		public override float PrimaryRate => 1.5f;
-		public override float SecondaryRate => 1.0f;
+		public override float SecondaryRate => 1f;
 		public override int ClipSize => 1;
 		public override bool IsMelee => true;
 

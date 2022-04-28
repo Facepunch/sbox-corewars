@@ -156,20 +156,17 @@ namespace Facepunch.CoreWars
 
 		public override void Simulate( Client owner )
 		{
-			if ( owner.Pawn is Player player )
+			if ( owner.Pawn.LifeState == LifeState.Alive )
 			{
-				if ( owner.Pawn.LifeState == LifeState.Alive )
+				if ( ChargeAttackEndTime > 0f && Time.Now >= ChargeAttackEndTime )
 				{
-					if ( ChargeAttackEndTime > 0f && Time.Now >= ChargeAttackEndTime )
-					{
-						OnChargeAttackFinish();
-						ChargeAttackEndTime = 0f;
-					}
-				}
-				else
-				{
+					OnChargeAttackFinish();
 					ChargeAttackEndTime = 0f;
 				}
+			}
+			else
+			{
+				ChargeAttackEndTime = 0f;
 			}
 
 			if ( !IsReloading )

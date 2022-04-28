@@ -113,6 +113,11 @@ namespace Facepunch.CoreWars
 			return BackpackInventory.Instance.Give( item );
 		}
 
+		public WeaponItem GetWeaponItem( Weapon weapon )
+		{
+			return FindItems<PortalGrenadeItem>().FirstOrDefault( i => i.Weapon == weapon );
+		}
+
 		public void TryGiveAmmo( AmmoType type, ushort amount )
 		{
 			var item = InventorySystem.CreateItem<AmmoItem>();
@@ -539,57 +544,52 @@ namespace Facepunch.CoreWars
 				}
 			}
 
-			if ( Prediction.FirstTime )
+			var currentSlotIndex = (int)CurrentHotbarIndex;
+
+			if ( Input.MouseWheel > 0 )
+				currentSlotIndex++;
+			else if ( Input.MouseWheel < 0 )
+				currentSlotIndex--;
+
+			var maxSlotIndex = HotbarInventory.Instance.SlotLimit - 1;
+
+			if ( currentSlotIndex < 0 )
+				currentSlotIndex = maxSlotIndex;
+			else if ( currentSlotIndex > maxSlotIndex )
+				currentSlotIndex = 0;
+
+
+			CurrentHotbarIndex = (ushort)currentSlotIndex;
+
+			UpdateHotbarSlotKeys();
+
+			var hotbarItem = HotbarInventory.Instance.GetFromSlot( CurrentHotbarIndex );
+
+			if ( hotbarItem is WeaponItem weaponItem )
+				ActiveChild = weaponItem.Weapon;
+			else
+				ActiveChild = null;
+
+			if ( IsClient )
 			{
-				var currentSlotIndex = (int)CurrentHotbarIndex;
-
-				if ( Input.MouseWheel > 0 )
-					currentSlotIndex++;
-				else if ( Input.MouseWheel < 0 )
-					currentSlotIndex--;
-
-				var maxSlotIndex = HotbarInventory.Instance.SlotLimit - 1;
-
-				if ( currentSlotIndex < 0 )
-					currentSlotIndex = maxSlotIndex;
-				else if ( currentSlotIndex > maxSlotIndex )
-					currentSlotIndex = 0;
-
-
-				CurrentHotbarIndex = (ushort)currentSlotIndex;
-
-				UpdateHotbarSlotKeys();
-
-				if ( IsServer )
+				if ( Input.Released( InputButton.Use ) )
 				{
-					var item = HotbarInventory.Instance.GetFromSlot( CurrentHotbarIndex );
-
-					if ( item is WeaponItem weaponItem )
-						ActiveChild = weaponItem.Weapon;
-					else
-						ActiveChild = null;
-				}
-				else
-				{
-					if ( Input.Released( InputButton.Use ) )
+					if ( !IDialog.IsActive() )
 					{
-						if ( !IDialog.IsActive() )
-						{
-							var trace = Trace.Ray( Input.Position, Input.Position + Input.Rotation.Forward * 10000f )
-								.EntitiesOnly()
-								.Ignore( this )
-								.Ignore( ActiveChild )
-								.Run();
+						var trace = Trace.Ray( Input.Position, Input.Position + Input.Rotation.Forward * 10000f )
+							.EntitiesOnly()
+							.Ignore( this )
+							.Ignore( ActiveChild )
+							.Run();
 
-							if ( trace.Entity is IUsable usable )
-							{
-								UseEntityCmd( trace.Entity.NetworkIdent );
-							}
-						}
-						else
+						if ( trace.Entity is IUsable usable )
 						{
-							IDialog.CloseActive();
+							UseEntityCmd( trace.Entity.NetworkIdent );
 						}
+					}
+					else
+					{
+						IDialog.CloseActive();
 					}
 				}
 			}
@@ -675,6 +675,15 @@ namespace Facepunch.CoreWars
 				var crowbar = InventorySystem.CreateItem<CrowbarItemTier1>();
 				TryGiveItem( crowbar );
 			}
+
+			var grenade = InventorySystem.CreateItem<PortalGrenadeItem>();
+			TryGiveItem( grenade );
+
+			grenade = InventorySystem.CreateItem<PortalGrenadeItem>();
+			TryGiveItem( grenade );
+
+			grenade = InventorySystem.CreateItem<PortalGrenadeItem>();
+			TryGiveItem( grenade );
 		}
 
 		public virtual void CreateInventories()
@@ -819,6 +828,7 @@ namespace Facepunch.CoreWars
 					{
 						weapon.Weapon = Library.Create<Weapon>( weapon.WeaponName );
 						weapon.Weapon.OnCarryStart( this );
+						weapon.IsDirty = true;
 					}
 					catch ( Exception e )
 					{
@@ -836,6 +846,7 @@ namespace Facepunch.CoreWars
 				{
 					weapon.Weapon.Delete();
 					weapon.Weapon = null;
+					weapon.IsDirty = true;
 				}
 			}
 		}
