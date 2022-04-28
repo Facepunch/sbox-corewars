@@ -14,7 +14,7 @@ namespace Facepunch.CoreWars
 		public virtual string Group => string.Empty;
 		public virtual Dictionary<Type, int> Costs => new();
 		public virtual int Quantity => 0;
-		public virtual int UpgradeTier => 1;
+		public virtual int Tier => 1;
 
 		public virtual bool CanAfford( Player player )
 		{
@@ -44,10 +44,10 @@ namespace Facepunch.CoreWars
 
 			if ( !string.IsNullOrEmpty( Group ) )
 			{
-				if ( UpgradeTier > 1 )
-					return core.Upgrades.Any( u => u.Group == Group && u.UpgradeTier == UpgradeTier - 1 );
+				if ( Tier > 1 )
+					return core.Upgrades.Any( u => u.Group == Group && u.Tier == Tier - 1 );
 				else
-					return !core.Upgrades.Any( u => u.Group == Group && u.UpgradeTier >= UpgradeTier );
+					return !core.Upgrades.Any( u => u.Group == Group && u.Tier >= Tier );
 			}
 
 			return true;
