@@ -76,6 +76,11 @@ namespace Facepunch.CoreWars
 		{
 			base.PostTemplateApplied();
 
+			if ( NPC.IsValid() )
+			{
+				SetNPC( NPC );
+			}
+
 			BindClass( "hidden", () => !IsOpen );
 		}
 	}
