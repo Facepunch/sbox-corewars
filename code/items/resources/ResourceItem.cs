@@ -6,6 +6,6 @@ namespace Facepunch.CoreWars
 {
 	public class ResourceItem : InventoryItem
 	{
-
+		public override bool DropOnDeath => true;
 	}
 }

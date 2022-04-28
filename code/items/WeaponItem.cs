@@ -7,7 +7,8 @@ namespace Facepunch.CoreWars
 	public class WeaponItem : InventoryItem
 	{
 		public virtual string WeaponName => string.Empty;
-		public virtual int WeaponTier => 0;
+		public virtual string Group => string.Empty;
+		public virtual int Tier => 0;
 
 		public Weapon Weapon { get; set; }
 
