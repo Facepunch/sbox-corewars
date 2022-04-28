@@ -16,12 +16,12 @@ namespace Facepunch.CoreWars
 			var items = player.FindItems<ArmorItem>()
 				.Where( i => i.ArmorSlot == ItemDefinition.ArmorSlot );
 
-			if ( items.Any( i => i.ArmorTier >= ItemDefinition.ArmorTier ) )
+			if ( items.Any( i => i.Tier >= ItemDefinition.Tier ) )
 				return false;
 
-			if ( ItemDefinition.ArmorTier > 1 )
+			if ( ItemDefinition.Tier > 1 )
 			{
-				if ( !items.Any( i => i.ArmorTier == ItemDefinition.ArmorTier - 1 ) )
+				if ( !items.Any( i => i.Tier == ItemDefinition.Tier - 1 ) )
 					return false;
 			}
 
@@ -37,7 +37,7 @@ namespace Facepunch.CoreWars
 		{
 			var item = InventorySystem.CreateItem<T>();
 
-			if ( ItemDefinition.ArmorTier > 1 )
+			if ( ItemDefinition.Tier > 1 )
 			{
 				var oldItem = player.FindItems<ArmorItem>()
 					.Where( i => i.ArmorSlot == ItemDefinition.ArmorSlot )
@@ -50,7 +50,7 @@ namespace Facepunch.CoreWars
 			}
 			else
 			{
-				player.TryGiveItem( item );
+				player.TryGiveArmor( item );
 			}
 		}
 	}

@@ -8,8 +8,10 @@ namespace Facepunch.CoreWars
 	public class CrowbarItemTier4 : WeaponItem
 	{
 		public override string WeaponName => "weapon_crowbar";
-		public override string Icon => "textures/items/weapon_crowbar.png";
+		public override bool RemoveOnDeath => true;
+		public override string Icon => "textures/items/weapon_crowbar_4.png";
 		public override string Name => "Crystal Crowbar";
-		public override int WeaponTier => 4;
+		public override string Group => "crowbar";
+		public override int Tier => 4;
 	}
 }

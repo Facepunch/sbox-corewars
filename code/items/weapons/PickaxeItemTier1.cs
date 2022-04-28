@@ -8,8 +8,9 @@ namespace Facepunch.CoreWars
 	public class PickaxeItemTier1 : WeaponItem
 	{
 		public override string WeaponName => "weapon_pickaxe";
-		public override string Icon => "textures/items/weapon_pickaxe.png";
+		public override string Icon => "textures/items/weapon_pickaxe_1.png";
 		public override string Name => "Light Pickaxe";
-		public override int WeaponTier => 1;
+		public override string Group => "pickaxe";
+		public override int Tier => 1;
 	}
 }

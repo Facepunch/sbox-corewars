@@ -13,16 +13,19 @@ namespace Facepunch.CoreWars
 		{
 			if ( !base.CanPurchase( player ) ) return false;
 
-			var items = player.FindItems<WeaponItem>()
-				.Where( i => i.WeaponName == ItemDefinition.WeaponName );
-
-			if ( items.Any( i => i.WeaponTier >= ItemDefinition.WeaponTier ) )
-				return false;
-
-			if ( ItemDefinition.WeaponTier > 1 )
+			if ( !string.IsNullOrEmpty( ItemDefinition.Group ) )
 			{
-				if ( !items.Any( i => i.WeaponTier == ItemDefinition.WeaponTier - 1 ) )
+				var items = player.FindItems<WeaponItem>()
+					.Where( i => i.Group == ItemDefinition.Group );
+
+				if ( items.Any( i => i.Tier >= ItemDefinition.Tier ) )
 					return false;
+
+				if ( ItemDefinition.Tier > 1 )
+				{
+					if ( !items.Any( i => i.Tier == ItemDefinition.Tier - 1 ) )
+						return false;
+				}
 			}
 
 			return true;
@@ -37,10 +40,10 @@ namespace Facepunch.CoreWars
 		{
 			var item = InventorySystem.CreateItem<T>();
 
-			if ( ItemDefinition.WeaponTier > 1 )
+			if ( ItemDefinition.Tier > 1 )
 			{
 				var oldItem = player.FindItems<WeaponItem>()
-					.Where( i => i.WeaponName == ItemDefinition.WeaponName )
+					.Where( i => i.Group == ItemDefinition.Group )
 					.FirstOrDefault();
 
 				if ( oldItem.IsValid() )

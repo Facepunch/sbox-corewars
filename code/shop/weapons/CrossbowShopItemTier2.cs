@@ -18,7 +18,7 @@ namespace Facepunch.CoreWars
 
 		public override string GetIcon( Player player )
 		{
-			return "textures/items/weapon_crossbow.png";
+			return "textures/items/weapon_crossbow_2.png";
 		}
 	}
 }

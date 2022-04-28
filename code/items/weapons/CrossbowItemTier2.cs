@@ -8,8 +8,9 @@ namespace Facepunch.CoreWars
 	public class CrossbowItemTier2 : WeaponItem
 	{
 		public override string WeaponName => "weapon_crossbow";
-		public override string Icon => "textures/items/weapon_crossbow.png";
+		public override string Icon => "textures/items/weapon_crossbow_2.png";
 		public override string Name => "Heavy Crossbow";
-		public override int WeaponTier => 2;
+		public override string Group => "crossbow";
+		public override int Tier => 2;
 	}
 }

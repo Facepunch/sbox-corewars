@@ -8,8 +8,9 @@ namespace Facepunch.CoreWars
 	public class AxeItemTier1 : WeaponItem
 	{
 		public override string WeaponName => "weapon_axe";
-		public override string Icon => "textures/items/weapon_axe.png";
+		public override string Icon => "textures/items/weapon_axe_1.png";
 		public override string Name => "Light Axe";
-		public override int WeaponTier => 1;
+		public override string Group => "axe";
+		public override int Tier => 1;
 	}
 }
