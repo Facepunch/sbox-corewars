@@ -50,6 +50,29 @@ namespace Facepunch.CoreWars
 		}
 
 		[ServerCmd]
+		public static void BuyUpgradeCmd( int index, string type )
+		{
+			if ( ConsoleSystem.Caller.Pawn is not Player player )
+				return;
+
+			var entity = FindByIndex( index );
+			if ( entity is not TeamUpgradesNPC npc ) return;
+			if ( npc.Position.Distance( player.Position ) > npc.MaxUseDistance ) return;
+
+			var item = npc.Upgrades.FirstOrDefault( i => i.GetType().Name == type );
+			if ( item == null ) return;
+			if ( !item.CanAfford( player ) ) return;
+			if ( !item.CanPurchase( player ) ) return;
+
+			foreach ( var kv in item.Costs )
+			{
+				player.TakeResources( kv.Key, kv.Value );
+			}
+
+			item.OnPurchased( player );
+		}
+
+		[ServerCmd]
 		public static void BuyItemCmd( int index, string type )
 		{
 			if ( ConsoleSystem.Caller.Pawn is not Player player )
@@ -144,6 +167,15 @@ namespace Facepunch.CoreWars
 			return true;
 		}
 
+		public List<T> FindItems<T>() where T : InventoryItem
+		{
+			var items = new List<T>();
+			items.AddRange( HotbarInventory.Instance.FindItems<T>() );
+			items.AddRange( BackpackInventory.Instance.FindItems<T>() );
+			items.AddRange( EquipmentInventory.Instance.FindItems<T>() );
+			return items;
+		}
+
 		public List<InventoryItem> FindItems( Type type )
 		{
 			var items = new List<InventoryItem>();
@@ -182,10 +214,9 @@ namespace Facepunch.CoreWars
 						amountLeftToTake -= item.StackSize;
 						totalAmountTaken += item.StackSize;
 						item.StackSize = 0;
-						item.Remove();
 					}
 
-					item.Container.Remove( item.ItemId );
+					item.Remove();
 				}
 			}
 
@@ -221,10 +252,9 @@ namespace Facepunch.CoreWars
 						amountLeftToTake -= item.StackSize;
 						totalAmountTaken += item.StackSize;
 						item.StackSize = 0;
-						item.Remove();
 					}
 
-					item.Container.Remove( item.ItemId );
+					item.Remove();
 				}
 			}
 
@@ -769,29 +799,29 @@ namespace Facepunch.CoreWars
 
 		private void UpdateHotbarSlotKeys()
 		{
-			if ( Input.Pressed( InputButton.Slot0 ) )
-				CurrentHotbarIndex = (ushort)Math.Min( 1, HotbarInventory.Instance.SlotLimit - 1 );
-
 			if ( Input.Pressed( InputButton.Slot1 ) )
-				CurrentHotbarIndex = (ushort)Math.Min( 2, HotbarInventory.Instance.SlotLimit - 1 );
+				CurrentHotbarIndex = (ushort)Math.Min( 0, HotbarInventory.Instance.SlotLimit - 1 );
 
 			if ( Input.Pressed( InputButton.Slot2 ) )
-				CurrentHotbarIndex = (ushort)Math.Min( 3, HotbarInventory.Instance.SlotLimit - 1 );
+				CurrentHotbarIndex = (ushort)Math.Min( 1, HotbarInventory.Instance.SlotLimit - 1 );
 
 			if ( Input.Pressed( InputButton.Slot3 ) )
-				CurrentHotbarIndex = (ushort)Math.Min( 4, HotbarInventory.Instance.SlotLimit - 1 );
+				CurrentHotbarIndex = (ushort)Math.Min( 2, HotbarInventory.Instance.SlotLimit - 1 );
 
 			if ( Input.Pressed( InputButton.Slot4 ) )
-				CurrentHotbarIndex = (ushort)Math.Min( 5, HotbarInventory.Instance.SlotLimit - 1 );
+				CurrentHotbarIndex = (ushort)Math.Min( 3, HotbarInventory.Instance.SlotLimit - 1 );
 
 			if ( Input.Pressed( InputButton.Slot5 ) )
-				CurrentHotbarIndex = (ushort)Math.Min( 6, HotbarInventory.Instance.SlotLimit - 1 );
+				CurrentHotbarIndex = (ushort)Math.Min( 4, HotbarInventory.Instance.SlotLimit - 1 );
 
 			if ( Input.Pressed( InputButton.Slot6 ) )
-				CurrentHotbarIndex = (ushort)Math.Min( 7, HotbarInventory.Instance.SlotLimit - 1 );
+				CurrentHotbarIndex = (ushort)Math.Min( 5, HotbarInventory.Instance.SlotLimit - 1 );
 
 			if ( Input.Pressed( InputButton.Slot7 ) )
-				CurrentHotbarIndex = (ushort)Math.Min( 8, HotbarInventory.Instance.SlotLimit - 1 );
+				CurrentHotbarIndex = (ushort)Math.Min( 6, HotbarInventory.Instance.SlotLimit - 1 );
+
+			if ( Input.Pressed( InputButton.Slot8 ) )
+				CurrentHotbarIndex = (ushort)Math.Min( 7, HotbarInventory.Instance.SlotLimit - 1 );
 		}
 	}
 }

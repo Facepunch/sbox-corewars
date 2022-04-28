@@ -74,7 +74,6 @@ namespace Facepunch.CoreWars
 		[ClientRpc]
 		private void OpenForClient()
 		{
-			Log.Info( "RPC Called" );
 			ItemStore.Current.SetNPC( this );
 			ItemStore.Current.Open();
 		}
