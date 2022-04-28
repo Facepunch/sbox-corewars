@@ -136,7 +136,13 @@ namespace Facepunch.CoreWars
 
 		public override void DoPlayerNoclip( Client client ) { }
 
-		public override void DoPlayerSuicide( Client client ) { }
+		public override void DoPlayerSuicide( Client client )
+		{
+			if ( client.Pawn is Player player )
+			{
+				player.TakeDamage( DamageInfo.Generic( 200f ) );
+			}
+		}
 
 		public override void ClientDisconnect( Client client, NetworkDisconnectionReason reason )
 		{
