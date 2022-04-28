@@ -46,8 +46,14 @@ namespace Facepunch.CoreWars
 			OnCreateProjectile( projectile );
 
 			var muzzle = GetAttachment( MuzzleAttachment );
-			var position = muzzle.Value.Position;
 			var forward = player.EyeRotation.Forward;
+			var position = player.EyePosition + forward * 100f;
+
+			if ( muzzle.HasValue )
+			{
+				position = muzzle.Value.Position;
+			}
+
 			var endPosition = player.EyePosition + forward * BulletRange;
 			var trace = Trace.Ray( player.EyePosition, endPosition )
 				.Ignore( player )

@@ -13,7 +13,7 @@ namespace Facepunch.CoreWars
 		public override AmmoType AmmoType => AmmoType.Bolt;
 		public override WeaponType Type => WeaponType.Projectile;
 		public override int Ammo => 10;
-		public override int Damage => 500;
+		public override int Damage => 40;
 	}
 
 	[Library( "weapon_crossbow", Title = "Crossbow" )]
@@ -22,29 +22,26 @@ namespace Facepunch.CoreWars
 		public override WeaponConfig Config => new CrossbowConfig();
 		public override string ImpactEffect => "particles/weapons/boomer/boomer_impact.vpcf";
 		public override string TrailEffect => "particles/weapons/boomer/boomer_projectile.vpcf";
-		public override string ViewModelPath => "models/weapons/v_shotblast.vmdl";
+		public override string ViewModelPath => "weapons/rust_crossbow/v_rust_crossbow.vmdl";
 		public override int ViewModelMaterialGroup => 1;
-		public override string MuzzleFlashEffect => "particles/weapons/boomer/boomer_muzzleflash.vpcf";
+		public override string MuzzleFlashEffect => null;
 		public override string CrosshairClass => "shotgun";
 		public override string HitSound => "barage.explode";
-		public override DamageFlags DamageType => DamageFlags.Blast;
+		public override DamageFlags DamageType => DamageFlags.Bullet;
 		public override float PrimaryRate => 0.3f;
 		public override float SecondaryRate => 1.0f;
 		public override float Speed => 1300f;
 		public override float Gravity => 5f;
 		public override float InheritVelocity => 0f;
-		public override string ProjectileModel => "models/weapons/barage_grenade/barage_grenade.vmdl";
+		public override string ProjectileModel => "weapons/rust_crossbow/rust_crossbow_bolt.vmdl";
 		public override int ClipSize => 1;
 		public override float ReloadTime => 2.3f;
 		public override float ProjectileLifeTime => 4f;
-		public virtual float BlastRadius => 96f;
 
 		public override void Spawn()
 		{
 			base.Spawn();
-
-			SetModel( "models/weapons/w_shotblast.vmdl" );
-			SetMaterialGroup( 1 );
+			SetModel( "weapons/rust_crossbow/rust_crossbow.vmdl" );
 		}
 
 		public override void AttackPrimary()
@@ -62,6 +59,9 @@ namespace Facepunch.CoreWars
 			if ( AmmoClip == 0 )
 				PlaySound( "blaster.empty" );
 
+			if ( IsClient )
+				ViewModelEntity?.SetAnimParameter( "fire", true );
+
 			base.AttackPrimary();
 		}
 
@@ -71,46 +71,21 @@ namespace Facepunch.CoreWars
 			base.PlayReloadSound();
 		}
 
+		public override void CreateViewModel()
+		{
+			base.CreateViewModel();
+			ViewModelEntity?.SetAnimParameter( "deploy", true );
+		}
+
 		public override void SimulateAnimator( PawnAnimator anim )
 		{
 			anim.SetAnimParameter( "holdtype", 2 );
-		}
-
-		protected override float ModifyDamage( Entity victim, float damage )
-		{
-			if ( victim == Owner ) return damage * 1.25f;
-
-			return base.ModifyDamage( victim, damage );
 		}
 
 		protected override void OnProjectileHit( BulletDropProjectile projectile, Entity target )
 		{
 			var explosion = Particles.Create( "particles/weapons/boomer/boomer_explosion.vpcf" );
 			explosion.SetPosition( 0, projectile.Position - projectile.Velocity.Normal * projectile.Radius );
-
-			if ( IsServer )
-            {
-				DamageInRadius( projectile.Position, BlastRadius, Config.Damage, 4f );
-
-				var voxelBlastRadius = (int)(BlastRadius / VoxelWorld.Current.VoxelSize);
-				var voxelPosition = VoxelWorld.Current.ToVoxelPosition( projectile.Position );
-
-				for ( var x = -voxelBlastRadius; x <= voxelBlastRadius; ++x )
-				{
-					for ( var y = -voxelBlastRadius; y <= voxelBlastRadius; ++y )
-					{
-						for ( var z = -voxelBlastRadius; z <= voxelBlastRadius; ++z )
-						{
-							var blockPosition = voxelPosition + new IntVector3( x, y, z );
-
-							if ( voxelPosition.Distance( blockPosition ) <= voxelBlastRadius )
-							{
-								VoxelWorld.Current.SetBlockOnServer( blockPosition, 0, 0 );
-							}
-						}
-					}
-				}
-			}
 		}
 	}
 }
