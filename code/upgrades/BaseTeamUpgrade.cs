@@ -7,12 +7,14 @@ using Sandbox;
 
 namespace Facepunch.CoreWars
 {
-	public abstract class BaseTeamUpgrade : BaseNetworkable
+	public abstract class BaseTeamUpgrade : BaseNetworkable, IPurchasableItem
 	{
-		public virtual Type PreviousUpgradeType => null;
 		public virtual string Description => string.Empty;
 		public virtual string Name => string.Empty;
+		public virtual string Group => string.Empty;
 		public virtual Dictionary<Type, int> Costs => new();
+		public virtual int Quantity => 0;
+		public virtual int UpgradeTier => 1;
 
 		public virtual bool CanAfford( Player player )
 		{
@@ -40,8 +42,13 @@ namespace Facepunch.CoreWars
 			if ( core.Upgrades.Any( u => u.GetType() == GetType() ) )
 				return false;
 
-			if ( PreviousUpgradeType != null )
-				return core.Upgrades.Any( u => u.GetType() == PreviousUpgradeType );
+			if ( !string.IsNullOrEmpty( Group ) )
+			{
+				if ( UpgradeTier > 1 )
+					return core.Upgrades.Any( u => u.Group == Group && u.UpgradeTier == UpgradeTier - 1 );
+				else
+					return !core.Upgrades.Any( u => u.Group == Group && u.UpgradeTier >= UpgradeTier );
+			}
 
 			return true;
 		}

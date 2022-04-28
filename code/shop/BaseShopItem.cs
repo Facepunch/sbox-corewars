@@ -7,7 +7,7 @@ using Sandbox;
 
 namespace Facepunch.CoreWars
 {
-	public abstract class BaseShopItem : BaseNetworkable
+	public abstract class BaseShopItem : BaseNetworkable, IPurchasableItem
 	{
 		public virtual Type RequiredUpgradeType => null;
 		public virtual string Description => string.Empty;
