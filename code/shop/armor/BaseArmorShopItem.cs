@@ -5,25 +5,24 @@ using System.Linq;
 
 namespace Facepunch.CoreWars
 {
-	public abstract class BaseArmorShopItem<T> : BaseShopItem where T : ArmorItem
+	public abstract class BaseArmorShopItem<T> : BaseShopItem where T : ArmorItem, new()
 	{
-		public virtual Type PreviousArmorType => null;
-		public virtual Type NextArmorType => null;
+		public T ItemDefinition { get; private set; } = new T();
 
 		public override bool CanPurchase( Player player )
 		{
 			if ( !base.CanPurchase( player ) ) return false;
 
-			if ( NextArmorType != null )
-			{
-				var items = player.FindItems( NextArmorType );
-				if ( items.Count > 0 ) return false;
-			}
+			var items = player.FindItems<ArmorItem>()
+				.Where( i => i.ArmorSlot == ItemDefinition.ArmorSlot );
 
-			if ( PreviousArmorType != null )
+			if ( items.Any( i => i.ArmorTier >= ItemDefinition.ArmorTier ) )
+				return false;
+
+			if ( ItemDefinition.ArmorTier > 1 )
 			{
-				var items = player.FindItems( PreviousArmorType );
-				return items.Count > 0;
+				if ( !items.Any( i => i.ArmorTier == ItemDefinition.ArmorTier - 1 ) )
+					return false;
 			}
 
 			return true;
@@ -38,10 +37,11 @@ namespace Facepunch.CoreWars
 		{
 			var item = InventorySystem.CreateItem<T>();
 
-			if ( PreviousArmorType != null )
+			if ( ItemDefinition.ArmorTier > 1 )
 			{
-				var oldItems = player.FindItems( PreviousArmorType );
-				var oldItem = oldItems.FirstOrDefault();
+				var oldItem = player.FindItems<ArmorItem>()
+					.Where( i => i.ArmorSlot == ItemDefinition.ArmorSlot )
+					.FirstOrDefault();
 
 				if ( oldItem.IsValid() )
 				{

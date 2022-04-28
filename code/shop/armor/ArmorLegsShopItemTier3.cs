@@ -10,7 +10,6 @@ namespace Facepunch.CoreWars
 	{
 		public override string Name => "Heavy Legs Armor";
 		public override string Description => "A heavy protection legs armor piece.";
-		public override Type PreviousArmorType => typeof( ArmorLegsTier2 );
 		public override Dictionary<Type, int> Costs => new()
 		{
 			[typeof( CrystalItem )] = 3

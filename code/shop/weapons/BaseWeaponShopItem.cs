@@ -5,25 +5,24 @@ using Sandbox;
 
 namespace Facepunch.CoreWars
 {
-	public abstract class BaseWeaponShopItem<T> : BaseShopItem where T : WeaponItem
+	public abstract class BaseWeaponShopItem<T> : BaseShopItem where T : WeaponItem, new()
 	{
-		public virtual Type PreviousWeaponType => null;
-		public virtual Type NextWeaponType => null;
+		public T ItemDefinition { get; private set; } = new T();
 
 		public override bool CanPurchase( Player player )
 		{
 			if ( !base.CanPurchase( player ) ) return false;
 
-			if ( NextWeaponType != null )
-			{
-				var items = player.FindItems( NextWeaponType );
-				if ( items.Count > 0 ) return false;
-			}
+			var items = player.FindItems<WeaponItem>()
+				.Where( i => i.WeaponName == ItemDefinition.WeaponName );
 
-			if ( PreviousWeaponType != null )
+			if ( items.Any( i => i.WeaponTier >= ItemDefinition.WeaponTier ) )
+				return false;
+
+			if ( ItemDefinition.WeaponTier > 1 )
 			{
-				var items = player.FindItems( PreviousWeaponType );
-				return items.Count > 0;
+				if ( !items.Any( i => i.WeaponTier == ItemDefinition.WeaponTier - 1 ) )
+					return false;
 			}
 
 			return true;
@@ -38,10 +37,11 @@ namespace Facepunch.CoreWars
 		{
 			var item = InventorySystem.CreateItem<T>();
 
-			if ( PreviousWeaponType != null )
+			if ( ItemDefinition.WeaponTier > 1 )
 			{
-				var oldItems = player.FindItems( PreviousWeaponType );
-				var oldItem = oldItems.FirstOrDefault();
+				var oldItem = player.FindItems<WeaponItem>()
+					.Where( i => i.WeaponName == ItemDefinition.WeaponName )
+					.FirstOrDefault();
 
 				if ( oldItem.IsValid() )
 				{

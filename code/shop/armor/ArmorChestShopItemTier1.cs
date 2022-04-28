@@ -10,7 +10,6 @@ namespace Facepunch.CoreWars
 	{
 		public override string Name => "Light Chest Armor";
 		public override string Description => "A low protection chest armor piece.";
-		public override Type NextArmorType => typeof( ArmorChestTier2 );
 		public override Dictionary<Type, int> Costs => new()
 		{
 			[typeof( IronItem )] = 16

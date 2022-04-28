@@ -14,7 +14,6 @@ namespace Facepunch.CoreWars
 		{
 			[typeof( IronItem )] = 60
 		};
-		public override Type PreviousWeaponType => typeof( CrowbarItemTier3 );
 		public override Type RequiredUpgradeType => typeof( ArmoryUpgrade );
 
 		public override string GetIcon( Player player )
