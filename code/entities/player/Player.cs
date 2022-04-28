@@ -140,6 +140,12 @@ namespace Facepunch.CoreWars
 			}
 		}
 
+		public bool TryGiveArmor( ArmorItem item )
+		{
+			var slotToIndex = (int)item.ArmorSlot - 1;
+			return EquipmentInventory.Instance.Give( item, (ushort)slotToIndex );
+		}
+
 		public ushort TryGiveItem( InventoryItem item )
 		{
 			var remaining = HotbarInventory.Instance.Stack( item );
@@ -308,7 +314,6 @@ namespace Facepunch.CoreWars
 			BackpackInventory.Instance.RemoveAll();
 			HotbarInventory.Instance.RemoveAll();
 			ChestInventory.Instance.RemoveAll();
-			GiveInitialItems();
 		}
 
 		public virtual Transform? GetSpawnpoint()
@@ -347,8 +352,6 @@ namespace Facepunch.CoreWars
 			Animator = new PlayerAnimator();
 
 			SetModel( "models/citizen/citizen.vmdl" );
-
-			GiveInitialItems();
 		}
 
 		public override void Spawn()
@@ -376,6 +379,23 @@ namespace Facepunch.CoreWars
 			EnableDrawing = false;
 
 			RespawnWhenAvailable();
+
+			var itemsToDrop = FindItems<InventoryItem>().Where( i => i.DropOnDeath );
+
+			foreach ( var item in itemsToDrop )
+			{
+				var entity = new ItemEntity();
+				entity.Position = WorldSpaceBounds.Center + Vector3.Up * 64f;
+				entity.SetItem( item );
+				entity.ApplyLocalImpulse( Vector3.Random * 100f );
+			}
+
+			var itemsToRemove = FindItems<InventoryItem>().Where( i => i.RemoveOnDeath );
+
+			foreach ( var item in itemsToRemove )
+			{
+				item.Remove();
+			}
 
 			base.OnKilled();
 		}
@@ -422,6 +442,7 @@ namespace Facepunch.CoreWars
 			}
 
 			ResetInterpolation();
+			GiveInitialItems();
 		}
 
 		public override void BuildInput( InputBuilder input )
@@ -622,23 +643,13 @@ namespace Facepunch.CoreWars
 
 		protected virtual void GiveInitialItems()
 		{
-			TryGiveBlock( VoxelWorld.Current.FindBlockId<GrassBlock>(), 1000 );
-			TryGiveBlock( VoxelWorld.Current.FindBlockId<WindowBlock>(), 500 );
+			var crowbars = FindItems<CrowbarItemTier1>();
 
-			TryGiveWeapon<CrossbowItemTier1>();
-			TryGiveAmmo( AmmoType.Bolt, 60 );
-
-			var iron = InventorySystem.CreateItem<IronItem>();
-			iron.StackSize = 16;
-			TryGiveItem( iron );
-
-			var chest = InventorySystem.CreateItem<ArmorChestTier1>();
-			var head = InventorySystem.CreateItem<ArmorHeadTier2>();
-			var legs = InventorySystem.CreateItem<ArmorLegsTier3>();
-
-			TryGiveItem( chest );
-			TryGiveItem( head );
-			TryGiveItem( legs );
+			if ( !crowbars.Any() )
+			{
+				var crowbar = InventorySystem.CreateItem<CrowbarItemTier1>();
+				TryGiveItem( crowbar );
+			}
 		}
 
 		public virtual void CreateInventories()
@@ -779,8 +790,15 @@ namespace Facepunch.CoreWars
 			{
 				if ( !weapon.Weapon.IsValid() )
 				{
-					weapon.Weapon = Library.Create<Weapon>( weapon.WeaponName );
-					weapon.Weapon.OnCarryStart( this );
+					try
+					{
+						weapon.Weapon = Library.Create<Weapon>( weapon.WeaponName );
+						weapon.Weapon.OnCarryStart( this );
+					}
+					catch ( Exception e )
+					{
+						Log.Error( e );
+					}
 				}
 			}
 		}
