@@ -11,6 +11,6 @@ namespace Facepunch.CoreWars
 		public override ArmorSlot ArmorSlot => ArmorSlot.Chest;
 		public override string Name => "Light Chest Armor";
 		public override string Icon => "textures/items/armor_chest_1.png";
-		public override int ArmorTier => 1;
+		public override int Tier => 1;
 	}
 }
