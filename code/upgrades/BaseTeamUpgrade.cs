@@ -7,7 +7,7 @@ using Sandbox;
 
 namespace Facepunch.CoreWars
 {
-	public abstract class BaseTeamUpgrade : BaseNetworkable, IPurchasableItem
+	public abstract class BaseTeamUpgrade : BaseNetworkable, IPurchasableItem, IValid
 	{
 		public virtual string Description => string.Empty;
 		public virtual string Name => string.Empty;
@@ -15,6 +15,8 @@ namespace Facepunch.CoreWars
 		public virtual Dictionary<Type, int> Costs => new();
 		public virtual int Quantity => 0;
 		public virtual int Tier => 1;
+
+		public bool IsValid => true;
 
 		public virtual bool CanAfford( Player player )
 		{

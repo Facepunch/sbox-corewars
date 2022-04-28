@@ -35,6 +35,8 @@ namespace Facepunch.CoreWars
 			{ Team.Yellow, Color.Yellow }
 		};
 
+		private static Dictionary<Team, TeamCore> Cores = new();
+
 		public static BlockType GetPlasticBlock( this Team team )
 		{
 			var world = VoxelWorld.Current;
@@ -58,7 +60,13 @@ namespace Facepunch.CoreWars
 
 		public static TeamCore GetCore( this Team team )
 		{
-			return Entity.All.OfType<TeamCore>().FirstOrDefault( t => t.Team == team );
+			if ( !Cores.TryGetValue( team, out var core ) )
+			{
+				core = Entity.All.OfType<TeamCore>().FirstOrDefault( t => t.Team == team );
+				Cores[team] = core;
+			}
+
+			return core;
 		}
 
 		public static Color GetColor( this Team team )

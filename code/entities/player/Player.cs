@@ -19,6 +19,7 @@ namespace Facepunch.CoreWars
 		[Net] public NetInventoryContainer HotbarInventory { get; private set; }
 		[Net] public NetInventoryContainer ChestInventory { get; private set; }
 		[Net] public NetInventoryContainer EquipmentInventory { get; private set; }
+		[Net] public TeamCore Core { get; private set; }
 		public ProjectileSimulator Projectiles { get; private set; }
 		public DamageInfo LastDamageTaken { get; private set; }
 		public TimeUntil NextBlockPlace { get; private set; }
@@ -292,6 +293,8 @@ namespace Facepunch.CoreWars
 			Host.AssertServer();
 
 			Team = team;
+			Core = team.GetCore();
+
 			OnTeamChanged( team );
 		}
 
@@ -629,6 +632,28 @@ namespace Facepunch.CoreWars
 			{
 				if ( Team != Team.None && attacker.Team == Team )
 					return;
+
+				if ( attacker.Core.IsValid() )
+				{
+					var damageTier = attacker.Core.GetUpgradeTier( "damage" );
+
+					if ( damageTier >= 2 )
+						info.Damage *= 1.35f;
+					else if ( damageTier >= 1 )
+						info.Damage *= 1.2f;
+				}
+			}
+
+			if ( Core.IsValid() )
+			{
+				var armorTier = Core.GetUpgradeTier( "armor" );
+
+				if ( armorTier >= 3 )
+					info.Damage *= 0.4f;
+				else if ( armorTier >= 2 )
+					info.Damage *= 0.6f;
+				else if ( armorTier >= 1 )
+					info.Damage *= 0.8f;
 			}
 
 			LastDamageTaken = info;

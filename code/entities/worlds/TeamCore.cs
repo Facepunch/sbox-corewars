@@ -4,6 +4,7 @@ using Facepunch.Voxels;
 using Sandbox;
 using System;
 using System.IO;
+using System.Linq;
 
 namespace Facepunch.CoreWars
 {
@@ -13,6 +14,23 @@ namespace Facepunch.CoreWars
 		[EditorProperty, Net] public Team Team { get; set; }
 
 		[Net] public List<BaseTeamUpgrade> Upgrades { get; set; }
+
+		public T FindUpgrade<T>() where T : BaseTeamUpgrade
+		{
+			return (Upgrades.FirstOrDefault( u => u is T ) as T);
+		}
+
+		public int GetUpgradeTier( string group )
+		{
+			var valid = Upgrades.Where( u => u.Group == group );
+			if ( !valid.Any() ) return 0;
+			return valid.Max( u => u.Tier );
+		}
+
+		public bool HasUpgrade<T>() where T : BaseTeamUpgrade
+		{
+			return Upgrades.Any( u => u is T );
+		}
 
 		public virtual void Reset()
 		{

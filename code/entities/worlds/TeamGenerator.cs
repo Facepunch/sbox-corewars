@@ -13,6 +13,9 @@ namespace Facepunch.CoreWars
 	{
 		[EditorProperty, Net] public Team Team { get; set; }
 
+		private TimeUntil NextGenerateCrystalTime { get; set; }
+		private TimeUntil NextGenerateGoldTime { get; set; }
+
 		private Particles Effect { get; set; }
 
 		public override void Spawn()
@@ -38,6 +41,28 @@ namespace Facepunch.CoreWars
 			Team = (Team)reader.ReadByte();
 		}
 
+		protected float GetNextGenerateGoldTime()
+		{
+			var core = Team.GetCore();
+
+			if ( core.IsValid() )
+			{
+				var tier = core.GetUpgradeTier( "gold" );
+
+				if ( tier >= 3 )
+					return 10f;
+				else if ( tier >= 2 )
+					return 15f;
+			}
+
+			return 30f;
+		}
+
+		protected float GetNextGenerateCrystalTime()
+		{
+			return 30f;
+		}
+
 		[Event.Tick.Client]
 		protected virtual void ClientTick()
 		{
@@ -51,24 +76,49 @@ namespace Facepunch.CoreWars
 
 		protected override void GenerateItems()
 		{
-			var itemsInArea = FindInSphere( Position, CollisionBounds.Size.Length * 2f )
-				.OfType<ItemEntity>()
-				.Where( entity => entity.Item.Instance is IronItem )
-				.Count();
-
-			if ( itemsInArea >= 16 ) return;
-
-			var item = InventorySystem.CreateItem<IronItem>();
-			item.StackSize = 1;
-
-			var entity = new ItemEntity();
-			entity.Position = WorldSpaceBounds.Center + Vector3.Up * 64f;
-			entity.SetItem( item );
-			entity.ApplyLocalImpulse( Vector3.Random * 100f );
+			Generate<IronItem>( 1 );
 		}
 
-		protected override float CalculateNextGenerationTime()
+		protected override void OnGeneratorTick()
 		{
+			var core = Team.GetCore();
+			if ( !core.IsValid() ) return;
+
+			if ( NextGenerateGoldTime )
+			{
+				if ( core.HasUpgrade<GoldGeneratorTier1>() )
+				{
+					Generate<GoldItem>( 1 );
+				}
+
+				NextGenerateGoldTime = GetNextGenerateGoldTime();
+			}
+
+			if ( NextGenerateCrystalTime )
+			{
+				if ( core.HasUpgrade<TeamGeneratorTier3>() )
+				{
+					Generate<CrystalItem>( 1 );
+				}
+
+				NextGenerateCrystalTime = GetNextGenerateCrystalTime();
+			}
+		}
+
+		protected override float GetNextGenerateTime()
+		{
+			var core = Team.GetCore();
+
+			if ( core.IsValid() )
+			{
+				var tier = core.GetUpgradeTier( "generator" );
+
+				if ( tier >= 2 )
+					return 0.5f;
+				else if ( tier >= 1 )
+					return 1f;
+			}
+
 			return 2f;
 		}
 	}

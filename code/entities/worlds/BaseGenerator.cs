@@ -4,12 +4,13 @@ using Facepunch.Voxels;
 using Sandbox;
 using System;
 using System.IO;
+using System.Linq;
 
 namespace Facepunch.CoreWars
 {
 	public partial class BaseGenerator : ModelEntity, ISourceEntity
 	{
-		private TimeUntil NextGeneration { get; set; }
+		private TimeUntil NextGenerateTime { get; set; }
 
 		public virtual void Serialize( BinaryWriter writer )
 		{
@@ -21,17 +22,43 @@ namespace Facepunch.CoreWars
 
 		}
 
+		protected void Generate<T>( int stackSize ) where T : ResourceItem
+		{
+			var itemsInArea = FindInSphere( Position, CollisionBounds.Size.Length * 2f )
+				.OfType<ItemEntity>()
+				.Where( entity => entity.Item.Instance is T )
+				.Count();
+
+			if ( itemsInArea >= 16 ) return;
+
+			var item = InventorySystem.CreateItem<T>();
+			item.StackSize = 1;
+
+			var entity = new ItemEntity();
+			entity.Position = WorldSpaceBounds.Center + Vector3.Up * 64f;
+			entity.SetItem( item );
+			entity.ApplyLocalImpulse( Vector3.Random * 100f );
+		}
+
+
 		[Event.Tick.Server]
 		protected virtual void ServerTick()
 		{
 			if ( !Game.IsState<GameState>() && !Game.IsState<LobbyState>() )
 				return;
 
-			if ( NextGeneration )
+			if ( NextGenerateTime )
 			{
 				GenerateItems();
-				NextGeneration = CalculateNextGenerationTime();
+				NextGenerateTime = GetNextGenerateTime();
 			}
+
+			OnGeneratorTick();
+		}
+
+		protected virtual void OnGeneratorTick()
+		{
+
 		}
 
 		protected virtual void GenerateItems()
@@ -39,7 +66,7 @@ namespace Facepunch.CoreWars
 
 		}
 
-		protected virtual float CalculateNextGenerationTime()
+		protected virtual float GetNextGenerateTime()
 		{
 			return 10f;
 		}

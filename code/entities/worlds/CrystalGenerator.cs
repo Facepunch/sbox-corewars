@@ -35,23 +35,10 @@ namespace Facepunch.CoreWars
 
 		protected override void GenerateItems()
 		{
-			var itemsInArea = FindInSphere( Position, CollisionBounds.Size.Length * 2f )
-				.OfType<ItemEntity>()
-				.Where( entity => entity.Item.Instance is CrystalItem )
-				.Count();
-
-			if ( itemsInArea >= 16 ) return;
-
-			var item = InventorySystem.CreateItem<CrystalItem>();
-			item.StackSize = 1;
-
-			var entity = new ItemEntity();
-			entity.Position = WorldSpaceBounds.Center + Vector3.Up * 64f;
-			entity.SetItem( item );
-			entity.ApplyLocalImpulse( Vector3.Random * 100f );
+			Generate<CrystalItem>( 1 );
 		}
 
-		protected override float CalculateNextGenerationTime()
+		protected override float GetNextGenerateTime()
 		{
 			return 30f;
 		}
