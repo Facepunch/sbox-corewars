@@ -17,7 +17,7 @@ namespace Facepunch.CoreWars
 	}
 
 	[Library( "weapon_crossbow", Title = "Crossbow" )]
-	partial class Crossbow : BulletDropWeapon<BulletDropProjectile>
+	public partial class Crossbow : BulletDropWeapon<BulletDropProjectile>
 	{
 		public override WeaponConfig Config => new CrossbowConfig();
 		public override string ImpactEffect => "particles/weapons/boomer/boomer_impact.vpcf";

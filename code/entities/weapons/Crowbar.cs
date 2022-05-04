@@ -13,17 +13,14 @@ namespace Facepunch.CoreWars
 		public override AmmoType AmmoType => AmmoType.None;
 		public override WeaponType Type => WeaponType.Melee;
 		public override int Ammo => 0;
-		public override int Damage => 10;
+		public override int Damage => 5;
 	}
 
 	[Library( "weapon_crowbar", Title = "Crowbar" )]
-	partial class Crowbar : Weapon
+	public partial class Crowbar : Weapon
 	{
 		public override WeaponConfig Config => new CrowbarConfig();
-		public override string ImpactEffect => "particles/weapons/boomer/boomer_impact.vpcf";
 		public override string ViewModelPath => "models/weapons/v_crowbar.vmdl";
-		public override int ViewModelMaterialGroup => 1;
-		public override string MuzzleFlashEffect => "particles/weapons/boomer/boomer_muzzleflash.vpcf";
 		public override DamageFlags DamageType => DamageFlags.Blunt;
 		public override float PrimaryRate => 1.5f;
 		public override float SecondaryRate => 1f;
@@ -45,12 +42,6 @@ namespace Facepunch.CoreWars
 
 			TimeSincePrimaryAttack = 0;
 			TimeSinceSecondaryAttack = 0;
-		}
-
-		public override void PlayReloadSound()
-		{
-			PlaySound( "blaster.reload" );
-			base.PlayReloadSound();
 		}
 
 		public override void SimulateAnimator( PawnAnimator anim )
@@ -76,8 +67,6 @@ namespace Facepunch.CoreWars
 		protected override void OnMeleeAttackHit( Entity victim )
 		{
 			ViewModelEntity?.SetAnimParameter( "attack_has_hit", true );
-			Log.Info( IsClient );
-
 			base.OnMeleeAttackHit( victim );
 		}
 	}
