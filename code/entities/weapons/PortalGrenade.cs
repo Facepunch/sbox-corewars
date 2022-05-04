@@ -49,7 +49,7 @@ namespace Facepunch.CoreWars
 			ShootEffects();
 			PlaySound( $"barage.launch" );
 
-			if ( IsServer && Owner is Player player )
+			if ( Owner is Player player )
 			{
 				var item = player.GetWeaponItem( this );
 
