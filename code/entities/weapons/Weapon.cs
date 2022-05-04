@@ -1,6 +1,7 @@
 ﻿using Sandbox;
 using System;
 using System.Collections.Generic;
+using Facepunch.CoreWars.Inventory;
 
 namespace Facepunch.CoreWars
 {
@@ -30,6 +31,9 @@ namespace Facepunch.CoreWars
 		public virtual int ViewModelMaterialGroup => 0;
 		public override string ViewModelPath => "weapons/rust_pistol/v_rust_pistol.vmdl";
 
+		[Net, Change( nameof( OnWeaponItemChanged ) )]
+		public NetInventoryItem Item { get; private set; }
+
 		[Net]
 		public int Slot { get; set; }
 
@@ -54,10 +58,18 @@ namespace Facepunch.CoreWars
 		public float ChargeAttackEndTime { get; private set; }
 		public AnimEntity AnimationOwner => Owner as AnimEntity;
 
+		public WeaponItem WeaponItem => Item.Instance as WeaponItem;
+
 		public int AvailableAmmo()
 		{
 			if ( Owner is not Player owner ) return 0;
 			return owner.GetAmmoCount( Config.AmmoType );
+		}
+
+		public void SetWeaponItem( WeaponItem item )
+		{
+			Item = new NetInventoryItem( item );
+			OnWeaponItemChanged();
 		}
 
 		public float GetDamageFalloff( float distance, float damage )
@@ -423,6 +435,11 @@ namespace Facepunch.CoreWars
 
 			ViewModelEntity?.SetAnimParameter( "fire", true );
 			CrosshairPanel?.CreateEvent( "fire" );
+		}
+
+		protected virtual void OnWeaponItemChanged()
+		{
+
 		}
 
 		protected virtual ModelEntity GetEffectEntity()

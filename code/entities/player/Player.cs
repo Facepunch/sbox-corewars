@@ -827,6 +827,7 @@ namespace Facepunch.CoreWars
 					try
 					{
 						weapon.Weapon = Library.Create<Weapon>( weapon.WeaponName );
+						weapon.Weapon.Item = new NetInventoryItem( weapon );
 						weapon.Weapon.OnCarryStart( this );
 						weapon.IsDirty = true;
 					}
