@@ -33,6 +33,12 @@ namespace Facepunch.CoreWars
 				damage *= SecondaryMaterialMultiplier;
 			}
 
+			if ( damage == 0 )
+			{
+				// We can't do no damage to blocks.
+				return;
+			}
+
 			var state = world.GetOrCreateState<BuildingBlockState>( voxel.Position );
 
 			if ( !state.IsValid() )
@@ -41,8 +47,10 @@ namespace Facepunch.CoreWars
 				return;
 			}
 
+			var newHealth = (state.Health - damage).FloorToInt().Clamp( 0, 100 );
+
 			state.LastDamageTime = 0f;
-			state.Health -= (byte)damage;
+			state.Health = (byte)newHealth;
 			state.IsDirty = true;
 
 			if ( state.Health <= 0 )
