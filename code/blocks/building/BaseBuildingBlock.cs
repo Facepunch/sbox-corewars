@@ -10,9 +10,7 @@ namespace Facepunch.CoreWars.Blocks
 
 		public override BlockState CreateState()
 		{
-			var state = new BuildingBlockState();
-			state.Health = 100;
-			return state;
+			return new BuildingBlockState();
 		}
 	}
 }
