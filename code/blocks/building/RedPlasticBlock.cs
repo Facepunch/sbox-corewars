@@ -4,10 +4,12 @@ using Sandbox;
 namespace Facepunch.CoreWars.Blocks
 {
 	[Library]
-	public class RedPlasticBlock : BlockType
+	public class RedPlasticBlock : BaseBuildingBlock
 	{
 		public override string DefaultTexture => "plastic_red_01";
 		public override string FriendlyName => "Red Plastic";
+		public override BuildingMaterialType MaterialType => BuildingMaterialType.Plastic;
+		public override float DamageMultiplier => 0.8f;
 	}
 }
 

@@ -4,9 +4,11 @@ using Sandbox;
 namespace Facepunch.CoreWars.Blocks
 {
 	[Library]
-	public class WoodenPlanksBlock : BlockType
+	public class WoodenPlanksBlock : BaseBuildingBlock
 	{
 		public override string DefaultTexture => "planks_01";
 		public override string FriendlyName => "Wooden Planks";
+		public override BuildingMaterialType MaterialType => BuildingMaterialType.Wooden;
+		public override float DamageMultiplier => 0.8f;
 	}
 }
