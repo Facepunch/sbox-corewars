@@ -1,4 +1,5 @@
-﻿using Facepunch.Voxels;
+﻿using Facepunch.CoreWars.Blocks;
+using Facepunch.Voxels;
 using Sandbox;
 
 namespace Facepunch.CoreWars
@@ -13,11 +14,11 @@ namespace Facepunch.CoreWars
 		public override AmmoType AmmoType => AmmoType.None;
 		public override WeaponType Type => WeaponType.Melee;
 		public override int Ammo => 0;
-		public override int Damage => 10;
+		public override int Damage => 20;
 	}
 
 	[Library( "weapon_pickaxe", Title = "Pickaxe" )]
-	public partial class Pickaxe : Weapon
+	public partial class Pickaxe : BlockDamageWeapon
 	{
 		public override WeaponConfig Config => new PickaxeConfig();
 		public override string ViewModelPath => "models/weapons/v_crowbar.vmdl";
@@ -26,6 +27,7 @@ namespace Facepunch.CoreWars
 		public override float SecondaryRate => 1f;
 		public override int ClipSize => 1;
 		public override bool IsMelee => true;
+		public override BuildingMaterialType PrimaryMaterialType => BuildingMaterialType.Metal;
 
 		public override void Spawn()
 		{
@@ -38,39 +40,11 @@ namespace Facepunch.CoreWars
 			PlayAttackAnimation();
 			ShootEffects();
 			PlaySound( $"barage.launch" );
-			MeleeStrike( Config.Damage, 1.5f );
+			MeleeStrike( Config.Damage * 0.2f, 1.5f );
 
 			if ( IsServer )
 			{
-				var world = VoxelWorld.Current;
-				
-				if ( world.GetBlockInDirection( Input.Position, Input.Rotation.Forward, out var position, 150f ) )
-				{
-					var voxel = world.GetVoxel( position );
-
-					if ( voxel.IsValid )
-					{
-						Log.Info( "Hit Voxel" );
-
-						var state = world.GetState<BlockState>( position );
-						
-						if ( !state.IsValid() )
-						{
-							state = world.GetOrCreateState<BlockState>( position );
-							state.Health = 100;
-						}
-
-						state.Health -= 10;
-						state.IsDirty = true;
-
-						Log.Info( state.Health );
-
-						if ( state.Health <= 0 )
-						{
-							world.SetBlockOnServer( position, 0 );
-						}
-					}
-				}
+				DamageVoxelInDirection( 150f );
 			}
 
 			TimeSincePrimaryAttack = 0;

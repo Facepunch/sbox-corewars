@@ -1,4 +1,4 @@
-﻿using Facepunch.Voxels;
+﻿using Facepunch.CoreWars.Blocks;
 using Sandbox;
 
 namespace Facepunch.CoreWars
@@ -17,7 +17,7 @@ namespace Facepunch.CoreWars
 	}
 
 	[Library( "weapon_axe", Title = "Axe" )]
-	public partial class Axe : Weapon
+	public partial class Axe : BlockDamageWeapon
 	{
 		public override WeaponConfig Config => new AxeConfig();
 		public override string ViewModelPath => "models/weapons/v_crowbar.vmdl";
@@ -26,6 +26,7 @@ namespace Facepunch.CoreWars
 		public override float SecondaryRate => 1f;
 		public override int ClipSize => 1;
 		public override bool IsMelee => true;
+		public override BuildingMaterialType PrimaryMaterialType => BuildingMaterialType.Wooden;
 
 		public override void Spawn()
 		{
@@ -38,7 +39,12 @@ namespace Facepunch.CoreWars
 			PlayAttackAnimation();
 			ShootEffects();
 			PlaySound( $"barage.launch" );
-			MeleeStrike( Config.Damage, 1.5f );
+			MeleeStrike( Config.Damage * 0.2f, 1.5f );
+
+			if ( IsServer )
+			{
+				DamageVoxelInDirection( 150f );
+			}
 
 			TimeSincePrimaryAttack = 0;
 			TimeSinceSecondaryAttack = 0;
