@@ -497,6 +497,20 @@ namespace Facepunch.CoreWars
 
 					NextBlockPlace = 0.1f;
 				}
+
+				if ( Input.Released( InputButton.Drop ) )
+				{
+					var container = HotbarInventory.Instance;
+					var item = container.GetFromSlot( CurrentHotbarIndex );
+
+					if ( item.IsValid() && item.CanBeDropped )
+					{
+						var entity = new ItemEntity();
+						entity.Position = Input.Position + Input.Rotation.Forward * 32f;
+						entity.SetItem( item );
+						entity.ApplyLocalImpulse( Input.Rotation.Forward * 100f + Vector3.Up * 50f );
+					}
+				}
 			}
 			else
 			{

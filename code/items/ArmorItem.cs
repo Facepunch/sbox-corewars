@@ -6,6 +6,8 @@ namespace Facepunch.CoreWars
 {
 	public class ArmorItem : InventoryItem
 	{
+		public override bool CanBeDropped => false;
+
 		public virtual float DamageMultiplier => 1f;
 		public virtual ArmorSlot ArmorSlot => ArmorSlot.None;
 		public virtual int Tier => 0;

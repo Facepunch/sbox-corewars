@@ -6,6 +6,8 @@ namespace Facepunch.CoreWars
 {
 	public class WeaponItem : InventoryItem
 	{
+		public override bool CanBeDropped => false;
+
 		public virtual string WeaponName => string.Empty;
 		public virtual string Group => string.Empty;
 		public virtual int Tier => 0;

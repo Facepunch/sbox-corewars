@@ -24,6 +24,11 @@ namespace Facepunch.CoreWars.Inventory
 			else
 			{
 				SetupPhysicsFromSphere( PhysicsMotionType.Dynamic, Vector3.Zero, 8f );
+
+				PhysicsBody.LinearDrag = 1f;
+				PhysicsBody.LinearDamping = 0.9f;
+				PhysicsBody.AngularDrag = 1f;
+				PhysicsBody.LinearDamping = 0.9f;
 			}
 
 			PickupTrigger = new PickupTrigger
