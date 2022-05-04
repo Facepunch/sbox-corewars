@@ -9,14 +9,15 @@ namespace Facepunch.CoreWars.Blocks
 
 		public TimeSince LastDamageTime { get; set; }
 
-		public override void Tick( IntVector3 position )
+		public override void Tick()
 		{
-			if ( LastDamageTime >= 2f )
+			if ( Health < 100 && LastDamageTime >= 2f )
 			{
 				Health = 100;
+				IsDirty = true;
 			}
 
-			base.Tick( position );
+			base.Tick();
 		}
 	}
 }
