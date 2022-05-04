@@ -497,23 +497,6 @@ namespace Facepunch.CoreWars
 
 					NextBlockPlace = 0.1f;
 				}
-				else if ( Input.Down( InputButton.Attack2 ) && NextBlockPlace )
-				{
-					if ( world.GetBlockInDirection( Input.Position, Input.Rotation.Forward, out var blockPosition, 200f ) )
-					{
-						var voxel = world.GetVoxel( blockPosition );
-
-						if ( voxel.IsValid )
-						{
-							if ( world.SetBlockInDirection( Input.Position, Input.Rotation.Forward, 0 ) )
-							{
-								TryGiveBlock( voxel.BlockId, 1 );
-							}
-						}
-					}
-
-					NextBlockPlace = 0.1f;
-				}
 			}
 			else
 			{
