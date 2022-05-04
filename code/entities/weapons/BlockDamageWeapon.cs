@@ -51,7 +51,7 @@ namespace Facepunch.CoreWars
 			}
 		}
 
-		protected virtual void DamageVoxelInDirection( float range )
+		protected virtual void DamageVoxelInDirection( float range, float damage )
 		{
 			var world = VoxelWorld.Current;
 
@@ -64,7 +64,7 @@ namespace Facepunch.CoreWars
 
 			if ( voxel.IsValid )
 			{
-				DamageVoxel( voxel, Config.Damage );
+				DamageVoxel( voxel, damage );
 			}
 		}
 	}

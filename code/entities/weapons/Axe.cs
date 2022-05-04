@@ -41,9 +41,9 @@ namespace Facepunch.CoreWars
 			PlaySound( $"barage.launch" );
 			MeleeStrike( Config.Damage * 0.2f, 1.5f );
 
-			if ( IsServer )
+			if ( IsServer && WeaponItem.IsValid() )
 			{
-				DamageVoxelInDirection( 150f );
+				DamageVoxelInDirection( 150f, Config.Damage * WeaponItem.Tier );
 			}
 
 			TimeSincePrimaryAttack = 0;
