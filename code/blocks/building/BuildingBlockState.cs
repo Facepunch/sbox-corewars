@@ -11,7 +11,7 @@ namespace Facepunch.CoreWars.Blocks
 
 		public override void Tick()
 		{
-			if ( Health < 100 && LastDamageTime >= 2f )
+			if ( IsServer && Health < 100 && LastDamageTime >= 2f )
 			{
 				Health = 100;
 				IsDirty = true;
