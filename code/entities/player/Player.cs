@@ -478,7 +478,10 @@ namespace Facepunch.CoreWars
 			{
 				EnableAllCollisions = false;
 				EnableDrawing = false;
-				Controller = new FlyController();
+				Controller = new FlyController
+				{
+					EnableCollisions = false
+				};
 			}
 			else
 			{

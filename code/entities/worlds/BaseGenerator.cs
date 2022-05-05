@@ -32,7 +32,7 @@ namespace Facepunch.CoreWars
 			if ( itemsInArea >= 16 ) return;
 
 			var item = InventorySystem.CreateItem<T>();
-			item.StackSize = 1;
+			item.StackSize = (ushort)stackSize;
 
 			var entity = new ItemEntity();
 			entity.Position = WorldSpaceBounds.Center + Vector3.Up * 64f;
@@ -40,11 +40,10 @@ namespace Facepunch.CoreWars
 			entity.ApplyLocalImpulse( Vector3.Random * 100f );
 		}
 
-
 		[Event.Tick.Server]
 		protected virtual void ServerTick()
 		{
-			if ( !Game.IsState<GameState>() && !Game.IsState<LobbyState>() )
+			if ( !Game.IsState<GameState>() )
 				return;
 
 			if ( NextGenerateTime )
