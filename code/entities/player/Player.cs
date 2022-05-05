@@ -354,26 +354,33 @@ namespace Facepunch.CoreWars
 				if ( world.Spawnpoints.Count == 0 )
 					return null;
 
-				var spawnpoint = Rand.FromList( world.Spawnpoints );
-				return new Transform( spawnpoint );
+				return new Transform( Rand.FromList( world.Spawnpoints ) );
 			}
 
 			var teamSpawnpoints = spawnpoints.Where( s => s.Team == Team ).ToList();
 
-			if ( Game.IsState<LobbyState>() || teamSpawnpoints.Count == 0 )
+			PlayerSpawnpoint spawnpoint = null;
+
+			if ( teamSpawnpoints.Count == 0 )
 			{
-				var lobbySpawnpoints = teamSpawnpoints.Where( s => s.Team == Team.None );
+				var lobbySpawnpoints = teamSpawnpoints.Where( s => s.Team == Team.None ).ToList();
 
 				if ( lobbySpawnpoints.Count > 0 )
-				{
-					return Rand.FromList( lobbySpawnpoints );
-				}
-
-				return Rand.FromList( spawnpoints );
+					spawnpoint = Rand.FromList( lobbySpawnpoints );
+				else
+					spawnpoint = Rand.FromList( spawnpoints );
+			}
+			else
+			{
+				spawnpoint = Rand.FromList( teamSpawnpoints );
 			}
 
-			var randomSpawnpoint = Rand.FromList( teamSpawnpoints );
-			return randomSpawnpoint.Transform;
+			if ( !spawnpoint.IsValid() )
+			{
+				return null;
+			}
+
+			return spawnpoint.Transform;
 		}
 
 		public virtual void OnMapLoaded()
@@ -465,9 +472,9 @@ namespace Facepunch.CoreWars
 
 		public override void Respawn()
 		{
-			Transform? spawnpoint = null;
+			var isLobbyState = Game.IsState<LobbyState>();
 
-			if ( !IsCoreValid() )
+			if ( !isLobbyState && !IsCoreValid() )
 			{
 				EnableAllCollisions = false;
 				EnableDrawing = false;
@@ -485,10 +492,14 @@ namespace Facepunch.CoreWars
 				WaterLevel = 0f;
 
 				CreateHull();
-				GiveInitialItems();
+
+				if ( !isLobbyState )
+				{
+					GiveInitialItems();
+				}
 			}
 
-			spawnpoint = GetSpawnpoint();
+			var spawnpoint = GetSpawnpoint();
 
 			if ( spawnpoint.HasValue )
 			{
@@ -511,8 +522,79 @@ namespace Facepunch.CoreWars
 		public override void Simulate( Client client )
 		{
 			var world = VoxelWorld.Current;
-
 			if ( !world.IsValid() ) return;
+
+			if ( Game.IsState<GameState>() )
+			{
+				SimulateGameState( client );
+			}
+
+			if ( IsClient && world.IsValid() )
+			{
+				var position = world.ToVoxelPosition( Input.Position );
+				var voxel = world.GetVoxel( position );
+
+				if ( voxel.IsValid )
+				{
+					DebugOverlay.ScreenText( 2, $"Sunlight Level: {voxel.GetSunLight()}", 0.1f );
+					DebugOverlay.ScreenText( 3, $"Torch Level: ({voxel.GetRedTorchLight()}, {voxel.GetGreenTorchLight()}, {voxel.GetBlueTorchLight()})", 0.1f );
+					DebugOverlay.ScreenText( 4, $"Chunk: {voxel.Chunk.Offset}", 0.1f );
+					DebugOverlay.ScreenText( 5, $"Position: {position}", 0.1f );
+					DebugOverlay.ScreenText( 6, $"Biome: {VoxelWorld.Current.GetBiomeAt( position.x, position.y ).Name}", 0.1f );
+				}
+			}
+
+			var viewer = Client.Components.Get<ChunkViewer>();
+			if ( !viewer.IsValid() ) return;
+			if ( viewer.IsInMapBounds() && !viewer.IsCurrentChunkReady ) return;
+
+			var controller = GetActiveController();
+			controller?.Simulate( client, this, GetActiveAnimator() );
+		}
+
+		public override void PostCameraSetup( ref CameraSetup setup )
+		{
+			base.PostCameraSetup( ref setup );
+		}
+
+		public override void TakeDamage( DamageInfo info )
+		{
+			if ( info.Attacker is Player attacker )
+			{
+				if ( Team != Team.None && attacker.Team == Team )
+					return;
+
+				if ( attacker.Core.IsValid() )
+				{
+					var damageTier = attacker.Core.GetUpgradeTier( "damage" );
+
+					if ( damageTier >= 2 )
+						info.Damage *= 1.35f;
+					else if ( damageTier >= 1 )
+						info.Damage *= 1.2f;
+				}
+			}
+
+			if ( Core.IsValid() )
+			{
+				var armorTier = Core.GetUpgradeTier( "armor" );
+
+				if ( armorTier >= 3 )
+					info.Damage *= 0.4f;
+				else if ( armorTier >= 2 )
+					info.Damage *= 0.6f;
+				else if ( armorTier >= 1 )
+					info.Damage *= 0.8f;
+			}
+
+			LastDamageTaken = info;
+
+			base.TakeDamage( info );
+		}
+
+		protected virtual void SimulateGameState( Client client )
+		{
+			var world = VoxelWorld.Current;
 
 			if ( IsServer )
 			{
@@ -602,7 +684,6 @@ namespace Facepunch.CoreWars
 
 
 			CurrentHotbarIndex = (ushort)currentSlotIndex;
-
 			UpdateHotbarSlotKeys();
 
 			var hotbarItem = HotbarInventory.Instance.GetFromSlot( CurrentHotbarIndex );
@@ -636,71 +717,9 @@ namespace Facepunch.CoreWars
 				}
 			}
 
-			if ( IsClient && world.IsValid() )
-			{
-				var position = world.ToVoxelPosition( Input.Position );
-				var voxel = world.GetVoxel( position );
-
-				if ( voxel.IsValid )
-				{
-					DebugOverlay.ScreenText( 2, $"Sunlight Level: {voxel.GetSunLight()}", 0.1f );
-					DebugOverlay.ScreenText( 3, $"Torch Level: ({voxel.GetRedTorchLight()}, {voxel.GetGreenTorchLight()}, {voxel.GetBlueTorchLight()})", 0.1f );
-					DebugOverlay.ScreenText( 4, $"Chunk: {voxel.Chunk.Offset}", 0.1f );
-					DebugOverlay.ScreenText( 5, $"Position: {position}", 0.1f );
-					DebugOverlay.ScreenText( 6, $"Biome: {VoxelWorld.Current.GetBiomeAt( position.x, position.y ).Name}", 0.1f );
-				}
-			}
-
 			Projectiles.Simulate();
 
 			SimulateActiveChild( client, ActiveChild );
-
-			var viewer = Client.Components.Get<ChunkViewer>();
-			if ( !viewer.IsValid() ) return;
-			if ( viewer.IsInMapBounds() && !viewer.IsCurrentChunkReady ) return;
-
-			var controller = GetActiveController();
-			controller?.Simulate( client, this, GetActiveAnimator() );
-		}
-
-		public override void PostCameraSetup( ref CameraSetup setup )
-		{
-			base.PostCameraSetup( ref setup );
-		}
-
-		public override void TakeDamage( DamageInfo info )
-		{
-			if ( info.Attacker is Player attacker )
-			{
-				if ( Team != Team.None && attacker.Team == Team )
-					return;
-
-				if ( attacker.Core.IsValid() )
-				{
-					var damageTier = attacker.Core.GetUpgradeTier( "damage" );
-
-					if ( damageTier >= 2 )
-						info.Damage *= 1.35f;
-					else if ( damageTier >= 1 )
-						info.Damage *= 1.2f;
-				}
-			}
-
-			if ( Core.IsValid() )
-			{
-				var armorTier = Core.GetUpgradeTier( "armor" );
-
-				if ( armorTier >= 3 )
-					info.Damage *= 0.4f;
-				else if ( armorTier >= 2 )
-					info.Damage *= 0.6f;
-				else if ( armorTier >= 1 )
-					info.Damage *= 0.8f;
-			}
-
-			LastDamageTaken = info;
-
-			base.TakeDamage( info );
 		}
 
 		protected virtual void OnTeamChanged( Team team )
