@@ -71,7 +71,7 @@ namespace Facepunch.CoreWars
 
 		private bool IsHidden()
 		{
-			return IDialog.IsActive();
+			return IDialog.IsActive() || !Game.IsState<GameState>();
 		}
 	}
 }
