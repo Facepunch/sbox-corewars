@@ -34,6 +34,7 @@ namespace Facepunch.CoreWars
 
 		public virtual void Reset()
 		{
+			Game.AddValidTeam( Team );
 			LifeState = LifeState.Alive;
 			Upgrades.Clear();
 			Health = 100f;
@@ -74,6 +75,7 @@ namespace Facepunch.CoreWars
 
 		public override void OnKilled()
 		{
+			Game.RemoveValidTeam( Team );
 			LifeState = LifeState.Dead;
 		}
 
