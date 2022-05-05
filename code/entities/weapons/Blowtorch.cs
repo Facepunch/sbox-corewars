@@ -20,8 +20,8 @@ namespace Facepunch.CoreWars
 	public partial class Blowtorch : BlockDamageWeapon
 	{
 		public override WeaponConfig Config => new BlowtorchConfig();
-		public override string ViewModelPath => "models/weapons/v_crowbar.vmdl";
-		public override DamageFlags DamageType => DamageFlags.Blunt;
+		public override string ViewModelPath => "weapons/rust_smg/v_rust_smg.vmdl";
+		public override DamageFlags DamageType => DamageFlags.Burn;
 		public override float PrimaryRate => 5f;
 		public override float SecondaryRate => 1f;
 		public override int ClipSize => 1;
@@ -32,7 +32,7 @@ namespace Facepunch.CoreWars
 		public override void Spawn()
 		{
 			base.Spawn();
-			SetModel( "models/weapons/w_crowbar.vmdl" );
+			SetModel( "weapons/rust_smg/rust_smg.vmdl" );
 		}
 
 		public override void AttackPrimary()
