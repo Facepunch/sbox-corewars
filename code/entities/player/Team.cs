@@ -69,6 +69,17 @@ namespace Facepunch.CoreWars
 			return core;
 		}
 
+		public static IEnumerable<Player> GetPlayers( this Team team )
+		{
+			foreach ( var player in Entity.All.OfType<Player>() )
+			{
+				if ( player.Team == team )
+				{
+					yield return player;
+				}
+			}
+		}
+
 		public static Color GetColor( this Team team )
 		{
 			if ( ColorMap.TryGetValue( team, out var color ) )
