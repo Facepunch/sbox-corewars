@@ -10,13 +10,16 @@ namespace Facepunch.CoreWars
 
 		public override void OnEnter()
 		{
-			foreach ( var player in Entity.All.OfType<Player>() )
+			if ( IsServer )
 			{
-				player.AssignRandomTeam( true );
-				player.RespawnWhenAvailable();
+				foreach ( var player in Entity.All.OfType<Player>() )
+				{
+					player.AssignRandomTeam( true );
+					player.RespawnWhenAvailable();
 
-				var playerId = player.Client.PlayerId;
-				PlayerToTeam[playerId] = player.Team;
+					var playerId = player.Client.PlayerId;
+					PlayerToTeam[playerId] = player.Team;
+				}
 			}
 		}
 
