@@ -36,18 +36,18 @@ namespace Facepunch.CoreWars
 			return (state != null);
 		}
 
+		public static void AddValidTeam( Team team )
+		{
+			ValidTeamSet.Add( team );
+		}
+
+		public static void RemoveValidTeam( Team team )
+		{
+			ValidTeamSet.Remove( team );
+		}
+
 		public static IReadOnlySet<Team> GetValidTeams()
 		{
-			if ( ValidTeamSet.Count == 0 )
-			{
-				var cores = All.OfType<TeamCore>();
-
-				foreach ( var core in cores )
-				{
-					ValidTeamSet.Add( core.Team );
-				}
-			}
-
 			return ValidTeamSet;
 		}
 
@@ -129,15 +129,9 @@ namespace Facepunch.CoreWars
 			StateSystem.Active?.OnPlayerKilled( player, player.LastDamageTaken );
 		}
 
-		public override bool CanHearPlayerVoice( Client sourceClient, Client destinationClient )
+		public override bool CanHearPlayerVoice( Client a, Client b )
 		{
-			if ( sourceClient.Pawn is not Player sourcePlayer )
-				return false;
-
-			if ( destinationClient.Pawn is not Player destinationPlayer )
-				return false;
-
-			return sourcePlayer.Team == destinationPlayer.Team;
+			return StateSystem.Active.CanHearPlayerVoice( a, b );
 		}
 
 		public override void DoPlayerNoclip( Client client ) { }
