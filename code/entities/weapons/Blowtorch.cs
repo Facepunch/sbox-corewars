@@ -20,8 +20,8 @@ namespace Facepunch.CoreWars
 	public partial class Blowtorch : BlockDamageWeapon
 	{
 		public override WeaponConfig Config => new BlowtorchConfig();
-		public override string ViewModelPath => "models/weapons/v_crowbar.vmdl";
-		public override DamageFlags DamageType => DamageFlags.Blunt;
+		public override string ViewModelPath => "weapons/rust_smg/v_rust_smg.vmdl";
+		public override DamageFlags DamageType => DamageFlags.Burn;
 		public override float PrimaryRate => 5f;
 		public override float SecondaryRate => 1f;
 		public override int ClipSize => 1;
@@ -29,23 +29,29 @@ namespace Facepunch.CoreWars
 		public override BuildingMaterialType PrimaryMaterialType => BuildingMaterialType.Plastic;
 		public override float SecondaryMaterialMultiplier => 0f;
 
+		private RealTimeUntil DestroyFlameTime { get; set; }
+		private Particles FlameParticles { get; set; }
+
 		public override void Spawn()
 		{
 			base.Spawn();
-			SetModel( "models/weapons/w_crowbar.vmdl" );
+			SetModel( "weapons/rust_smg/rust_smg.vmdl" );
 		}
 
 		public override void AttackPrimary()
 		{
-			PlayAttackAnimation();
-			ShootEffects();
-			PlaySound( $"barage.launch" );
-
 			if ( IsServer && WeaponItem.IsValid() )
 			{
-				DamageVoxelInDirection( 150f, Config.Damage );
+				DamageVoxelInDirection( 100f, Config.Damage );
 			}
 
+			if ( FlameParticles == null )
+			{
+				FlameParticles = Particles.Create( "particles/weapons/blowtorch/blowtorch_flame.vpcf" );
+				FlameParticles.SetEntityAttachment( 0, EffectEntity, "muzzle" );
+			}
+
+			DestroyFlameTime = 0.5f;
 			TimeSincePrimaryAttack = 0;
 			TimeSinceSecondaryAttack = 0;
 		}
@@ -62,18 +68,20 @@ namespace Facepunch.CoreWars
 			}
 		}
 
-		protected override void ShootEffects()
+		[Event.Tick]
+		protected virtual void Tick()
 		{
-			base.ShootEffects();
-
-			ViewModelEntity?.SetAnimParameter( "attack", true );
-			ViewModelEntity?.SetAnimParameter( "holdtype_attack", 1 );
+			if ( DestroyFlameTime && FlameParticles != null )
+			{
+				FlameParticles?.Destroy();
+				FlameParticles = null;
+			}
 		}
 
-		protected override void OnMeleeAttackHit( Entity victim )
+		protected override void OnDestroy()
 		{
-			ViewModelEntity?.SetAnimParameter( "attack_has_hit", true );
-			base.OnMeleeAttackHit( victim );
+			FlameParticles?.Destroy();
+			base.OnDestroy();
 		}
 	}
 }

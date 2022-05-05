@@ -273,6 +273,12 @@ namespace Facepunch.CoreWars
 			return totalAmountTaken;
 		}
 
+		public bool IsCoreValid()
+		{
+			var core = Team.GetCore();
+			return core.IsValid() && core.LifeState == LifeState.Alive;
+		}
+
 		public int GetAmmoCount( AmmoType type )
 		{
 			var items = new List<AmmoItem>();
@@ -303,10 +309,22 @@ namespace Facepunch.CoreWars
 			OnTeamChanged( team );
 		}
 
-		public void AssignRandomTeam()
+		public void AssignRandomTeam( bool assignToSmallestTeam = false )
 		{
 			var teams = Game.GetValidTeams().ToArray();
-			var team = Rand.FromArray( teams );
+
+			if ( teams.Length == 0 )
+			{
+				SetTeam( Team.None );
+				return;
+			}
+
+			Team team;
+
+			if ( assignToSmallestTeam )
+				team = teams.OrderBy( t => t.GetPlayers().Count() ).First();
+			else
+				team = Rand.FromArray( teams );
 
 			SetTeam( team );
 		}
@@ -336,12 +354,33 @@ namespace Facepunch.CoreWars
 				if ( world.Spawnpoints.Count == 0 )
 					return null;
 
-				var spawnpoint = Rand.FromList( world.Spawnpoints );
-				return new Transform( spawnpoint );
+				return new Transform( Rand.FromList( world.Spawnpoints ) );
 			}
 
-			var randomSpawnpoint = Rand.FromList( spawnpoints );
-			return randomSpawnpoint.Transform;
+			var teamSpawnpoints = spawnpoints.Where( s => s.Team == Team ).ToList();
+
+			PlayerSpawnpoint spawnpoint = null;
+
+			if ( teamSpawnpoints.Count == 0 )
+			{
+				var lobbySpawnpoints = teamSpawnpoints.Where( s => s.Team == Team.None ).ToList();
+
+				if ( lobbySpawnpoints.Count > 0 )
+					spawnpoint = Rand.FromList( lobbySpawnpoints );
+				else
+					spawnpoint = Rand.FromList( spawnpoints );
+			}
+			else
+			{
+				spawnpoint = Rand.FromList( teamSpawnpoints );
+			}
+
+			if ( !spawnpoint.IsValid() )
+			{
+				return null;
+			}
+
+			return spawnpoint.Transform;
 		}
 
 		public virtual void OnMapLoaded()
@@ -384,6 +423,7 @@ namespace Facepunch.CoreWars
 				}
 			}
 
+			EnableAllCollisions = false;
 			EnableDrawing = false;
 
 			RespawnWhenAvailable();
@@ -432,15 +472,35 @@ namespace Facepunch.CoreWars
 
 		public override void Respawn()
 		{
-			Game.Current?.PlayerRespawned( this );
+			var isLobbyState = Game.IsState<LobbyState>();
 
-			EnableDrawing = true;
-			LifeState = LifeState.Alive;
-			Health = 100f;
-			Velocity = Vector3.Zero;
-			WaterLevel = 0f;
+			if ( !isLobbyState && !IsCoreValid() )
+			{
+				EnableAllCollisions = false;
+				EnableDrawing = false;
+				Controller = new FlyController
+				{
+					EnableCollisions = false
+				};
+			}
+			else
+			{
+				Game.Current?.PlayerRespawned( this );
 
-			CreateHull();
+				EnableAllCollisions = true;
+				EnableDrawing = true;
+				LifeState = LifeState.Alive;
+				Health = 100f;
+				Velocity = Vector3.Zero;
+				WaterLevel = 0f;
+
+				CreateHull();
+
+				if ( !isLobbyState )
+				{
+					GiveInitialItems();
+				}
+			}
 
 			var spawnpoint = GetSpawnpoint();
 
@@ -450,7 +510,6 @@ namespace Facepunch.CoreWars
 			}
 
 			ResetInterpolation();
-			GiveInitialItems();
 		}
 
 		public override void BuildInput( InputBuilder input )
@@ -466,8 +525,79 @@ namespace Facepunch.CoreWars
 		public override void Simulate( Client client )
 		{
 			var world = VoxelWorld.Current;
-
 			if ( !world.IsValid() ) return;
+
+			if ( Game.IsState<GameState>() )
+			{
+				SimulateGameState( client );
+			}
+
+			if ( IsClient && world.IsValid() )
+			{
+				var position = world.ToVoxelPosition( Input.Position );
+				var voxel = world.GetVoxel( position );
+
+				if ( voxel.IsValid )
+				{
+					DebugOverlay.ScreenText( 2, $"Sunlight Level: {voxel.GetSunLight()}", 0.1f );
+					DebugOverlay.ScreenText( 3, $"Torch Level: ({voxel.GetRedTorchLight()}, {voxel.GetGreenTorchLight()}, {voxel.GetBlueTorchLight()})", 0.1f );
+					DebugOverlay.ScreenText( 4, $"Chunk: {voxel.Chunk.Offset}", 0.1f );
+					DebugOverlay.ScreenText( 5, $"Position: {position}", 0.1f );
+					DebugOverlay.ScreenText( 6, $"Biome: {VoxelWorld.Current.GetBiomeAt( position.x, position.y ).Name}", 0.1f );
+				}
+			}
+
+			var viewer = Client.Components.Get<ChunkViewer>();
+			if ( !viewer.IsValid() ) return;
+			if ( viewer.IsInMapBounds() && !viewer.IsCurrentChunkReady ) return;
+
+			var controller = GetActiveController();
+			controller?.Simulate( client, this, GetActiveAnimator() );
+		}
+
+		public override void PostCameraSetup( ref CameraSetup setup )
+		{
+			base.PostCameraSetup( ref setup );
+		}
+
+		public override void TakeDamage( DamageInfo info )
+		{
+			if ( info.Attacker is Player attacker )
+			{
+				if ( Team != Team.None && attacker.Team == Team )
+					return;
+
+				if ( attacker.Core.IsValid() )
+				{
+					var damageTier = attacker.Core.GetUpgradeTier( "damage" );
+
+					if ( damageTier >= 2 )
+						info.Damage *= 1.35f;
+					else if ( damageTier >= 1 )
+						info.Damage *= 1.2f;
+				}
+			}
+
+			if ( Core.IsValid() )
+			{
+				var armorTier = Core.GetUpgradeTier( "armor" );
+
+				if ( armorTier >= 3 )
+					info.Damage *= 0.4f;
+				else if ( armorTier >= 2 )
+					info.Damage *= 0.6f;
+				else if ( armorTier >= 1 )
+					info.Damage *= 0.8f;
+			}
+
+			LastDamageTaken = info;
+
+			base.TakeDamage( info );
+		}
+
+		protected virtual void SimulateGameState( Client client )
+		{
+			var world = VoxelWorld.Current;
 
 			if ( IsServer )
 			{
@@ -557,7 +687,6 @@ namespace Facepunch.CoreWars
 
 
 			CurrentHotbarIndex = (ushort)currentSlotIndex;
-
 			UpdateHotbarSlotKeys();
 
 			var hotbarItem = HotbarInventory.Instance.GetFromSlot( CurrentHotbarIndex );
@@ -591,71 +720,9 @@ namespace Facepunch.CoreWars
 				}
 			}
 
-			if ( IsClient && world.IsValid() )
-			{
-				var position = world.ToVoxelPosition( Input.Position );
-				var voxel = world.GetVoxel( position );
-
-				if ( voxel.IsValid )
-				{
-					DebugOverlay.ScreenText( 2, $"Sunlight Level: {voxel.GetSunLight()}", 0.1f );
-					DebugOverlay.ScreenText( 3, $"Torch Level: ({voxel.GetRedTorchLight()}, {voxel.GetGreenTorchLight()}, {voxel.GetBlueTorchLight()})", 0.1f );
-					DebugOverlay.ScreenText( 4, $"Chunk: {voxel.Chunk.Offset}", 0.1f );
-					DebugOverlay.ScreenText( 5, $"Position: {position}", 0.1f );
-					DebugOverlay.ScreenText( 6, $"Biome: {VoxelWorld.Current.GetBiomeAt( position.x, position.y ).Name}", 0.1f );
-				}
-			}
-
 			Projectiles.Simulate();
 
 			SimulateActiveChild( client, ActiveChild );
-
-			var viewer = Client.Components.Get<ChunkViewer>();
-			if ( !viewer.IsValid() ) return;
-			if ( viewer.IsInMapBounds() && !viewer.IsCurrentChunkReady ) return;
-
-			var controller = GetActiveController();
-			controller?.Simulate( client, this, GetActiveAnimator() );
-		}
-
-		public override void PostCameraSetup( ref CameraSetup setup )
-		{
-			base.PostCameraSetup( ref setup );
-		}
-
-		public override void TakeDamage( DamageInfo info )
-		{
-			if ( info.Attacker is Player attacker )
-			{
-				if ( Team != Team.None && attacker.Team == Team )
-					return;
-
-				if ( attacker.Core.IsValid() )
-				{
-					var damageTier = attacker.Core.GetUpgradeTier( "damage" );
-
-					if ( damageTier >= 2 )
-						info.Damage *= 1.35f;
-					else if ( damageTier >= 1 )
-						info.Damage *= 1.2f;
-				}
-			}
-
-			if ( Core.IsValid() )
-			{
-				var armorTier = Core.GetUpgradeTier( "armor" );
-
-				if ( armorTier >= 3 )
-					info.Damage *= 0.4f;
-				else if ( armorTier >= 2 )
-					info.Damage *= 0.6f;
-				else if ( armorTier >= 1 )
-					info.Damage *= 0.8f;
-			}
-
-			LastDamageTaken = info;
-
-			base.TakeDamage( info );
 		}
 
 		protected virtual void OnTeamChanged( Team team )
@@ -824,7 +891,7 @@ namespace Facepunch.CoreWars
 					try
 					{
 						weapon.Weapon = Library.Create<Weapon>( weapon.WeaponName );
-						weapon.Weapon.Item = new NetInventoryItem( weapon );
+						weapon.Weapon.SetWeaponItem( weapon );
 						weapon.Weapon.OnCarryStart( this );
 						weapon.IsDirty = true;
 					}

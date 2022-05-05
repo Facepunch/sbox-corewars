@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Facepunch.CoreWars.Inventory
 {
-	public partial class ItemEntity : ModelEntity
+	public partial class ItemEntity : ModelEntity, IResettable
 	{
 		[Net] public NetInventoryItem Item { get; private set; }
 
@@ -58,6 +58,11 @@ namespace Facepunch.CoreWars.Inventory
 			}
 
 			return null;
+		}
+
+		public virtual void Reset()
+		{
+			Delete();
 		}
 
 		public override void Spawn()
