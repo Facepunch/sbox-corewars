@@ -6,14 +6,12 @@ namespace Facepunch.CoreWars
 	public partial class LobbyState : BaseState
 	{
 		[Net] public RealTimeUntil StateEndTime { get; set; }
-		public float StateDuration => 60f;
+		public float StateDuration => 15f;
 
 		public override void OnEnter()
 		{
 			if ( IsServer )
 			{
-				IResettable.ResetAll();
-
 				foreach ( var player in Entity.All.OfType<Player>() )
 				{
 					player.RespawnWhenAvailable();

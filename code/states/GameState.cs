@@ -12,10 +12,14 @@ namespace Facepunch.CoreWars
 		{
 			if ( IsServer )
 			{
+				IResettable.ResetAll();
+
 				foreach ( var player in Entity.All.OfType<Player>() )
 				{
 					player.AssignRandomTeam( true );
 					player.RespawnWhenAvailable();
+
+					Log.Info( "Team: " + player.Team );
 
 					var playerId = player.Client.PlayerId;
 					PlayerToTeam[playerId] = player.Team;
