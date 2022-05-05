@@ -29,6 +29,9 @@ namespace Facepunch.CoreWars
 		public override BuildingMaterialType PrimaryMaterialType => BuildingMaterialType.Plastic;
 		public override float SecondaryMaterialMultiplier => 0f;
 
+		private RealTimeUntil DestroyFlameTime { get; set; }
+		private Particles FlameParticles { get; set; }
+
 		public override void Spawn()
 		{
 			base.Spawn();
@@ -37,15 +40,18 @@ namespace Facepunch.CoreWars
 
 		public override void AttackPrimary()
 		{
-			PlayAttackAnimation();
-			ShootEffects();
-			PlaySound( $"barage.launch" );
-
 			if ( IsServer && WeaponItem.IsValid() )
 			{
 				DamageVoxelInDirection( 150f, Config.Damage );
 			}
 
+			if ( FlameParticles == null )
+			{
+				FlameParticles = Particles.Create( "particles/weapons/blowtorch/blowtorch_flame.vpcf" );
+				FlameParticles.SetEntityAttachment( 0, EffectEntity, "muzzle" );
+			}
+
+			DestroyFlameTime = 0.5f;
 			TimeSincePrimaryAttack = 0;
 			TimeSinceSecondaryAttack = 0;
 		}
@@ -62,18 +68,20 @@ namespace Facepunch.CoreWars
 			}
 		}
 
-		protected override void ShootEffects()
+		[Event.Tick]
+		protected virtual void Tick()
 		{
-			base.ShootEffects();
-
-			ViewModelEntity?.SetAnimParameter( "attack", true );
-			ViewModelEntity?.SetAnimParameter( "holdtype_attack", 1 );
+			if ( DestroyFlameTime && FlameParticles != null )
+			{
+				FlameParticles?.Destroy();
+				FlameParticles = null;
+			}
 		}
 
-		protected override void OnMeleeAttackHit( Entity victim )
+		protected override void OnDestroy()
 		{
-			ViewModelEntity?.SetAnimParameter( "attack_has_hit", true );
-			base.OnMeleeAttackHit( victim );
+			FlameParticles?.Destroy();
+			base.OnDestroy();
 		}
 	}
 }

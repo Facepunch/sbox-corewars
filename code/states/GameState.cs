@@ -19,8 +19,6 @@ namespace Facepunch.CoreWars
 					player.AssignRandomTeam( true );
 					player.RespawnWhenAvailable();
 
-					Log.Info( "Team: " + player.Team );
-
 					var playerId = player.Client.PlayerId;
 					PlayerToTeam[playerId] = player.Team;
 				}
