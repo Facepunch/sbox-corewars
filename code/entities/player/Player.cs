@@ -273,6 +273,12 @@ namespace Facepunch.CoreWars
 			return totalAmountTaken;
 		}
 
+		public bool IsCoreValid()
+		{
+			var core = Team.GetCore();
+			return core.IsValid() && core.LifeState == LifeState.Alive;
+		}
+
 		public int GetAmmoCount( AmmoType type )
 		{
 			var items = new List<AmmoItem>();
@@ -303,10 +309,22 @@ namespace Facepunch.CoreWars
 			OnTeamChanged( team );
 		}
 
-		public void AssignRandomTeam()
+		public void AssignRandomTeam( bool assignToSmallestTeam = false )
 		{
 			var teams = Game.GetValidTeams().ToArray();
-			var team = Rand.FromArray( teams );
+
+			if ( teams.Length == 0 )
+			{
+				SetTeam( Team.None );
+				return;
+			}
+
+			Team team;
+
+			if ( assignToSmallestTeam )
+				team = teams.OrderBy( t => t.GetPlayers().Count() ).First();
+			else
+				team = Rand.FromArray( teams );
 
 			SetTeam( team );
 		}
@@ -340,7 +358,21 @@ namespace Facepunch.CoreWars
 				return new Transform( spawnpoint );
 			}
 
-			var randomSpawnpoint = Rand.FromList( spawnpoints );
+			var teamSpawnpoints = spawnpoints.Where( s => s.Team == Team ).ToList();
+
+			if ( teamSpawnpoints.Count == 0 )
+			{
+				var lobbySpawnpoints = teamSpawnpoints.Where( s => s.Team == Team.None );
+
+				if ( lobbySpawnpoints.Count > 0 )
+				{
+					return Rand.FromList( lobbySpawnpoints );
+				}
+
+				return Rand.FromList( spawnpoints );
+			}
+
+			var randomSpawnpoint = Rand.FromList( teamSpawnpoints );
 			return randomSpawnpoint.Transform;
 		}
 
@@ -384,6 +416,7 @@ namespace Facepunch.CoreWars
 				}
 			}
 
+			EnableAllCollisions = false;
 			EnableDrawing = false;
 
 			RespawnWhenAvailable();
@@ -432,8 +465,17 @@ namespace Facepunch.CoreWars
 
 		public override void Respawn()
 		{
+			if ( !IsCoreValid() )
+			{
+				EnableAllCollisions = false;
+				EnableDrawing = false;
+				Controller = new FlyController();
+				return;
+			}
+
 			Game.Current?.PlayerRespawned( this );
 
+			EnableAllCollisions = true;
 			EnableDrawing = true;
 			LifeState = LifeState.Alive;
 			Health = 100f;
@@ -824,7 +866,7 @@ namespace Facepunch.CoreWars
 					try
 					{
 						weapon.Weapon = Library.Create<Weapon>( weapon.WeaponName );
-						weapon.Weapon.Item = new NetInventoryItem( weapon );
+						weapon.Weapon.SetWeaponItem( weapon );
 						weapon.Weapon.OnCarryStart( this );
 						weapon.IsDirty = true;
 					}
