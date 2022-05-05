@@ -58,7 +58,7 @@ namespace Facepunch.CoreWars
 
 		public override void SimulateAnimator( PawnAnimator anim )
 		{
-			anim.SetAnimParameter( "holdtype", 5 );
+			anim.SetAnimParameter( "holdtype", 2 );
 			anim.SetAnimParameter( "aim_body_weight", 1.0f );
 
 			if ( Owner.IsValid() )
