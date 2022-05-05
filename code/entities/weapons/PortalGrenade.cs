@@ -37,6 +37,8 @@ namespace Facepunch.CoreWars
 		public override float ReloadTime => 2.3f;
 		public override float ProjectileLifeTime => 4f;
 
+		private Player PlayerToTeleport { get; set; }
+
 		public override void Spawn()
 		{
 			base.Spawn();
@@ -49,7 +51,7 @@ namespace Facepunch.CoreWars
 			ShootEffects();
 			PlaySound( $"barage.launch" );
 
-			if ( Owner is Player player )
+			if ( IsServer && Owner is Player player )
 			{
 				var item = player.GetWeaponItem( this );
 
@@ -57,6 +59,8 @@ namespace Facepunch.CoreWars
 				{
 					item.Remove();
 				}
+
+				PlayerToTeleport = player;
 			}
 
 			base.AttackPrimary();
@@ -75,8 +79,23 @@ namespace Facepunch.CoreWars
 
 		protected override void OnProjectileHit( BulletDropProjectile projectile, Entity target )
 		{
+			var position = projectile.Position;
 			var explosion = Particles.Create( "particles/weapons/boomer/boomer_explosion.vpcf" );
-			explosion.SetPosition( 0, projectile.Position - projectile.Velocity.Normal * projectile.Radius );
+			explosion.SetPosition( 0, position - projectile.Velocity.Normal * projectile.Radius );
+
+			if ( !PlayerToTeleport.IsValid() )
+				return;
+
+			var world = VoxelWorld.Current;
+			var blockPosition = world.ToVoxelPosition( position );
+			var blockBelowType = world.GetAdjacentBlock( blockPosition, (int)BlockFace.Bottom );
+			var trace = Trace.Ray( position, position + Vector3.Down * 32f ).EntitiesOnly().Run();
+
+			if ( blockBelowType > 0 || trace.Hit )
+			{
+				PlayerToTeleport.Position = position;
+				PlayerToTeleport.ResetInterpolation();
+			}
 		}
 	}
 }
