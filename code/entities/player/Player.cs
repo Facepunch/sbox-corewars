@@ -360,7 +360,7 @@ namespace Facepunch.CoreWars
 
 			var teamSpawnpoints = spawnpoints.Where( s => s.Team == Team ).ToList();
 
-			if ( teamSpawnpoints.Count == 0 )
+			if ( Game.IsState<LobbyState>() || teamSpawnpoints.Count == 0 )
 			{
 				var lobbySpawnpoints = teamSpawnpoints.Where( s => s.Team == Team.None );
 
@@ -465,26 +465,30 @@ namespace Facepunch.CoreWars
 
 		public override void Respawn()
 		{
+			Transform? spawnpoint = null;
+
 			if ( !IsCoreValid() )
 			{
 				EnableAllCollisions = false;
 				EnableDrawing = false;
 				Controller = new FlyController();
-				return;
+			}
+			else
+			{
+				Game.Current?.PlayerRespawned( this );
+
+				EnableAllCollisions = true;
+				EnableDrawing = true;
+				LifeState = LifeState.Alive;
+				Health = 100f;
+				Velocity = Vector3.Zero;
+				WaterLevel = 0f;
+
+				CreateHull();
+				GiveInitialItems();
 			}
 
-			Game.Current?.PlayerRespawned( this );
-
-			EnableAllCollisions = true;
-			EnableDrawing = true;
-			LifeState = LifeState.Alive;
-			Health = 100f;
-			Velocity = Vector3.Zero;
-			WaterLevel = 0f;
-
-			CreateHull();
-
-			var spawnpoint = GetSpawnpoint();
+			spawnpoint = GetSpawnpoint();
 
 			if ( spawnpoint.HasValue )
 			{
@@ -492,7 +496,6 @@ namespace Facepunch.CoreWars
 			}
 
 			ResetInterpolation();
-			GiveInitialItems();
 		}
 
 		public override void BuildInput( InputBuilder input )
