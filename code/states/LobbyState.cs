@@ -3,19 +3,23 @@ using System.Linq;
 
 namespace Facepunch.CoreWars
 {
-	public class LobbyState : BaseState
+	public partial class LobbyState : BaseState
 	{
+		[Net] public RealTimeUntil StateEndTime { get; set; }
+		public float StateDuration => 60f;
+
 		public override void OnEnter()
 		{
-			if ( Host.IsServer )
+			if ( IsServer )
 			{
 				IResettable.ResetAll();
 
 				foreach ( var player in Entity.All.OfType<Player>() )
 				{
-					player.AssignRandomTeam();
 					player.RespawnWhenAvailable();
 				}
+
+				StateEndTime = StateDuration;
 			}
 		}
 
@@ -24,10 +28,23 @@ namespace Facepunch.CoreWars
 
 		}
 
+		public override bool CanHearPlayerVoice( Client sourceClient, Client destinationClient )
+		{
+			return true;
+		}
+
 		public override void OnPlayerJoined( Player player )
 		{
-			player.AssignRandomTeam();
 			player.RespawnWhenAvailable();
+		}
+
+		[Event.Tick.Server]
+		protected virtual void ServerTick()
+		{
+			if ( StateEndTime )
+			{
+				System.Set( new GameState() );
+			}
 		}
 	}
 }
