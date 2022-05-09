@@ -421,6 +421,12 @@ namespace Facepunch.CoreWars
 					resource.Container.Remove( resource );
 					attacker.TryGiveItem( resource );
 				}
+
+				Hud.AddKillFeed( To.Everyone, attacker, this, LastDamageTaken.Weapon );
+			}
+			else
+			{
+				Hud.AddKillFeed( To.Everyone, this );
 			}
 
 			EnableAllCollisions = false;
@@ -598,6 +604,11 @@ namespace Facepunch.CoreWars
 		protected virtual void SimulateGameState( Client client )
 		{
 			var world = VoxelWorld.Current;
+
+			if ( Input.Released( InputButton.Reload ) )
+			{
+				CameraMode = new ThirdPersonCamera();
+			}
 
 			if ( IsServer )
 			{
