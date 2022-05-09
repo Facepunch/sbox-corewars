@@ -12,6 +12,9 @@ namespace Facepunch.CoreWars
 	{
 		public static UpgradeStore Current { get; private set; }
 
+		public string IronAmount => GetResourceCount<IronItem>().ToString();
+		public string GoldAmount => GetResourceCount<GoldItem>().ToString();
+		public string CrystalAmount => GetResourceCount<CrystalItem>().ToString();
 		public Panel ItemContainer { get; set; }
 		public TeamUpgradesNPC NPC { get; set; }
 		public bool IsOpen { get; set; }
@@ -65,6 +68,16 @@ namespace Facepunch.CoreWars
 			}
 
 			base.Tick();
+		}
+
+		protected int GetResourceCount<T>() where T : ResourceItem
+		{
+			if ( Local.Pawn is Player player )
+			{
+				return player.FindItems<T>().Sum( i => i.StackSize );
+			}
+
+			return 0;
 		}
 
 		protected virtual void OnItemPurchased( IPurchasableItem item )
