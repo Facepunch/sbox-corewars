@@ -40,7 +40,7 @@ namespace Facepunch.CoreWars
 
 		protected override float GetNextGenerateTime()
 		{
-			return 15f;
+			return 30f;
 		}
 	}
 }

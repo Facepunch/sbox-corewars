@@ -50,12 +50,12 @@ namespace Facepunch.CoreWars
 				var tier = core.GetUpgradeTier( "gold" );
 
 				if ( tier >= 3 )
-					return 10f;
-				else if ( tier >= 2 )
 					return 20f;
+				else if ( tier >= 2 )
+					return 30f;
 			}
 
-			return 30f;
+			return 40f;
 		}
 
 		protected float GetNextGenerateCrystalTime()
