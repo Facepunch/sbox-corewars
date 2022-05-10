@@ -61,6 +61,8 @@ namespace Facepunch.CoreWars
 				CollisionGroup = CollisionGroup.Trigger;
 			}
 
+			Tags.Add( "volume" );
+
 			EnableSolidCollisions = false;
 			EnableTouch = true;
 		}
