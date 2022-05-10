@@ -111,9 +111,14 @@ namespace Facepunch.CoreWars
 				BaseVelocity = BaseVelocity.WithZ( 0 );
 			}
 
+			var player = Client.Pawn as Player;
+
 			if ( Input.Down( InputButton.Jump ) )
 			{
-				DoJumpAction();
+				if ( !player.IsValid() || !player.IsOutOfBreath )
+				{
+					DoJumpAction();
+				}
 			}
 
 			var startOnGround = GroundEntity != null;
@@ -137,6 +142,14 @@ namespace Facepunch.CoreWars
 			WishVelocity *= GetWishSpeed();
 
 			Duck.PreTick();
+
+			if ( player.IsValid() )
+			{
+				if ( Input.Down( InputButton.Duck ) )
+					player.ReduceStamina( 10f * Time.Delta );
+				else
+					player.GainStamina( 15f * Time.Delta );
+			}
 
 			var currentBlockBelow = currentMap.GetVoxel( currentMap.ToVoxelPosition( Position ) + Chunk.BlockDirections[(int)BlockFace.Bottom] );
 
@@ -217,7 +230,17 @@ namespace Facepunch.CoreWars
 			var wishSpeed = Duck.GetWishSpeed();
 			if ( wishSpeed >= 0f ) return wishSpeed;
 
-			if ( Input.Down( InputButton.Duck ) )
+			var isSprinting = Input.Down( InputButton.Duck );
+
+			if ( Client.Pawn is Player player )
+			{
+				if ( player.IsOutOfBreath )
+				{
+					isSprinting = false;
+				}
+			}
+
+			if ( isSprinting )
 				return Scale( SprintSpeed * MoveSpeedScale );
 			else
 				return Scale( WalkSpeed * MoveSpeedScale );
@@ -387,6 +410,11 @@ namespace Facepunch.CoreWars
 				Velocity -= new Vector3( 0, 0, Gravity * 0.5f ) * Time.Delta;
 
 				AddEvent( "jump" );
+
+				if ( Client.Pawn is Player player )
+				{
+					player.ReduceStamina( 10f );
+				}
 			}
 		}
 
