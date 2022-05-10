@@ -416,6 +416,7 @@ namespace Facepunch.CoreWars
 
 		public override void Spawn()
 		{
+			EnableTouchPersists = true;
 			EnableDrawing = false;
 			EnableTouch = true;
 
