@@ -818,9 +818,9 @@ namespace Facepunch.CoreWars
 			EquipmentInventory = new NetInventoryContainer( equipment );
 		}
 
-		public override void StartTouch( Entity other )
+		public override void Touch( Entity other )
 		{
-			base.StartTouch( other );
+			base.Touch( other );
 
 			if ( other is not ItemEntity itemEntity ) return;
 			if ( !itemEntity.TimeUntilCanPickup || !itemEntity.Item.IsValid() ) return;
@@ -831,8 +831,6 @@ namespace Facepunch.CoreWars
 			{
 				itemEntity.Take();
 			}
-
-			base.StartTouch( other );
 		}
 
 		[Event.Tick.Server]
