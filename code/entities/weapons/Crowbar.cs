@@ -35,6 +35,12 @@ namespace Facepunch.CoreWars
 
 		public override void AttackPrimary()
 		{
+			if ( Owner is not Player player )
+				return;
+
+			if ( player.IsOutOfBreath )
+				return;
+
 			PlayAttackAnimation();
 			ShootEffects();
 			PlaySound( $"barage.launch" );
@@ -42,6 +48,8 @@ namespace Facepunch.CoreWars
 
 			TimeSincePrimaryAttack = 0;
 			TimeSinceSecondaryAttack = 0;
+
+			player.ReduceStamina( 5f );
 		}
 
 		public override void SimulateAnimator( PawnAnimator anim )
