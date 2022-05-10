@@ -84,13 +84,16 @@ namespace Facepunch.CoreWars.Editor
 
 				if ( Mode == EntitiesToolMode.Place || Mode == EntitiesToolMode.MoveAndRotate )
 				{
-					if ( CurrentAttribute.IsVolume )
+					if ( Mode == EntitiesToolMode.Place && CurrentAttribute.IsVolume )
 					{
-						var aimSourcePosition = VoxelWorld.Current.ToSourcePosition( aimVoxelPosition );
-						var volumeBBox = GetVolumeBBox( StartPosition.HasValue ? StartPosition.Value : aimSourcePosition, aimSourcePosition );
+						if ( Volume.IsValid() )
+						{
+							var aimSourcePosition = VoxelWorld.Current.ToSourcePosition( aimVoxelPosition );
+							var volumeBBox = GetVolumeBBox( StartPosition.HasValue ? StartPosition.Value : aimSourcePosition, aimSourcePosition );
 
-						Volume.Position = volumeBBox.Mins;
-						Volume.RenderBounds = new BBox( volumeBBox.Mins - Volume.Position, volumeBBox.Maxs - Volume.Position );
+							Volume.Position = volumeBBox.Mins;
+							Volume.RenderBounds = new BBox( volumeBBox.Mins - Volume.Position, volumeBBox.Maxs - Volume.Position );
+						}
 					}
 					else if ( GhostEntity.IsValid() )
 					{
@@ -216,6 +219,8 @@ namespace Facepunch.CoreWars.Editor
 				SelectedEntity.EnableDrawing = true;
 				SelectedEntity = null;
 			}
+
+			StartPosition = null;
 		}
 
 		protected override void OnPrimary( Client client )
@@ -331,9 +336,13 @@ namespace Facepunch.CoreWars.Editor
 
 		private bool TryGetTargetEntity( out ISourceEntity target, out TraceResult trace )
 		{
-			 trace = Trace.Ray( Input.Position, Input.Position + Input.Rotation.Forward * 5000f )
-				.EntitiesOnly()
-				.Run();
+			var request = Trace.Ray( Input.Position, Input.Position + Input.Rotation.Forward * 5000f )
+				.EntitiesOnly();
+
+			if ( Input.Down( InputButton.Run ) )
+				request = request.WithoutTags( "volume" );
+
+			trace = request.Run();
 
 			if ( trace.Entity.IsValid() && trace.Entity is ISourceEntity )
 			{
