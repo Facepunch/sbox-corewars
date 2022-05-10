@@ -7,10 +7,10 @@
 
     InventorySlot {
         margin-right: 16px;
-    }
 
-    :last-child {
-        margin-right: 0px;
+        &:last-child {
+            margin-right: 0px;
+        }
     }
 
     &.hidden {
