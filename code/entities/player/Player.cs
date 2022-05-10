@@ -15,11 +15,14 @@ namespace Facepunch.CoreWars
 	{
 		[Net, Change( nameof( OnTeamChanged ) )] public Team Team { get; private set; }
 		[Net, Predicted] public ushort CurrentHotbarIndex { get; private set; }
+		[Net, Predicted] public bool IsOutOfBreath { get; set; }
+		[Net, Predicted] public float Stamina { get; set; }
 		[Net] public NetInventoryContainer BackpackInventory { get; private set; }
 		[Net] public NetInventoryContainer HotbarInventory { get; private set; }
 		[Net] public NetInventoryContainer ChestInventory { get; private set; }
 		[Net] public NetInventoryContainer EquipmentInventory { get; private set; }
 		[Net] public TeamCore Core { get; private set; }
+
 		public ProjectileSimulator Projectiles { get; private set; }
 		public DamageInfo LastDamageTaken { get; private set; }
 		public TimeUntil NextBlockPlace { get; private set; }
@@ -162,6 +165,16 @@ namespace Facepunch.CoreWars
 			}
 
 			return remaining;
+		}
+
+		public void ReduceStamina( float amount )
+		{
+			Stamina = Math.Max( Stamina - amount, 0f );
+		}
+
+		public void GainStamina( float amount )
+		{
+			Stamina = Math.Min( Stamina + amount, 100f );
 		}
 
 		public bool CanBuildAt( Vector3 position )
@@ -496,6 +509,7 @@ namespace Facepunch.CoreWars
 				EnableAllCollisions = true;
 				EnableDrawing = true;
 				LifeState = LifeState.Alive;
+				Stamina = 100f;
 				Health = 100f;
 				Velocity = Vector3.Zero;
 				WaterLevel = 0f;
@@ -609,6 +623,11 @@ namespace Facepunch.CoreWars
 			{
 				CameraMode = new ThirdPersonCamera();
 			}
+
+			if ( Stamina <= 10f )
+				IsOutOfBreath = true;
+			else if ( IsOutOfBreath && Stamina >= 40f )
+				IsOutOfBreath = false;
 
 			if ( IsServer )
 			{
