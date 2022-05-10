@@ -114,7 +114,7 @@ namespace Facepunch.CoreWars.Editor
 						var endSourceVoxelPosition = VoxelWorld.Current.ToVoxelPosition( EndPosition.Value );
 
 						var action = new DuplicateBlocksAction();
-						action.Initialize( startSourceVoxelPosition, endSourceVoxelPosition, aimVoxelPosition );
+						action.Initialize( startSourceVoxelPosition, endSourceVoxelPosition, aimVoxelPosition, Input.Down( InputButton.Run ) );
 
 						Player.Perform( action );
 					}
