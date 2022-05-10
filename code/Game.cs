@@ -62,6 +62,15 @@ namespace Facepunch.CoreWars
 			Current = this;
 		}
 
+		[ServerCmd( "take_damage" )]
+		public static void TakeDamageCmd()
+		{
+			if ( ConsoleSystem.Caller.Pawn is Player player )
+			{
+				player.TakeDamage( DamageInfo.Generic( 10f ) );
+			}
+		}
+
 		public override void ClientSpawn()
 		{
 			Hud = IsEditorMode ? new EditorHud() : new Hud();
