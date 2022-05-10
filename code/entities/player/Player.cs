@@ -638,7 +638,7 @@ namespace Facepunch.CoreWars
 
 					if ( item.IsValid() && item is BlockItem blockItem )
 					{
-						var success = world.SetBlockInDirection( Input.Position, Input.Rotation.Forward, blockItem.BlockId, true, 200f, ( position ) =>
+						var success = world.SetBlockInDirection( Input.Position, Input.Rotation.Forward, blockItem.BlockId, true, 5f, ( position ) =>
 						{
 							var sourcePosition = world.ToSourcePosition( position );
 							return CanBuildAt( sourcePosition );
