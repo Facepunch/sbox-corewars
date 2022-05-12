@@ -8,13 +8,17 @@ using System.IO;
 namespace Facepunch.CoreWars
 {
 	[EditorEntity( Title = "Team Upgrades NPC", Group = "Gameplay", EditorModel = "models/citizen/citizen.vmdl" )]
-	public partial class TeamUpgradesNPC : AnimEntity, ISourceEntity, IUsable
+	public partial class TeamUpgradesNPC : AnimEntity, ISourceEntity, IUsable, INameplate
 	{
 		[EditorProperty] public Team Team { get; set; }
 
 		[Net] public List<BaseTeamUpgrade> Upgrades { get; set; }
 
+		public string DisplayName => "Team Upgrades";
 		public float MaxUseDistance => 300f;
+		public bool IsFriendly => true;
+
+		private Nameplate Nameplate { get; set; }
 
 		public override void Spawn()
 		{
@@ -42,6 +46,12 @@ namespace Facepunch.CoreWars
 			}
 
 			base.Spawn();
+		}
+
+		public override void ClientSpawn()
+		{
+			Nameplate = new Nameplate( this );
+			base.ClientSpawn();
 		}
 
 		public virtual void Serialize( BinaryWriter writer )

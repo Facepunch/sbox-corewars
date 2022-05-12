@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Facepunch.CoreWars
 {
-	public partial class Player : Sandbox.Player, IResettable
+	public partial class Player : Sandbox.Player, IResettable, INameplate
 	{
 		[Net, Change( nameof( OnTeamChanged ) )] public Team Team { get; private set; }
 		[Net, Predicted] public ushort CurrentHotbarIndex { get; private set; }
@@ -26,11 +26,26 @@ namespace Facepunch.CoreWars
 		public ProjectileSimulator Projectiles { get; private set; }
 		public DamageInfo LastDamageTaken { get; private set; }
 		public TimeUntil NextBlockPlace { get; private set; }
+		public string DisplayName => Client.Name;
+
+		public bool IsFriendly
+		{
+			get
+			{
+				if ( Local.Pawn is Player player )
+				{
+					return player.Team == Team;
+				}
+
+				return false;
+			}
+		}
 
 		private TimeSince TimeSinceBackpackOpen { get; set; }
 		private bool IsBackpackToggleMode { get; set; }
 		private bool IsWaitingToRespawn { get; set; }
 		private bool ShouldResetEyeRotation { get; set; }
+		private Nameplate Nameplate { get; set; }
 
 		public Player() : base()
 		{
@@ -480,6 +495,8 @@ namespace Facepunch.CoreWars
 
 				Hotbar.Current?.SetContainer( hotbar );
 			}
+
+			Nameplate = new Nameplate( this );
 
 			base.ClientSpawn();
 		}
