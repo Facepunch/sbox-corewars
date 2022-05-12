@@ -25,7 +25,7 @@ namespace Facepunch.CoreWars
 		public override string ViewModelPath => "weapons/rust_crossbow/v_rust_crossbow.vmdl";
 		public override int ViewModelMaterialGroup => 1;
 		public override string MuzzleFlashEffect => null;
-		public override string HitSound => "barage.explode";
+		public override string HitSound => null;
 		public override DamageFlags DamageType => DamageFlags.Bullet;
 		public override float PrimaryRate => 0.3f;
 		public override float SecondaryRate => 1f;
@@ -80,8 +80,7 @@ namespace Facepunch.CoreWars
 
 		protected override void OnProjectileHit( BulletDropProjectile projectile, Entity target )
 		{
-			var explosion = Particles.Create( "particles/weapons/boomer/boomer_explosion.vpcf" );
-			explosion.SetPosition( 0, projectile.Position - projectile.Velocity.Normal * projectile.Radius );
+
 		}
 	}
 }
