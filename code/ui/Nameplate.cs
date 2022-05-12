@@ -92,6 +92,9 @@ namespace Facepunch.CoreWars
 			if ( Entity.LifeState == LifeState.Dead )
 				return false;
 
+			if ( Entity == Local.Pawn )
+				return false;
+
 			return true;
 		}
 	}
