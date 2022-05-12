@@ -39,7 +39,13 @@ namespace Facepunch.CoreWars
 
 		private bool IsHidden()
 		{
-			return IDialog.IsActive() || !Game.IsState<GameState>();
+			if ( Local.Pawn.LifeState == LifeState.Dead )
+				return true;
+
+			if ( IDialog.IsActive() || !Game.IsState<GameState>() )
+				return true;
+
+			return false;
 		}
 	}
 }
