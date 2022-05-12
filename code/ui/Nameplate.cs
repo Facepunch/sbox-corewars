@@ -47,7 +47,7 @@ namespace Facepunch.CoreWars
 
 			var transform = Transform;
 
-			transform.Position = Entity.WorldSpaceBounds.Center + Vector3.Up * 48f;
+			transform.Position = Entity.WorldSpaceBounds.Center + Vector3.Up * 56f;
 
 			var targetRotation = Rotation.LookAt( CurrentView.Position - Position );
 			transform.Rotation = targetRotation;
