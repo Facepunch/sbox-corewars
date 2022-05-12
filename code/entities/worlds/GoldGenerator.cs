@@ -12,6 +12,7 @@ namespace Facepunch.CoreWars
 	public class GoldGenerator : BaseGenerator
 	{
 		private Particles Effect { get; set; }
+		private int Tier { get; set; }
 
 		public override void Spawn()
 		{

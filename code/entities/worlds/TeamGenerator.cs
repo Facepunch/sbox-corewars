@@ -18,6 +18,14 @@ namespace Facepunch.CoreWars
 
 		private Particles Effect { get; set; }
 
+		public override void Reset()
+		{
+			NextGenerateCrystalTime = GetNextGenerateCrystalTime();
+			NextGenerateGoldTime = GetNextGenerateGoldTime();
+
+			base.Reset();
+		}
+
 		public override void Spawn()
 		{
 			SetModel( "models/gameplay/resource_pool/resource_pool.vmdl" );

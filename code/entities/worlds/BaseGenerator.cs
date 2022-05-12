@@ -8,9 +8,14 @@ using System.Linq;
 
 namespace Facepunch.CoreWars
 {
-	public partial class BaseGenerator : ModelEntity, ISourceEntity
+	public partial class BaseGenerator : ModelEntity, ISourceEntity, IResettable
 	{
 		private TimeUntil NextGenerateTime { get; set; }
+
+		public virtual void Reset()
+		{
+			NextGenerateTime = GetNextGenerateTime();
+		}
 
 		public virtual void Serialize( BinaryWriter writer )
 		{
