@@ -402,13 +402,6 @@ namespace Facepunch.CoreWars
 			EnableAllCollisions = true;
 
 			CameraMode = new FirstPersonCamera();
-
-			Controller = new MoveController()
-			{
-				WalkSpeed = 195f,
-				SprintSpeed = 375f
-			};
-
 			Animator = new PlayerAnimator();
 
 			SetModel( "models/citizen/citizen.vmdl" );
@@ -510,6 +503,11 @@ namespace Facepunch.CoreWars
 				EnableAllCollisions = true;
 				EnableDrawing = true;
 				LifeState = LifeState.Alive;
+				Controller = new MoveController
+				{
+					WalkSpeed = 195f,
+					SprintSpeed = 375f
+				};
 				Stamina = 100f;
 				Health = 100f;
 				Velocity = Vector3.Zero;
