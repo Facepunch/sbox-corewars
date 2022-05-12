@@ -496,6 +496,7 @@ namespace Facepunch.CoreWars
 				{
 					EnableCollisions = false
 				};
+				LifeState = LifeState.Dead;
 			}
 			else
 			{
@@ -556,10 +557,14 @@ namespace Facepunch.CoreWars
 
 			if ( Game.IsState<GameState>() )
 			{
-				SimulateGameState( client );
+				if ( LifeState == LifeState.Alive )
+				{
+					SimulateGameState( client );
+				}
 			}
 
 			var viewer = Client.Components.Get<ChunkViewer>();
+
 			if ( !viewer.IsValid() )
 				return;
 
@@ -568,12 +573,15 @@ namespace Facepunch.CoreWars
 
 			if ( IsServer && viewer.IsBelowWorld() )
 			{
-				var damageInfo = DamageInfo.Generic( 1000f )
-					.WithPosition( Position )
-					.WithFlag( DamageFlags.Fall );
+				if ( LifeState == LifeState.Alive )
+				{
+					var damageInfo = DamageInfo.Generic( 1000f )
+						.WithPosition( Position )
+						.WithFlag( DamageFlags.Fall );
 
-				TakeDamage( damageInfo );
-				return;
+					TakeDamage( damageInfo );
+					return;
+				}
 			}
 
 			var controller = GetActiveController();
@@ -623,11 +631,6 @@ namespace Facepunch.CoreWars
 		protected virtual void SimulateGameState( Client client )
 		{
 			var world = VoxelWorld.Current;
-
-			if ( Input.Released( InputButton.Reload ) )
-			{
-				CameraMode = new ThirdPersonCamera();
-			}
 
 			if ( Stamina <= 10f )
 				IsOutOfBreath = true;
@@ -827,8 +830,14 @@ namespace Facepunch.CoreWars
 		{
 			base.Touch( other );
 
-			if ( other is not ItemEntity itemEntity ) return;
-			if ( !itemEntity.TimeUntilCanPickup || !itemEntity.Item.IsValid() ) return;
+			if ( LifeState == LifeState.Dead )
+				return;
+
+			if ( other is not ItemEntity itemEntity )
+				return;
+
+			if ( !itemEntity.TimeUntilCanPickup || !itemEntity.Item.IsValid() )
+				return;
 
 			var remaining = TryGiveItem( itemEntity.Item.Instance );
 
