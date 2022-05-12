@@ -296,18 +296,6 @@ namespace Facepunch.CoreWars
 			mover.MaxStandableAngle = GroundAngle;
 			mover.TryMoveWithStep( Time.Delta, StepSize );
 
-			var world = VoxelWorld.Current;
-
-			if ( world.IsValid() )
-			{
-				var position = world.ToVoxelPosition( mover.Position );
-				if ( !world.IsInBounds( position ) )
-				{
-					Velocity = Vector3.Zero;
-					return;
-				}
-			}
-
 			Position = mover.Position;
 			Velocity = mover.Velocity;
 		}
@@ -318,18 +306,6 @@ namespace Facepunch.CoreWars
 			mover.Trace = mover.Trace.Size( Mins, Maxs ).Ignore( Pawn );
 			mover.MaxStandableAngle = GroundAngle;
 			mover.TryMove( Time.Delta );
-
-			var world = VoxelWorld.Current;
-
-			if ( world.IsValid() )
-			{
-				var position = world.ToVoxelPosition( mover.Position );
-				if ( !world.IsInBounds( position ) )
-				{
-					Velocity = Vector3.Zero;
-					return;
-				}
-			}
 
 			Position = mover.Position;
 			Velocity = mover.Velocity;
