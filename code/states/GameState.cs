@@ -11,6 +11,8 @@ namespace Facepunch.CoreWars
 		[Net] public RealTimeUntil NextStageTime { get; private set; }
 		[Net, Change( nameof( OnStageChanged ) )] public RoundStage Stage { get; private set; }
 
+		public float StageTimeMultiplier => 1f;
+
 		public bool HasReachedStage( RoundStage stage )
 		{
 			return Stage >= stage;
@@ -31,7 +33,8 @@ namespace Facepunch.CoreWars
 					PlayerToTeam[playerId] = player.Team;
 				}
 
-				NextStageTime = 300f;
+				Announcements.Send( To.Everyone, "Core Wars", "Destroy your opponents Core to prevent them respawning!", "textures/ui/logo_spinner.png" );
+				NextStageTime = 300f * StageTimeMultiplier;
 				Stage = RoundStage.Start;
 			}
 		}
@@ -71,38 +74,45 @@ namespace Facepunch.CoreWars
 			Log.Info( $"Stage changed to {stage}" );
 		}
 
+		[Event.Tick.Server]
 		protected virtual void ServerTick()
 		{
 			if ( !NextStageTime ) return;
 
 			if ( Stage == RoundStage.Start )
 			{
-				NextStageTime = 300f;
+				Announcements.Send( To.Everyone, "Gold II", "Gold generators now generate faster!", "textures/items/gold.png" );
+				NextStageTime = 300f * StageTimeMultiplier;
 				Stage = RoundStage.GoldII;
 			}
 			else if ( Stage == RoundStage.GoldII )
 			{
-				NextStageTime = 300f;
+				Announcements.Send( To.Everyone, "Crystal II", "Crystal generators now generate faster!", "textures/items/crystal.png" );
+				NextStageTime = 300f * StageTimeMultiplier;
 				Stage = RoundStage.CrystalII;
 			}
 			else if ( Stage == RoundStage.CrystalII )
 			{
-				NextStageTime = 300f;
+				Announcements.Send( To.Everyone, "Gold III", "Gold generators now even generate faster!", "textures/items/gold.png" );
+				NextStageTime = 300f * StageTimeMultiplier;
 				Stage = RoundStage.GoldIII;
 			}
 			else if ( Stage == RoundStage.GoldIII )
 			{
-				NextStageTime = 300f;
+				Announcements.Send( To.Everyone, "Crystal III", "Crystal generators now generate even faster!", "textures/items/crystal.png" );
+				NextStageTime = 300f * StageTimeMultiplier;
 				Stage = RoundStage.CrystalIII;
 			}
 			else if ( Stage == RoundStage.CrystalIII )
 			{
-				NextStageTime = 600f;
+				Announcements.Send( To.Everyone, "Warning", "All team Cores will self-destruct in 60 seconds!", "textures/ui/logo_spinner.png" );
+				NextStageTime = 60f * StageTimeMultiplier;
 				Stage = RoundStage.NoBeds;
 			}
 			else if ( Stage == RoundStage.NoBeds )
 			{
-				NextStageTime = 300f;
+				Announcements.Send( To.Everyone, "Sudden Death", "All team Cores have self-destructed!", "textures/ui/skull.png" );
+				NextStageTime = 300f * StageTimeMultiplier;
 				Stage = RoundStage.SuddenDeath;
 			}
 			else if ( Stage == RoundStage.SuddenDeath )
