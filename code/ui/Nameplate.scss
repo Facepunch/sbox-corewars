@@ -1,0 +1,49 @@
+﻿Nameplate {
+    align-items: center;
+    justify-content: center;
+
+    .container {
+        font-weight: bold;
+        font-size: 56px;
+        border-radius: 8px;
+        align-items: center;
+        justify-content: center;
+        mix-blend-mode: lighten;
+        background-size: cover;
+        position: absolute;
+        padding: 16px;
+
+        .name {
+            font-family: Roboto;
+            text-shadow: 0px 0px 6px rgba(100 0 0 0.2);
+            color: red;
+        }
+    }
+
+    .dot {
+        background-color: red;
+        box-shadow: 0px 0px 32px -2px rgba(150 0 0 0.05);
+        border: 1px solid #eda6a6;
+        position: absolute;
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+    }
+
+    &.friendly {
+        .name {
+            text-shadow: 0px 0px 6px rgba(0 100 0 0.2);
+            color: lightgreen;
+        }
+
+        .dot {
+            background-color: lightgreen;
+            box-shadow: 0px 0px 32px -2px rgba(0 150 0 0.05);
+            border: 1px solid #a8e9b1;
+        }
+    }
+
+    &.hidden {
+        display: none;
+    }
+}
