@@ -12,7 +12,6 @@ namespace Facepunch.CoreWars
 	public class GoldGenerator : BaseGenerator
 	{
 		private Particles Effect { get; set; }
-		private int Tier { get; set; }
 
 		public override void Spawn()
 		{
@@ -41,6 +40,14 @@ namespace Facepunch.CoreWars
 
 		protected override float GetNextGenerateTime()
 		{
+			if ( Game.TryGetState<GameState>( out var state ) )
+			{
+				if ( state.HasReachedStage( RoundStage.GoldIII ) )
+					return 10f;
+				else if ( state.HasReachedStage( RoundStage.GoldII ) )
+					return 20f;
+			}
+
 			return 30f;
 		}
 	}
