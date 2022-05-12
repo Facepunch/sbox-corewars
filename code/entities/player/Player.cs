@@ -553,24 +553,22 @@ namespace Facepunch.CoreWars
 				SimulateGameState( client );
 			}
 
-			if ( IsClient && world.IsValid() )
-			{
-				var position = world.ToVoxelPosition( Input.Position );
-				var voxel = world.GetVoxel( position );
-
-				if ( voxel.IsValid )
-				{
-					DebugOverlay.ScreenText( 2, $"Sunlight Level: {voxel.GetSunLight()}", 0.1f );
-					DebugOverlay.ScreenText( 3, $"Torch Level: ({voxel.GetRedTorchLight()}, {voxel.GetGreenTorchLight()}, {voxel.GetBlueTorchLight()})", 0.1f );
-					DebugOverlay.ScreenText( 4, $"Chunk: {voxel.Chunk.Offset}", 0.1f );
-					DebugOverlay.ScreenText( 5, $"Position: {position}", 0.1f );
-					DebugOverlay.ScreenText( 6, $"Biome: {VoxelWorld.Current.GetBiomeAt( position.x, position.y ).Name}", 0.1f );
-				}
-			}
-
 			var viewer = Client.Components.Get<ChunkViewer>();
-			if ( !viewer.IsValid() ) return;
-			if ( viewer.IsInMapBounds() && !viewer.IsCurrentChunkReady ) return;
+			if ( !viewer.IsValid() )
+				return;
+
+			if ( viewer.IsInWorld() && !viewer.IsCurrentChunkReady )
+				return;
+
+			if ( IsServer && viewer.IsBelowWorld() )
+			{
+				var damageInfo = DamageInfo.Generic( 1000f )
+					.WithPosition( Position )
+					.WithFlag( DamageFlags.Fall );
+
+				TakeDamage( damageInfo );
+				return;
+			}
 
 			var controller = GetActiveController();
 			controller?.Simulate( client, this, GetActiveAnimator() );
@@ -597,18 +595,18 @@ namespace Facepunch.CoreWars
 					else if ( damageTier >= 1 )
 						info.Damage *= 1.2f;
 				}
-			}
 
-			if ( Core.IsValid() )
-			{
-				var armorTier = Core.GetUpgradeTier( "armor" );
+				if ( Core.IsValid() )
+				{
+					var armorTier = Core.GetUpgradeTier( "armor" );
 
-				if ( armorTier >= 3 )
-					info.Damage *= 0.4f;
-				else if ( armorTier >= 2 )
-					info.Damage *= 0.6f;
-				else if ( armorTier >= 1 )
-					info.Damage *= 0.8f;
+					if ( armorTier >= 3 )
+						info.Damage *= 0.4f;
+					else if ( armorTier >= 2 )
+						info.Damage *= 0.6f;
+					else if ( armorTier >= 1 )
+						info.Damage *= 0.8f;
+				}
 			}
 
 			LastDamageTaken = info;
