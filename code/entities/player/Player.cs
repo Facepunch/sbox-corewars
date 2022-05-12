@@ -30,6 +30,7 @@ namespace Facepunch.CoreWars
 		private TimeSince TimeSinceBackpackOpen { get; set; }
 		private bool IsBackpackToggleMode { get; set; }
 		private bool IsWaitingToRespawn { get; set; }
+		private bool ShouldResetEyeRotation { get; set; }
 
 		public Player() : base()
 		{
@@ -501,6 +502,7 @@ namespace Facepunch.CoreWars
 				Game.Current?.PlayerRespawned( this );
 
 				EnableAllCollisions = true;
+				ResetEyeRotation( To.Single( this ) );
 				EnableDrawing = true;
 				LifeState = LifeState.Alive;
 				Controller = new MoveController
@@ -533,6 +535,12 @@ namespace Facepunch.CoreWars
 
 		public override void BuildInput( InputBuilder input )
 		{
+			if ( ShouldResetEyeRotation )
+			{
+				input.ViewAngles = Angles.Zero;
+				ShouldResetEyeRotation = false;
+			}
+
 			base.BuildInput( input );
 		}
 
@@ -828,6 +836,12 @@ namespace Facepunch.CoreWars
 			{
 				itemEntity.Take();
 			}
+		}
+
+		[ClientRpc]
+		protected void ResetEyeRotation()
+		{
+			ShouldResetEyeRotation = true;
 		}
 
 		[Event.Tick.Server]
