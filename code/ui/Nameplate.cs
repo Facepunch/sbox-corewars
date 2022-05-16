@@ -10,10 +10,10 @@ namespace Facepunch.CoreWars
 		public Panel Container { get; private set; }
 		public Panel Dot { get; private set; }
 		public Label NameLabel { get; private set; }
-		public float StartFadeDistance { get; set; } = 750f;
-		public float EndFadeDistance { get; set; } = 1000f;
-		public float StartDotDistance { get; set; } = 1225f;
-		public float EndDotDistance { get; set; } = 2500f;
+		public float StartFadeDistance { get; set; } = 375f;
+		public float EndFadeDistance { get; set; } = 500f;
+		public float StartDotDistance { get; set; } = 525f;
+		public float EndDotDistance { get; set; } = 1250f;
 		public INameplate Entity { get; private set; }
 
 		public Nameplate( INameplate entity )

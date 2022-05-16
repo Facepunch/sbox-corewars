@@ -3,19 +3,18 @@
     justify-content: center;
 
     .container {
-        font-weight: bold;
-        font-size: 56px;
+        background-color: rgba( 50 50 50 0.6 );
+        font-size: 48px;
         border-radius: 8px;
         align-items: center;
         justify-content: center;
-        mix-blend-mode: lighten;
         background-size: cover;
         position: absolute;
-        padding: 16px;
+        padding: 8px;
 
         .name {
             font-family: Roboto;
-            text-shadow: 0px 0px 6px rgba(100 0 0 0.2);
+            text-shadow: 0px 0px 6px rgba(200 0 0 0.2);
             color: red;
         }
     }
@@ -26,14 +25,14 @@
         border: 1px solid #eda6a6;
         position: absolute;
         border-radius: 50%;
-        width: 48px;
-        height: 48px;
+        width: 40px;
+        height: 40px;
     }
 
     &.friendly {
         .name {
-            text-shadow: 0px 0px 6px rgba(0 100 0 0.2);
-            color: lightgreen;
+            text-shadow: 0px 0px 6px rgba(0 200 0 0.4);
+            color: chartreuse;
         }
 
         .dot {
