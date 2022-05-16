@@ -28,10 +28,16 @@
         }
 
         .core {
-            background-image: url( /textures/items/gold.png );
+            background-image: url( /textures/ui/logo_spinner.png );
             background-size: cover;
             width: 32px;
             height: 32px;
+        }
+
+        &.no-core {
+            .core {
+                background-image: url( /textures/ui/no_core.png );
+            }
         }
     }
 
@@ -63,6 +69,10 @@
                 font-family: Roboto;
                 color: white;
                 flex-grow: 1;
+            }
+
+            .name {
+
             }
 
             .kills {
