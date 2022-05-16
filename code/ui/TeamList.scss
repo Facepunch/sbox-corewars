@@ -1,0 +1,25 @@
+﻿TeamList {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    flex-direction: row;
+
+    .container {
+        background-color: rgba( 50 50 50 0.4 );
+        padding: 8px;
+        border-radius: 2px;
+        flex-direction: column;
+
+        TeamItem {
+            margin-top: 4px;
+        }
+
+        &:first-child {
+            margin-top: 0px;
+        }
+    }
+
+    &.hidden {
+        display: none;
+    }
+}

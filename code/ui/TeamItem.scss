@@ -1,0 +1,76 @@
+﻿TeamItem {
+    display: flex;
+    flex-direction: column;
+
+    .header {
+        display: flex;
+        flex-direction: row;
+        background-color: red;
+        border-radius: 2px;
+        padding: 4px;
+        justify-content: center;
+        align-items: center;
+
+        label {
+            color: white;
+            font-size: 20px;
+            font-family: Roboto;
+            flex-grow: 1;
+            font-weight: bold;
+        }
+
+        :first-child {
+            margin-left: 16px;
+        }
+
+        :last-child {
+            margin-right: 16px;
+        }
+
+        .core {
+            background-image: url( /textures/items/gold.png );
+            background-size: cover;
+            width: 32px;
+            height: 32px;
+        }
+    }
+
+    .players {
+        display: flex;
+        flex-direction: column;
+
+        .player {
+            background-color: rgba( 0 0 0 0.4 );
+            justify-content: center;
+            align-items: center;
+            border-radius: 2px;
+            margin-bottom: 4px;
+            margin-top: 4px;
+            padding: 4px;
+            display: flex;
+
+            :first-child {
+                margin-left: 16px;
+            }
+
+            :last-child {
+                margin-right: 16px;
+            }
+
+            label {
+                color: black;
+                font-size: 20px;
+                font-family: Roboto;
+                color: white;
+                flex-grow: 1;
+            }
+
+            .kills {
+            }
+        }
+
+        :last-child {
+            margin-bottom: 0px;
+        }
+    }
+}
