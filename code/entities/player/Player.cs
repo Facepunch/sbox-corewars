@@ -498,6 +498,8 @@ namespace Facepunch.CoreWars
 
 			Nameplate = new Nameplate( this );
 
+			TeamList.Refresh();
+
 			base.ClientSpawn();
 		}
 
@@ -724,6 +726,11 @@ namespace Facepunch.CoreWars
 						Backpack.Current?.Close();
 					}
 				}
+
+				if ( Input.Down( InputButton.Menu ) )
+					TeamList.Open();
+				else
+					TeamList.Close();
 			}
 
 			var currentSlotIndex = (int)CurrentHotbarIndex;
@@ -782,7 +789,10 @@ namespace Facepunch.CoreWars
 
 		protected virtual void OnTeamChanged( Team team )
 		{
-
+			if ( IsClient )
+			{
+				TeamList.Refresh();
+			}
 		}
 
 		protected virtual void GiveInitialItems()
