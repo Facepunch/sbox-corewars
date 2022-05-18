@@ -15,6 +15,19 @@ namespace Facepunch.CoreWars
 		public string StageText => GetStageText();
 		public string TimeText => GetTimeText();
 
+		public Panel Icon { get; set; }
+
+		public override void Tick()
+		{
+			if ( Game.TryGetState<GameState>( out var state ) )
+			{
+				var iconPath = state.Stage.GetIcon();
+				Icon.Style.SetBackgroundImage( iconPath );
+			}
+
+			base.Tick();
+		}
+
 		protected override void PostTemplateApplied()
 		{
 			BindClass( "hidden", IsHidden );
@@ -45,7 +58,7 @@ namespace Facepunch.CoreWars
 		{
 			if ( Game.TryGetState<GameState>( out var state ) )
 			{
-				return TimeSpan.FromSeconds( state.NextStageTime.Absolute ).ToString( @"mm\:ss" );
+				return TimeSpan.FromSeconds( state.NextStageTime ).ToString( @"mm\:ss" );
 			}
 
 			return string.Empty;

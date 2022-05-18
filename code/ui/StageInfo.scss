@@ -6,7 +6,7 @@
     justify-content: center;
 
     .container {
-        background-color: rgba( 0 0 0 0.4 );
+        background-color: rgba( 0 0 0 0.1 );
         position: absolute;
         border-radius: 2px;
         top: 32px;
@@ -17,22 +17,34 @@
         min-width: 400px;
         padding: 8px;
 
-        .stage {
-            font-size: 48px;
-            font-family: Roboto;
-            color: orangered;
+        .header {
+            align-items: center;
+            justify-content: center;
+
+            .stage {
+                font-size: 40px;
+                font-family: Roboto;
+                color: orangered;
+            }
+
+            .icon {
+                background-size: cover;
+                margin-right: 16px;
+                width: 40px;
+                height: 40px;
+            }
         }
 
         .time {
-            font-size: 32px;
+            font-size: 48px;
             font-family: Roboto;
             color: white;
         }
 
         .next-stage-panel {
-            background-color: rgba( 50 50 50 0.4 );
+            background-color: rgba( 50 50 50 0.2 );
             border-radius: 2px;
-            margin-top: 8px;
+            margin-top: 4px;
             padding: 8px;
 
             label {
