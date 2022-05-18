@@ -12,7 +12,7 @@ namespace Facepunch.CoreWars
 		CrystalII,
 		GoldIII,
 		CrystalIII,
-		NoBeds,
+		NoCores,
 		SuddenDeath,
 		End
 	}
@@ -27,12 +27,37 @@ namespace Facepunch.CoreWars
 				return stage + 1;
 		}
 
+		public static string GetIcon( this RoundStage stage )
+		{
+			switch ( stage )
+			{
+				case RoundStage.Start:
+					return "textures/ui/logo_spinner.png";
+				case RoundStage.GoldII:
+					return "textures/items/gold.png";
+				case RoundStage.CrystalII:
+					return "textures/items/crystal.png";
+				case RoundStage.GoldIII:
+					return "textures/items/gold.png";
+				case RoundStage.CrystalIII:
+					return "textures/items/crystal.png";
+				case RoundStage.NoCores:
+					return "textures/ui/no_core.png";
+				case RoundStage.SuddenDeath:
+					return "textures/ui/skull.png";
+				case RoundStage.End:
+					return "textures/ui/skull.png";
+			}
+
+			return string.Empty;
+		}
+
 		public static string GetName( this RoundStage stage )
 		{
 			switch ( stage )
 			{
 				case RoundStage.Start:
-					return "Start";
+					return "Core Wars";
 				case RoundStage.GoldII:
 					return "Gold II";
 				case RoundStage.CrystalII:
@@ -41,7 +66,7 @@ namespace Facepunch.CoreWars
 					return "Gold III";
 				case RoundStage.CrystalIII:
 					return "Crystal III";
-				case RoundStage.NoBeds:
+				case RoundStage.NoCores:
 					return "No Beds";
 				case RoundStage.SuddenDeath:
 					return "Sudden Death";
