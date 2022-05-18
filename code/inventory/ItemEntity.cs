@@ -79,6 +79,9 @@ namespace Facepunch.CoreWars.Inventory
 				Icon = new ItemWorldIcon( this );
 			}
 
+			var particles = Particles.Create( "particles/gameplay/items/item_on_ground/item_on_ground.vpcf", this );
+			particles.SetEntity( 0, this );
+
 			base.ClientSpawn();
 		}
 

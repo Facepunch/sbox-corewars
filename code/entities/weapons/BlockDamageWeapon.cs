@@ -47,6 +47,7 @@ namespace Facepunch.CoreWars
 				return;
 			}
 
+			var sourcePosition = world.ToSourcePositionCenter( voxel.Position );
 			var newHealth = (state.Health - damage).FloorToInt().Clamp( 0, 100 );
 
 			state.LastDamageTime = 0f;
@@ -55,7 +56,15 @@ namespace Facepunch.CoreWars
 
 			if ( state.Health <= 0 )
 			{
+				var effect = Particles.Create( "particles/gameplay/blocks/block_destroyed/block_destroyed.vpcf" );
+				effect.SetPosition( 0, sourcePosition );
+
 				world.SetBlockOnServer( voxel.Position, 0 );
+			}
+			else
+			{
+				var effect = Particles.Create( "particles/gameplay/blocks/block_damaged/block_damaged.vpcf" );
+				effect.SetPosition( 0, sourcePosition );
 			}
 		}
 

@@ -21,7 +21,7 @@ namespace Facepunch.CoreWars
 	{
 		public override WeaponConfig Config => new PortalGrenadeConfig();
 		public override string ImpactEffect => "particles/weapons/boomer/boomer_impact.vpcf";
-		public override string TrailEffect => "particles/weapons/boomer/boomer_projectile.vpcf";
+		public override string TrailEffect => "particles/weapons/portal_grenade/portal_grenade_trail/portal_grenade_trail.vpcf";
 		public override string ViewModelPath => "models/weapons/v_portal_grenade.vmdl";
 		public override int ViewModelMaterialGroup => 1;
 		public override string MuzzleFlashEffect => null;

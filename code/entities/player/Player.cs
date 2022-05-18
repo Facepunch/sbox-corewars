@@ -642,6 +642,10 @@ namespace Facepunch.CoreWars
 					else if ( armorTier >= 1 )
 						info.Damage *= 0.8f;
 				}
+
+				var particles = Particles.Create( "particles/gameplay/player/taken_damage/taken_damage.vpcf", this );
+				particles.SetPosition( 0, info.Position );
+				particles.SetForward( 0, info.Force.Normal * -1f );
 			}
 
 			LastDamageTaken = info;
@@ -667,15 +671,18 @@ namespace Facepunch.CoreWars
 
 					if ( item.IsValid() && item is BlockItem blockItem )
 					{
-						var success = world.SetBlockInDirection( Input.Position, Input.Rotation.Forward, blockItem.BlockId, true, 5f, ( position ) =>
+						var success = world.SetBlockInDirection( Input.Position, Input.Rotation.Forward, blockItem.BlockId, out var blockPosition, true, 5f, ( position ) =>
 						{
 							var sourcePosition = world.ToSourcePosition( position );
 							return CanBuildAt( sourcePosition );
-						} );
+						});
 
 						if ( success )
 						{
 							item.StackSize--;
+
+							var particles = Particles.Create( "particles/gameplay/blocks/block_placed/block_placed.vpcf" );
+							particles.SetPosition( 0, world.ToSourcePositionCenter( blockPosition ) );
 
 							if ( item.StackSize <= 0 )
 							{
