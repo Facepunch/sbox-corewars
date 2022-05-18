@@ -8,6 +8,41 @@ using System.Linq;
 
 namespace Facepunch.CoreWars
 {
+	public class TeamPlayerItem : Panel
+	{
+		public Player Player { get; private set; }
+		public Label Name { get; private set; }
+		public Label Kills { get; private set; }
+		public Label Spacer { get; private set; }
+
+		public void Update( Player player )
+		{
+			Player = player;
+
+			DeleteChildren( true );
+
+			Name = Add.Label( player.Client.Name, "name" );
+			Kills = Add.Label( "0", "kills" );
+			Spacer = Add.Label( "" );
+		}
+
+		public override void Tick()
+		{
+			if ( !Player.IsValid() )
+			{
+				if ( !IsDeleting )
+				{
+					Delete();
+					return;
+				}
+			}
+
+			Kills.Text = Player.Client.GetInt( "kills " ).ToString();
+
+			base.Tick();
+		}
+	}
+
 	[UseTemplate]
 	public partial class TeamItem : Panel
 	{
@@ -28,10 +63,8 @@ namespace Facepunch.CoreWars
 			{
 				if ( player.Client.IsValid() )
 				{
-					var item = Players.Add.Panel( "player" );
-					item.Add.Label( player.Client.Name, "name" );
-					item.Add.Label( "0", "kills" );
-					item.Add.Label( "" );
+					var item = Players.AddChild<TeamPlayerItem>( "player" );
+					item.Update( player );
 				}
 			}
 		}

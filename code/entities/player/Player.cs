@@ -369,6 +369,8 @@ namespace Facepunch.CoreWars
 			BackpackInventory.Instance.RemoveAll();
 			HotbarInventory.Instance.RemoveAll();
 			ChestInventory.Instance.RemoveAll();
+
+			Client.SetInt( "kills", 0 );
 		}
 
 		public virtual Transform? GetSpawnpoint()
