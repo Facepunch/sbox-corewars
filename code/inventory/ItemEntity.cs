@@ -10,9 +10,11 @@ namespace Facepunch.CoreWars.Inventory
 		[Net] public NetInventoryItem Item { get; private set; }
 
 		public TimeUntil TimeUntilCanPickup { get; set; }
+		public Vector3 IconPosition { get; set; }
 
 		private PickupTrigger PickupTrigger { get; set; }
 		private ItemWorldIcon Icon { get; set; }
+		private Particles Effect { get; set; }
 
 		public void SetItem( InventoryItem item )
 		{
@@ -79,10 +81,17 @@ namespace Facepunch.CoreWars.Inventory
 				Icon = new ItemWorldIcon( this );
 			}
 
-			var particles = Particles.Create( "particles/gameplay/items/item_on_ground/item_on_ground.vpcf", this );
-			particles.SetEntity( 0, this );
+			Effect = Particles.Create( "particles/gameplay/items/item_on_ground/item_on_ground.vpcf", this );
+			Effect.SetPosition( 0, WorldSpaceBounds.Center );
 
 			base.ClientSpawn();
+		}
+
+		[Event.Tick.Client]
+		protected virtual void ClientTick()
+		{
+			IconPosition = WorldSpaceBounds.Center + Vector3.Up * (12f + MathF.Sin( Time.Now ) * 8f);
+			Effect?.SetPosition( 0, IconPosition );
 		}
 
 		protected override void OnDestroy()
