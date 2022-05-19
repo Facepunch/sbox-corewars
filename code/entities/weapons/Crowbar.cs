@@ -64,14 +64,6 @@ namespace Facepunch.CoreWars
 			}
 		}
 
-		protected override void OnMeleeAttackHit( Entity entity )
-		{
-			if ( entity is Player )
-			{
-				PlaySound( "melee.hitflesh" );
-			}
-		}
-
 		protected override void ShootEffects()
 		{
 			base.ShootEffects();
@@ -82,6 +74,11 @@ namespace Facepunch.CoreWars
 
 		protected override void OnMeleeAttackHit( Entity victim )
 		{
+			if ( victim is Player )
+			{
+				PlaySound( "melee.hitflesh" );
+			}
+
 			ViewModelEntity?.SetAnimParameter( "attack_has_hit", true );
 			base.OnMeleeAttackHit( victim );
 		}
