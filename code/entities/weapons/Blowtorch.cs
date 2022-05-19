@@ -31,6 +31,7 @@ namespace Facepunch.CoreWars
 
 		private RealTimeUntil DestroyFlameTime { get; set; }
 		private Particles FlameParticles { get; set; }
+		private Sound? FlameSound { get; set; }
 
 		public override void Spawn()
 		{
@@ -49,6 +50,11 @@ namespace Facepunch.CoreWars
 			{
 				FlameParticles = Particles.Create( "particles/weapons/blowtorch/blowtorch_flame.vpcf" );
 				FlameParticles.SetEntityAttachment( 0, EffectEntity, "muzzle" );
+			}
+
+			if ( !FlameSound.HasValue )
+			{
+				FlameSound = PlaySound( "weapon.blowtorch" );
 			}
 
 			DestroyFlameTime = 0.5f;
@@ -73,6 +79,12 @@ namespace Facepunch.CoreWars
 		{
 			if ( DestroyFlameTime && FlameParticles != null )
 			{
+				if ( FlameSound.HasValue )
+				{
+					FlameSound.Value.Stop();
+					FlameSound = null;
+				}
+
 				FlameParticles?.Destroy();
 				FlameParticles = null;
 			}
@@ -80,6 +92,12 @@ namespace Facepunch.CoreWars
 
 		protected override void OnDestroy()
 		{
+			if ( FlameSound.HasValue )
+			{
+				FlameSound.Value.Stop();
+				FlameSound = null;
+			}
+
 			FlameParticles?.Destroy();
 			base.OnDestroy();
 		}
