@@ -64,6 +64,14 @@ namespace Facepunch.CoreWars
 			}
 		}
 
+		protected override void OnMeleeAttackHit( Entity entity )
+		{
+			if ( entity is Player )
+			{
+				PlaySound( "melee.hitflesh" );
+			}
+		}
+
 		protected override void ShootEffects()
 		{
 			base.ShootEffects();

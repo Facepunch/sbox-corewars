@@ -53,17 +53,14 @@ namespace Facepunch.CoreWars
 
 			PlayAttackAnimation();
 			ShootEffects();
-			PlaySound( $"barage.launch" );
-
-			if ( AmmoClip == 0 )
-				PlaySound( "blaster.empty" );
+			PlaySound( $"crossbow.fire" );
 
 			base.AttackPrimary();
 		}
 
 		public override void PlayReloadSound()
 		{
-			PlaySound( "blaster.reload" );
+			PlaySound( "crossbow.reload" );
 			base.PlayReloadSound();
 		}
 

@@ -684,6 +684,8 @@ namespace Facepunch.CoreWars
 							var particles = Particles.Create( "particles/gameplay/blocks/block_placed/block_placed.vpcf" );
 							particles.SetPosition( 0, world.ToSourcePositionCenter( blockPosition ) );
 
+							PlaySound( "block.place" );
+
 							if ( item.StackSize <= 0 )
 							{
 								InventorySystem.RemoveItem( item );

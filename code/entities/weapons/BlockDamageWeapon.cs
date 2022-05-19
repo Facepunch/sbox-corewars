@@ -54,6 +54,11 @@ namespace Facepunch.CoreWars
 			state.Health = (byte)newHealth;
 			state.IsDirty = true;
 
+			if ( !string.IsNullOrEmpty( block.HitSound ) )
+			{
+				PlaySound( block.HitSound );
+			}
+
 			if ( state.Health <= 0 )
 			{
 				var effect = Particles.Create( "particles/gameplay/blocks/block_destroyed/block_destroyed.vpcf" );
