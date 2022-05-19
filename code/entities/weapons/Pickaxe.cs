@@ -39,8 +39,8 @@ namespace Facepunch.CoreWars
 		{
 			PlayAttackAnimation();
 			ShootEffects();
-			PlaySound( $"barage.launch" );
 			MeleeStrike( Config.Damage * 0.2f, 1.5f );
+			PlaySound( "melee.swing" );
 
 			if ( IsServer && WeaponItem.IsValid() )
 			{

@@ -43,8 +43,8 @@ namespace Facepunch.CoreWars
 
 			PlayAttackAnimation();
 			ShootEffects();
-			PlaySound( $"barage.launch" );
 			MeleeStrike( Config.Damage, 1.5f );
+			PlaySound( "melee.swing" );
 
 			TimeSincePrimaryAttack = 0;
 			TimeSinceSecondaryAttack = 0;

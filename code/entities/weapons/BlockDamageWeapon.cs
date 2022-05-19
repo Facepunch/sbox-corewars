@@ -56,7 +56,10 @@ namespace Facepunch.CoreWars
 
 			if ( !string.IsNullOrEmpty( block.HitSound ) )
 			{
-				PlaySound( block.HitSound );
+				using ( Prediction.Off() )
+				{
+					PlaySound( block.HitSound );
+				}
 			}
 
 			if ( state.Health <= 0 )
