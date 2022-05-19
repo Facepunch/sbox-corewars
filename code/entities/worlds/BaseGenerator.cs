@@ -43,6 +43,8 @@ namespace Facepunch.CoreWars
 			entity.Position = WorldSpaceBounds.Center + Vector3.Up * 64f;
 			entity.SetItem( item );
 			entity.ApplyLocalImpulse( Vector3.Random * 100f );
+
+			PlaySound( "item.dropped" );
 		}
 
 		[Event.Tick.Server]

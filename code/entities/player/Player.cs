@@ -706,6 +706,8 @@ namespace Facepunch.CoreWars
 						entity.SetItem( item );
 						entity.ApplyLocalImpulse( Input.Rotation.Forward * 100f + Vector3.Up * 50f );
 					}
+
+					PlaySound( "item.dropped" );
 				}
 			}
 			else
