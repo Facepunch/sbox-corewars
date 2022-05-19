@@ -883,6 +883,7 @@ namespace Facepunch.CoreWars
 
 			if ( remaining == 0 )
 			{
+				PlaySound( "item.pickup" );
 				itemEntity.Take();
 			}
 		}
