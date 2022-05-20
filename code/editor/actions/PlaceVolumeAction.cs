@@ -21,7 +21,7 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void Perform()
 		{
-			var volume = Library.Create<IVolumeEntity>( Attribute.Name );
+			var volume = TypeLibrary.Create<IVolumeEntity>( Attribute.Name );
 
 			volume.Position = Mins;
 			volume.SetVolume( Mins, Maxs );

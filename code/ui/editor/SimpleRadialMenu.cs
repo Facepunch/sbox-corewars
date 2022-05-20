@@ -38,13 +38,13 @@ namespace Facepunch.CoreWars.Editor
 			Populate();
 		}
 
-		public void AddTool( EditorToolAttribute attribute )
+		public void AddTool( TypeDescription type )
 		{
 			var item = ItemContainer.AddChild<RadialMenuItem>();
-			item.Title = attribute.Title;
-			item.Description = attribute.Description;
-			item.SetIcon( attribute.Icon );
-			item.OnSelected = () => EditorPlayer.ChangeToolTo( attribute.Identifier );
+			item.Title = type.Title;
+			item.Description = type.Description;
+			item.SetIcon( type.Icon );
+			item.OnSelected = () => EditorPlayer.ChangeToolTo( type.Identity );
 			Items.Add( item );
 		}
 
@@ -103,7 +103,7 @@ namespace Facepunch.CoreWars.Editor
 				Dot.Style.Left = Length.Pixels( lx * ScaleFromScreen );
 				Dot.Style.Top = Length.Pixels( ly * ScaleFromScreen );
 
-				if ( Hovered != null && builder.Down( InputButton.Attack1 ) )
+				if ( Hovered != null && builder.Down( InputButton.PrimaryAttack ) )
 				{
 					Hovered.OnSelected?.Invoke();
 					LastCloseTime = 0f;
@@ -115,8 +115,8 @@ namespace Facepunch.CoreWars.Editor
 
 			if ( IsOpen || LastCloseTime < 0.1f )
 			{
-				builder.ClearButton( InputButton.Attack1 );
-				builder.ClearButton( InputButton.Attack2 );
+				builder.ClearButton( InputButton.PrimaryAttack );
+				builder.ClearButton( InputButton.SecondaryAttack );
 			}
 		}
 

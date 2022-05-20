@@ -56,7 +56,7 @@ namespace Facepunch.CoreWars
 		public TimeSince TimeSinceMeleeAttack { get; set; }
 
 		public float ChargeAttackEndTime { get; private set; }
-		public AnimEntity AnimationOwner => Owner as AnimEntity;
+		public AnimatedEntity AnimationOwner => Owner as AnimatedEntity;
 
 		public WeaponItem WeaponItem => Item.Instance as WeaponItem;
 
@@ -378,11 +378,6 @@ namespace Facepunch.CoreWars
 		public override void CreateHudElements()
 		{
 			if ( Local.Hud == null ) return;
-
-			/*
-			CrosshairPanel = Local.Hud.AddChild<Crosshair>();
-			CrosshairPanel.AddClass( CrosshairClass );
-			*/
 		}
 
 		public bool IsUsable()
@@ -428,13 +423,7 @@ namespace Facepunch.CoreWars
 				CreateMuzzleFlash();
 			}
 
-			if ( IsLocalPawn )
-			{
-				_ = new Sandbox.ScreenShake.Perlin();
-			}
-
 			ViewModelEntity?.SetAnimParameter( "fire", true );
-			CrosshairPanel?.CreateEvent( "fire" );
 		}
 
 		protected virtual void OnWeaponItemChanged()

@@ -8,7 +8,7 @@ namespace Facepunch.CoreWars
 	[UseTemplate]
 	public partial class Hud : RootPanel
 	{
-		[ServerCmd]
+		[ConCmd.Server]
 		public static void TestToastCmd( string text )
 		{
 			Toast( To.Everyone, text, "textures/items/crystal.png" );

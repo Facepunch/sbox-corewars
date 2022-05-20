@@ -15,11 +15,11 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void Populate()
 		{
-			var available = Library.GetAttributes<EditorToolAttribute>();
+			var available = TypeLibrary.GetTypes<EditorTool>();
 
-			foreach ( var attribute in available )
+			foreach ( var type in available )
 			{
-				AddTool( attribute );
+				AddTool( TypeLibrary.GetDescription( type ) );
 			}
 
 			AddAction( "Block List", "View available blocks", "textures/ui/blocklist.png", () => EditorBlockList.Open() );

@@ -40,7 +40,7 @@ namespace Facepunch.CoreWars.Editor
 				false
 			);
 
-			DebugOverlay.Text( sourceBBox.Center, $"Edit {block.FriendlyName}", Color.Cyan, Time.Delta );
+			DebugOverlay.Text( $"Edit {block.FriendlyName}", sourceBBox.Center, Color.Cyan, Time.Delta );
 		}
 
 		protected override void OnPrimary( Client client )

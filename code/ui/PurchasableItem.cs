@@ -34,7 +34,7 @@ namespace Facepunch.CoreWars
 
 				foreach ( var kv in item.Costs )
 				{
-					var itemType = Library.Create<ResourceItem>( kv.Key );
+					var itemType = TypeLibrary.Create<ResourceItem>( kv.Key );
 					if ( itemType == null ) continue;
 
 					var itemCost = kv.Value;

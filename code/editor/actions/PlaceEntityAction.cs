@@ -21,7 +21,7 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void Perform()
 		{
-			var entity = Library.Create<ISourceEntity>( Attribute.Name );
+			var entity = TypeLibrary.Create<ISourceEntity>( Attribute.Name );
 			entity.Position = Position;
 			entity.Rotation = Rotation;
 

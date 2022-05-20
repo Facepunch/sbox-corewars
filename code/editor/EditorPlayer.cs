@@ -64,14 +64,14 @@ namespace Facepunch.CoreWars.Editor
 			client.Pawn = this;
 		}
 
-		[ServerCmd]
+		[ConCmd.Server]
 		public static void ChangeToolTo( int libraryId )
 		{
 			if ( ConsoleSystem.Caller.Pawn is EditorPlayer player )
 			{
 				if ( !player.Tools.TryGetValue( libraryId, out var tool ) )
 				{
-					tool = Library.TryCreate<EditorTool>( libraryId );
+					tool = TypeLibrary.Create<EditorTool>( libraryId );
 					player.Tools[libraryId] = tool;
 				}
 
@@ -79,7 +79,7 @@ namespace Facepunch.CoreWars.Editor
 			}
 		}
 
-		[ServerCmd]
+		[ConCmd.Server]
 		public static void SetHotbarBlockId( int slot, int blockId )
 		{
 			var client = ConsoleSystem.Caller;
@@ -261,21 +261,6 @@ namespace Facepunch.CoreWars.Editor
 			if ( !VoxelWorld.Current.IsValid() ) return;
 
 			var currentMap = VoxelWorld.Current;
-
-			if ( IsClient && currentMap.IsValid() )
-			{
-				var position = currentMap.ToVoxelPosition( Input.Position );
-				var voxel = currentMap.GetVoxel( position );
-
-				if ( voxel.IsValid )
-				{
-					DebugOverlay.ScreenText( 2, $"Sunlight Level: {voxel.GetSunLight()}", 0.1f );
-					DebugOverlay.ScreenText( 3, $"Torch Level: ({voxel.GetRedTorchLight()}, {voxel.GetGreenTorchLight()}, {voxel.GetBlueTorchLight()})", 0.1f );
-					DebugOverlay.ScreenText( 4, $"Chunk: {voxel.Chunk.Offset}", 0.1f );
-					DebugOverlay.ScreenText( 5, $"Position: {position}", 0.1f );
-					DebugOverlay.ScreenText( 6, $"Biome: {VoxelWorld.Current.GetBiomeAt( position.x, position.y ).Name}", 0.1f );
-				}
-			}
 
 			if ( Prediction.FirstTime )
 			{

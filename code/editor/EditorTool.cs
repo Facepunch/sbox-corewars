@@ -15,12 +15,12 @@ namespace Facepunch.CoreWars.Editor
 
 		public virtual void Simulate( Client client )
 		{
-			if ( Input.Pressed( InputButton.Attack1 ) )
+			if ( Input.Pressed( InputButton.PrimaryAttack ) )
 			{
 				OnPrimary( client );
 			}
 
-			if ( Input.Pressed( InputButton.Attack2 ) )
+			if ( Input.Pressed( InputButton.SecondaryAttack ) )
 			{
 				OnSecondary( client );
 			}

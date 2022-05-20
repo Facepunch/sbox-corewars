@@ -127,7 +127,7 @@ namespace Facepunch.CoreWars.Editor
 				{
 					var localPosition = entity.Position - sourceMins;
 					var newPosition = targetMins + localPosition;
-					var newEntity = Library.Create<ISourceEntity>( entity.GetType() );
+					var newEntity = TypeLibrary.Create<ISourceEntity>( entity.GetType() );
 
 					newEntity.Position = newPosition;
 					newEntity.Rotation = entity.Rotation;

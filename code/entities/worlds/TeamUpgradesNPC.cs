@@ -8,7 +8,7 @@ using System.IO;
 namespace Facepunch.CoreWars
 {
 	[EditorEntity( Title = "Team Upgrades NPC", Group = "Gameplay", EditorModel = "models/citizen/citizen.vmdl" )]
-	public partial class TeamUpgradesNPC : AnimEntity, ISourceEntity, IUsable, INameplate
+	public partial class TeamUpgradesNPC : AnimatedEntity, ISourceEntity, IUsable, INameplate
 	{
 		[EditorProperty] public Team Team { get; set; }
 
@@ -36,12 +36,12 @@ namespace Facepunch.CoreWars
 
 			Upgrades = new List<BaseTeamUpgrade>();
 
-			var types = Library.GetAll<BaseTeamUpgrade>();
+			var types = TypeLibrary.GetTypes<BaseTeamUpgrade>();
 
 			foreach ( var type in types )
 			{
 				if ( type.IsAbstract || type.IsGenericType ) continue;
-				var upgrade = Library.Create<BaseTeamUpgrade>( type );
+				var upgrade = TypeLibrary.Create<BaseTeamUpgrade>( type );
 				Upgrades.Add( upgrade );
 			}
 

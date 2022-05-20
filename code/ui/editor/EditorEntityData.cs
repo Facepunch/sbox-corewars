@@ -31,13 +31,13 @@ namespace Facepunch.CoreWars.Editor
 			return convertedValue;
 		}
 
-		[ServerCmd]
+		[ConCmd.Server]
 		public static void SaveEntityKeyValue( int entityId, string key, string value )
 		{
 			var entity = Sandbox.Entity.FindByIndex( entityId );
 			if ( !entity.IsValid() ) return;
 
-			var properties = Reflection.GetProperties( entity );
+			var properties = TypeLibrary.GetProperties( entity );
 
 			foreach ( var property in properties )
 			{
@@ -53,7 +53,7 @@ namespace Facepunch.CoreWars.Editor
 			}
 		}
 
-		[ServerCmd( "cw_open_entity_data" )]
+		[ConCmd.Server( "cw_open_entity_data" )]
 		public static void SendOpenRequest( int entityId )
 		{
 			var entity = Sandbox.Entity.FindByIndex( entityId );
@@ -63,7 +63,7 @@ namespace Facepunch.CoreWars.Editor
 			{
 				using ( var writer = new BinaryWriter( stream ) )
 				{
-					var properties = Reflection.GetProperties( entity )
+					var properties = TypeLibrary.GetProperties( entity )
 						.Where( property => property.GetCustomAttribute<EditorPropertyAttribute>() != null );
 
 					writer.Write( properties.Count() );
@@ -91,7 +91,7 @@ namespace Facepunch.CoreWars.Editor
 				using ( var reader = new BinaryReader( stream ) )
 				{
 					var propertyCount = reader.ReadInt32();
-					var properties = Reflection.GetProperties( entity );
+					var properties = TypeLibrary.GetProperties( entity );
 
 					for ( var i = 0; i < propertyCount; i++ )
 					{
@@ -135,7 +135,7 @@ namespace Facepunch.CoreWars.Editor
 
 			ChangedValues.Clear();
 
-			var properties = Reflection.GetProperties( Entity );
+			var properties = TypeLibrary.GetProperties( Entity );
 
 			for ( int i = 0; i < properties.Length; i++ )
 			{

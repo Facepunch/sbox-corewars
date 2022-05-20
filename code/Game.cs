@@ -71,7 +71,7 @@ namespace Facepunch.CoreWars
 			base.ClientSpawn();
 		}
 
-		[ServerCmd( "cw_editor_save" )]
+		[ConCmd.Server( "cw_editor_save" )]
 		public static void SaveEditorMapCmd( string fileName )
 		{
 			if ( !fileName.StartsWith( "worlds/" ) )
@@ -89,7 +89,7 @@ namespace Facepunch.CoreWars
 			state.CurrentFileName = fileName;
 		}
 
-		[ServerCmd( "cw_editor_load" )]
+		[ConCmd.Server( "cw_editor_load" )]
 		public static void LoadEditorMapCmd( string fileName )
 		{
 			_ = LoadEditorMapTask( fileName );

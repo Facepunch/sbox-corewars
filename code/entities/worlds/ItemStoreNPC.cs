@@ -8,7 +8,7 @@ using System.IO;
 namespace Facepunch.CoreWars
 {
 	[EditorEntity( Title = "Item Store NPC", Group = "Gameplay", EditorModel = "models/citizen/citizen.vmdl" )]
-	public partial class ItemStoreNPC : AnimEntity, ISourceEntity, IUsable, INameplate
+	public partial class ItemStoreNPC : AnimatedEntity, ISourceEntity, IUsable, INameplate
 	{
 		[EditorProperty] public Team Team { get; set; }
 
@@ -36,12 +36,12 @@ namespace Facepunch.CoreWars
 
 			Items = new List<BaseShopItem>();
 
-			var types = Library.GetAll<BaseShopItem>();
+			var types = TypeLibrary.GetTypes<BaseShopItem>();
 
 			foreach ( var type in types )
 			{
 				if ( type.IsAbstract || type.IsGenericType ) continue;
-				var item = Library.Create<BaseShopItem>( type );
+				var item = TypeLibrary.Create<BaseShopItem>( type );
 				Items.Add( item );
 			}
 

@@ -52,7 +52,7 @@ namespace Facepunch.CoreWars
 			Projectiles = new( this );
 		}
 
-		[ServerCmd]
+		[ConCmd.Server]
 		public static void UseEntityCmd( int index )
 		{
 			if ( ConsoleSystem.Caller.Pawn is not Player player )
@@ -69,7 +69,7 @@ namespace Facepunch.CoreWars
 			}
 		}
 
-		[ServerCmd]
+		[ConCmd.Server]
 		public static void BuyUpgradeCmd( int index, string type )
 		{
 			if ( ConsoleSystem.Caller.Pawn is not Player player )
@@ -92,7 +92,7 @@ namespace Facepunch.CoreWars
 			item.OnPurchased( player );
 		}
 
-		[ServerCmd]
+		[ConCmd.Server]
 		public static void BuyItemCmd( int index, string type )
 		{
 			if ( ConsoleSystem.Caller.Pawn is not Player player )
@@ -664,7 +664,7 @@ namespace Facepunch.CoreWars
 
 			if ( IsServer )
 			{
-				if ( Input.Down( InputButton.Attack1 ) && NextBlockPlace )
+				if ( Input.Down( InputButton.PrimaryAttack ) && NextBlockPlace )
 				{
 					var container = HotbarInventory.Instance;
 					var item = container.GetFromSlot( CurrentHotbarIndex );
@@ -982,7 +982,7 @@ namespace Facepunch.CoreWars
 				{
 					try
 					{
-						weapon.Weapon = Library.Create<Weapon>( weapon.WeaponName );
+						weapon.Weapon = TypeLibrary.Create<Weapon>( weapon.WeaponName );
 						weapon.Weapon.SetWeaponItem( weapon );
 						weapon.Weapon.OnCarryStart( this );
 						weapon.IsDirty = true;

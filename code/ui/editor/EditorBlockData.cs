@@ -31,7 +31,7 @@ namespace Facepunch.CoreWars.Editor
 			return convertedValue;
 		}
 
-		[ServerCmd]
+		[ConCmd.Server]
 		public static void SaveBlockDataValue( int x, int y, int z, string key, string value )
 		{
 			var world = VoxelWorld.Current;
@@ -39,8 +39,7 @@ namespace Facepunch.CoreWars.Editor
 
 			var voxel = world.GetVoxel( x, y, z );
 			var state = world.GetOrCreateState<BlockState>( voxel.Position );
-
-			var properties = Reflection.GetProperties( state );
+			var properties = TypeLibrary.GetProperties( state );
 
 			foreach ( var property in properties )
 			{
@@ -52,7 +51,7 @@ namespace Facepunch.CoreWars.Editor
 			state.IsDirty = true;
 		}
 
-		[ServerCmd( "cw_open_block_data" )]
+		[ConCmd.Server( "cw_open_block_data" )]
 		public static void SendOpenRequest( int x, int y, int z )
 		{
 			var world = VoxelWorld.Current;
@@ -65,7 +64,7 @@ namespace Facepunch.CoreWars.Editor
 			{
 				using ( var writer = new BinaryWriter( stream ) )
 				{
-					var properties = Reflection.GetProperties( state )
+					var properties = TypeLibrary.GetProperties( state )
 						.Where( property => property.GetCustomAttribute<EditorPropertyAttribute>() != null );
 
 					writer.Write( properties.Count() );
@@ -96,7 +95,7 @@ namespace Facepunch.CoreWars.Editor
 				using ( var reader = new BinaryReader( stream ) )
 				{
 					var propertyCount = reader.ReadInt32();
-					var properties = Reflection.GetProperties( state );
+					var properties = TypeLibrary.GetProperties( state );
 
 					for ( var i = 0; i < propertyCount; i++ )
 					{
@@ -142,7 +141,7 @@ namespace Facepunch.CoreWars.Editor
 
 			ChangedValues.Clear();
 
-			var properties = Reflection.GetProperties( State );
+			var properties = TypeLibrary.GetProperties( State );
 
 			for ( int i = 0; i < properties.Length; i++ )
 			{

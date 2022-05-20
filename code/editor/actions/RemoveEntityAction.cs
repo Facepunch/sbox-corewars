@@ -1,6 +1,7 @@
 ﻿using Facepunch.Voxels;
 using Sandbox;
 using System.IO;
+using System;
 
 namespace Facepunch.CoreWars.Editor
 {
@@ -8,14 +9,14 @@ namespace Facepunch.CoreWars.Editor
 	{
 		public override string Name => "Remove Entity";
 
-		private EditorEntityAttribute Attribute { get; set; }
+		private Type EntityType { get; set; }
 		private Transform Transform { get; set; }
 		private byte[] Data { get; set; }
 		private int EntityId { get; set; }
 
 		public void Initialize( ISourceEntity entity )
 		{
-			Attribute = Library.GetAttribute( entity.GetType() ) as EditorEntityAttribute;
+			EntityType = entity.GetType();
 
 			if ( FindObjectId( entity, out var id ) )
 				EntityId = id;
@@ -53,7 +54,7 @@ namespace Facepunch.CoreWars.Editor
 			{
 				using ( var reader = new BinaryReader( stream ) )
 				{
-					var entity = Library.Create<ISourceEntity>( Attribute.Name );
+					var entity = TypeLibrary.Create<ISourceEntity>( EntityType );
 					entity.Transform = Transform;
 					entity.Deserialize( reader );
 					UpdateObject( EntityId, entity );

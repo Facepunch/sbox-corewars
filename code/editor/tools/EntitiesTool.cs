@@ -16,8 +16,8 @@ namespace Facepunch.CoreWars.Editor
 	[EditorTool( Title = "Entities", Description = "Add or manipulate entities", Icon = "textures/ui/tools/entities.png" )]
 	public partial class EntitiesTool : EditorTool
 	{
-		[ServerCmd]
-		public static void ChangeLibraryAttributeCmd( string type )
+		[ConCmd.Server]
+		public static void ChangeLibraryAttributeCmd( string typeName )
 		{
 			if ( ConsoleSystem.Caller.Pawn is not EditorPlayer player )
 				return;
@@ -25,10 +25,11 @@ namespace Facepunch.CoreWars.Editor
 			if ( player.Tool is not EntitiesTool tool )
 				return;
 
-			tool.SetAttribute( (EditorEntityAttribute)Library.GetAttribute( type ) );
+			var type = TypeLibrary.GetTypeByName( typeName );
+			tool.SetAttribute( TypeLibrary.GetAttribute<EditorEntityAttribute>( type ) );
 		}
 
-		[ServerCmd]
+		[ConCmd.Server]
 		public static void ChangeModeCmd( int mode )
 		{
 			if ( ConsoleSystem.Caller.Pawn is not EditorPlayer player )
@@ -114,7 +115,7 @@ namespace Facepunch.CoreWars.Editor
 			{
 				if ( string.IsNullOrEmpty( CurrentType ) )
 				{
-					var attribute = Library.GetAttributes<EditorEntityAttribute>().FirstOrDefault();
+					var attribute = TypeLibrary.GetAttributes<EditorEntityAttribute>().FirstOrDefault();
 					SetAttribute( attribute );
 				}
 
@@ -152,9 +153,10 @@ namespace Facepunch.CoreWars.Editor
 			CreateMoveGhostEntity();
 		}
 
-		protected virtual void OnTypeChanged( string type )
+		protected virtual void OnTypeChanged( string typeName )
 		{
-			CurrentAttribute = (EditorEntityAttribute)Library.GetAttribute( type );
+			var type = TypeLibrary.GetTypeByName( typeName );
+			CurrentAttribute = TypeLibrary.GetAttribute<EditorEntityAttribute>( type );
 			OnAttributeChanged( CurrentAttribute );
 		}
 
@@ -194,13 +196,13 @@ namespace Facepunch.CoreWars.Editor
 				DebugOverlay.Box( worldBounds.Mins, worldBounds.Maxs, outlineColor, Time.Delta, false );
 
 				if ( Mode == EntitiesToolMode.Remove )
-					DebugOverlay.Text( trace.EndPosition, $"Delete {entityType.Name}", Color.Red, Time.Delta );
+					DebugOverlay.Text( $"Delete {entityType.Name}", trace.EndPosition, Color.Red, Time.Delta );
 				else if ( Mode == EntitiesToolMode.DataEditor )
-					DebugOverlay.Text( trace.EndPosition, $"Edit {entityType.Name}", Color.Cyan, Time.Delta );
+					DebugOverlay.Text( $"Edit {entityType.Name}", trace.EndPosition, Color.Cyan, Time.Delta );
 				else if ( Mode == EntitiesToolMode.MoveAndRotate )
-					DebugOverlay.Text( trace.EndPosition, $"Move {entityType.Name}", Color.Yellow, Time.Delta );
+					DebugOverlay.Text( $"Move {entityType.Name}", trace.EndPosition, Color.Yellow, Time.Delta );
 				else
-					DebugOverlay.Text( trace.EndPosition, entityType.Name, Time.Delta );
+					DebugOverlay.Text( entityType.Name, trace.EndPosition, Time.Delta );
 			}
 		}
 

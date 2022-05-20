@@ -34,7 +34,7 @@ namespace Facepunch.CoreWars.Editor
 		{
 			Container.DeleteChildren();
 
-			var attributes = Library.GetAttributes<EditorEntityAttribute>().ToList();
+			var attributes = TypeLibrary.GetAttributes<EditorEntityAttribute>().ToList();
 			var categories = new Dictionary<string, List<EditorEntityAttribute>>();
 
 			for ( int i = 0; i < attributes.Count; i++ )
