@@ -13,7 +13,8 @@ namespace Facepunch.CoreWars.Editor
 		DataEditor
 	}
 
-	[EditorTool( Title = "Entities", Description = "Add or manipulate entities", Icon = "textures/ui/tools/entities.png" )]
+	[EditorTool( Title = "Entities", Description = "Add or manipulate entities" )]
+	[Icon( "textures/ui/tools/entities.png" )]
 	public partial class EntitiesTool : EditorTool
 	{
 		[ConCmd.Server]

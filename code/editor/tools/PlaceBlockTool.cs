@@ -4,7 +4,8 @@ using Sandbox;
 
 namespace Facepunch.CoreWars.Editor
 {
-	[EditorTool( Title = "Place Block", Description = "Place a block", Icon = "textures/ui/tools/placeblock.png" )]
+	[EditorTool( Title = "Place Block", Description = "Place a block" )]
+	[Icon( "textures/ui/tools/placeblock.png" )]
 	public class PlaceBlockTool : EditorTool
 	{
 		private EditorBlockGhost BlockGhost { get; set; }

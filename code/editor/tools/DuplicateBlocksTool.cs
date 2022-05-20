@@ -4,7 +4,8 @@ using Sandbox;
 
 namespace Facepunch.CoreWars.Editor
 {
-	[EditorTool( Title = "Duplicate Blocks", Description = "Duplicate an area of blocks", Icon = "textures/ui/tools/duplicateblocks.png" )]
+	[EditorTool( Title = "Duplicate Blocks", Description = "Duplicate an area of blocks" )]
+	[Icon( "textures/ui/tools/duplicateblocks.png" )]
 	public partial class DuplicateBlocksTool : EditorTool
 	{
 		public enum DuplicateStage
