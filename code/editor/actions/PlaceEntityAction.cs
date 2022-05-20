@@ -7,21 +7,21 @@ namespace Facepunch.CoreWars.Editor
 	{
 		public override string Name => "Place Entity";
 
-		private EditorEntityAttribute Attribute { get; set; }
+		private TypeDescription EntityType { get; set; }
 		private Vector3 Position { get; set; }
 		private Rotation Rotation { get; set; }
 		private int EntityId { get; set; }
 
-		public void Initialize( EditorEntityAttribute attribute, Vector3 position, Rotation rotation )
+		public void Initialize( TypeDescription type, Vector3 position, Rotation rotation )
 		{
-			Attribute = attribute;
+			EntityType = type;
 			Position = position;
 			Rotation = rotation;
 		}
 
 		public override void Perform()
 		{
-			var entity = TypeLibrary.Create<ISourceEntity>( Attribute.Name );
+			var entity = TypeLibrary.Create<ISourceEntity>( EntityType.Identity );
 			entity.Position = Position;
 			entity.Rotation = Rotation;
 

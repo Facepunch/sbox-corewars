@@ -5,10 +5,12 @@ using Sandbox;
 using System;
 using System.IO;
 using System.Linq;
+using System.ComponentModel;
 
 namespace Facepunch.CoreWars
 {
-	[EditorEntity( Title = "Team Generator", Group = "Generators", EditorModel = "models/gameplay/resource_pool/resource_pool.vmdl" )]
+	[EditorEntity( Title = "Team Generator", EditorModel = "models/gameplay/resource_pool/resource_pool.vmdl" )]
+	[Category( "Generators" )]
 	public partial class TeamGenerator : BaseGenerator
 	{
 		[EditorProperty, Net] public Team Team { get; set; }

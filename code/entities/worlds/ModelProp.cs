@@ -4,10 +4,12 @@ using Facepunch.Voxels;
 using Sandbox;
 using System;
 using System.IO;
+using System.ComponentModel;
 
 namespace Facepunch.CoreWars
 {
-	[EditorEntity( Title = "Model Prop", Group = "Scenery", EditorModel = "models/citizen_props/crate01.vmdl" )]
+	[EditorEntity( Title = "Model Prop", EditorModel = "models/citizen_props/crate01.vmdl" )]
+	[Category( "Scenery" )]
 	public partial class ModelProp : ModelEntity, ISourceEntity, IEditorCallbacks
 	{
 		[EditorProperty] public string ModelPath { get; set; } = "models/citizen_props/crate01.vmdl";

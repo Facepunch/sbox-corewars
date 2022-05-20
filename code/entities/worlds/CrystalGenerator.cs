@@ -5,10 +5,12 @@ using Sandbox;
 using System;
 using System.IO;
 using System.Linq;
+using System.ComponentModel;
 
 namespace Facepunch.CoreWars
 {
-	[EditorEntity( Title = "Crystal Generator", Group = "Generators", EditorModel = "models/gameplay/resource_pool/resource_pool_crystal.vmdl" )]
+	[EditorEntity( Title = "Crystal Generator", EditorModel = "models/gameplay/resource_pool/resource_pool_crystal.vmdl" )]
+	[Category( "Generators" )]
 	public class CrystalGenerator : BaseGenerator, ISourceEntity
 	{
 		private Particles Effect { get; set; }

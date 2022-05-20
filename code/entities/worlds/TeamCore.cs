@@ -5,10 +5,12 @@ using Sandbox;
 using System;
 using System.IO;
 using System.Linq;
+using System.ComponentModel;
 
 namespace Facepunch.CoreWars
 {
-	[EditorEntity( Title = "Team Core", Group = "Team Entities", EditorModel = "models/gameplay/base_core/base_core.vmdl" )]
+	[EditorEntity( Title = "Team Core", EditorModel = "models/gameplay/base_core/base_core.vmdl" )]
+	[Category( "Team Entities" )]
 	public partial class TeamCore : ModelEntity, ISourceEntity, IResettable
 	{
 		[EditorProperty, Net] public Team Team { get; set; }

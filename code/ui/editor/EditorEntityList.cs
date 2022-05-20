@@ -34,21 +34,21 @@ namespace Facepunch.CoreWars.Editor
 		{
 			Container.DeleteChildren();
 
-			var attributes = TypeLibrary.GetAttributes<EditorEntityAttribute>().ToList();
-			var categories = new Dictionary<string, List<EditorEntityAttribute>>();
+			var descriptions = TypeLibrary.GetDescriptions<Entity>().Where( d => d.GetAttribute<EditorEntityAttribute>() != null ).ToList();
+			var categories = new Dictionary<string, List<TypeDescription>>();
 
-			for ( int i = 0; i < attributes.Count; i++ )
+			for ( int i = 0; i < descriptions.Count; i++ )
 			{
-				var attribute = attributes[i];
-				var group = string.IsNullOrEmpty( attribute.Group ) ? "Other" : attribute.Group;
+				var description = descriptions[i];
+				var group = string.IsNullOrEmpty( description.Group ) ? "Other" : description.Group;
 				
 				if ( !categories.TryGetValue( group, out var list ) )
 				{
-					list = new List<EditorEntityAttribute>();
+					list = new List<TypeDescription>();
 					categories.Add( group, list );
 				}
 
-				list.Add( attribute );
+				list.Add( description );
 			}
 
 			foreach ( var kv in categories )
@@ -60,17 +60,17 @@ namespace Facepunch.CoreWars.Editor
 
 				for ( int i = 0; i < values.Count; i++ )
 				{
-					var attribute = values[i];
-					var button = container.Add.Button( attribute.Title );
+					var description = values[i];
+					var button = container.Add.Button( description.Title );
 					button.AddClass( "editor-button" );
-					button.AddEventListener( "onclick", () => OnItemSelected( attribute ) );
+					button.AddEventListener( "onclick", () => OnItemSelected( description ) );
 				}
 			}
 		}
 
-		protected virtual void OnItemSelected( EditorEntityAttribute attribute )
+		protected virtual void OnItemSelected( TypeDescription description )
 		{
-			EntitiesTool.ChangeLibraryAttributeCmd( attribute.Name );
+			EntitiesTool.ChangeEntityToolCmd( description.ClassName );
 			Delete();
 		}
 

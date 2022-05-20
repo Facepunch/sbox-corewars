@@ -4,10 +4,12 @@ using Facepunch.Voxels;
 using Sandbox;
 using System;
 using System.IO;
+using System.ComponentModel;
 
 namespace Facepunch.CoreWars
 {
-	[EditorEntity( Title = "Item Store NPC", Group = "Gameplay", EditorModel = "models/citizen/citizen.vmdl" )]
+	[EditorEntity( Title = "Item Store NPC", EditorModel = "models/citizen/citizen.vmdl" )]
+	[Category( "Gameplay" )]
 	public partial class ItemStoreNPC : AnimatedEntity, ISourceEntity, IUsable, INameplate
 	{
 		[EditorProperty] public Team Team { get; set; }

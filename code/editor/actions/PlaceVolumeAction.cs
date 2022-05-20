@@ -7,21 +7,21 @@ namespace Facepunch.CoreWars.Editor
 	{
 		public override string Name => "Place Volume";
 
-		private EditorEntityAttribute Attribute { get; set; }
+		private TypeDescription EntityType { get; set; }
 		private Vector3 Mins { get; set; }
 		private Vector3 Maxs { get; set; }
 		private int EntityId  { get; set; }
 
-		public void Initialize( EditorEntityAttribute attribute, Vector3 mins, Vector3 maxs )
+		public void Initialize( TypeDescription type, Vector3 mins, Vector3 maxs )
 		{
-			Attribute = attribute;
+			EntityType = type;
 			Mins = mins;
 			Maxs = maxs;
 		}
 
 		public override void Perform()
 		{
-			var volume = TypeLibrary.Create<IVolumeEntity>( Attribute.Name );
+			var volume = TypeLibrary.Create<IVolumeEntity>( EntityType.Identity );
 
 			volume.Position = Mins;
 			volume.SetVolume( Mins, Maxs );

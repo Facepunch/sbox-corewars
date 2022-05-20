@@ -18,7 +18,7 @@ namespace Facepunch.CoreWars.Editor
 	public partial class EntitiesTool : EditorTool
 	{
 		[ConCmd.Server]
-		public static void ChangeLibraryAttributeCmd( string typeName )
+		public static void ChangeEntityToolCmd( string typeName )
 		{
 			if ( ConsoleSystem.Caller.Pawn is not EditorPlayer player )
 				return;
@@ -27,7 +27,7 @@ namespace Facepunch.CoreWars.Editor
 				return;
 
 			var type = TypeLibrary.GetTypeByName( typeName );
-			tool.SetAttribute( TypeLibrary.GetAttribute<EditorEntityAttribute>( type ) );
+			tool.SetTypeDescription( TypeLibrary.GetDescription( type ) );
 		}
 
 		[ConCmd.Server]
@@ -47,21 +47,23 @@ namespace Facepunch.CoreWars.Editor
 		[Net, Change( nameof( OnEntityChanged ) )] public ModelEntity SelectedEntity { get; private set; }
 		[Net] public Rotation CurrentRotation { get; private set; }
 
+		private TypeDescription CurrentTypeDescription { get; set; }
 		private EditorEntityAttribute CurrentAttribute { get; set; }
 		private VolumeEntity Volume { get; set; }
 		private ModelEntity GhostEntity { get; set; }
 		private TimeUntil NextActionTime { get; set; }
 		private Vector3? StartPosition { get; set; }
 
-		public void SetAttribute( EditorEntityAttribute attribute )
+		public void SetTypeDescription( TypeDescription description )
 		{
 			Host.AssertServer();
 
-			if ( CurrentType != attribute.Name )
+			if ( CurrentType != description.ClassName )
 			{
-				CurrentType = attribute.Name;
-				CurrentAttribute = attribute;
-				OnAttributeChanged( CurrentAttribute );
+				CurrentType = description.ClassName;
+				CurrentAttribute = description.GetAttribute<EditorEntityAttribute>();
+				CurrentTypeDescription = description;
+				OnTypeDescriptionChanged( description );
 			}
 		}
 
@@ -80,7 +82,7 @@ namespace Facepunch.CoreWars.Editor
 		{
 			var currentMap = VoxelWorld.Current;
 
-			if ( IsClient && currentMap.IsValid() )
+			if ( IsClient && currentMap.IsValid() && CurrentAttribute != null )
 			{
 				var aimVoxelPosition = GetAimVoxelPosition( 4f );
 
@@ -116,8 +118,8 @@ namespace Facepunch.CoreWars.Editor
 			{
 				if ( string.IsNullOrEmpty( CurrentType ) )
 				{
-					var attribute = TypeLibrary.GetAttributes<EditorEntityAttribute>().FirstOrDefault();
-					SetAttribute( attribute );
+					var description = TypeLibrary.GetDescriptions<Entity>().Where( d => d.GetAttribute<EditorEntityAttribute>() != null ).FirstOrDefault();
+					SetTypeDescription( description );
 				}
 
 				SetMode( EntitiesToolMode.Place );
@@ -158,10 +160,11 @@ namespace Facepunch.CoreWars.Editor
 		{
 			var type = TypeLibrary.GetTypeByName( typeName );
 			CurrentAttribute = TypeLibrary.GetAttribute<EditorEntityAttribute>( type );
-			OnAttributeChanged( CurrentAttribute );
+			CurrentTypeDescription = TypeLibrary.GetDescription( type );
+			OnTypeDescriptionChanged( CurrentTypeDescription );
 		}
 
-		protected virtual void OnAttributeChanged( EditorEntityAttribute attribute )
+		protected virtual void OnTypeDescriptionChanged( TypeDescription attribute )
 		{
 			if ( IsClient )
 			{
@@ -251,7 +254,7 @@ namespace Facepunch.CoreWars.Editor
 								);
 
 								var action = new PlaceVolumeAction();
-								action.Initialize( CurrentAttribute, bbox.Mins, bbox.Maxs );
+								action.Initialize( CurrentTypeDescription, bbox.Mins, bbox.Maxs );
 
 								Player.Perform( action );
 							}
@@ -271,7 +274,7 @@ namespace Facepunch.CoreWars.Editor
 						var aimSourcePosition = VoxelWorld.Current.ToSourcePositionCenter( aimVoxelPosition, shouldCenterOnXY, shouldCenterOnXY, false );
 
 						var action = new PlaceEntityAction();
-						action.Initialize( CurrentAttribute, aimSourcePosition, CurrentRotation );
+						action.Initialize( CurrentTypeDescription, aimSourcePosition, CurrentRotation );
 						Player.Perform( action );
 					}
 

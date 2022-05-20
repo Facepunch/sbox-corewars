@@ -3,10 +3,12 @@ using Sandbox;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.ComponentModel;
 
 namespace Facepunch.CoreWars
 {
-	[EditorEntity( Title = "Trigger Hurt", Group = "Triggers", IsVolume = true, VolumeMaterial = "materials/editor/trigger_hurt.vmat" )]
+	[EditorEntity( Title = "Trigger Hurt", IsVolume = true, VolumeMaterial = "materials/editor/trigger_hurt.vmat" )]
+	[Category( "Triggers" )]
 	public partial class TriggerHurt : BaseTrigger
 	{
 		[EditorProperty, Range( 1f, 100f, 1f )]

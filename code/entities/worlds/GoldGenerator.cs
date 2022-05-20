@@ -5,10 +5,12 @@ using Sandbox;
 using System;
 using System.IO;
 using System.Linq;
+using System.ComponentModel;
 
 namespace Facepunch.CoreWars
 {
-	[EditorEntity( Title = "Gold Generator", Group = "Generators", EditorModel = "models/gameplay/resource_pool/resource_pool_gold.vmdl" )]
+	[EditorEntity( Title = "Gold Generator",EditorModel = "models/gameplay/resource_pool/resource_pool_gold.vmdl" )]
+	[Category( "Generators" )]
 	public class GoldGenerator : BaseGenerator
 	{
 		private Particles Effect { get; set; }

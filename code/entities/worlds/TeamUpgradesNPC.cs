@@ -4,10 +4,12 @@ using Facepunch.Voxels;
 using Sandbox;
 using System;
 using System.IO;
+using System.ComponentModel;
 
 namespace Facepunch.CoreWars
 {
-	[EditorEntity( Title = "Team Upgrades NPC", Group = "Gameplay", EditorModel = "models/citizen/citizen.vmdl" )]
+	[EditorEntity( Title = "Team Upgrades NPC", EditorModel = "models/citizen/citizen.vmdl" )]
+	[Category( "Gameplay" )]
 	public partial class TeamUpgradesNPC : AnimatedEntity, ISourceEntity, IUsable, INameplate
 	{
 		[EditorProperty] public Team Team { get; set; }

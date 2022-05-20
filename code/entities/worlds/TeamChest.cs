@@ -4,10 +4,12 @@ using Facepunch.Voxels;
 using Sandbox;
 using System;
 using System.IO;
+using System.ComponentModel;
 
 namespace Facepunch.CoreWars
 {
-	[EditorEntity( Title = "Team Chest", Group = "Team Entities", EditorModel = "models/gameplay/team_chest/team_chest.vmdl" )]
+	[EditorEntity( Title = "Team Chest",  EditorModel = "models/gameplay/team_chest/team_chest.vmdl" )]
+	[Category( "Team Entities" )]
 	public partial class TeamChest : ModelEntity, ISourceEntity, IResettable, IUsable
 	{
 		public float MaxUseDistance => 300f;

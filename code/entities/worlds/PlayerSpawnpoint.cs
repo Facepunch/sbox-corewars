@@ -3,10 +3,12 @@ using Facepunch.Voxels;
 using Sandbox;
 using System;
 using System.IO;
+using System.ComponentModel;
 
 namespace Facepunch.CoreWars
 {
-	[EditorEntity( Title = "Player Spawnpoint", Group = "Gameplay", EditorModel = "models/editor/playerstart.vmdl" )]
+	[EditorEntity( Title = "Player Spawnpoint", EditorModel = "models/editor/playerstart.vmdl" )]
+	[Category( "Gameplay" )]
 	public class PlayerSpawnpoint : ModelEntity, ISourceEntity
 	{
 		[EditorProperty] public Team Team { get; set; }

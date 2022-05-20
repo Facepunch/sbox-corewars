@@ -3,7 +3,7 @@ using Sandbox;
 
 namespace Facepunch.CoreWars.Editor
 {
-	public partial class EditorTool : BaseNetworkable, IValid
+	public abstract partial class EditorTool : BaseNetworkable, IValid
 	{
 		public virtual string Name => "Tool";
 

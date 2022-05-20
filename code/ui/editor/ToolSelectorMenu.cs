@@ -19,7 +19,10 @@ namespace Facepunch.CoreWars.Editor
 
 			foreach ( var type in available )
 			{
-				AddTool( TypeLibrary.GetDescription( type ) );
+				if ( !type.IsAbstract )
+				{
+					AddTool( TypeLibrary.GetDescription( type ) );
+				}
 			}
 
 			AddAction( "Block List", "View available blocks", "textures/ui/blocklist.png", () => EditorBlockList.Open() );

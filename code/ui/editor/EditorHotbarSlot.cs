@@ -3,6 +3,7 @@ using Facepunch.Voxels;
 using Sandbox;
 using Sandbox.UI;
 using System.Linq;
+using System;
 
 namespace Facepunch.CoreWars.Editor
 {
@@ -24,9 +25,12 @@ namespace Facepunch.CoreWars.Editor
 
 			if ( !string.IsNullOrEmpty( icon ) )
 			{
-				Style.SetBackgroundImage( icon );
-				Style.BackgroundSizeX = Length.Cover;
-				Style.BackgroundSizeY = Length.Cover;
+				if ( FileSystem.Mounted.FileExists( icon ) )
+				{
+					Style.SetBackgroundImage( icon );
+					Style.BackgroundSizeX = Length.Cover;
+					Style.BackgroundSizeY = Length.Cover;
+				}
 			}
 			else
 			{
