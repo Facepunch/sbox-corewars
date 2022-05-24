@@ -624,9 +624,6 @@ namespace Facepunch.CoreWars
 		{
 			if ( info.Attacker is Player attacker )
 			{
-				var hitboxGroup = GetHitboxGroup( info.HitboxIndex );
-				attacker.ShowHitMarker( To.Single( attacker ), hitboxGroup );
-
 				if ( Team != Team.None && attacker.Team == Team )
 					return;
 
@@ -652,9 +649,15 @@ namespace Facepunch.CoreWars
 						info.Damage *= 0.8f;
 				}
 
-				var particles = Particles.Create( "particles/gameplay/player/taken_damage/taken_damage.vpcf", this );
-				particles.SetPosition( 0, info.Position );
-				particles.SetForward( 0, info.Force.Normal * -1f );
+				using ( Prediction.Off() )
+				{
+					var particles = Particles.Create( "particles/gameplay/player/taken_damage/taken_damage.vpcf", this );
+					particles.SetPosition( 0, info.Position );
+					particles.SetForward( 0, info.Force.Normal * -1f );
+				}
+
+				var hitboxGroup = GetHitboxGroup( info.HitboxIndex );
+				attacker.ShowHitMarker( To.Single( attacker ), hitboxGroup );
 			}
 
 			LastDamageTaken = info;
@@ -828,15 +831,6 @@ namespace Facepunch.CoreWars
 				var crowbar = InventorySystem.CreateItem<CrowbarItemTier1>();
 				TryGiveItem( crowbar );
 			}
-
-			var grenade = InventorySystem.CreateItem<PortalGrenadeItem>();
-			TryGiveItem( grenade );
-
-			grenade = InventorySystem.CreateItem<PortalGrenadeItem>();
-			TryGiveItem( grenade );
-
-			grenade = InventorySystem.CreateItem<PortalGrenadeItem>();
-			TryGiveItem( grenade );
 		}
 
 		public virtual void CreateInventories()
