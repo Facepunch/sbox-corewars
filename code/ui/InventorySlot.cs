@@ -64,9 +64,12 @@ namespace Facepunch.CoreWars
 		{
 			if ( !Item.IsValid() ) return string.Empty;
 
-			if ( Item is WeaponItem weapon )
+			if ( Item is WeaponItem weaponItem )
 			{
-				return weapon.Ammo.ToString();
+				var weapon = weaponItem.Weapon;
+
+				if ( weapon.IsValid() && weapon.ClipSize > 0 )
+					return weapon.AmmoClip.ToString();
 			}
 
 			return (Item.StackSize > 1) ? Item.StackSize.ToString() : string.Empty;
