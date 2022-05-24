@@ -38,9 +38,6 @@ namespace Facepunch.CoreWars
 		public int Slot { get; set; }
 
 		[Net, Predicted]
-		public int AmmoClip { get; set; }
-
-		[Net, Predicted]
 		public TimeSince TimeSinceReload { get; set; }
 
 		[Net, Predicted]
@@ -57,6 +54,27 @@ namespace Facepunch.CoreWars
 
 		public float ChargeAttackEndTime { get; private set; }
 		public AnimatedEntity AnimationOwner => Owner as AnimatedEntity;
+
+		public int AmmoClip
+		{
+			get
+			{
+				if ( WeaponItem.IsValid() )
+				{
+					return WeaponItem.Ammo;
+				}
+
+				return 0;
+			}
+			set
+			{
+				if ( WeaponItem.IsValid() )
+				{
+					WeaponItem.Ammo = value;
+					WeaponItem.IsDirty = true;
+				}
+			}
+		}
 
 		public WeaponItem WeaponItem => Item.Instance as WeaponItem;
 
@@ -123,18 +141,13 @@ namespace Facepunch.CoreWars
 		public override void ActiveStart( Entity owner )
 		{
 			base.ActiveStart( owner );
-
 			PlaySound( $"weapon.pickup{Rand.Int( 1, 4 )}" );
-
 			TimeSinceDeployed = 0f;
 		}
 
 		public override void Spawn()
 		{
 			base.Spawn();
-
-			AmmoClip = ClipSize;
-
 			SetModel( "weapons/rust_pistol/rust_pistol.vmdl" );
 		}
 
@@ -146,8 +159,6 @@ namespace Facepunch.CoreWars
 			if ( AmmoClip >= ClipSize )
 				return;
 
-			TimeSinceReload = 0f;
-
 			if ( Owner is Player player )
 			{
 				if ( !UnlimitedAmmo )
@@ -157,6 +168,7 @@ namespace Facepunch.CoreWars
 				}
 			}
 
+			TimeSinceReload = 0f;
 			IsReloading = true;
 
 			if ( ReloadAnimation )
