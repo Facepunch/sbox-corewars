@@ -13,7 +13,7 @@ namespace Facepunch.CoreWars
 		[Net, Predicted] public string HitSound { get; set; } = "";
 		[Net, Predicted] public string ModelName { get; set; } = "";
 
-		public Action<BulletDropProjectile, Entity> Callback { get; private set; }
+		public Action<BulletDropProjectile, TraceResult> Callback { get; private set; }
 		public bool PlayFlybySounds { get; set; } = false;
 		public RealTimeUntil CanHitTime { get; set; } = 0.1f;
 		public ProjectileSimulator Simulator { get; set; }
@@ -36,13 +36,13 @@ namespace Facepunch.CoreWars
 		protected Particles Follower { get; set; }
 		protected Particles Trail { get; set; }
 
-		public void Initialize( Vector3 start, Vector3 velocity, float radius, Action<BulletDropProjectile, Entity> callback = null )
+		public void Initialize( Vector3 start, Vector3 velocity, float radius, Action<BulletDropProjectile, TraceResult> callback = null )
 		{
 			Initialize( start, velocity, callback );
 			Radius = radius;
 		}
 
-		public void Initialize( Vector3 start, Vector3 velocity, Action<BulletDropProjectile, Entity> callback = null )
+		public void Initialize( Vector3 start, Vector3 velocity, Action<BulletDropProjectile, TraceResult> callback = null )
 		{
 			if ( LifeTime.HasValue )
 			{
@@ -141,7 +141,7 @@ namespace Facepunch.CoreWars
 				if ( ExplodeOnDestroy )
 				{
 					PlayHitEffects( Vector3.Zero );
-					Callback?.Invoke( this, trace.Entity );
+					Callback?.Invoke( this, trace );
 				}
 
 				Delete();
@@ -152,7 +152,7 @@ namespace Facepunch.CoreWars
 			if ( HasHitTarget( trace ) )
 			{
 				PlayHitEffects( trace.Normal );
-				Callback?.Invoke( this, trace.Entity );
+				Callback?.Invoke( this, trace );
 				Delete();
 			}
 		}
