@@ -8,6 +8,8 @@ namespace Facepunch.CoreWars
 	[UseTemplate]
 	public partial class Hud : RootPanel
 	{
+		public Panel Crosshair { get; set; }
+
 		[ConCmd.Server]
 		public static void TestToastCmd( string text )
 		{
