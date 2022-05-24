@@ -1,4 +1,5 @@
 ﻿Crosshair {
+    transition: all 0.1s ease-in-out;
     background-color: white;
     border-radius: 50%;
     transform: translate( -50% -50% );
@@ -9,8 +10,9 @@
     width: 16px;
     height: 16px;
 
-    .hit-marker {
-        background-color: black;
+    &.hit-marker {
+        transition: all 0.1s ease-in-out;
+        background-color: red;
         border: 2px solid white;
         width: 32px;
         height: 32px;
