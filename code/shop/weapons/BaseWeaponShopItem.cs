@@ -7,6 +7,9 @@ namespace Facepunch.CoreWars
 {
 	public abstract class BaseWeaponShopItem<T> : BaseShopItem where T : WeaponItem, new()
 	{
+		public virtual AmmoType AmmoType => AmmoType.None;
+		public virtual int AmmoAmount => 0;
+
 		public T ItemDefinition { get; private set; } = new T();
 
 		public override bool CanPurchase( Player player )
@@ -54,6 +57,14 @@ namespace Facepunch.CoreWars
 			else
 			{
 				player.TryGiveItem( item );
+			}
+
+			if ( AmmoType > AmmoType.None && AmmoAmount > 0 )
+			{
+				var ammo = InventorySystem.CreateItem<AmmoItem>();
+				ammo.AmmoType = AmmoType;
+				ammo.StackSize = (ushort)AmmoAmount;
+				player.TryGiveItem( ammo );
 			}
 		}
 	}
