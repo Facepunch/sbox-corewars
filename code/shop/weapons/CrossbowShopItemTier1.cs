@@ -14,6 +14,8 @@ namespace Facepunch.CoreWars
 		{
 			[typeof( IronItem )] = 40
 		};
+		public override AmmoType AmmoType => AmmoType.Bolt;
+		public override int AmmoAmount => 8;
 
 		public override string GetIcon( Player player )
 		{
