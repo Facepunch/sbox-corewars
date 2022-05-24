@@ -14,7 +14,7 @@ namespace Facepunch.CoreWars
 		public ushort Slot { get; set; }
 		public InventoryItem Item { get; set; }
 		public bool IsSelected { get; set; }
-		public string StackSize => (Item.IsValid() && Item.StackSize > 1) ? Item.StackSize.ToString() : string.Empty;
+		public string StackSize => GetStackSize();
 		public float IconSize => Box.Rect.Size.Length;
 		public string DefaultIcon { get; private set; }
 		public ArmorSlot ArmorSlot { get; private set; }
@@ -58,6 +58,18 @@ namespace Facepunch.CoreWars
 		public string GetIconTexture()
 		{
 			return Item.IsValid() ? Item.Icon : null;
+		}
+
+		public string GetStackSize()
+		{
+			if ( !Item.IsValid() ) return string.Empty;
+
+			if ( Item is WeaponItem weapon )
+			{
+				return weapon.Ammo.ToString();
+			}
+
+			return (Item.StackSize > 1) ? Item.StackSize.ToString() : string.Empty;
 		}
 
 		public bool CanDrop( IDraggable draggable, DraggableMode mode )
