@@ -13,6 +13,7 @@ namespace Facepunch.CoreWars
 		public virtual int Tier => 0;
 
 		public Weapon Weapon { get; set; }
+		public int Ammo { get; set; }
 
 		public override bool CanStackWith( InventoryItem other )
 		{
@@ -26,12 +27,16 @@ namespace Facepunch.CoreWars
 			else
 				writer.Write( 0 );
 
+			writer.Write( Ammo );
+
 			base.Write( writer );
 		}
 
 		public override void Read( BinaryReader reader )
 		{
 			Weapon = (Entity.FindByIndex( reader.ReadInt32() ) as Weapon);
+			Ammo = reader.ReadInt32();
+
 			base.Read( reader );
 		}
 
