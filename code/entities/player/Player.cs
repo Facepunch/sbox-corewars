@@ -358,6 +358,12 @@ namespace Facepunch.CoreWars
 			SetTeam( team );
 		}
 
+		[ClientRpc]
+		public void ShowHitMarker( int hitboxGroup )
+		{
+			Crosshair.Current?.Hit( hitboxGroup );
+		}
+
 		public void RespawnWhenAvailable()
 		{
 			IsWaitingToRespawn = true;
@@ -618,6 +624,9 @@ namespace Facepunch.CoreWars
 		{
 			if ( info.Attacker is Player attacker )
 			{
+				var hitboxGroup = GetHitboxGroup( info.HitboxIndex );
+				attacker.ShowHitMarker( To.Single( attacker ), hitboxGroup );
+
 				if ( Team != Team.None && attacker.Team == Team )
 					return;
 
