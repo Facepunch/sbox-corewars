@@ -82,8 +82,8 @@ namespace Facepunch.CoreWars
 				var info = new DamageInfo()
 					.WithAttacker( Owner )
 					.WithWeapon( this )
-					.WithPosition( projectile.Position )
-					.WithForce( projectile.Velocity )
+					.WithPosition( trace.EndPosition )
+					.WithForce( projectile.Velocity * 0.1f )
 					.WithFlag( DamageType )
 					.WithHitBody( trace.Body )
 					.WithHitbox( trace.HitboxIndex );

@@ -33,7 +33,7 @@ namespace Facepunch.CoreWars
 		public override float Gravity => 5f;
 		public override float InheritVelocity => 0f;
 		public override string ProjectileModel => "models/weapons/w_portal_grenade.vmdl";
-		public override int ClipSize => 1;
+		public override int ClipSize => 0;
 		public override float ReloadTime => 2.3f;
 		public override float ProjectileLifeTime => 4f;
 

@@ -25,7 +25,7 @@ namespace Facepunch.CoreWars
 		public override DamageFlags DamageType => DamageFlags.Blunt;
 		public override float PrimaryRate => 2f;
 		public override float SecondaryRate => 1f;
-		public override int ClipSize => 1;
+		public override int ClipSize => 0;
 		public override bool IsMelee => true;
 		public override BuildingMaterialType PrimaryMaterialType => BuildingMaterialType.Metal;
 

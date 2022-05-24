@@ -24,7 +24,7 @@ namespace Facepunch.CoreWars
 		public override DamageFlags DamageType => DamageFlags.Blunt;
 		public override float PrimaryRate => 1.5f;
 		public override float SecondaryRate => 1f;
-		public override int ClipSize => 1;
+		public override int ClipSize => 0;
 		public override bool IsMelee => true;
 
 		public override void Spawn()
@@ -74,12 +74,11 @@ namespace Facepunch.CoreWars
 
 		protected override void OnMeleeAttackHit( Entity victim )
 		{
-			if ( victim is Player )
-			{
-				PlaySound( "melee.hitflesh" );
-			}
-
 			ViewModelEntity?.SetAnimParameter( "attack_has_hit", true );
+
+			if ( victim is Player target )
+				target.PlaySound( "melee.hitflesh" );
+
 			base.OnMeleeAttackHit( victim );
 		}
 	}
