@@ -77,7 +77,7 @@ namespace Facepunch.CoreWars
 			anim.SetAnimParameter( "holdtype", 5 );
 		}
 
-		protected override void OnProjectileHit( BulletDropProjectile projectile, Entity target )
+		protected override void OnProjectileHit( BulletDropProjectile projectile, TraceResult trace )
 		{
 			var position = projectile.Position;
 			var explosion = Particles.Create( "particles/weapons/boomer/boomer_explosion.vpcf" );
@@ -89,7 +89,10 @@ namespace Facepunch.CoreWars
 			var world = VoxelWorld.Current;
 			var blockPosition = world.ToVoxelPosition( position );
 			var blockBelowType = world.GetAdjacentBlock( blockPosition, (int)BlockFace.Bottom );
-			var trace = Trace.Ray( position, position + Vector3.Down * 32f ).EntitiesOnly().Run();
+
+			trace = Trace.Ray( position, position + Vector3.Down * 32f )
+				.EntitiesOnly()
+				.Run();
 
 			if ( blockBelowType > 0 || trace.Hit )
 			{

@@ -75,7 +75,7 @@ namespace Facepunch.CoreWars
 
 		protected virtual void DamageInRadius( Vector3 position, float radius, float baseDamage, float force = 1f )
 		{
-			var entities = Entity.FindInSphere( position, radius );
+			var entities = FindInSphere( position, radius );
 
 			foreach ( var entity in entities )
 			{
@@ -94,13 +94,13 @@ namespace Facepunch.CoreWars
 
 		}
 
-		protected virtual void OnProjectileHit( BulletDropProjectile projectile, Entity target )
+		protected virtual void OnProjectileHit( BulletDropProjectile projectile, TraceResult trace )
 		{
-			if ( IsServer && target.IsValid() )
+			if ( IsServer && trace.Entity.IsValid() )
 			{
-				var distance = target.Position.Distance( projectile.StartPosition );
+				var distance = trace.Entity.Position.Distance( projectile.StartPosition );
 				var damage = GetDamageFalloff( distance, Config.Damage );
-				DealDamage( target, projectile.Position, projectile.Velocity * 0.1f, damage );
+				DealDamage( trace.Entity, projectile.Position, projectile.Velocity * 0.1f, damage );
 			}
 		}
 	}

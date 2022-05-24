@@ -75,9 +75,22 @@ namespace Facepunch.CoreWars
 			anim.SetAnimParameter( "holdtype", 2 );
 		}
 
-		protected override void OnProjectileHit( BulletDropProjectile projectile, Entity target )
+		protected override void OnProjectileHit( BulletDropProjectile projectile, TraceResult trace )
 		{
+			if ( IsServer && trace.Entity is Player victim )
+			{
+				var info = new DamageInfo()
+					.WithAttacker( Owner )
+					.WithWeapon( this )
+					.WithPosition( projectile.Position )
+					.WithForce( projectile.Velocity )
+					.WithFlag( DamageType )
+					.WithHitBody( trace.Body )
+					.WithHitbox( trace.HitboxIndex );
 
+				info.Damage = GetDamageFalloff( projectile.StartPosition.Distance( victim.Position ), Config.Damage );
+				victim.TakeDamage( info );
+			}
 		}
 	}
 }
