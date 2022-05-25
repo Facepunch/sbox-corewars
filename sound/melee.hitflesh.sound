@@ -2,9 +2,17 @@
 {
 	data = 
 	{
-		sounds = 
+		UI = false
+		Volume = 1
+		VolumeRandom = 0
+		Pitch = 1
+		PitchRandom = 0
+		DistanceMax = 360
+		Sounds = 
 		[
-			"sound/melee.hitflesh.vsnd",
+			resource:"sound/melee.hitflesh1.vsnd",
+			resource:"sound/melee.hitflesh2.vsnd",
 		]
+		SelectionMode = 3
 	}
 }
