@@ -180,6 +180,7 @@
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
             <key type="filename">rough/concrete_01_rough.png</key>
+            <key type="filename">rough/dev_grid_rough.png</key>
             <key type="filename">rough/dirt_02_rough.png</key>
             <key type="filename">rough/grass_01_rough.png</key>
             <key type="filename">rough/grass_dirt_01_rough.png</key>
