@@ -984,7 +984,7 @@ namespace Facepunch.CoreWars
 
 		private void OnEquipmentItemTaken( ushort slot, InventoryItem instance )
 		{
-			if ( instance is ArmorItem armor && !instance.Container.Is( EquipmentInventory ) )
+			if ( instance is ArmorItem armor && !EquipmentInventory.Is( instance.Container ) )
 			{
 				if ( Armor.TryGetValue( armor.ArmorSlot, out var model ) )
 				{
@@ -1029,7 +1029,7 @@ namespace Facepunch.CoreWars
 		{
 			if ( instance is WeaponItem weapon )
 			{
-				if ( weapon.Weapon.IsValid() && !instance.Container.Is( HotbarInventory ) )
+				if ( weapon.Weapon.IsValid() && !HotbarInventory.Is( instance.Container ) )
 				{
 					weapon.Weapon.Delete();
 					weapon.Weapon = null;

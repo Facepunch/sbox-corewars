@@ -8,8 +8,7 @@ namespace Facepunch.CoreWars.Inventory
 		public InventoryContainer Container { get; set; }
 		public ItemEntity WorldEntity { get; private set; }
 		public bool IsWorldEntity { get; private set; }
-		public string LibraryName { get; set; }
-		public int LibraryId { get; set; }
+		public string ClassName { get; set; }
 
 		public virtual ushort DefaultStackSize => 1;
 		public virtual ushort MaxStackSize => 1;
