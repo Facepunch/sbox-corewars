@@ -85,8 +85,7 @@ namespace Facepunch.CoreWars
 					.WithPosition( trace.EndPosition )
 					.WithForce( projectile.Velocity * 0.1f )
 					.WithFlag( DamageType )
-					.WithHitBody( trace.Body )
-					.WithHitbox( trace.HitboxIndex );
+					.UsingTraceResult( trace );
 
 				info.Damage = GetDamageFalloff( projectile.StartPosition.Distance( victim.Position ), Config.Damage );
 				victim.TakeDamage( info );

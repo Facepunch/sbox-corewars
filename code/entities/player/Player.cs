@@ -651,9 +651,8 @@ namespace Facepunch.CoreWars
 
 				using ( Prediction.Off() )
 				{
-					var particles = Particles.Create( "particles/gameplay/player/taken_damage/taken_damage.vpcf", this );
-					particles.SetPosition( 0, info.Position );
-					particles.SetForward( 0, info.Force.Normal * -1f );
+					var particles = Particles.Create( "particles/gameplay/player/taken_damage/taken_damage.vpcf", info.Position );
+					particles.SetForward( 0, info.Force.Normal );
 				}
 
 				var hitboxGroup = GetHitboxGroup( info.HitboxIndex );
@@ -831,6 +830,10 @@ namespace Facepunch.CoreWars
 				var crowbar = InventorySystem.CreateItem<CrowbarItemTier1>();
 				TryGiveItem( crowbar );
 			}
+
+			var crossbow = InventorySystem.CreateItem<CrossbowItemTier1>();
+			TryGiveItem( crossbow );
+			TryGiveAmmo( AmmoType.Bolt, 20 );
 		}
 
 		public virtual void CreateInventories()

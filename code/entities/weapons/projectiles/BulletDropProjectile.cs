@@ -129,6 +129,7 @@ namespace Facepunch.CoreWars
 
 			var trace = Trace.Ray( Position, newPosition )
 				.HitLayer( CollisionLayer.Water, true )
+				.UseHitboxes()
 				.Size( Radius )
 				.Ignore( this )
 				.Ignore( IgnoreEntity )
