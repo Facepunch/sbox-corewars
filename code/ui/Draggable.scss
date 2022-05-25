@@ -1,13 +1,13 @@
 ﻿Draggable {
-    position: absolute;
-    width: 80px;
-    height: 80px;
-    pointer-events: none;
-    background-size: cover;
-    transform: translate( -50% -50% );
-    display: none;
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  pointer-events: none;
+  background-size: cover;
+  transform: translate(-50% -50%);
+  display: none;
 
-    &.active {
-        display: flex;
-    }
+  &.active {
+    display: flex;
+  }
 }
