@@ -735,10 +735,10 @@ namespace Facepunch.CoreWars
 					else
 						IsBackpackToggleMode = false;
 
-					if ( !IDialog.IsActive() )
-					{
+					if ( IDialog.IsActive() )
+						IDialog.CloseActive();
+					else
 						Backpack.Current?.Open();
-					}
 				}
 
 				if ( Input.Released( InputButton.Score ) )
