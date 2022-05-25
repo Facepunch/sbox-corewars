@@ -35,6 +35,7 @@ namespace Facepunch.CoreWars.Editor
 
 			entity.Position = Position;
 			entity.Rotation = Rotation;
+			entity.ResetInterpolation();
 
 			base.Perform();
 		}

@@ -47,9 +47,9 @@ namespace Facepunch.CoreWars
 			var isEditorMode = Game.Current.IsEditorMode;
 
 			if ( isEditorMode )
-				SetupPhysicsFromAABB( PhysicsMotionType.Static, Model.Bounds.Mins, Model.Bounds.Maxs );
+				SetupPhysicsFromAABB( PhysicsMotionType.Keyframed, Model.Bounds.Mins, Model.Bounds.Maxs );
 			else
-				SetupPhysicsFromModel( PhysicsMotionType.Static );
+				SetupPhysicsFromModel( PhysicsMotionType.Keyframed );
 		}
 	}
 }
