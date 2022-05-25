@@ -34,6 +34,8 @@ namespace Facepunch.CoreWars
 				else
 					Icon.Style.BackgroundImage = null;
 
+				SetClass( "is-empty", true );
+
 				return;
 			}
 
@@ -43,6 +45,8 @@ namespace Facepunch.CoreWars
 				Icon.Style.SetBackgroundImage( icon );
 			else
 				Icon.Style.BackgroundImage = null;
+
+			SetClass( "is-empty", false );
 		}
 
 		public void SetArmorSlot( ArmorSlot slot )
