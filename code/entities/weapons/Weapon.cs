@@ -27,6 +27,7 @@ namespace Facepunch.CoreWars
 		public virtual bool IsPassive => false;
 		public virtual float ChargeAttackDuration => 2f;
 		public virtual DamageFlags DamageType => DamageFlags.Bullet;
+		public virtual string ReloadSoundName => string.Empty;
 		public virtual int HoldType => 1;
 		public virtual int ViewModelMaterialGroup => 0;
 		public override string ViewModelPath => "weapons/rust_pistol/v_rust_pistol.vmdl";
@@ -54,6 +55,8 @@ namespace Facepunch.CoreWars
 
 		public float ChargeAttackEndTime { get; private set; }
 		public AnimatedEntity AnimationOwner => Owner as AnimatedEntity;
+
+		private Sound ReloadSound { get; set; }
 
 		public int AmmoClip
 		{
@@ -145,6 +148,15 @@ namespace Facepunch.CoreWars
 			TimeSinceDeployed = 0f;
 		}
 
+		public override void ActiveEnd( Entity ent, bool dropped )
+		{
+			base.ActiveEnd( ent, dropped );
+
+			ReloadSound.Stop();
+			TimeSinceReload = 0f;
+			IsReloading = false;
+		}
+
 		public override void Spawn()
 		{
 			base.Spawn();
@@ -174,7 +186,9 @@ namespace Facepunch.CoreWars
 			if ( ReloadAnimation )
 				PlayReloadAnimation();
 
-			PlayReloadSound();
+			if ( !String.IsNullOrEmpty( ReloadSoundName ) )
+				ReloadSound = PlaySound( ReloadSoundName );
+
 			DoClientReload();
 		}
 
@@ -250,11 +264,6 @@ namespace Facepunch.CoreWars
 					AmmoClip = ClipSize;
 				}
 			}
-		}
-
-		public virtual void PlayReloadSound()
-		{
-
 		}
 
 		[ClientRpc]

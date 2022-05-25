@@ -32,6 +32,7 @@ namespace Facepunch.CoreWars
 		public override float Speed => 1300f;
 		public override float Gravity => 5f;
 		public override float InheritVelocity => 0f;
+		public override string ReloadSoundName => "crossbow.reload";
 		public override string ProjectileModel => "weapons/rust_crossbow/rust_crossbow_bolt.vmdl";
 		public override int ClipSize => 1;
 		public override float ReloadTime => 2.3f;
@@ -56,12 +57,6 @@ namespace Facepunch.CoreWars
 			PlaySound( $"crossbow.fire" );
 
 			base.AttackPrimary();
-		}
-
-		public override void PlayReloadSound()
-		{
-			PlaySound( "crossbow.reload" );
-			base.PlayReloadSound();
 		}
 
 		public override void CreateViewModel()
