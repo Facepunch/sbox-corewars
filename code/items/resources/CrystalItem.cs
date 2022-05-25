@@ -7,7 +7,7 @@ namespace Facepunch.CoreWars
 	[Library( "item_crystal" )]
 	public class CrystalItem : ResourceItem
 	{
-		public override ushort MaxStackSize => 32;
+		public override ushort MaxStackSize => 64;
 		public override string Name => "Crystal";
 		public override string Icon => "textures/items/crystal.png";
 

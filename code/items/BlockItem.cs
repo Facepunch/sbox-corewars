@@ -10,7 +10,7 @@ namespace Facepunch.CoreWars
 	{
 		public byte BlockId { get; set; }
 
-		public override ushort MaxStackSize => 60;
+		public override ushort MaxStackSize => 64;
 		public override bool RemoveOnDeath => true;
 
 		public override string Name
