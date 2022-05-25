@@ -19,6 +19,16 @@ namespace Facepunch.CoreWars.Inventory
 			Instance = container;
 		}
 
+		public bool Is( InventoryContainer container )
+		{
+			return container == Instance;
+		}
+
+		public bool Is( NetInventoryContainer container )
+		{
+			return container == this;
+		}
+
 		public void Read( ref NetRead read )
 		{
 			if ( Initialized ) return;
