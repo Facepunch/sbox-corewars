@@ -186,6 +186,7 @@
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
             <key type="filename">color/concrete_01.png</key>
+            <key type="filename">color/dev_grid.png</key>
             <key type="filename">color/dirt_02.png</key>
             <key type="filename">color/grass_01.png</key>
             <key type="filename">color/grass_dirt_01.png</key>

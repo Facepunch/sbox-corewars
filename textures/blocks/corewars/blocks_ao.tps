@@ -180,6 +180,7 @@
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
             <key type="filename">ao/concrete_01_ao.png</key>
+            <key type="filename">ao/dev_grid_ao.png</key>
             <key type="filename">ao/dirt_02_ao.png</key>
             <key type="filename">ao/grass_01_ao.png</key>
             <key type="filename">ao/grass_dirt_01_ao.png</key>
