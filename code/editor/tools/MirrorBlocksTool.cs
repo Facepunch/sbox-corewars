@@ -71,7 +71,7 @@ namespace Facepunch.CoreWars.Editor
 				var endVoxelPosition = VoxelWorld.Current.ToVoxelPosition( EndPosition.Value );
 
 				var action = new MirrorBlocksAction();
-				action.Initialize( startVoxelPosition, endVoxelPosition, flipX, flipY, Input.Down( InputButton.Run ) );
+				action.Initialize( startVoxelPosition, endVoxelPosition, flipX, flipY );
 
 				Player.Perform( action );
 			}

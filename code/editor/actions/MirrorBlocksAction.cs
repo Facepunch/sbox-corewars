@@ -17,15 +17,13 @@ namespace Facepunch.CoreWars.Editor
 		private byte[] OldBlockIds { get; set; }
 		private IntVector3 Mins { get; set; }
 		private IntVector3 Maxs { get; set; }
-		private List<int> EntityIds { get; set; }
-		private bool ShouldMirrorEntities { get; set; }
 		private bool FlipX { get; set; }
 		private bool FlipY { get; set; }
 		private int Width { get; set; }
 		private int Height { get; set; }
 		private int Depth { get; set; }
 
-		public void Initialize( IntVector3 mins, IntVector3 maxs, bool flipX, bool flipY, bool mirrorEntities = false )
+		public void Initialize( IntVector3 mins, IntVector3 maxs, bool flipX, bool flipY )
 		{
 			var world = VoxelWorld.Current;
 
@@ -125,16 +123,6 @@ namespace Facepunch.CoreWars.Editor
 				}
 			}
 
-			/*
-			foreach ( var entityId in EntityIds )
-			{
-				if ( FindObject<Entity>( entityId, out var entity ) )
-				{
-					entity.Delete();
-				}
-			}
-			*/
-
 			base.Undo();
 		}
 
@@ -146,67 +134,6 @@ namespace Facepunch.CoreWars.Editor
 		private int GetArrayIndex( int x, int y, int z )
 		{
 			return x * Height * Depth + y * Depth + z;
-		}
-
-		private void MirrorEntities()
-		{
-			EntityIds.Clear();
-
-			/*
-			var world = VoxelWorld.Current;
-			var sourceMins = world.ToSourcePosition( SourceMins );
-			var sourceMaxs = world.ToSourcePosition( SourceMaxs );
-			var targetMins = world.ToSourcePosition( TargetMins );
-			var minX = Math.Min( sourceMins.x, sourceMaxs.x );
-			var minY = Math.Min( sourceMins.y, sourceMaxs.y );
-			var minZ = Math.Min( sourceMins.z, sourceMaxs.z );
-			var maxX = Math.Max( sourceMins.x, sourceMaxs.x );
-			var maxY = Math.Max( sourceMins.y, sourceMaxs.y );
-			var maxZ = Math.Max( sourceMins.z, sourceMaxs.z );
-			var entities = Entity.FindInBox( new BBox( new Vector3( minX, minY, minZ ), new Vector3( maxX, maxY, maxZ ) ) );
-
-			foreach ( var entity in entities )
-			{
-				if ( entity is ISourceEntity sourceEntity )
-				{
-					var localPosition = entity.Position - sourceMins;
-					var newPosition = targetMins + localPosition;
-					var newEntity = TypeLibrary.Create<ISourceEntity>( entity.GetType() );
-
-					newEntity.Position = newPosition;
-					newEntity.Rotation = entity.Rotation;
-
-					IVolumeEntity volumeEntity = default;
-					Vector3 oldMins = default;
-					Vector3 oldMaxs = default;
-
-					if ( entity is IVolumeEntity )
-					{
-						volumeEntity = (entity as IVolumeEntity);
-
-						var localMins = volumeEntity.Mins - sourceMins;
-						var localMaxs = volumeEntity.Maxs - sourceMins;
-
-						oldMins = volumeEntity.Mins;
-						oldMaxs = volumeEntity.Maxs;
-
-						volumeEntity.Mins = targetMins + localMins;
-						volumeEntity.Maxs = targetMins + localMaxs;
-					}
-
-					var serialized = BinaryHelper.Serialize( w => sourceEntity.Serialize( w ) );
-					BinaryHelper.Deserialize( serialized, r => newEntity.Deserialize( r ) );
-
-					if ( volumeEntity.IsValid() )
-					{
-						volumeEntity.Mins = oldMins;
-						volumeEntity.Maxs = oldMaxs;
-					}
-
-					EntityIds.Add( AddObject( newEntity ) );
-				}
-			}
-			*/
 		}
 	}
 }
