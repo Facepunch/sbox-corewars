@@ -5,7 +5,7 @@ using Sandbox;
 namespace Facepunch.CoreWars.Editor
 {
 	[EditorTool( Title = "Mirror Blocks", Description = "Mirror an area of blocks" )]
-	[Icon( "textures/ui/tools/duplicateblocks.png" )]
+	[Icon( "textures/ui/tools/mirrorblocks.png" )]
 	public partial class MirrorBlocksTool : EditorTool
 	{
 		public enum MirrorStage
