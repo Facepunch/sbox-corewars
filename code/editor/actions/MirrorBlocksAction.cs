@@ -77,9 +77,6 @@ namespace Facepunch.CoreWars.Editor
 					}
 				}
 			}
-
-			ShouldMirrorEntities = mirrorEntities;
-			EntityIds = new();
 		}
 
 		public override void Perform()
