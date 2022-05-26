@@ -21,7 +21,7 @@ namespace Facepunch.CoreWars.Editor
 		private IntVector3 SourceMaxs { get; set; }
 		private IntVector3 TargetMins { get; set; }
 		private List<int> EntityIds { get; set; }
-		private bool CopyEntities { get; set; }
+		private bool ShouldCopyEntities { get; set; }
 
 		public void Initialize( IntVector3 sourceMins, IntVector3 sourceMaxs, IntVector3 targetMins, bool copyEntities = false )
 		{
@@ -35,12 +35,12 @@ namespace Facepunch.CoreWars.Editor
 			var totalBlocks = SourcePositions.Count();
 			var currentIndex = 0;
 
+			ShouldCopyEntities = copyEntities;
 			TargetPositions = new IntVector3[totalBlocks];
 			OldBlockStates = new BlockState[totalBlocks];
 			OldBlockIds = new byte[totalBlocks];
 			NewBlockStates = new BlockState[totalBlocks];
 			NewBlockIds = new byte[totalBlocks];
-			CopyEntities = copyEntities;
 			EntityIds = new();
 
 			foreach ( var position in SourcePositions )
@@ -76,9 +76,9 @@ namespace Facepunch.CoreWars.Editor
 				world.SetState( TargetPositions[i], NewBlockStates[i] );
 			}
 
-			if ( CopyEntities )
+			if ( ShouldCopyEntities )
 			{
-				PasteEntities();
+				CopyAndPasteEntities();
 			}
 
 			base.Perform();
@@ -105,7 +105,7 @@ namespace Facepunch.CoreWars.Editor
 			base.Undo();
 		}
 
-		private void PasteEntities()
+		private void CopyAndPasteEntities()
 		{
 			EntityIds.Clear();
 

@@ -34,13 +34,13 @@ namespace Facepunch.CoreWars.Editor
 		}
 
 		[ConCmd.Server( "mirror_blocks_mirror" )]
-		public static void SendMirrorCmd()
+		public static void SendMirrorCmd( bool flipX, bool flipY )
 		{
 			if ( ConsoleSystem.Caller.Pawn is EditorPlayer player )
 			{
 				if ( player.Tool is MirrorBlocksTool tool )
 				{
-					tool.Mirror();
+					tool.Mirror( flipX, flipY );
 				}
 			}
 		}
@@ -58,17 +58,28 @@ namespace Facepunch.CoreWars.Editor
 			Stage = MirrorStage.Select;
 		}
 
-		public void Mirror()
+		public void Mirror( bool flipX, bool flipY )
 		{
 			if ( IsClient )
 			{
-				SendMirrorCmd();
+				SendMirrorCmd( flipX, flipY );
 			}
 
-			if ( Stage == MirrorStage.Mirror )
+			if ( IsServer && Stage == MirrorStage.Mirror )
 			{
+				var startVoxelPosition = VoxelWorld.Current.ToVoxelPosition( StartPosition.Value );
+				var endVoxelPosition = VoxelWorld.Current.ToVoxelPosition( EndPosition.Value );
 
+				var action = new MirrorBlocksAction();
+				action.Initialize( startVoxelPosition, endVoxelPosition, flipX, flipY, Input.Down( InputButton.Run ) );
+
+				Player.Perform( action );
 			}
+
+			NextBlockPlace = 0.1f;
+			StartPosition = null;
+			EndPosition = null;
+			Stage = MirrorStage.Select;
 		}
 
 		public override void Simulate( Client client )
@@ -155,21 +166,6 @@ namespace Facepunch.CoreWars.Editor
 					else
 					{
 						StartPosition = aimSourcePosition;
-					}
-				}
-				else
-				{
-					if ( IsServer )
-					{
-						/*
-						var startSourceVoxelPosition = VoxelWorld.Current.ToVoxelPosition( StartPosition.Value );
-						var endSourceVoxelPosition = VoxelWorld.Current.ToVoxelPosition( EndPosition.Value );
-
-						var action = new DuplicateBlocksAction();
-						action.Initialize( startSourceVoxelPosition, endSourceVoxelPosition, aimVoxelPosition, Input.Down( InputButton.Run ) );
-
-						Player.Perform( action );
-						*/
 					}
 				}
 

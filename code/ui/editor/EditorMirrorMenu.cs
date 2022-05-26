@@ -56,9 +56,12 @@ namespace Facepunch.CoreWars.Editor
 			{
 				if ( player.Tool is MirrorBlocksTool tool )
 				{
-					tool.Mirror();
+					tool.Mirror( XAxis.Checked, YAxis.Checked );
 				}
 			}
+
+			Delete();
+			Current = null;
 		}
 
 		protected virtual void Cancel()
