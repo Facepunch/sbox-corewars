@@ -1,12 +1,10 @@
 ﻿RadialMenuItem {
     position: absolute;
     background-color: #f5deb363;
-    border-color: wheat;
-    border-width: 2px;
     width: 150px;
     height: 150px;
     opacity: 0.8;
-    border-radius: 30%;
+    border-radius: 10%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -19,7 +17,7 @@
     &.selected {
         box-shadow: 0px 10px 13px -7px #000000, 0px 0px 27px 3px rgba(97,223,41,0.81);
         border-color: green;
-        border-width: 4px;
+        border-width: 2px;
         opacity: 0.9;
     }
 }
