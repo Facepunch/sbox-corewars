@@ -134,8 +134,8 @@ namespace Facepunch.CoreWars.Editor
 				item.IsSelected = (Hovered == item);
 
 				var fItemCount = (float)Items.Count;
-				var maxItemScale = 1.3f;
-				var minItemScale = 0.9f - fItemCount.Remap( 4f, 8f, 0f, 0.2f );
+				var maxItemScale = 1.2f;
+				var minItemScale = 0.9f - fItemCount.Remap( 4f, 10f, 0f, 0.35f );
 				var distanceToMouse = item.Box.Rect.Center.Distance( VirtualMouse );
 				var distanceToScale = distanceToMouse.Remap( 0f, item.Box.Rect.Size.Length * 1.5f, maxItemScale, minItemScale ).Clamp( minItemScale, maxItemScale );
 
