@@ -6,6 +6,7 @@ namespace Facepunch.CoreWars.Editor
 	public abstract partial class EditorTool : BaseNetworkable, IValid
 	{
 		public virtual string Name => "Tool";
+		public virtual string SecondaryMode => string.Empty;
 
 		[Net] public EditorPlayer Player { get; set; }
 

@@ -47,6 +47,8 @@ namespace Facepunch.CoreWars.Editor
 		[Net, Change( nameof( OnEntityChanged ) )] public ModelEntity SelectedEntity { get; private set; }
 		[Net] public Rotation CurrentRotation { get; private set; }
 
+		public override string SecondaryMode => Mode.ToString().ToTitleCase();
+
 		private TypeDescription CurrentTypeDescription { get; set; }
 		private EditorEntityAttribute CurrentAttribute { get; set; }
 		private VolumeEntity Volume { get; set; }
