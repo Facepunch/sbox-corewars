@@ -23,8 +23,8 @@ namespace Facepunch.CoreWars
 				HealthBar.Style.Width = Length.Fraction( player.Health / 100f );
 				HealthBar.SetClass( "health-low", player.Health <= 15f );
 
-				HealthValue.Text = $"{player.Health}%";
-				StaminaValue.Text = $"{player.Stamina}%";
+				HealthValue.Text = $"{player.Health.CeilToInt()}%";
+				StaminaValue.Text = $"{player.Stamina.CeilToInt()}%";
 
 				StaminaBar.Style.Width = Length.Fraction( player.Stamina / 100f );
 				StaminaBar.SetClass( "stamina-low", player.IsOutOfBreath );
