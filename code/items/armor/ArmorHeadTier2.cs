@@ -11,7 +11,7 @@ namespace Facepunch.CoreWars
 		public override ArmorSlot ArmorSlot => ArmorSlot.Head;
 		public override string Name => "Medium Head Armor";
 		public override string Icon => "textures/items/armor_head_2.png";
-		public override string ModelName => "models/citizen_clothes/hat/hat_hardhat.vmdl";
+		public override string ModelName => "models/citizen_clothes/hat/hat_securityhelmet.vmdl";
 		public override int Tier => 2;
 	}
 }
