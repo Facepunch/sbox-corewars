@@ -25,6 +25,13 @@ namespace Facepunch.CoreWars.Editor
 			{
 				OnSecondary( client );
 			}
+
+			var world = VoxelWorld.Current;
+
+			if ( world.IsValid() )
+			{
+				DebugOverlay.Axis( world.ToSourcePositionCenter( world.MaxSize / 2 ), Rotation.Identity, 100, 0f, false );
+			}
 		}
 
 		public virtual void OnSelected()

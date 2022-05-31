@@ -58,6 +58,29 @@ namespace Facepunch.CoreWars
 			return world.GetBlockType( blockId );
 		}
 
+		public static To GetTo( this Team team )
+		{
+			var players = team.GetPlayers();
+			return To.Multiple( players.Select( p => p.Client ) );
+		}
+
+		public static string GetHudClass( this Team team )
+		{
+			return team switch
+			{
+				Team.None => "team_none",
+				Team.Blue => "team_blue",
+				Team.Red => "team_red",
+				Team.Orange => "team_orange",
+				Team.Green => "team_green",
+				Team.Purple => "team_purple",
+				Team.Pink => "team_pink",
+				Team.Cyan => "team_cyan",
+				Team.Yellow => "team_yellow",
+				_ => throw new System.NotImplementedException()
+			};
+		}
+
 		public static TeamCore GetCore( this Team team )
 		{
 			if ( !Cores.TryGetValue( team, out var core ) )
