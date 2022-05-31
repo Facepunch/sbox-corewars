@@ -14,29 +14,43 @@ StageInfo {
     border: 2px solid $box-border;
     border-radius: 8px;
     padding: 4px 8px;
+    min-width: 100px;
+    margin-right: 8px;
 
-    &:first-child {
-      margin-right: 8px;
+    &:last-child {
+      margin-right: 0;
     }
 
     .icon {
-      background-color: pink;
+      background-size: cover;
       width: 24px;
       height: 24px;
       margin-right: 8px;
+
+      &.time {
+        background-image: url(/textures/ui/icon_time.png);
+      }
+
+      &.current-stage {
+        background-image: url(/textures/ui/icon_stage_next.png);
+      }
+
+      &.next-stage {
+        background-image: url(/textures/ui/icon_stage_next.png);
+      }
     }
 
     label {
       color: #fff;
       font-size: 18px;
       text-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
+      padding-top: 1px;
+      min-width: 40px;
     }
   }
 
   .container {
-    background-color: rgba(0 0 0 0.1);
     position: absolute;
-    border-radius: 2px;
     top: 32px;
     display: flex;
     flex-direction: column;

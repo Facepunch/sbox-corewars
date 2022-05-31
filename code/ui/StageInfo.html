@@ -4,25 +4,17 @@
   <div class="container">
     <div class="box-container">
       <div class="box">
-        <div class="icon"></div>
-        <label class="title">00:00</label>
+        <div class="icon time"></div>
+        <label @text="TimeText" class="title">00:00</label>
       </div>
       <div class="box">
-        <div class="icon"></div>
-        <label class="title">00:00</label>
+        <div @ref="Icon" class="icon"></div>
+        <label @text="StageText" class="title">00:00</label>
       </div>
-    </div>
-
-    <div class="header">
-      <div @ref="Icon" class="icon"></div>
-      <label @text="StageText" class="stage"></label>
-    </div>
-
-    <label @text="TimeText" class="time"></label>
-
-    <div class="next-stage-panel">
-      <label>Next Stage:</label>
-      <label @text="NextStageText" class="next-stage"></label>
+      <div class="box">
+        <div class="icon next-stage"></div>
+        <label @text="NextStageText" class="title">00:00</label>
+      </div>
     </div>
   </div>
 </div>
