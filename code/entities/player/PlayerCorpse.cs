@@ -11,6 +11,8 @@ namespace Facepunch.CoreWars
 	{
 		public Player Player { get; set; }
 
+		private TimeSince TimeSinceSpawned { get; set; }
+
 		public PlayerCorpse()
 		{
 			MoveType = MoveType.Physics;
@@ -55,13 +57,18 @@ namespace Facepunch.CoreWars
 				var body = GetBonePhysicsBody( forceBone );
 
 				if ( body != null )
-				{
 					body.ApplyForce( force * 1000 );
-				}
 				else
-				{
 					PhysicsGroup.AddVelocity( force );
-				}
+			}
+		}
+
+		[Event.Tick.Client]
+		protected virtual void ClientTick()
+		{
+			if ( IsClientOnly && TimeSinceSpawned > 10f )
+			{
+				Delete();
 			}
 		}
 	}

@@ -7,7 +7,7 @@ namespace Facepunch.CoreWars
 	[Library( "item_iron" )]
 	public class IronItem : ResourceItem
 	{
-		public override ushort MaxStackSize => 32;
+		public override ushort MaxStackSize => 64;
 		public override string Name => "Iron";
 		public override string Icon => "textures/items/iron.png";
 

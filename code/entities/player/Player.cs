@@ -23,6 +23,7 @@ namespace Facepunch.CoreWars
 		[Net] public NetInventoryContainer EquipmentInventory { get; private set; }
 		[Net] public TeamCore Core { get; private set; }
 
+		public Dictionary<ArmorSlot,BaseClothing> Armor { get; private set; }
 		public ProjectileSimulator Projectiles { get; private set; }
 		public DamageInfo LastDamageTaken { get; private set; }
 		public TimeUntil NextBlockPlace { get; private set; }
@@ -120,6 +121,7 @@ namespace Facepunch.CoreWars
 			CurrentHotbarIndex = 0;
 			client.Pawn = this;
 			CreateInventories();
+			Armor = new();
 		}
 
 		public bool TryGiveWeapon<T>() where T : WeaponItem
@@ -427,8 +429,6 @@ namespace Facepunch.CoreWars
 
 			CameraMode = new FirstPersonCamera();
 			Animator = new PlayerAnimator();
-
-			SetModel( "models/citizen/citizen.vmdl" );
 		}
 
 		public override void Spawn()
@@ -436,6 +436,10 @@ namespace Facepunch.CoreWars
 			EnableTouchPersists = true;
 			EnableDrawing = false;
 			EnableTouch = true;
+
+			SetModel( "models/citizen/citizen.vmdl" );
+			AttachClothing( "models/citizen_clothes/shoes/slippers/models/slippers.vmdl" );
+			SetMaterialGroup( Rand.Int( MaterialGroupCount - 1 ) );
 
 			base.Spawn();
 		}
@@ -459,6 +463,8 @@ namespace Facepunch.CoreWars
 			{
 				Hud.AddKillFeed( To.Everyone, this );
 			}
+
+			BecomeRagdollOnClient( LastDamageTaken.Force, LastDamageTaken.BoneIndex );
 
 			EnableAllCollisions = false;
 			EnableDrawing = false;
@@ -651,9 +657,8 @@ namespace Facepunch.CoreWars
 
 				using ( Prediction.Off() )
 				{
-					var particles = Particles.Create( "particles/gameplay/player/taken_damage/taken_damage.vpcf", this );
-					particles.SetPosition( 0, info.Position );
-					particles.SetForward( 0, info.Force.Normal * -1f );
+					var particles = Particles.Create( "particles/gameplay/player/taken_damage/taken_damage.vpcf", info.Position );
+					particles.SetForward( 0, info.Force.Normal );
 				}
 
 				var hitboxGroup = GetHitboxGroup( info.HitboxIndex );
@@ -831,6 +836,10 @@ namespace Facepunch.CoreWars
 				var crowbar = InventorySystem.CreateItem<CrowbarItemTier1>();
 				TryGiveItem( crowbar );
 			}
+
+			var crossbow = InventorySystem.CreateItem<CrossbowItemTier1>();
+			TryGiveItem( crossbow );
+			TryGiveAmmo( AmmoType.Bolt, 20 );
 		}
 
 		public virtual void CreateInventories()
@@ -958,12 +967,31 @@ namespace Facepunch.CoreWars
 
 		private void OnEquipmentItemGiven( ushort slot, InventoryItem instance )
 		{
+			if ( instance is ArmorItem armor )
+			{
+				if ( Armor.TryGetValue( armor.ArmorSlot, out var model ) )
+				{
+					Armor.Remove( armor.ArmorSlot );
+					model.Delete();
+				}
 
+				if ( !string.IsNullOrEmpty( armor.ModelName ) )
+				{
+					Armor.Add( armor.ArmorSlot, AttachClothing( armor.ModelName ) );
+				}
+			}
 		}
 
 		private void OnEquipmentItemTaken( ushort slot, InventoryItem instance )
 		{
-
+			if ( instance is ArmorItem armor && !EquipmentInventory.Is( instance.Container ) )
+			{
+				if ( Armor.TryGetValue( armor.ArmorSlot, out var model ) )
+				{
+					Armor.Remove( armor.ArmorSlot );
+					model.Delete();
+				}
+			}
 		}
 
 		private void OnBackpackItemGiven( ushort slot, InventoryItem instance )
@@ -1001,7 +1029,7 @@ namespace Facepunch.CoreWars
 		{
 			if ( instance is WeaponItem weapon )
 			{
-				if ( weapon.Weapon.IsValid() && instance.Container != HotbarInventory.Instance )
+				if ( weapon.Weapon.IsValid() && !HotbarInventory.Is( instance.Container ) )
 				{
 					weapon.Weapon.Delete();
 					weapon.Weapon = null;

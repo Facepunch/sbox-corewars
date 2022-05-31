@@ -14,6 +14,17 @@ namespace Facepunch.CoreWars.Editor
 
 		}
 
+		public void AddRowToGroup( string entryTitle, Panel control )
+		{
+			var row = (currentGroup ?? this).AddChild<Field>();
+
+			var title = row.Add.Panel( "label" );
+			title.Add.Label( entryTitle );
+
+			var value = row.AddChild<FieldControl>();
+			control.Parent = value;
+		}
+
 		public void AddRowWithCallback( PropertyInfo member, object target, Panel control, Action<object> callback )
 		{
 			var entryTitle = member.Name;

@@ -14,7 +14,7 @@ namespace Facepunch.CoreWars.Inventory
 		{
 			if ( item != null )
 			{
-				writer.Write( item.LibraryId );
+				writer.Write( item.ClassName );
 				writer.Write( item.StackSize );
 				writer.Write( item.ItemId );
 				writer.Write( item.SlotId );
@@ -23,7 +23,7 @@ namespace Facepunch.CoreWars.Inventory
 			}
 			else
 			{
-				writer.Write( -1 );
+				writer.Write( string.Empty );
 			}
 		}
 

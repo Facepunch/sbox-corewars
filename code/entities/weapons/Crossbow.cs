@@ -32,6 +32,7 @@ namespace Facepunch.CoreWars
 		public override float Speed => 1300f;
 		public override float Gravity => 5f;
 		public override float InheritVelocity => 0f;
+		public override string ReloadSoundName => "crossbow.reload";
 		public override string ProjectileModel => "weapons/rust_crossbow/rust_crossbow_bolt.vmdl";
 		public override int ClipSize => 1;
 		public override float ReloadTime => 2.3f;
@@ -58,12 +59,6 @@ namespace Facepunch.CoreWars
 			base.AttackPrimary();
 		}
 
-		public override void PlayReloadSound()
-		{
-			PlaySound( "crossbow.reload" );
-			base.PlayReloadSound();
-		}
-
 		public override void CreateViewModel()
 		{
 			base.CreateViewModel();
@@ -85,8 +80,7 @@ namespace Facepunch.CoreWars
 					.WithPosition( trace.EndPosition )
 					.WithForce( projectile.Velocity * 0.1f )
 					.WithFlag( DamageType )
-					.WithHitBody( trace.Body )
-					.WithHitbox( trace.HitboxIndex );
+					.UsingTraceResult( trace );
 
 				info.Damage = GetDamageFalloff( projectile.StartPosition.Distance( victim.Position ), Config.Damage );
 				victim.TakeDamage( info );

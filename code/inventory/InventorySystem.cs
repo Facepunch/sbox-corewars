@@ -104,7 +104,7 @@ namespace Facepunch.CoreWars.Inventory
 		public static InventoryItem CreateDuplicateItem( InventoryItem item )
 		{
 			var description = TypeLibrary.GetDescription( item.GetType() );
-			var duplicate = CreateItem( description.Identity );
+			var duplicate = CreateItem( description.Name );
 			
 			using ( var writeStream = new MemoryStream() )
 			{
@@ -130,10 +130,10 @@ namespace Facepunch.CoreWars.Inventory
 		public static T CreateItem<T>( ulong itemId = 0 ) where T : InventoryItem
 		{
 			var description = TypeLibrary.GetDescription( typeof( T ) );
-			return (CreateItem( description.Identity, itemId ) as T);
+			return (CreateItem( description.Name, itemId ) as T);
 		}
 
-		public static InventoryItem CreateItem( int libraryId, ulong itemId = 0 )
+		public static InventoryItem CreateItem( string className, ulong itemId = 0 )
 		{
 			if ( itemId > 0 && Items.TryGetValue( itemId, out var instance ) )
 			{
@@ -145,11 +145,11 @@ namespace Facepunch.CoreWars.Inventory
 				itemId = ++NextItemId;
 			}
 
-			instance = TypeLibrary.Create<InventoryItem>( libraryId );
+			instance = TypeLibrary.Create<InventoryItem>( className );
 			instance.ItemId = itemId;
 			instance.IsValid = true;
 			instance.StackSize = instance.DefaultStackSize;
-			instance.LibraryId = libraryId;
+			instance.ClassName = className;
 			instance.OnCreated();
 
 			Items[itemId] = instance;

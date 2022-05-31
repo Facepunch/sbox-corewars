@@ -4,17 +4,17 @@ using Sandbox;
 
 namespace Facepunch.CoreWars.Editor
 {
-	[EditorTool( Title = "Duplicate Blocks", Description = "Duplicate an area of blocks" )]
-	[Icon( "textures/ui/tools/duplicateblocks.png" )]
-	public partial class DuplicateBlocksTool : EditorTool
+	[EditorTool( Title = "Move Blocks", Description = "Move an area of blocks" )]
+	[Icon( "textures/ui/tools/moveblocks.png" )]
+	public partial class MoveBlocksTool : EditorTool
 	{
-		public enum DuplicateStage
+		public enum MoveStage
 		{
-			Copy,
-			Paste
+			Select,
+			Move
 		}
 
-		[Net] public DuplicateStage Stage { get; set; } = DuplicateStage.Copy;
+		[Net] public MoveStage Stage { get; set; } = MoveStage.Select;
 
 		private EditorAreaGhost AreaGhost { get; set; }
 		private TimeUntil NextBlockPlace { get; set; }
@@ -30,7 +30,7 @@ namespace Facepunch.CoreWars.Editor
 				var aimVoxelPosition = GetAimVoxelPosition( 6f );
 				var aimSourcePosition = world.ToSourcePosition( aimVoxelPosition );
 
-				if ( Stage == DuplicateStage.Copy )
+				if ( Stage == MoveStage.Select )
 				{
 					if ( StartPosition.HasValue )
 					{
@@ -75,7 +75,7 @@ namespace Facepunch.CoreWars.Editor
 
 			StartPosition = null;
 			EndPosition = null;
-			Stage = DuplicateStage.Copy;
+			Stage = MoveStage.Select;
 		}
 
 		public override void OnDeselected()
@@ -92,15 +92,16 @@ namespace Facepunch.CoreWars.Editor
 		{
 			if ( NextBlockPlace )
 			{
+				var world = VoxelWorld.Current;
 				var aimVoxelPosition = GetAimVoxelPosition( 6f );
-				var aimSourcePosition = VoxelWorld.Current.ToSourcePosition( aimVoxelPosition );
+				var aimSourcePosition = world.ToSourcePosition( aimVoxelPosition );
 
-				if ( Stage == DuplicateStage.Copy )
+				if ( Stage == MoveStage.Select )
 				{
 					if ( StartPosition.HasValue )
 					{
 						EndPosition = aimSourcePosition;
-						Stage = DuplicateStage.Paste;
+						Stage = MoveStage.Move;
 					}
 					else
 					{
@@ -111,14 +112,19 @@ namespace Facepunch.CoreWars.Editor
 				{
 					if ( IsServer )
 					{
-						var startSourceVoxelPosition = VoxelWorld.Current.ToVoxelPosition( StartPosition.Value );
-						var endSourceVoxelPosition = VoxelWorld.Current.ToVoxelPosition( EndPosition.Value );
+						var startSourceVoxelPosition = world.ToVoxelPosition( StartPosition.Value );
+						var endSourceVoxelPosition = world.ToVoxelPosition( EndPosition.Value );
 
-						var action = new DuplicateBlocksAction();
-						action.Initialize( startSourceVoxelPosition, endSourceVoxelPosition, aimVoxelPosition, Input.Down( InputButton.Run ) );
+						var action = new MoveBlocksAction();
+						action.Initialize( startSourceVoxelPosition, endSourceVoxelPosition, aimVoxelPosition);
 
 						Player.Perform( action );
 					}
+
+					NextBlockPlace = 0.1f;
+					StartPosition = null;
+					EndPosition = null;
+					Stage = MoveStage.Select;
 				}
 
 				NextBlockPlace = 0.1f;
@@ -131,7 +137,8 @@ namespace Facepunch.CoreWars.Editor
 			{
 				NextBlockPlace = 0.1f;
 				StartPosition = null;
-				Stage = DuplicateStage.Copy;
+				EndPosition = null;
+				Stage = MoveStage.Select;
 			}
 		}
 	}

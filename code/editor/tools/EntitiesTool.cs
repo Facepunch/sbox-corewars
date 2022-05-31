@@ -47,6 +47,8 @@ namespace Facepunch.CoreWars.Editor
 		[Net, Change( nameof( OnEntityChanged ) )] public ModelEntity SelectedEntity { get; private set; }
 		[Net] public Rotation CurrentRotation { get; private set; }
 
+		public override string SecondaryMode => Mode.ToString().ToTitleCase();
+
 		private TypeDescription CurrentTypeDescription { get; set; }
 		private EditorEntityAttribute CurrentAttribute { get; set; }
 		private VolumeEntity Volume { get; set; }
@@ -80,9 +82,9 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void Simulate( Client client )
 		{
-			var currentMap = VoxelWorld.Current;
+			var world = VoxelWorld.Current;
 
-			if ( IsClient && currentMap.IsValid() && CurrentAttribute != null )
+			if ( IsClient && world.IsValid() && CurrentAttribute != null )
 			{
 				var aimVoxelPosition = GetAimVoxelPosition( 4f );
 
@@ -92,7 +94,7 @@ namespace Facepunch.CoreWars.Editor
 					{
 						if ( Volume.IsValid() )
 						{
-							var aimSourcePosition = VoxelWorld.Current.ToSourcePosition( aimVoxelPosition );
+							var aimSourcePosition = world.ToSourcePosition( aimVoxelPosition );
 							var volumeBBox = GetVolumeBBox( StartPosition.HasValue ? StartPosition.Value : aimSourcePosition, aimSourcePosition );
 
 							Volume.Position = volumeBBox.Mins;

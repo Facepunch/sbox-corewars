@@ -362,6 +362,16 @@ namespace Facepunch.CoreWars.Inventory
 			return true;
 		}
 
+		public bool Is( InventoryContainer container )
+		{
+			return container == this;
+		}
+
+		public bool Is( NetInventoryContainer container )
+		{
+			return container.Instance == this;
+		}
+
 		public InventoryItem Remove( InventoryItem item )
 		{
 			return Remove( item.ItemId );
