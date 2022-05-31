@@ -21,10 +21,12 @@ Vitals {
         background-size: cover;
         width: 24px;
         height: 24px;
+        font-size: 24px;
         margin-right: 8px;
         position: absolute;
         left: -32px;
         z-index: 1;
+        text-shadow: 0 2px 0 rgba(0, 0, 0, 0.5);
       }
 
       .bar-wrapper {
@@ -38,7 +40,7 @@ Vitals {
         margin-bottom: 8px;
 
         .icon {
-          background-image: url(/textures/ui/icon_health.png);
+          color: $pink;
         }
 
         .bar {
@@ -54,7 +56,7 @@ Vitals {
 
       &.stamina {
         .icon {
-          background-image: url(/textures/ui/icon_energy.png);
+          color: $blue;
         }
 
         .bar {

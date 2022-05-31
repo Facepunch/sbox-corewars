@@ -3,16 +3,17 @@
 <div>
   <div class="player-vitals">
     <div class="vital health">
-      <div class="icon"></div>
+      <Icon class="icon">favorite</Icon>
       <div class="bar-wrapper">
         <div @ref="HealthBar" class="bar">
+          <div class="mdi mdi-name"></div>
           <label class="value" @ref="HealthValue">50%</label>
         </div>
       </div>
     </div>
 
     <div class="vital stamina">
-      <div class="icon"></div>
+      <Icon class="icon">bolt</Icon>
       <div class="bar-wrapper">
         <div @ref="StaminaBar" class="bar">
           <label class="value" @ref="StaminaValue">50%</label>

@@ -25,17 +25,12 @@ StageInfo {
       background-size: cover;
       width: 24px;
       height: 24px;
+      font-size: 24px;
+      color: $grey;
       margin-right: 8px;
-
-      &.time {
-        background-image: url(/textures/ui/icon_time.png);
-      }
+      text-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
 
       &.current-stage {
-        background-image: url(/textures/ui/icon_stage_next.png);
-      }
-
-      &.next-stage {
         background-image: url(/textures/ui/icon_stage_next.png);
       }
     }
