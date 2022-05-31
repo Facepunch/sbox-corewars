@@ -66,32 +66,6 @@ ChatBox {
   }
 }
 
-.team_blue {
-  chatbox {
-    textentrycontainer {
-      .channel {
-        &.team {
-          background-color: blue;
-          color: grey;
-        }
-      }
-    }
-  }
-}
-
-.team_red {
-  chatbox {
-    textentrycontainer {
-      .channel {
-        &.team {
-          background-color: red;
-          color: #fff;
-        }
-      }
-    }
-  }
-}
-
 chatentry {
   margin-bottom: 0px;
   color: white;
@@ -135,6 +109,7 @@ chatentry {
   }
 
   .channel {
+    color: #fff;
     align-self: flex-start;
     min-height: 42px;
     align-items: center;
@@ -158,7 +133,7 @@ chatentry {
     padding: 5px 0;
     font-weight: 600;
     font-size: 18px;
-    color: #c0fb2e;
+    color: #fff;
     flex-shrink: 0;
     font-family: $font;
     margin-left: 8px;
@@ -184,23 +159,72 @@ chatentry {
   }
 
   &.tip {
-    background-color: red;
+    background-color: $blue;
   }
 
   &.noavatar {
     padding-left: 12px;
   }
 
-  &.team_red {
-    background-color: $pink;
-
-    .message {
-      color: #fff;
+  &.team_orange {
+    .channel {
+      background-color: orange;
     }
 
+    .name {
+      color: orange;
+    }
+  }
+
+  &.team_green {
+    .channel {
+      background-color: green;
+    }
+
+    .name {
+      color: green;
+    }
+  }
+  &.team_purple {
+    .channel {
+      background-color: purple;
+    }
+
+    .name {
+      color: purple;
+    }
+  }
+  &.team_pink {
+    .channel {
+      background-color: pink;
+    }
+
+    .name {
+      color: pink;
+    }
+  }
+  &.team_cyan {
+    .channel {
+      background-color: cyan;
+    }
+
+    .name {
+      color: cyan;
+    }
+  }
+  &.team_yellow {
+    .channel {
+      background-color: yellow;
+    }
+
+    .name {
+      color: yellow;
+    }
+  }
+
+  &.team_red {
     .channel {
       background-color: $pink;
-      color: #fff;
     }
 
     .name {
@@ -209,13 +233,8 @@ chatentry {
   }
 
   &.team_blue {
-    .message {
-      color: #fff;
-    }
-
     .channel {
       background-color: $blue;
-      color: #fff;
     }
 
     .name {
