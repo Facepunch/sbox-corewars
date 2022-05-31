@@ -13,19 +13,20 @@ Vitals {
     flex-direction: column;
     padding-left: 32px;
 
-    .icon {
-      background-color: red;
-      width: 24px;
-      height: 24px;
-      margin-right: 8px;
-      position: absolute;
-      left: -32px;
-      z-index: 1;
-    }
-
     .vital {
       width: 340px;
       height: 24px;
+
+      .icon {
+        background-size: cover;
+
+        width: 24px;
+        height: 24px;
+        margin-right: 8px;
+        position: absolute;
+        left: -32px;
+        z-index: 1;
+      }
 
       .bar-wrapper {
         background-color: $box-bg;
@@ -36,6 +37,11 @@ Vitals {
 
       &.health {
         margin-bottom: 8px;
+
+        .icon {
+          background-image: url(/textures/ui/icon_health.png);
+        }
+
         .bar {
           background-color: $pink;
 
@@ -48,6 +54,10 @@ Vitals {
       }
 
       &.stamina {
+        .icon {
+          background-image: url(/textures/ui/icon_energy.png);
+        }
+
         .bar {
           background-color: $blue;
 
