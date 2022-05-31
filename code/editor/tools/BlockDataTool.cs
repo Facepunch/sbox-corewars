@@ -28,10 +28,11 @@ namespace Facepunch.CoreWars.Editor
 			var position = GetTargetBlockPosition();
 			if ( !position.HasValue ) return;
 
-			var blockId = VoxelWorld.Current.GetBlock( position.Value );
-			var block = VoxelWorld.Current.GetBlockType( blockId );
+			var world = VoxelWorld.Current;
+			var blockId = world.GetBlock( position.Value );
+			var block = world.GetBlockType( blockId );
 			var outlineColor = Color.Cyan;
-			var sourceBBox = VoxelWorld.Current.ToSourceBBox( position.Value );
+			var sourceBBox = world.ToSourceBBox( position.Value );
 
 			DebugOverlay.Box(
 				sourceBBox.Mins,

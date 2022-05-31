@@ -82,9 +82,9 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void Simulate( Client client )
 		{
-			var currentMap = VoxelWorld.Current;
+			var world = VoxelWorld.Current;
 
-			if ( IsClient && currentMap.IsValid() && CurrentAttribute != null )
+			if ( IsClient && world.IsValid() && CurrentAttribute != null )
 			{
 				var aimVoxelPosition = GetAimVoxelPosition( 4f );
 
@@ -94,7 +94,7 @@ namespace Facepunch.CoreWars.Editor
 					{
 						if ( Volume.IsValid() )
 						{
-							var aimSourcePosition = VoxelWorld.Current.ToSourcePosition( aimVoxelPosition );
+							var aimSourcePosition = world.ToSourcePosition( aimVoxelPosition );
 							var volumeBBox = GetVolumeBBox( StartPosition.HasValue ? StartPosition.Value : aimSourcePosition, aimSourcePosition );
 
 							Volume.Position = volumeBBox.Mins;

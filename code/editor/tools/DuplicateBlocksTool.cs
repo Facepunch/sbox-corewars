@@ -23,12 +23,12 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void Simulate( Client client )
 		{
-			var currentMap = VoxelWorld.Current;
+			var world = VoxelWorld.Current;
 
-			if ( IsClient && currentMap.IsValid() )
+			if ( IsClient && world.IsValid() )
 			{
 				var aimVoxelPosition = GetAimVoxelPosition( 6f );
-				var aimSourcePosition = VoxelWorld.Current.ToSourcePosition( aimVoxelPosition );
+				var aimSourcePosition = world.ToSourcePosition( aimVoxelPosition );
 
 				if ( Stage == DuplicateStage.Copy )
 				{

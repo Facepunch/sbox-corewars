@@ -7,16 +7,17 @@ using System;
 
 namespace Facepunch.CoreWars.Editor
 {
-	public class MirrorBlocksAction : EditorAction
+	public class FlipBlocksAction : EditorAction
 	{
-		public override string Name => "Mirror Blocks";
+		public override string Name => "Flip Blocks";
 		 
-		private BlockState[] NewTargetBlockStates { get; set; }
-		private byte[] NewTargetBlockIds { get; set; }
-		private BlockState[] OldTargetBlockStates { get; set; }
-		private byte[] OldTargetBlockIds { get; set; }
+		private BlockState[] NewBlockStates { get; set; }
+		private byte[] NewBlockIds { get; set; }
+		private BlockState[] OldBlockStates { get; set; }
+		private byte[] OldBlockIds { get; set; }
 		private IntVector3 Mins { get; set; }
 		private IntVector3 Maxs { get; set; }
+		private bool FromOrigin { get; set; }
 		private bool FlipX { get; set; }
 		private bool FlipY { get; set; }
 		private int Width { get; set; }
@@ -39,10 +40,10 @@ namespace Facepunch.CoreWars.Editor
 
 			var totalBlocks = Width * Height * Depth;
 
-			OldTargetBlockIds = new byte[totalBlocks];
-			NewTargetBlockIds = new byte[totalBlocks];
-			NewTargetBlockStates = new BlockState[totalBlocks];
-			OldTargetBlockStates = new BlockState[totalBlocks];
+			OldBlockIds = new byte[totalBlocks];
+			NewBlockIds = new byte[totalBlocks];
+			OldBlockStates = new BlockState[totalBlocks];
+			NewBlockStates = new BlockState[totalBlocks];
 
 			for ( var x = Mins.x; x <= Maxs.x; x++ )
 			{
@@ -53,25 +54,27 @@ namespace Facepunch.CoreWars.Editor
 						var position = new IntVector3( x, y, z );
 						var localPosition = GetLocalPosition( x, y, z );
 						var oldIndex = GetArrayIndex( localPosition.x, localPosition.y, localPosition.z );
+						OldBlockIds[oldIndex] = world.GetBlock( position );
+						OldBlockStates[oldIndex] = world.GetState<BlockState>( position );
+					}
+				}
+			}
 
-						NewTargetBlockIds[oldIndex] = world.GetBlock( position );
-
-						var state = world.GetState<BlockState>( position );
-
-						if ( state.IsValid() )
-						{
-							NewTargetBlockStates[oldIndex] = state.Copy();
-						}
-
-						var origin = world.MaxSize / 2;
-						var delta = position - origin;
-						var mirrored = origin - delta;
-
-						if ( FlipX ) position.x = mirrored.x;
-						if ( FlipY ) position.y = mirrored.y;
-
-						OldTargetBlockIds[oldIndex] = world.GetBlock( position );
-						OldTargetBlockStates[oldIndex] = world.GetState<BlockState>( position );
+			for ( var x = Mins.x; x <= Maxs.x; x++ )
+			{
+				for ( var y = Mins.y; y <= Maxs.y; y++ )
+				{
+					for ( var z = Mins.z; z <= Maxs.z; z++ )
+					{
+						var localPosition = GetLocalPosition( x, y, z );
+						var newIndex = GetArrayIndex( localPosition.x, localPosition.y, localPosition.z );
+						var oldIndex = GetArrayIndex(
+							FlipX ? (Width - localPosition.x - 1) : localPosition.x,
+							FlipY ? (Height - localPosition.y - 1) : localPosition.y,
+							localPosition.z
+						);
+						NewBlockStates[newIndex] = OldBlockStates[oldIndex];
+						NewBlockIds[newIndex] = OldBlockIds[oldIndex];
 					}
 				}
 			}
@@ -90,16 +93,8 @@ namespace Facepunch.CoreWars.Editor
 						var position = new IntVector3( x, y, z );
 						var localPosition = GetLocalPosition( x, y, z );
 						var newIndex = GetArrayIndex( localPosition.x, localPosition.y, localPosition.z );
-
-						var origin = world.MaxSize / 2;
-						var delta = position - origin;
-						var mirrored = origin - delta;
-
-						if ( FlipX ) position.x = mirrored.x;
-						if ( FlipY ) position.y = mirrored.y;
-
-						world.SetBlockOnServer( position, NewTargetBlockIds[newIndex] );
-						world.SetState( position, NewTargetBlockStates[newIndex] );
+						world.SetBlockOnServer( position, NewBlockIds[newIndex] );
+						world.SetState( position, NewBlockStates[newIndex] );
 					}
 				}
 			}
@@ -120,15 +115,8 @@ namespace Facepunch.CoreWars.Editor
 						var position = new IntVector3( x, y, z );
 						var localPosition = GetLocalPosition( x, y, z );
 						var oldIndex = GetArrayIndex( localPosition.x, localPosition.y, localPosition.z );
-						var origin = world.MaxSize / 2;
-						var delta = position - origin;
-						var mirrored = origin - delta;
-
-						if ( FlipX ) position.x = mirrored.x;
-						if ( FlipY ) position.y = mirrored.y;
-
-						world.SetBlockOnServer( position, OldTargetBlockIds[oldIndex] );
-						world.SetState( position, OldTargetBlockStates[oldIndex] );
+						world.SetBlockOnServer( position, OldBlockIds[oldIndex] );
+						world.SetState( position, OldBlockStates[oldIndex] );
 					}
 				}
 			}

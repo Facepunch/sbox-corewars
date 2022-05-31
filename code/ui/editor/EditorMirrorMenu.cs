@@ -16,6 +16,7 @@ namespace Facepunch.CoreWars.Editor
 		public static EditorMirrorMenu Current { get; private set; }
 
 		public SimpleForm PropertyForm { get; set; }
+		public Checkbox FromOrigin { get; set; }
 		public Checkbox XAxis { get; set; }
 		public Checkbox YAxis { get; set; }
 
@@ -33,9 +34,11 @@ namespace Facepunch.CoreWars.Editor
 			PropertyForm.Clear();
 			PropertyForm.StartGroup();
 
+			FromOrigin = new Checkbox();
 			XAxis = new Checkbox();
 			YAxis = new Checkbox();
 
+			PropertyForm.AddRowToGroup( "From Origin", FromOrigin );
 			PropertyForm.AddRowToGroup( "X Axis", XAxis );
 			PropertyForm.AddRowToGroup( "Y Axis", YAxis );
 
@@ -56,7 +59,7 @@ namespace Facepunch.CoreWars.Editor
 			{
 				if ( player.Tool is MirrorBlocksTool tool )
 				{
-					tool.Mirror( XAxis.Checked, YAxis.Checked );
+					tool.Mirror( XAxis.Checked, YAxis.Checked, FromOrigin.Checked );
 				}
 			}
 

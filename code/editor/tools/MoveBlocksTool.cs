@@ -23,12 +23,12 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void Simulate( Client client )
 		{
-			var currentMap = VoxelWorld.Current;
+			var world = VoxelWorld.Current;
 
-			if ( IsClient && currentMap.IsValid() )
+			if ( IsClient && world.IsValid() )
 			{
 				var aimVoxelPosition = GetAimVoxelPosition( 6f );
-				var aimSourcePosition = VoxelWorld.Current.ToSourcePosition( aimVoxelPosition );
+				var aimSourcePosition = world.ToSourcePosition( aimVoxelPosition );
 
 				if ( Stage == MoveStage.Select )
 				{
@@ -92,8 +92,9 @@ namespace Facepunch.CoreWars.Editor
 		{
 			if ( NextBlockPlace )
 			{
+				var world = VoxelWorld.Current;
 				var aimVoxelPosition = GetAimVoxelPosition( 6f );
-				var aimSourcePosition = VoxelWorld.Current.ToSourcePosition( aimVoxelPosition );
+				var aimSourcePosition = world.ToSourcePosition( aimVoxelPosition );
 
 				if ( Stage == MoveStage.Select )
 				{
@@ -111,8 +112,8 @@ namespace Facepunch.CoreWars.Editor
 				{
 					if ( IsServer )
 					{
-						var startSourceVoxelPosition = VoxelWorld.Current.ToVoxelPosition( StartPosition.Value );
-						var endSourceVoxelPosition = VoxelWorld.Current.ToVoxelPosition( EndPosition.Value );
+						var startSourceVoxelPosition = world.ToVoxelPosition( StartPosition.Value );
+						var endSourceVoxelPosition = world.ToVoxelPosition( EndPosition.Value );
 
 						var action = new MoveBlocksAction();
 						action.Initialize( startSourceVoxelPosition, endSourceVoxelPosition, aimVoxelPosition);

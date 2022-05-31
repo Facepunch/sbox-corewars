@@ -34,13 +34,13 @@ namespace Facepunch.CoreWars.Editor
 		}
 
 		[ConCmd.Server( "mirror_blocks_mirror" )]
-		public static void SendMirrorCmd( bool flipX, bool flipY )
+		public static void SendMirrorCmd( bool flipX, bool flipY, bool fromOrigin )
 		{
 			if ( ConsoleSystem.Caller.Pawn is EditorPlayer player )
 			{
 				if ( player.Tool is MirrorBlocksTool tool )
 				{
-					tool.Mirror( flipX, flipY );
+					tool.Mirror( flipX, flipY, fromOrigin );
 				}
 			}
 		}
@@ -58,11 +58,11 @@ namespace Facepunch.CoreWars.Editor
 			Stage = MirrorStage.Select;
 		}
 
-		public void Mirror( bool flipX, bool flipY )
+		public void Mirror( bool flipX, bool flipY, bool fromOrigin )
 		{
 			if ( IsClient )
 			{
-				SendMirrorCmd( flipX, flipY );
+				SendMirrorCmd( flipX, flipY, fromOrigin );
 			}
 
 			if ( IsServer && Stage == MirrorStage.Mirror )
@@ -70,10 +70,18 @@ namespace Facepunch.CoreWars.Editor
 				var startVoxelPosition = VoxelWorld.Current.ToVoxelPosition( StartPosition.Value );
 				var endVoxelPosition = VoxelWorld.Current.ToVoxelPosition( EndPosition.Value );
 
-				var action = new MirrorBlocksAction();
-				action.Initialize( startVoxelPosition, endVoxelPosition, flipX, flipY );
-
-				Player.Perform( action );
+				if ( fromOrigin )
+				{
+					var action = new MirrorBlocksAction();
+					action.Initialize( startVoxelPosition, endVoxelPosition, flipX, flipY );
+					Player.Perform( action );
+				}
+				else
+				{
+					var action = new FlipBlocksAction();
+					action.Initialize( startVoxelPosition, endVoxelPosition, flipX, flipY );
+					Player.Perform( action );
+				}
 			}
 
 			NextBlockPlace = 0.1f;
@@ -84,12 +92,12 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void Simulate( Client client )
 		{
-			var currentMap = VoxelWorld.Current;
+			var world = VoxelWorld.Current;
 
-			if ( IsClient && currentMap.IsValid() && AreaGhost.IsValid() )
+			if ( IsClient && world.IsValid() && AreaGhost.IsValid() )
 			{
 				var aimVoxelPosition = GetAimVoxelPosition( 6f );
-				var aimSourcePosition = VoxelWorld.Current.ToSourcePosition( aimVoxelPosition );
+				var aimSourcePosition = world.ToSourcePosition( aimVoxelPosition );
 
 				if ( Stage == MirrorStage.Select )
 				{
