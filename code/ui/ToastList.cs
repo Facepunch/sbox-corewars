@@ -92,27 +92,32 @@ namespace Facepunch.CoreWars
 	{
 		public static ToastList Instance { get; private set; }
 
+		public Panel KillFeedContainer { get; set; }
+		public Panel ToastsContainer { get; set; }
+
 		public ToastList()
 		{
+			KillFeedContainer = Add.Panel( "killfeed" );
+			ToastsContainer = Add.Panel( "toasts" );
 			StyleSheet.Load( "/ui/ToastList.scss" );
 			Instance = this;
 		}
 
 		public void AddKillFeed( Player attacker, Player victim, Entity weapon )
 		{
-			var item = AddChild<KillFeedItem>();
+			var item = KillFeedContainer.AddChild<KillFeedItem>();
 			item.Update( attacker, victim, weapon );
 		}
 
 		public void AddKillFeed( Player victim )
 		{
-			var item = AddChild<KillFeedItem>();
+			var item = KillFeedContainer.AddChild<KillFeedItem>();
 			item.Update( victim );
 		}
 
 		public void AddItem( string text, Texture icon = null )
 		{
-			var item = AddChild<ToastItem>();
+			var item = ToastsContainer.AddChild<ToastItem>();
 			item.Update( text, icon );
 		}
 	}
