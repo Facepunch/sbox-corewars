@@ -1,66 +1,94 @@
-﻿StageInfo {
-    position: absolute;
-    width: 100%;
-    height: 100%;
+﻿@import "./scss/base.scss";
+
+StageInfo {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+
+  .box {
     align-items: center;
     justify-content: center;
+    background-color: $box-bg;
+    border: 2px solid $box-border;
+    border-radius: 8px;
+    padding: 4px 8px;
 
-    .container {
-        background-color: rgba( 0 0 0 0.1 );
-        position: absolute;
-        border-radius: 2px;
-        top: 32px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-width: 400px;
-        padding: 8px;
-
-        .header {
-            align-items: center;
-            justify-content: center;
-
-            .stage {
-                font-size: 40px;
-                font-family: Roboto;
-                color: orangered;
-            }
-
-            .icon {
-                background-size: cover;
-                margin-right: 16px;
-                width: 40px;
-                height: 40px;
-            }
-        }
-
-        .time {
-            font-size: 48px;
-            font-family: Roboto;
-            color: white;
-        }
-
-        .next-stage-panel {
-            background-color: rgba( 50 50 50 0.2 );
-            border-radius: 2px;
-            margin-top: 4px;
-            padding: 8px;
-
-            label {
-                font-family: Roboto;
-                font-size: 24px;
-                color: white;
-            }
-
-            .next-stage {
-                margin-left: 8px;
-                color: orange;
-            }
-        }
+    &:first-child {
+      margin-right: 8px;
     }
 
-    &.hidden {
-        display: none;
+    .icon {
+      background-color: pink;
+      width: 24px;
+      height: 24px;
+      margin-right: 8px;
     }
+
+    label {
+      color: #fff;
+      font-size: 18px;
+      text-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  .container {
+    background-color: rgba(0 0 0 0.1);
+    position: absolute;
+    border-radius: 2px;
+    top: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 400px;
+    padding: 8px;
+
+    .header {
+      align-items: center;
+      justify-content: center;
+
+      .stage {
+        font-size: 40px;
+        font-family: Roboto;
+        color: orangered;
+      }
+
+      .icon {
+        background-size: cover;
+        margin-right: 16px;
+        width: 40px;
+        height: 40px;
+      }
+    }
+
+    .time {
+      font-size: 48px;
+      font-family: Roboto;
+      color: white;
+    }
+
+    .next-stage-panel {
+      background-color: rgba(50 50 50 0.2);
+      border-radius: 2px;
+      margin-top: 4px;
+      padding: 8px;
+
+      label {
+        font-family: Roboto;
+        font-size: 24px;
+        color: white;
+      }
+
+      .next-stage {
+        margin-left: 8px;
+        color: orange;
+      }
+    }
+  }
+
+  &.hidden {
+    display: none;
+  }
 }
