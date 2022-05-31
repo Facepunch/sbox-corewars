@@ -1,106 +1,105 @@
 ﻿ToastList {
-    flex-direction: column;
-    flex-grow: 0;
-    position: absolute;
-    right: 64px;
-    bottom: 300px;
-    z-index: 10;
+  flex-direction: column;
+  flex-grow: 0;
+  position: absolute;
+  right: 64px;
+  bottom: 300px;
+  z-index: 10;
 
-    KillFeedItem {
-        align-self: flex-end;
-        align-items: center;
-        background-color: rgba( 0 0 0 0.6 );
-        backdrop-filter-blur: 8px;
-        flex-direction: row;
-        border-radius: 2px;
-        margin-top: 8px;
-        padding: 8px 16px;
-        transition: all 1s ease-out;
-        opacity: 1;
-        bottom: 0;
+  KillFeedItem {
+    align-self: flex-end;
+    align-items: center;
+    background-color: red;
+    backdrop-filter-blur: 8px;
+    flex-direction: row;
+    border-radius: 2px;
+    margin-top: 8px;
+    transition: all 1s ease-out;
+    opacity: 1;
+    bottom: 0;
 
-        &:intro {
-            opacity: 0;
-            bottom: -20px;
-        }
-
-        &:outro {
-            opacity: 0;
-            bottom: 20px;
-            transition: all 1s ease-out;
-        }
-
-        label, text {
-            color: #fff;
-            font-family: Roboto;
-            font-size: 24px;
-            flex-grow: 1;
-        }
-
-        .attacker {
-            flex-grow: 1;
-            font-family: Roboto;
-
-            &.hidden {
-                display: none;
-            }
-        }
-
-        .victim {
-            flex-grow: 1;
-        }
-
-        .icon {
-            width: 48px;
-            height: 48px;
-            margin-right: 16px;
-
-            &.has-attacker {
-                margin-left: 16px;
-            }
-        }
+    &:intro {
+      opacity: 0;
+      bottom: -20px;
     }
 
-    ToastItem {
-        align-self: flex-start;
-        align-items: center;
-        background-color: rgba( 0 0 0 0.6 );
-        backdrop-filter-blur: 8px;
-        border-radius: 2px;
-        flex-direction: row;
-        margin-top: 8px;
-        padding: 8px 16px;
-        transition: all 1s ease-out;
-        opacity: 1;
-        bottom: 0;
-
-        &:intro {
-            opacity: 0;
-            bottom: -20px;
-        }
-
-        &:outro {
-            opacity: 0;
-            bottom: 20px;
-            transition: all 1s ease-out;
-        }
-
-        .text {
-            color: white;
-            font-size: 24px;
-            font-family: Roboto;
-            margin-left: 8px;
-            flex-grow: 1;
-            margin-right: 16px;
-        }
-
-        .icon {
-            width: 48px;
-            height: 48px;
-
-            &.hidden {
-                display: none;
-            }
-        }
+    &:outro {
+      opacity: 0;
+      bottom: 20px;
+      transition: all 1s ease-out;
     }
+
+    label,
+    text {
+      color: #fff;
+      font-size: 24px;
+      flex-grow: 1;
+    }
+
+    .attacker {
+      flex-grow: 1;
+      font-family: Roboto;
+
+      &.hidden {
+        display: none;
+      }
+    }
+
+    .victim {
+      flex-grow: 1;
+    }
+
+    .icon {
+      width: 48px;
+      height: 48px;
+      margin-right: 16px;
+
+      &.has-attacker {
+        margin-left: 16px;
+      }
+    }
+  }
+
+  ToastItem {
+    align-self: flex-start;
+    align-items: center;
+    background-color: rgba(0 0 0 0.6);
+    backdrop-filter-blur: 8px;
+    border-radius: 2px;
+    flex-direction: row;
+    margin-top: 8px;
+    padding: 8px 16px;
+    transition: all 1s ease-out;
+    opacity: 1;
+    bottom: 0;
+
+    &:intro {
+      opacity: 0;
+      bottom: -20px;
+    }
+
+    &:outro {
+      opacity: 0;
+      bottom: 20px;
+      transition: all 1s ease-out;
+    }
+
+    .text {
+      color: white;
+      font-size: 24px;
+      font-family: Roboto;
+      margin-left: 8px;
+      flex-grow: 1;
+      margin-right: 16px;
+    }
+
+    .icon {
+      width: 48px;
+      height: 48px;
+
+      &.hidden {
+        display: none;
+      }
+    }
+  }
 }

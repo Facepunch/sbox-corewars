@@ -40,11 +40,11 @@ Vitals {
         margin-bottom: 8px;
 
         .icon {
-          color: $pink;
+          color: $red;
         }
 
         .bar {
-          background-color: $pink;
+          background-color: $red;
 
           &.health-low {
             animation-name: health-low;
