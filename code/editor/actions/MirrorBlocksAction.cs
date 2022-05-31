@@ -63,12 +63,15 @@ namespace Facepunch.CoreWars.Editor
 							NewTargetBlockStates[oldIndex] = state.Copy();
 						}
 
-						var origin = world.MaxSize / 2;
-						var delta = position - origin;
+						var sourcePosition = world.ToSourcePositionCenter( position );
+						var origin = world.ToSourcePositionCenter( world.MaxSize / 2 );
+						var delta = world.ToSourcePositionCenter( position ) - origin;
 						var mirrored = origin - delta;
 
-						if ( FlipX ) position.x = mirrored.x;
-						if ( FlipY ) position.y = mirrored.y;
+						if ( FlipX ) sourcePosition.x = mirrored.x;
+						if ( FlipY ) sourcePosition.y = mirrored.y;
+
+						position = world.ToVoxelPosition( sourcePosition );
 
 						OldTargetBlockIds[oldIndex] = world.GetBlock( position );
 						OldTargetBlockStates[oldIndex] = world.GetState<BlockState>( position );
@@ -90,13 +93,15 @@ namespace Facepunch.CoreWars.Editor
 						var position = new IntVector3( x, y, z );
 						var localPosition = GetLocalPosition( x, y, z );
 						var newIndex = GetArrayIndex( localPosition.x, localPosition.y, localPosition.z );
-
-						var origin = world.MaxSize / 2;
-						var delta = position - origin;
+						var sourcePosition = world.ToSourcePositionCenter( position );
+						var origin = world.ToSourcePositionCenter( world.MaxSize / 2 );
+						var delta = world.ToSourcePositionCenter( position ) - origin;
 						var mirrored = origin - delta;
 
-						if ( FlipX ) position.x = mirrored.x;
-						if ( FlipY ) position.y = mirrored.y;
+						if ( FlipX ) sourcePosition.x = mirrored.x;
+						if ( FlipY ) sourcePosition.y = mirrored.y;
+
+						position = world.ToVoxelPosition( sourcePosition );
 
 						world.SetBlockOnServer( position, NewTargetBlockIds[newIndex] );
 						world.SetState( position, NewTargetBlockStates[newIndex] );
@@ -120,12 +125,15 @@ namespace Facepunch.CoreWars.Editor
 						var position = new IntVector3( x, y, z );
 						var localPosition = GetLocalPosition( x, y, z );
 						var oldIndex = GetArrayIndex( localPosition.x, localPosition.y, localPosition.z );
-						var origin = world.MaxSize / 2;
-						var delta = position - origin;
+						var sourcePosition = world.ToSourcePositionCenter( position );
+						var origin = world.ToSourcePositionCenter( world.MaxSize / 2 );
+						var delta = world.ToSourcePositionCenter( position ) - origin;
 						var mirrored = origin - delta;
 
-						if ( FlipX ) position.x = mirrored.x;
-						if ( FlipY ) position.y = mirrored.y;
+						if ( FlipX ) sourcePosition.x = mirrored.x;
+						if ( FlipY ) sourcePosition.y = mirrored.y;
+
+						position = world.ToVoxelPosition( sourcePosition );
 
 						world.SetBlockOnServer( position, OldTargetBlockIds[oldIndex] );
 						world.SetState( position, OldTargetBlockStates[oldIndex] );
