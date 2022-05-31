@@ -89,6 +89,18 @@ namespace Facepunch.CoreWars
 			state.CurrentFileName = fileName;
 		}
 
+		[ConCmd.Server( "cw_change_team")]
+		public static void ChangeTeamCmd( string teamIndex )
+		{
+			var team = Enum.Parse<Team>( teamIndex );
+
+			if ( ConsoleSystem.Caller.Pawn is Player player )
+			{
+				player.SetTeam( team );
+				Log.Info( "Changed team to: " + team.ToString() );
+			}
+		}
+
 		[ConCmd.Server( "cw_editor_load" )]
 		public static void LoadEditorMapCmd( string fileName )
 		{
