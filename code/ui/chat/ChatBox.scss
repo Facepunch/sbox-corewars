@@ -1,19 +1,20 @@
-﻿@import "_variables.scss";
+﻿@import "../scss/base.scss";
 
 ChatBox {
   position: absolute;
   bottom: 100px;
   left: 64px;
   flex-direction: column;
-  width: 700px;
-  font-family: Poppins;
+  width: 500px;
+  font-family: $font;
   font-size: 13px;
   pointer-events: none;
   z-index: 8;
 
   textentrycontainer {
-    background-color: $panel-bg;
-    backdrop-filter: $blur-medium;
+    background-color: $box-bg;
+    border: 2px solid $box-border;
+    border-radius: 10px;
     opacity: 0;
     width: 100%;
     padding: 0;
@@ -22,7 +23,7 @@ ChatBox {
     tabtextentry {
       font-size: 16px;
       flex-shrink: 0;
-      font-family: $mainFont;
+      text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
       flex-grow: 0;
       color: white;
       width: 100%;
@@ -30,10 +31,12 @@ ChatBox {
     }
 
     .channel {
+      background-color: $box-border;
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
       margin-right: 10px;
       font-size: 16px;
       color: white;
-      font-family: $fontBold;
       padding: 8px;
       min-width: 80px;
       text-align: center;
@@ -44,8 +47,8 @@ ChatBox {
       }
 
       &.all {
-        background-color: $panel-bg;
-        color: $green;
+        background-color: $gold;
+        color: $box-bg;
       }
     }
   }
@@ -68,8 +71,8 @@ ChatBox {
     textentrycontainer {
       .channel {
         &.team {
-          background-color: $blue;
-          color: $dark-grey;
+          background-color: blue;
+          color: grey;
         }
       }
     }
@@ -81,7 +84,7 @@ ChatBox {
     textentrycontainer {
       .channel {
         &.team {
-          background-color: $red;
+          background-color: red;
           color: #fff;
         }
       }
@@ -95,13 +98,14 @@ chatentry {
   transition: all 0.1s ease-out;
   opacity: 1;
   max-height: 200px;
-  min-height: 40px;
+  min-height: 42px;
   flex-shrink: 0;
   flex-grow: 0;
   padding: 0 8px 0 0;
   max-width: 100%;
   transform: scale(1);
-  backdrop-filter: $blur-medium;
+  //backdrop-filter: $blur-medium;
+  font-family: $font;
   margin-bottom: 2px;
   flex-direction: row;
 
@@ -122,7 +126,7 @@ chatentry {
   image {
     width: 42px;
     height: 42px;
-    border-radius: 0;
+    border-radius: 8px;
     margin: 0;
     padding: 0;
     max-height: 42px;
@@ -131,11 +135,19 @@ chatentry {
   }
 
   .channel {
-    font-family: $fontBold;
-    font-size: 14px;
-    color: #c0fb2e;
+    align-self: flex-start;
+    min-height: 42px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    margin-left: 8px;
+    font-family: $font;
+    font-size: 16px;
+    color: #fff;
     flex-shrink: 0;
-    padding: 12px 8px 0 8px;
+    padding: 0 8px;
+    min-width: 40px;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
 
     &.hidden {
       display: none;
@@ -143,22 +155,24 @@ chatentry {
   }
 
   .name {
-    padding: 10px 0;
+    padding: 5px 0;
     font-weight: 600;
-    font-size: 16px;
+    font-size: 18px;
     color: #c0fb2e;
     flex-shrink: 0;
-    font-family: $fontBold;
+    font-family: $font;
     margin-left: 8px;
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
   }
 
   .message {
     color: white;
-    font-family: $mainFont;
-    font-size: 14px;
+    font-family: $font;
+    font-size: 18px;
     flex-grow: 1;
     margin-left: 8px;
-    padding-top: 12px;
+    padding-top: 5px;
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
   }
 
   &.noname .name {
@@ -173,84 +187,31 @@ chatentry {
     padding-left: 12px;
   }
 
-  &.info {
-    align-items: center;
-    justify-content: center;
-    background-color: rgba($yellow, 0.1);
-    box-shadow: 0 5px 10px rgba($dark-grey, 0.1);
-    padding: 0 8px 0 0;
-    min-height: 40px;
-
-    image {
-      margin-right: 8px;
-    }
-
-    .message {
-      text-shadow: $text-shadow;
-      font-size: 16px;
-      color: $yellow;
-      padding: 0;
-      margin: 0;
-    }
-  }
-
-  &.tip {
-    align-items: center;
-    justify-content: center;
-    background-color: rgba($chatTipColor, 0.1);
-    box-shadow: 0 5px 10px rgba($dark-grey, 0.1);
-    padding: 0 8px 0 0;
-    min-height: 40px;
-
-    .message {
-      text-shadow: $text-shadow;
-      font-size: 16px;
-      color: $chatTipColor;
-      padding: 0;
-      margin: 0;
-    }
-
-    .channel {
-      color: #fff;
-      text-shadow: $text-shadow;
-      background-color: rgba($chatTipColor, 0.3);
-      font-size: 16px;
-      padding: 0;
-      margin: 0 8px 0 0;
-      padding: 8px;
-      height: 40px;
-    }
-  }
-
   &.team_red {
-    background-color: $panel-bg;
-    border-left: 3px solid $red;
+    background-color: $pink;
 
     .message {
       color: #fff;
     }
 
     .channel {
-      background-color: $red;
+      background-color: $pink;
       color: #fff;
     }
 
     .name {
-      color: $red;
+      color: $pink;
     }
   }
 
   &.team_blue {
-    background-color: $panel-bg;
-    border-left: 3px solid $blue;
-
     .message {
       color: #fff;
     }
 
     .channel {
       background-color: $blue;
-      color: $dark-grey;
+      color: #fff;
     }
 
     .name {
