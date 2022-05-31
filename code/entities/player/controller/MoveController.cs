@@ -21,7 +21,7 @@ namespace Facepunch.CoreWars
 		public float FallDamageMax { get; set; } = 400f;
 		public float StayOnGroundAngle { get; set; } = 270f;
 		public float GroundAngle { get; set; } = 46f;
-		public float StepSize { get; set; } = 2f;
+		public float StepSize { get; set; } = 28f;
 		public float MaxNonJumpVelocity { get; set; } = 140f;
 		public float BodyGirth { get; set; } = 32f;
 		public float BodyHeight { get; set; } = 72f;
