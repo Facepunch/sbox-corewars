@@ -10,7 +10,7 @@ Backpack {
   pointer-events: none;
   backdrop-filter-blur: 24px;
   flex-direction: column;
-  background-color: rgba(50 35 25 0.8);
+  background-color: rgba(0, 0, 0, 0.9);
   padding-bottom: 100px;
 
   .title {
@@ -52,7 +52,6 @@ Backpack {
       InventorySlot {
         margin-right: 10px;
         margin-top: 10px;
-        box-shadow: 0 4px 0 rgba(0, 0, 0, 0.7);
 
         &.is-empty {
           box-shadow: none;

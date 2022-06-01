@@ -59,8 +59,8 @@ namespace Facepunch.CoreWars
 
 		public void UpdatePosition()
 		{
-			Style.Left = Length.Pixels( Mouse.Position.x * ScaleFromScreen );
-			Style.Top = Length.Pixels( Mouse.Position.y * ScaleFromScreen );
+			Style.Left = Length.Pixels( Mouse.Position.x - 40 * ScaleFromScreen );
+			Style.Top = Length.Pixels( Mouse.Position.y - 40 * ScaleFromScreen );
 		}
 
 		public void SetMode( DraggableMode mode )
@@ -72,8 +72,8 @@ namespace Facepunch.CoreWars
 		{
 			ActiveDraggable = draggable;
 			Style.SetBackgroundImage( draggable.GetIconTexture() );
-			Style.Width = Length.Pixels( draggable.IconSize * ScaleFromScreen );
-			Style.Height = Length.Pixels( draggable.IconSize * ScaleFromScreen );
+			Style.Width = Length.Pixels( 80 * ScaleFromScreen );
+			Style.Height = Length.Pixels( 80 * ScaleFromScreen );
 		}
 
 		public override void Tick()
