@@ -12,6 +12,7 @@ Backpack {
   flex-direction: column;
   background-color: rgba(0, 0, 0, 0.9);
   padding-bottom: 100px;
+  z-index: 100;
 
   .title {
     color: $red;

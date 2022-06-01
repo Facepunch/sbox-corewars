@@ -10,6 +10,7 @@ Draggable {
   background-position: center;
   backdrop-filter-blur: 24px;
   display: none;
+  z-index: 101;
 
   &.active {
     display: flex;
