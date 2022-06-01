@@ -11,7 +11,7 @@ namespace Facepunch.CoreWars
 	[Category( "Gameplay" )]
 	public class PlayerSpawnpoint : ModelEntity, ISourceEntity
 	{
-		[EditorProperty] public Team Team { get; set; }
+		[EditorProperty, Net] public Team Team { get; set; }
 
 		public override void Spawn()
 		{
