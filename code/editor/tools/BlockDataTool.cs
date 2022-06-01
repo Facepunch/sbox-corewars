@@ -12,6 +12,8 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void OnSelected()
 		{
+			base.OnSelected();
+
 			Event.Register( this );
 
 			NextActionTime = 0.1f;
@@ -19,6 +21,8 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void OnDeselected()
 		{
+			base.OnDeselected();
+
 			Event.Unregister( this );
 		}
 

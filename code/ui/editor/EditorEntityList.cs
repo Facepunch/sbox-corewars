@@ -37,6 +37,8 @@ namespace Facepunch.CoreWars.Editor
 			var descriptions = TypeLibrary.GetDescriptions<Entity>().Where( d => d.GetAttribute<EditorEntityAttribute>() != null ).ToList();
 			var categories = new Dictionary<string, List<TypeDescription>>();
 
+			descriptions.Sort( ( a, b ) => a.Group.CompareTo( b.Group ) );
+
 			for ( int i = 0; i < descriptions.Count; i++ )
 			{
 				var description = descriptions[i];

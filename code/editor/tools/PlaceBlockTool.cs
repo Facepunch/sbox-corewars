@@ -28,6 +28,8 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void OnSelected()
 		{
+			base.OnSelected();
+
 			if ( IsClient )
 			{
 				BlockGhost = new EditorBlockGhost
@@ -41,6 +43,8 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void OnDeselected()
 		{
+			base.OnDeselected();
+
 			if ( IsClient )
 			{
 				BlockGhost?.Delete();

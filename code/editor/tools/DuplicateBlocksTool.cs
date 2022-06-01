@@ -14,7 +14,7 @@ namespace Facepunch.CoreWars.Editor
 			Paste
 		}
 
-		[Net] public DuplicateStage Stage { get; set; } = DuplicateStage.Copy;
+		[Net, Change( nameof( OnStageChanged ))] public DuplicateStage Stage { get; set; } = DuplicateStage.Copy;
 
 		private EditorAreaGhost AreaGhost { get; set; }
 		private TimeUntil NextBlockPlace { get; set; }
@@ -59,6 +59,8 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void OnSelected()
 		{
+			base.OnSelected();
+
 			if ( IsClient )
 			{
 				VoxelWorld.Current.GlobalOpacity = 0.8f;
@@ -80,11 +82,24 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void OnDeselected()
 		{
+			base.OnDeselected();
+
 			if ( IsClient )
 			{
 				Player.Camera.ZoomOut = 0f;
 				VoxelWorld.Current.GlobalOpacity = 1f;
 				AreaGhost?.Delete();
+			}
+		}
+
+		protected void OnStageChanged( DuplicateStage stage )
+		{
+			var display = EditorToolDisplay.Current;
+			display.ClearHotkeys();
+
+			if ( stage == DuplicateStage.Paste )
+			{
+				display.AddHotkey( InputButton.Run, "Copy Entities" );
 			}
 		}
 

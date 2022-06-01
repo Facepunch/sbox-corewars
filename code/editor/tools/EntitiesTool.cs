@@ -124,6 +124,8 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void OnSelected()
 		{
+			base.OnSelected();
+
 			if ( IsServer )
 			{
 				if ( string.IsNullOrEmpty( CurrentType ) )
@@ -147,6 +149,8 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void OnDeselected()
 		{
+			base.OnDeselected();
+
 			if ( IsClient )
 			{
 				DestroyGhostEntity();
@@ -228,6 +232,21 @@ namespace Facepunch.CoreWars.Editor
 					CreateGhostEntity();
 				else
 					DestroyGhostEntity();
+
+				var display = EditorToolDisplay.Current;
+				display.ClearHotkeys();
+				display.AddHotkey( InputButton.Use, "Aim Voxel Align" );
+
+				if ( !SelectedEntity.IsValid() && mode != EntitiesToolMode.Place )
+				{
+					display.AddHotkey( InputButton.Run, "Ignore Volume" );
+				}
+				else
+				{
+					display.AddHotkey( InputButton.Run, "No Center X" );
+					display.AddHotkey( InputButton.Duck, "No Center X" );
+					display.AddHotkey( InputButton.Flashlight, "Align Top" );
+				}
 			}
 
 			if ( IsServer && SelectedEntity.IsValid() )

@@ -40,6 +40,44 @@
         }
     }
 
+    .hotkeys {
+        position: absolute;
+        background: linear-gradient(to right, rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%);
+        width: 20%;
+        bottom: 200px;
+        left: 0px;
+        display: flex;
+
+        .list {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+
+            .item {
+                align-items: center;
+                margin-top: 8px;
+
+                .glyph {
+                    margin-right: 16px;
+                }
+
+                .text {
+                    font-size: 24px;
+                    font-family: Roboto;
+                    color: white;
+                }
+
+                &:first-child {
+                    margin-top: 0px;
+                }
+            }
+        }
+
+        &.hidden {
+            display: none;
+        }
+    }
+
     &.hidden {
         display: none;
     }
