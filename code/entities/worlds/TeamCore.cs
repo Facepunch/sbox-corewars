@@ -57,7 +57,7 @@ namespace Facepunch.CoreWars
 			SetModel( "models/gameplay/base_core/base_core.vmdl" );
 
 			Transmit = TransmitType.Always;
-			SetupPhysicsFromAABB( PhysicsMotionType.Static, Model.Bounds.Mins, Model.Bounds.Maxs );
+			SetupPhysicsFromAABB( PhysicsMotionType.Keyframed, Model.Bounds.Mins, Model.Bounds.Maxs );
 
 			Upgrades = new List<BaseTeamUpgrade>();
 
