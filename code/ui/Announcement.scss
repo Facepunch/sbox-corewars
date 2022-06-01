@@ -1,55 +1,52 @@
-﻿Announcement {
-    align-self: flex-start;
+﻿@import "./scss/base.scss";
+
+Announcement {
+  background-color: rgba($blue-dark, 0.9);
+  border: 2px solid $blue;
+  border-radius: 8px;
+  align-self: center;
+  flex-direction: column;
+  padding: 8px 16px;
+  transition: all 0.5s ease-in-out;
+  transform-origin: 50% 50%;
+  opacity: 1;
+  top: 0;
+  min-width: 330px;
+
+  &:intro {
+    opacity: 0;
+    top: -20px;
+  }
+
+  &:outro {
+    opacity: 0;
+    top: -20px;
+    transition: all 0.5s ease-in-out;
+  }
+
+  .header {
     align-items: center;
-    background-color: rgba(50 50 50 0.6);
-    border-radius: 2px;
-    flex-direction: column;
-    padding: 32px;
-    transition: all 0.5s bounce-in;
-    transform: translateX(-50%);
-    opacity: 1;
-    bottom: 0;
 
-    &:intro {
-        opacity: 0;
-        transform: scale(0 0) translateX(-50%);
+    .icon {
+      width: 32px;
+      height: 32px;
+      margin-right: 8px;
+
+      &.hidden {
+        display: none;
+      }
     }
 
-    &:outro {
-        opacity: 0;
-        transform: scale(0 0);
-        transform: scale(0 0) translateX(-50%);
-        transition: all 0.5s bounce-out;
+    .title {
+      font-size: 24px;
+      color: $blue;
     }
+  }
 
-    .header {
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 8px;
-
-        .icon {
-            width: 48px;
-            height: 48px;
-            margin-right: 16px;
-
-            &.hidden {
-                display: none;
-            }
-        }
-
-        .title {
-            font-family: Roboto;
-            font-size: 32px;
-            color: #f39b78;
-        }
-    }
-
-    .text {
-        color: white;
-        font-size: 24px;
-        font-family: Roboto;
-        margin-left: 8px;
-        flex-grow: 1;
-        margin-right: 16px;
-    }
+  .text {
+    color: white;
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.6);
+    font-size: 18px;
+    flex-grow: 1;
+  }
 }
