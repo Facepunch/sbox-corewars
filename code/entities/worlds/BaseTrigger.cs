@@ -52,7 +52,7 @@ namespace Facepunch.CoreWars
 			Mins = mins;
 			Maxs = maxs;
 
-			SetupPhysicsFromAABB( PhysicsMotionType.Static, Transform.PointToLocal( mins ), Transform.PointToLocal( maxs ) );
+			SetupPhysicsFromAABB( PhysicsMotionType.Keyframed, Transform.PointToLocal( mins ), Transform.PointToLocal( maxs ) );
 
 			var isEditorMode = Game.Current.IsEditorMode;
 
