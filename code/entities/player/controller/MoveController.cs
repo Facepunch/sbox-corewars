@@ -145,7 +145,7 @@ namespace Facepunch.CoreWars
 
 			if ( player.IsValid() )
 			{
-				if ( Input.Down( InputButton.Duck ) )
+				if ( Input.Down( InputButton.Duck ) && !Input.Down( InputButton.Run ) && WishVelocity.Length > 1f )
 					player.ReduceStamina( 10f * Time.Delta );
 				else
 					player.GainStamina( 15f * Time.Delta );

@@ -18,7 +18,9 @@ namespace Facepunch.CoreWars.Editor
 		public SimpleForm PropertyForm { get; set; }
 		public Checkbox FromOrigin { get; set; }
 		public Checkbox XAxis { get; set; }
+		public SliderEntry XOriginOffset { get; set; }
 		public Checkbox YAxis { get; set; }
+		public SliderEntry YOriginOffset { get; set; }
 
 		public static void Open()
 		{
@@ -34,13 +36,27 @@ namespace Facepunch.CoreWars.Editor
 			PropertyForm.Clear();
 			PropertyForm.StartGroup();
 
+			XOriginOffset = new SliderEntry();
+			XOriginOffset.MinValue = -10f;
+			XOriginOffset.MaxValue = 10f;
+			XOriginOffset.Value = 0f;
+			XOriginOffset.Step = 1f;
+
+			YOriginOffset = new SliderEntry();
+			YOriginOffset.MinValue = -10f;
+			YOriginOffset.MaxValue = 10f;
+			YOriginOffset.Value = 0f;
+			YOriginOffset.Step = 1f;
+
 			FromOrigin = new Checkbox();
 			XAxis = new Checkbox();
 			YAxis = new Checkbox();
 
 			PropertyForm.AddRowToGroup( "From Origin", FromOrigin );
 			PropertyForm.AddRowToGroup( "X Axis", XAxis );
+			PropertyForm.AddRowToGroup( "X Origin Offset", XOriginOffset );
 			PropertyForm.AddRowToGroup( "Y Axis", YAxis );
+			PropertyForm.AddRowToGroup( "Y Origin Offset", YOriginOffset );
 
 			PropertyForm.EndGroup();
 
@@ -59,7 +75,7 @@ namespace Facepunch.CoreWars.Editor
 			{
 				if ( player.Tool is MirrorBlocksTool tool )
 				{
-					tool.Mirror( XAxis.Checked, YAxis.Checked, FromOrigin.Checked );
+					tool.Mirror( XAxis.Checked, YAxis.Checked, FromOrigin.Checked, XOriginOffset.Value.CeilToInt(), YOriginOffset.Value.CeilToInt() );
 				}
 			}
 

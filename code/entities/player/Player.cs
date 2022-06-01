@@ -836,10 +836,6 @@ namespace Facepunch.CoreWars
 				var crowbar = InventorySystem.CreateItem<CrowbarItemTier1>();
 				TryGiveItem( crowbar );
 			}
-
-			var crossbow = InventorySystem.CreateItem<CrossbowItemTier1>();
-			TryGiveItem( crossbow );
-			TryGiveAmmo( AmmoType.Bolt, 20 );
 		}
 
 		public virtual void CreateInventories()
