@@ -101,6 +101,12 @@ namespace Facepunch.CoreWars
 			}
 		}
 
+		[ConCmd.Server( "cw_announcement" )]
+		public static void AddAnnouncementCmd( string title, string text )
+		{
+			Announcements.Send( To.Everyone, title, text, RoundStage.Start.GetIcon() );
+		}
+
 		[ConCmd.Client( "cw_add_kill_feed" )]
 		public static void AddKillFeedCmd( bool suicide )
 		{
