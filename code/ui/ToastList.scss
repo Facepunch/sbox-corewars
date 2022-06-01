@@ -1,64 +1,87 @@
-﻿ToastList {
-  flex-direction: column;
-  flex-grow: 0;
-  position: absolute;
-  right: 64px;
-  bottom: 300px;
-  z-index: 10;
+﻿@import "./scss/base.scss";
+
+.killfeed {
+  flex-direction: column-reverse;
+  top: -100px;
 
   KillFeedItem {
     align-self: flex-end;
     align-items: center;
-    background-color: red;
-    backdrop-filter-blur: 8px;
-    flex-direction: row;
-    border-radius: 2px;
-    margin-top: 8px;
+    background-color: $box-bg;
+    border-radius: 4px;
+    padding: 0 8px;
+    margin-bottom: 4px;
     transition: all 1s ease-out;
     opacity: 1;
-    bottom: 0;
 
     &:intro {
       opacity: 0;
-      bottom: -20px;
     }
-
     &:outro {
       opacity: 0;
-      bottom: 20px;
       transition: all 1s ease-out;
     }
 
-    label,
-    text {
+    label {
       color: #fff;
-      font-size: 24px;
-      flex-grow: 1;
-    }
+      font-size: 18px;
+      text-shadow: 0 2px 0 rgba(0, 0, 0, 0.5);
 
-    .attacker {
-      flex-grow: 1;
-      font-family: Roboto;
+      &.attacker {
+        margin-right: 8px;
+      }
 
-      &.hidden {
-        display: none;
+      &.victim {
+        margin-left: 8px;
+      }
+
+      &.team_red {
+        color: $red;
+      }
+      &.team_blue {
+        color: $blue;
+      }
+      &.team_green {
+        color: $green;
+      }
+      &.team_yellow {
+        color: $yellow;
+      }
+      &.team_orange {
+        color: $orange;
+      }
+      &.team_cyan {
+        color: $cyan;
+      }
+      &.team_purple {
+        color: $purple;
+      }
+      &.team_pink {
+        color: $pink;
       }
     }
 
-    .victim {
-      flex-grow: 1;
-    }
+    &.is-suicide {
+      flex-direction: row-reverse;
 
-    .icon {
-      width: 48px;
-      height: 48px;
-      margin-right: 16px;
+      .attacker {
+        display: none;
+      }
 
-      &.has-attacker {
-        margin-left: 16px;
+      .victim {
+        margin-left: 0;
+        margin-right: 8px;
       }
     }
   }
+}
+
+ToastList {
+  flex-direction: column;
+  flex-grow: 0;
+  position: absolute;
+  right: 64px;
+  z-index: 10;
 
   ToastItem {
     align-self: flex-start;
