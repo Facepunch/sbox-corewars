@@ -106,6 +106,13 @@ namespace Facepunch.CoreWars.Editor
 						var shouldCenterOnX = !Input.Down( InputButton.Run );
 						var shouldCenterOnY = !Input.Down( InputButton.Duck );
 						var aimSourcePosition = VoxelWorld.Current.ToSourcePositionCenter( aimVoxelPosition, shouldCenterOnX, shouldCenterOnY, false );
+
+						if ( Input.Down( InputButton.Flashlight ) )
+						{
+							var topSourcePosition = world.ToSourcePosition( aimVoxelPosition ) + world.VoxelSize;
+							aimSourcePosition.z = topSourcePosition.z - SelectedEntity.Model.Bounds.Size.z;
+						}
+
 						GhostEntity.Position = aimSourcePosition;
 						GhostEntity.Rotation = CurrentRotation;
 					}
@@ -234,6 +241,8 @@ namespace Facepunch.CoreWars.Editor
 
 		protected override void OnPrimary( Client client )
 		{
+			var world = VoxelWorld.Current;
+
 			if ( NextActionTime )
 			{
 				var aimVoxelPosition = GetAimVoxelPosition( 4f );
@@ -242,7 +251,7 @@ namespace Facepunch.CoreWars.Editor
 				{
 					if ( CurrentAttribute.IsVolume )
 					{
-						var aimSourcePosition = VoxelWorld.Current.ToSourcePosition( aimVoxelPosition );
+						var aimSourcePosition = world.ToSourcePosition( aimVoxelPosition );
 
 						if ( StartPosition.HasValue )
 						{
@@ -252,8 +261,8 @@ namespace Facepunch.CoreWars.Editor
 								var endVoxelPosition = aimVoxelPosition;
 
 								var bbox = GetVolumeBBox(
-									VoxelWorld.Current.ToSourcePosition( startVoxelPosition ),
-									VoxelWorld.Current.ToSourcePosition( endVoxelPosition )
+									world.ToSourcePosition( startVoxelPosition ),
+									world.ToSourcePosition( endVoxelPosition )
 								);
 
 								var action = new PlaceVolumeAction();
@@ -275,7 +284,13 @@ namespace Facepunch.CoreWars.Editor
 					{
 						var shouldCenterOnX = !Input.Down( InputButton.Run );
 						var shouldCenterOnY = !Input.Down( InputButton.Duck );
-						var aimSourcePosition = VoxelWorld.Current.ToSourcePositionCenter( aimVoxelPosition, shouldCenterOnX, shouldCenterOnY, false );
+						var aimSourcePosition = world.ToSourcePositionCenter( aimVoxelPosition, shouldCenterOnX, shouldCenterOnY, false );
+
+						if ( Input.Down( InputButton.Flashlight ) )
+						{
+							var topSourcePosition = world.ToSourcePosition( aimVoxelPosition ) + world.VoxelSize;
+							aimSourcePosition.z = topSourcePosition.z - SelectedEntity.Model.Bounds.Size.z;
+						}
 
 						var action = new PlaceEntityAction();
 						action.Initialize( CurrentTypeDescription, aimSourcePosition, CurrentRotation );
@@ -292,7 +307,13 @@ namespace Facepunch.CoreWars.Editor
 						{
 							var shouldCenterOnX = !Input.Down( InputButton.Run );
 							var shouldCenterOnY = !Input.Down( InputButton.Duck );
-							var aimSourcePosition = VoxelWorld.Current.ToSourcePositionCenter( aimVoxelPosition, shouldCenterOnX, shouldCenterOnY, false );
+							var aimSourcePosition = world.ToSourcePositionCenter( aimVoxelPosition, shouldCenterOnX, shouldCenterOnY, false );
+
+							if ( Input.Down( InputButton.Flashlight ) )
+							{
+								var topSourcePosition = world.ToSourcePosition( aimVoxelPosition ) + world.VoxelSize;
+								aimSourcePosition.z = topSourcePosition.z - SelectedEntity.Model.Bounds.Size.z;
+							}
 
 							var action = new MoveEntityAction();
 							action.Initialize( SelectedEntity, aimSourcePosition, CurrentRotation );
