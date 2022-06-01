@@ -45,7 +45,7 @@ namespace Facepunch.CoreWars
 		public void Update( Player attacker, Player victim, Entity weapon, DamageFlags flags )
 		{
 			Attacker.Text = attacker.Client.Name;
-			Attacker.AddClass( victim.Team.GetHudClass() );
+			Attacker.AddClass( attacker.Team.GetHudClass() );
 
 			Victim.Text = victim.Client.Name;
 			Victim.AddClass( victim.Team.GetHudClass() );
