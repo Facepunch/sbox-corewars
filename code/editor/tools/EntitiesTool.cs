@@ -103,8 +103,9 @@ namespace Facepunch.CoreWars.Editor
 					}
 					else if ( GhostEntity.IsValid() )
 					{
-						var shouldCenterOnXY = !Input.Down( InputButton.Run );
-						var aimSourcePosition = VoxelWorld.Current.ToSourcePositionCenter( aimVoxelPosition, shouldCenterOnXY, shouldCenterOnXY, false );
+						var shouldCenterOnX = !Input.Down( InputButton.Run );
+						var shouldCenterOnY = !Input.Down( InputButton.Duck );
+						var aimSourcePosition = VoxelWorld.Current.ToSourcePositionCenter( aimVoxelPosition, shouldCenterOnX, shouldCenterOnY, false );
 						GhostEntity.Position = aimSourcePosition;
 						GhostEntity.Rotation = CurrentRotation;
 					}
@@ -272,8 +273,9 @@ namespace Facepunch.CoreWars.Editor
 					}
 					else if ( IsServer )
 					{
-						var shouldCenterOnXY = !Input.Down( InputButton.Run );
-						var aimSourcePosition = VoxelWorld.Current.ToSourcePositionCenter( aimVoxelPosition, shouldCenterOnXY, shouldCenterOnXY, false );
+						var shouldCenterOnX = !Input.Down( InputButton.Run );
+						var shouldCenterOnY = !Input.Down( InputButton.Duck );
+						var aimSourcePosition = VoxelWorld.Current.ToSourcePositionCenter( aimVoxelPosition, shouldCenterOnX, shouldCenterOnY, false );
 
 						var action = new PlaceEntityAction();
 						action.Initialize( CurrentTypeDescription, aimSourcePosition, CurrentRotation );
@@ -288,8 +290,9 @@ namespace Facepunch.CoreWars.Editor
 					{
 						if ( SelectedEntity.IsValid() )
 						{
-							var shouldCenterOnXY = !Input.Down( InputButton.Run );
-							var aimSourcePosition = VoxelWorld.Current.ToSourcePositionCenter( aimVoxelPosition, shouldCenterOnXY, shouldCenterOnXY, false );
+							var shouldCenterOnX = !Input.Down( InputButton.Run );
+							var shouldCenterOnY = !Input.Down( InputButton.Duck );
+							var aimSourcePosition = VoxelWorld.Current.ToSourcePositionCenter( aimVoxelPosition, shouldCenterOnX, shouldCenterOnY, false );
 
 							var action = new MoveEntityAction();
 							action.Initialize( SelectedEntity, aimSourcePosition, CurrentRotation );
