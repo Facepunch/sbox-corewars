@@ -3,6 +3,7 @@ using Facepunch.CoreWars.Inventory;
 using Facepunch.Voxels;
 using Sandbox;
 using Sandbox.UI;
+using Sandbox.UI.Construct;
 using System.Collections.Generic;
 
 namespace Facepunch.CoreWars.Editor
@@ -10,9 +11,17 @@ namespace Facepunch.CoreWars.Editor
 	[UseTemplate]
 	public partial class EditorToolDisplay : Panel
 	{
+		public static EditorToolDisplay Current { get; private set; }
+
 		public string ToolName => GetToolName();
 		public string ToolDescription => GetToolDescription();
+		public Panel HotkeyList { get; set; }
 		public Panel ToolIcon { get; set; }
+
+		public EditorToolDisplay()
+		{
+			Current = this;
+		}
 
 		private string GetToolName()
 		{
@@ -76,6 +85,26 @@ namespace Facepunch.CoreWars.Editor
 			base.Tick();
 		}
 
+		public void ClearHotkeys()
+		{
+			HotkeyList.DeleteChildren( true );
+		}
+
+		public void AddHotkey( InputButton button, string text )
+		{
+			var panel = new Panel();
+			panel.AddClass( "item" );
+
+			var glyph = panel.Add.Image( "", "glyph" );
+			glyph.Texture = Input.GetGlyph( button, InputGlyphSize.Small );
+			glyph.Style.Width = glyph.Texture.Width;
+			glyph.Style.Height = glyph.Texture.Height;
+
+			panel.Add.Label( text, "text" );
+
+			HotkeyList.AddChild( panel );
+		}
+
 		private bool IsHidden()
 		{
 			if ( !VoxelWorld.Current.IsValid() )
@@ -94,8 +123,9 @@ namespace Facepunch.CoreWars.Editor
 
 		protected override void PostTemplateApplied()
 		{
+			HotkeyList.Parent.BindClass( "hidden", () => HotkeyList.ChildrenCount == 0 );
 			BindClass( "hidden", () => IsHidden() );
-			
+
 			base.PostTemplateApplied();
 		}
 	}

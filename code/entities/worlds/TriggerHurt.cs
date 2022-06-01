@@ -8,6 +8,7 @@ using System.ComponentModel;
 namespace Facepunch.CoreWars
 {
 	[EditorEntity( Title = "Trigger Hurt", IsVolume = true, VolumeMaterial = "materials/editor/trigger_hurt.vmat" )]
+	[ClassName( "cw_trigger_hurt" )]
 	[Category( "Triggers" )]
 	public partial class TriggerHurt : BaseTrigger
 	{

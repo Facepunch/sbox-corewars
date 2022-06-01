@@ -36,12 +36,17 @@ namespace Facepunch.CoreWars.Editor
 
 		public virtual void OnSelected()
 		{
-
+			var display = EditorToolDisplay.Current;
+			display?.AddHotkey( InputButton.Use, "Aim Voxel Align" );
 		}
 
 		public virtual void OnDeselected()
 		{
-
+			if ( IsClient )
+			{
+				var display = EditorToolDisplay.Current;
+				display?.ClearHotkeys();
+			}
 		}
 
 		protected IntVector3 GetAimVoxelPosition( float range )

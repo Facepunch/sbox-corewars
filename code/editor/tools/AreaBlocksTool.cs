@@ -41,6 +41,8 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void OnSelected()
 		{
+			base.OnSelected();
+
 			if ( IsClient )
 			{
 				VoxelWorld.Current.GlobalOpacity = 0.8f;
@@ -58,6 +60,8 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void OnDeselected()
 		{
+			base.OnDeselected();
+
 			if ( IsClient )
 			{
 				VoxelWorld.Current.GlobalOpacity = 1f;
