@@ -34,13 +34,13 @@ namespace Facepunch.CoreWars.Editor
 		}
 
 		[ConCmd.Server( "mirror_blocks_mirror" )]
-		public static void SendMirrorCmd( bool flipX, bool flipY, bool fromOrigin )
+		public static void SendMirrorCmd( bool flipX, bool flipY, bool fromOrigin, int offsetX, int offsetY )
 		{
 			if ( ConsoleSystem.Caller.Pawn is EditorPlayer player )
 			{
 				if ( player.Tool is MirrorBlocksTool tool )
 				{
-					tool.Mirror( flipX, flipY, fromOrigin );
+					tool.Mirror( flipX, flipY, fromOrigin, offsetX, offsetY );
 				}
 			}
 		}
@@ -58,11 +58,11 @@ namespace Facepunch.CoreWars.Editor
 			Stage = MirrorStage.Select;
 		}
 
-		public void Mirror( bool flipX, bool flipY, bool fromOrigin )
+		public void Mirror( bool flipX, bool flipY, bool fromOrigin, int offsetX, int offsetY )
 		{
 			if ( IsClient )
 			{
-				SendMirrorCmd( flipX, flipY, fromOrigin );
+				SendMirrorCmd( flipX, flipY, fromOrigin, offsetX, offsetY );
 			}
 
 			if ( IsServer && Stage == MirrorStage.Mirror )
@@ -73,7 +73,7 @@ namespace Facepunch.CoreWars.Editor
 				if ( fromOrigin )
 				{
 					var action = new MirrorBlocksAction();
-					action.Initialize( startVoxelPosition, endVoxelPosition, flipX, flipY );
+					action.Initialize( startVoxelPosition, endVoxelPosition, flipX, flipY, offsetX, offsetY );
 					Player.Perform( action );
 				}
 				else

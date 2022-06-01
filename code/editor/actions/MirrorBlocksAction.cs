@@ -19,11 +19,13 @@ namespace Facepunch.CoreWars.Editor
 		private IntVector3 Maxs { get; set; }
 		private bool FlipX { get; set; }
 		private bool FlipY { get; set; }
+		private int OffsetX { get; set; }
+		private int OffsetY { get; set; }
 		private int Width { get; set; }
 		private int Height { get; set; }
 		private int Depth { get; set; }
 
-		public void Initialize( IntVector3 mins, IntVector3 maxs, bool flipX, bool flipY )
+		public void Initialize( IntVector3 mins, IntVector3 maxs, bool flipX, bool flipY, int offsetX, int offsetY )
 		{
 			var world = VoxelWorld.Current;
 
@@ -33,6 +35,8 @@ namespace Facepunch.CoreWars.Editor
 			Mins = world.GetPositionMins( mins, maxs );
 			Maxs = world.GetPositionMaxs( mins, maxs );
 
+			OffsetX = offsetX;
+			OffsetY = offsetY;
 			Width = (Maxs.x - Mins.x) + 1;
 			Height = (Maxs.y - Mins.y) + 1;
 			Depth = (Maxs.z - Mins.z) + 1;
@@ -68,8 +72,17 @@ namespace Facepunch.CoreWars.Editor
 						var delta = world.ToSourcePositionCenter( position ) - origin;
 						var mirrored = origin - delta;
 
-						if ( FlipX ) sourcePosition.x = mirrored.x;
-						if ( FlipY ) sourcePosition.y = mirrored.y;
+						if ( FlipX )
+						{
+							sourcePosition.x = mirrored.x;
+							sourcePosition.x += (OffsetX * world.VoxelSize);
+						}
+
+						if ( FlipY )
+						{
+							sourcePosition.y = mirrored.y;
+							sourcePosition.y += (OffsetY * world.VoxelSize);
+						}
 
 						position = world.ToVoxelPosition( sourcePosition );
 
@@ -98,8 +111,17 @@ namespace Facepunch.CoreWars.Editor
 						var delta = world.ToSourcePositionCenter( position ) - origin;
 						var mirrored = origin - delta;
 
-						if ( FlipX ) sourcePosition.x = mirrored.x;
-						if ( FlipY ) sourcePosition.y = mirrored.y;
+						if ( FlipX )
+						{
+							sourcePosition.x = mirrored.x;
+							sourcePosition.x += (OffsetX * world.VoxelSize);
+						}
+
+						if ( FlipY )
+						{
+							sourcePosition.y = mirrored.y;
+							sourcePosition.y += (OffsetY * world.VoxelSize);
+						}
 
 						position = world.ToVoxelPosition( sourcePosition );
 
@@ -130,8 +152,17 @@ namespace Facepunch.CoreWars.Editor
 						var delta = world.ToSourcePositionCenter( position ) - origin;
 						var mirrored = origin - delta;
 
-						if ( FlipX ) sourcePosition.x = mirrored.x;
-						if ( FlipY ) sourcePosition.y = mirrored.y;
+						if ( FlipX )
+						{
+							sourcePosition.x = mirrored.x;
+							sourcePosition.x += (OffsetX * world.VoxelSize);
+						}
+
+						if ( FlipY )
+						{
+							sourcePosition.y = mirrored.y;
+							sourcePosition.y += (OffsetY * world.VoxelSize);
+						}
 
 						position = world.ToVoxelPosition( sourcePosition );
 
