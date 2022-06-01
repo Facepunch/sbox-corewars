@@ -9,7 +9,7 @@ namespace Facepunch.CoreWars
 {
 	[EditorEntity( Title = "Player Spawnpoint", EditorModel = "models/dev/playerstart_tint.vmdl" )]
 	[Category( "Gameplay" )]
-	public class PlayerSpawnpoint : ModelEntity, ISourceEntity
+	public partial class PlayerSpawnpoint : ModelEntity, ISourceEntity
 	{
 		[EditorProperty, Net] public Team Team { get; set; }
 
