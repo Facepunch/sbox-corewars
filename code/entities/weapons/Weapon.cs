@@ -5,9 +5,13 @@ using Facepunch.CoreWars.Inventory;
 
 namespace Facepunch.CoreWars
 {
-	public abstract partial class Weapon : BaseWeapon
+	public abstract partial class Weapon : BaseWeapon, IKillFeedInfo
 	{
 		public abstract WeaponConfig Config { get; }
+
+		public virtual string[] KillFeedReasons => new[] { "killed" };
+		public virtual string KillFeedIcon => WeaponItem?.Icon ?? string.Empty;
+		public virtual string KillFeedName => WeaponItem?.Name ?? string.Empty;
 		public virtual string MuzzleAttachment => "muzzle";
 		public virtual string MuzzleFlashEffect => "particles/pistol_muzzleflash.vpcf";
 		public virtual string CrosshairClass => "automatic";

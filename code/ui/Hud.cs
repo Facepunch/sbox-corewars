@@ -31,15 +31,15 @@ namespace Facepunch.CoreWars
 		}
 
 		[ClientRpc]
-		public static void AddKillFeed( Player attacker, Player victim, Entity weapon )
+		public static void AddKillFeed( Player attacker, Player victim, Entity weapon, DamageFlags flags )
 		{
-			ToastList.Instance.AddKillFeed( attacker, victim, weapon );
+			ToastList.Instance.AddKillFeed( attacker, victim, weapon, flags );
 		}
 
 		[ClientRpc]
-		public static void AddKillFeed( Player victim )
+		public static void AddKillFeed( Player victim, DamageFlags flags )
 		{
-			ToastList.Instance.AddKillFeed( victim );
+			ToastList.Instance.AddKillFeed( victim, flags );
 		}
 
 		public static void ToastAll( string text, string icon = "" )

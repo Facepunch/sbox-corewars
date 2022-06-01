@@ -20,6 +20,7 @@ namespace Facepunch.CoreWars
 	public partial class Crowbar : Weapon
 	{
 		public override WeaponConfig Config => new CrowbarConfig();
+		public override string[] KillFeedReasons => new[] { "chopped", "slashed" };
 		public override string ViewModelPath => "models/weapons/v_crowbar.vmdl";
 		public override DamageFlags DamageType => DamageFlags.Blunt;
 		public override float PrimaryRate => 1.5f;

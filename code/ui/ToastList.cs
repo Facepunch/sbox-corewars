@@ -10,43 +10,55 @@ namespace Facepunch.CoreWars
 	{
 		public Label Attacker { get; set; }
 		public Label Victim { get; set; }
-		public Image Icon { get; set; }
+		public Label Reason { get; set; }
 
 		private float EndTime { get; set; }
 
 		public KillFeedItem()
 		{
 			Attacker = Add.Label( "", "attacker" );
-			Icon = Add.Image( "", "icon" );
+			Reason = Add.Label( "", "reason" );
 			Victim = Add.Label( "", "victim" );
 		}
 
-		public void Update( Player victim )
+		public void Update( Player victim, DamageFlags flags )
 		{
 			Attacker.SetClass( "hidden", true );
+			AddClass( "is-suicide" );
 
 			Victim.Text = victim.Client.Name;
-			Victim.Style.FontColor = victim.Team.GetColor();
-			Victim.Style.Dirty();
+			Victim.AddClass( victim.Team.GetHudClass() );
 
-			Icon.SetClass( "has-attacker", false );
-			Icon.Texture = Texture.Load( FileSystem.Mounted, "textures/ui/skull.png" );
+			if ( flags.HasFlag( DamageFlags.Fall ) )
+			{
+				Reason.Text = "fell into the void";
+			}
+			else
+			{
+				var reasons = new string[] { "decided to end it all" };
+				Reason.Text = Rand.FromArray( reasons );
+			}
 
 			EndTime = Time.Now + 3f;
 		}
 
-		public void Update( Player attacker, Player victim, Entity weapon )
+		public void Update( Player attacker, Player victim, Entity weapon, DamageFlags flags )
 		{
 			Attacker.Text = attacker.Client.Name;
-			Attacker.Style.FontColor = attacker.Team.GetColor();
-			Attacker.Style.Dirty();
+			Attacker.AddClass( victim.Team.GetHudClass() );
 
 			Victim.Text = victim.Client.Name;
-			Victim.Style.FontColor = victim.Team.GetColor();
-			Victim.Style.Dirty();
+			Victim.AddClass( victim.Team.GetHudClass() );
 
-			Icon.SetClass( "has-attacker", true );
-			Icon.Texture = Texture.Load( FileSystem.Mounted, "textures/ui/skull.png" );
+			Reason.Text = "killed";
+
+			if ( weapon is IKillFeedInfo info )
+			{
+				if ( info.KillFeedReasons.Length > 0 )
+				{
+					Reason.Text = Rand.FromArray( info.KillFeedReasons );
+				}
+			}
 
 			EndTime = Time.Now + 3f;
 		}
@@ -103,16 +115,16 @@ namespace Facepunch.CoreWars
 			Instance = this;
 		}
 
-		public void AddKillFeed( Player attacker, Player victim, Entity weapon )
+		public void AddKillFeed( Player attacker, Player victim, Entity weapon, DamageFlags flags )
 		{
 			var item = KillFeedContainer.AddChild<KillFeedItem>();
-			item.Update( attacker, victim, weapon );
+			item.Update( attacker, victim, weapon, flags );
 		}
 
-		public void AddKillFeed( Player victim )
+		public void AddKillFeed( Player victim, DamageFlags flags )
 		{
 			var item = KillFeedContainer.AddChild<KillFeedItem>();
-			item.Update( victim );
+			item.Update( victim, flags );
 		}
 
 		public void AddItem( string text, Texture icon = null )

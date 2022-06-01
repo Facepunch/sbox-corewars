@@ -457,11 +457,11 @@ namespace Facepunch.CoreWars
 					attacker.TryGiveItem( resource );
 				}
 
-				Hud.AddKillFeed( To.Everyone, attacker, this, LastDamageTaken.Weapon );
+				Hud.AddKillFeed( To.Everyone, attacker, this, LastDamageTaken.Weapon, LastDamageTaken.Flags );
 			}
 			else
 			{
-				Hud.AddKillFeed( To.Everyone, this );
+				Hud.AddKillFeed( To.Everyone, this, LastDamageTaken.Flags );
 			}
 
 			BecomeRagdollOnClient( LastDamageTaken.Force, LastDamageTaken.BoneIndex );
