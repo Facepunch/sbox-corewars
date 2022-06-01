@@ -74,13 +74,16 @@ InventorySlot {
 
   &.valid-drag {
     transition: all 0.1s ease-out;
-    background-color: rgba(#b6e074 0.3);
+    background-color: rgba($blue, 0.8);
+    border-color: $blue;
     transform: scale(1.1 1.1);
   }
 
   &.invalid-drag {
     transition: all 0.1s ease-out;
-    background-color: rgba(#e07474 0.3);
-    transform: scale(1.1 1.1);
+    background-color: $red;
+    border-color: $red;
+    opacity: 0.1;
+    transform: scale(1);
   }
 }
