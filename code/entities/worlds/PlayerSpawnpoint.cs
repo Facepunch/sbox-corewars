@@ -7,15 +7,15 @@ using System.ComponentModel;
 
 namespace Facepunch.CoreWars
 {
-	[EditorEntity( Title = "Player Spawnpoint", EditorModel = "models/editor/playerstart.vmdl" )]
+	[EditorEntity( Title = "Player Spawnpoint", EditorModel = "models/dev/playerstart_tint.vmdl" )]
 	[Category( "Gameplay" )]
-	public class PlayerSpawnpoint : ModelEntity, ISourceEntity
+	public partial class PlayerSpawnpoint : ModelEntity, ISourceEntity
 	{
-		[EditorProperty] public Team Team { get; set; }
+		[EditorProperty, Net] public Team Team { get; set; }
 
 		public override void Spawn()
 		{
-			SetModel( "models/editor/playerstart.vmdl" );
+			SetModel( "models/dev/playerstart_tint.vmdl" );
 
 			var isEditorMode = Game.Current.IsEditorMode;
 
@@ -39,6 +39,12 @@ namespace Facepunch.CoreWars
 		public virtual void Deserialize( BinaryReader reader )
 		{
 			Team = (Team)reader.ReadByte();
+		}
+
+		[Event.Tick.Client]
+		protected virtual void ClientTick()
+		{
+			RenderColor = Team.GetColor();
 		}
 	}
 }
