@@ -20,6 +20,7 @@ namespace Facepunch.CoreWars
 	public partial class Crossbow : BulletDropWeapon<BulletDropProjectile>
 	{
 		public override WeaponConfig Config => new CrossbowConfig();
+		public override string[] KillFeedReasons => new[] { "shot", "blasted" };
 		public override string ImpactEffect => "particles/weapons/boomer/boomer_impact.vpcf";
 		public override string TrailEffect => "particles/weapons/boomer/boomer_projectile.vpcf";
 		public override string ViewModelPath => "weapons/rust_crossbow/v_rust_crossbow.vmdl";

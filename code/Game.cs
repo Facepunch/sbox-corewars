@@ -101,6 +101,19 @@ namespace Facepunch.CoreWars
 			}
 		}
 
+		[ConCmd.Client( "cw_add_kill_feed" )]
+		public static void AddKillFeedCmd( bool suicide )
+		{
+			if ( suicide )
+			{
+				ToastList.Instance.AddKillFeed( Local.Pawn as Player, DamageFlags.Fall );
+			}
+			else
+			{
+				ToastList.Instance.AddKillFeed( Local.Pawn as Player, Local.Pawn as Player, (Local.Pawn as Player).ActiveChild, DamageFlags.Fall );
+			}
+		}
+
 		[ConCmd.Server( "cw_editor_load" )]
 		public static void LoadEditorMapCmd( string fileName )
 		{
