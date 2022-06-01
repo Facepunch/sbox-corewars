@@ -16,25 +16,25 @@ namespace Facepunch.CoreWars
 
 		[EditorProperty, Net, Range( 0f, 2048f, 1f )] public float Range { get; set; } = 256f;
 		[EditorProperty, Net, Range( 0f, 10f )] public float Brightness { get; set; } = 5f;
-		[EditorProperty, Net, Range( 0f, 1f )] public float ColorR { get; set; } = 1f;
-		[EditorProperty, Net, Range( 0f, 1f )] public float ColorG { get; set; } = 1f;
-		[EditorProperty, Net, Range( 0f, 1f )] public float ColorB { get; set; } = 1f;
+		[EditorProperty, Net, Range( 0f, 1f )] public float Red { get; set; } = 1f;
+		[EditorProperty, Net, Range( 0f, 1f )] public float Green { get; set; } = 1f;
+		[EditorProperty, Net, Range( 0f, 1f )] public float Blue { get; set; } = 1f;
 
 		public virtual void Serialize( BinaryWriter writer )
 		{
 			writer.Write( Range );
-			writer.Write( ColorR );
-			writer.Write( ColorG );
-			writer.Write( ColorB );
+			writer.Write( Red );
+			writer.Write( Green );
+			writer.Write( Blue );
 			writer.Write( Brightness );
 		}
 
 		public virtual void Deserialize( BinaryReader reader )
 		{
 			Range = reader.ReadSingle();
-			ColorR = reader.ReadSingle();
-			ColorG = reader.ReadSingle();
-			ColorB = reader.ReadSingle();
+			Red = reader.ReadSingle();
+			Green = reader.ReadSingle();
+			Blue = reader.ReadSingle();
 			Brightness = reader.ReadSingle();
 			UpdateLightSettings();
 		}
@@ -68,7 +68,7 @@ namespace Facepunch.CoreWars
 		private void UpdateLightSettings()
 		{
 			Light.Range = Range;
-			Light.Color = new Color( ColorR, ColorG, ColorB );
+			Light.Color = new Color( Red, Green, Blue );
 			Light.Brightness = Brightness;
 
 			var isEditorMode = Game.Current.IsEditorMode;
