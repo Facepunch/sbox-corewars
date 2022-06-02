@@ -31,6 +31,8 @@ namespace Facepunch.CoreWars
 				if ( !world.IsValid() ) return string.Empty;
 
 				var block = world.GetBlockType( BlockId );
+
+				if ( !string.IsNullOrEmpty( block.Icon ) ) return block.Icon;
 				if ( string.IsNullOrEmpty( block.DefaultTexture ) ) return string.Empty;
 
 				return $"textures/blocks/corewars/color/{ block.DefaultTexture }.png";

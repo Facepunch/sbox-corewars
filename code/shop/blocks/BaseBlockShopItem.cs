@@ -19,6 +19,7 @@ namespace Facepunch.CoreWars
 		public override string GetIcon( Player player )
 		{
 			var block = GetBlockType( player );
+			if ( !string.IsNullOrEmpty( block.Icon ) ) return block.Icon;
 			return $"textures/blocks/corewars/color/{block.DefaultTexture}.png";
 		}
 
