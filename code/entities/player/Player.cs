@@ -70,6 +70,18 @@ namespace Facepunch.CoreWars
 			}
 		}
 
+		[ConCmd.Server( "cw_give_item" )]
+		public static void GiveItemCmd( string itemName, int amount )
+		{
+			if ( ConsoleSystem.Caller.Pawn is not Player player )
+				return;
+
+			var item = InventorySystem.CreateItem( itemName );
+			item.StackSize = (ushort)amount;
+
+			player.TryGiveItem( item );
+		}
+
 		[ConCmd.Server]
 		public static void BuyUpgradeCmd( int index, string type )
 		{
