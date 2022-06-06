@@ -8,6 +8,7 @@ namespace Facepunch.CoreWars
 	{
 		public override bool CanBeDropped => false;
 		public override ushort MaxStackSize => 4;
+		public virtual string ConsumeSound => string.Empty;
 
 		public override bool CanStackWith( InventoryItem other )
 		{
@@ -16,6 +17,11 @@ namespace Facepunch.CoreWars
 
 		public virtual void OnConsumed( Player player )
 		{
+			if ( !string.IsNullOrEmpty( ConsumeSound ) )
+			{
+				player.PlaySound( ConsumeSound );
+			}
+
 			StackSize--;
 
 			if ( StackSize <= 0 )
