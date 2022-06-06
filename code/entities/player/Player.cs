@@ -26,7 +26,7 @@ namespace Facepunch.CoreWars
 		public Dictionary<ArmorSlot,BaseClothing> Armor { get; private set; }
 		public ProjectileSimulator Projectiles { get; private set; }
 		public DamageInfo LastDamageTaken { get; private set; }
-		public TimeUntil NextBlockPlace { get; private set; }
+		public TimeUntil NextActionTime { get; private set; }
 		public string DisplayName => Client.Name;
 
 		public bool IsFriendly
@@ -688,38 +688,45 @@ namespace Facepunch.CoreWars
 
 			if ( IsServer )
 			{
-				if ( Input.Down( InputButton.PrimaryAttack ) && NextBlockPlace )
+				if ( Input.Down( InputButton.PrimaryAttack ) && NextActionTime )
 				{
 					var container = HotbarInventory.Instance;
 					var item = container.GetFromSlot( CurrentHotbarIndex );
 
-					if ( item.IsValid() && item is BlockItem blockItem )
+					if ( item.IsValid() )
 					{
-						var success = world.SetBlockInDirection( Input.Position, Input.Rotation.Forward, blockItem.BlockId, out var blockPosition, true, 5f, ( position ) =>
+						if ( item is BlockItem blockItem )
 						{
-							var sourcePosition = world.ToSourcePosition( position );
-							return CanBuildAt( sourcePosition );
-						});
+							var success = world.SetBlockInDirection( Input.Position, Input.Rotation.Forward, blockItem.BlockId, out var blockPosition, true, 5f, ( position ) =>
+							{
+								var sourcePosition = world.ToSourcePosition( position );
+								return CanBuildAt( sourcePosition );
+							} );
 
-						if ( success )
+							if ( success )
+							{
+								item.StackSize--;
+
+								using ( Prediction.Off() )
+								{
+									var particles = Particles.Create( "particles/gameplay/blocks/block_placed/block_placed.vpcf" );
+									particles.SetPosition( 0, world.ToSourcePositionCenter( blockPosition ) );
+									PlaySound( "block.place" );
+								}
+
+								if ( item.StackSize <= 0 )
+								{
+									InventorySystem.RemoveItem( item );
+								}
+							}
+						}
+						else if ( item is BrewItem brewItem )
 						{
-							item.StackSize--;
-
-							using ( Prediction.Off() )
-							{
-								var particles = Particles.Create( "particles/gameplay/blocks/block_placed/block_placed.vpcf" );
-								particles.SetPosition( 0, world.ToSourcePositionCenter( blockPosition ) );
-								PlaySound( "block.place" );
-							}
-
-							if ( item.StackSize <= 0 )
-							{
-								InventorySystem.RemoveItem( item );
-							}
+							brewItem.OnConsumed( this );
 						}
 					}
 
-					NextBlockPlace = 0.1f;
+					NextActionTime = 0.1f;
 				}
 
 				if ( Input.Released( InputButton.Drop ) )
