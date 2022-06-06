@@ -9,7 +9,8 @@ namespace Facepunch.CoreWars.Blocks
 		Wooden,
 		Metal,
 		Plastic,
-		Blastproof
+		Blastproof,
+		Explosives
 	}
 }
 
