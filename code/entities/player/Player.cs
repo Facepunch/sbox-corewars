@@ -22,6 +22,7 @@ namespace Facepunch.CoreWars
 		[Net] public NetInventoryContainer ChestInventory { get; private set; }
 		[Net] public NetInventoryContainer EquipmentInventory { get; private set; }
 		[Net] public TeamCore Core { get; private set; }
+		[Net] public List<BaseBuff> Buffs { get; private set; }
 
 		public Dictionary<ArmorSlot,BaseClothing> Armor { get; private set; }
 		public ProjectileSimulator Projectiles { get; private set; }
@@ -134,6 +135,7 @@ namespace Facepunch.CoreWars
 			client.Pawn = this;
 			CreateInventories();
 			Armor = new();
+			Buffs = new();
 		}
 
 		public bool TryGiveWeapon<T>() where T : WeaponItem
@@ -158,6 +160,21 @@ namespace Facepunch.CoreWars
 			{
 				BackpackInventory.Instance.Stack( item );
 			}
+		}
+
+		public void GiveBuff( BaseBuff buff )
+		{
+			var existing = Buffs.Where( b => b.GetType() == buff.GetType() ).FirstOrDefault();
+
+			if ( existing != null )
+			{
+				existing.TimeUntilExpired = existing.Duration;
+				return;
+			}
+
+			buff.TimeUntilExpired = buff.Duration;
+			buff.OnActivated( this );
+			Buffs.Add( buff );
 		}
 
 		public void TryGiveBlock( byte blockId, ushort amount )
@@ -378,6 +395,16 @@ namespace Facepunch.CoreWars
 			IsWaitingToRespawn = true;
 		}
 
+		public void ClearBuffs()
+		{
+			foreach ( var buff in Buffs )
+			{
+				buff.OnExpired( this );
+			}
+
+			Buffs.Clear();
+		}
+
 		public virtual void Reset()
 		{
 			EquipmentInventory.Instance.RemoveAll();
@@ -386,6 +413,8 @@ namespace Facepunch.CoreWars
 			ChestInventory.Instance.RemoveAll();
 
 			Client.SetInt( "kills", 0 );
+
+			ClearBuffs();
 		}
 
 		public virtual Transform? GetSpawnpoint()
@@ -477,6 +506,7 @@ namespace Facepunch.CoreWars
 			EnableDrawing = false;
 
 			RespawnWhenAvailable();
+			ClearBuffs();
 
 			var itemsToDrop = FindItems<InventoryItem>().Where( i => i.DropOnDeath );
 
@@ -563,6 +593,8 @@ namespace Facepunch.CoreWars
 					GiveInitialItems();
 				}
 			}
+
+			ClearBuffs();
 
 			var spawnpoint = GetSpawnpoint();
 
@@ -927,6 +959,17 @@ namespace Facepunch.CoreWars
 				if ( !spawnpoint.HasValue ) return;
 				IsWaitingToRespawn = false;
 				Respawn();
+			}
+
+			for ( var i = Buffs.Length - 1; i >= 0; i-- )
+			{
+				var buff = Buffs[i];
+
+				if ( buff.TimeUntilExpired )
+				{
+					buff.OnExpired( this );
+					Buffs.RemoveAt( i );
+				}
 			}
 		}
 

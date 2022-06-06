@@ -11,6 +11,7 @@ namespace Facepunch.CoreWars
 
 		public override void OnConsumed( Player player )
 		{
+			player.GiveBuff( new SpeedBuff() );
 			base.OnConsumed( player );
 		}
 	}
