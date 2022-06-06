@@ -8,7 +8,7 @@ namespace Facepunch.CoreWars
 	{
 		public override bool CanBeDropped => false;
 		public override ushort MaxStackSize => 4;
-		public virtual string ConsumeSound => string.Empty;
+		public virtual string ConsumeSound => "brew.consume";
 
 		public override bool CanStackWith( InventoryItem other )
 		{

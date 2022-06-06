@@ -961,7 +961,7 @@ namespace Facepunch.CoreWars
 				Respawn();
 			}
 
-			for ( var i = Buffs.Length - 1; i >= 0; i-- )
+			for ( var i = Buffs.Count - 1; i >= 0; i-- )
 			{
 				var buff = Buffs[i];
 
