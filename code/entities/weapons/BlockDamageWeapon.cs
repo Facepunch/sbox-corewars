@@ -71,6 +71,8 @@ namespace Facepunch.CoreWars
 				}
 
 				world.SetBlockOnServer( voxel.Position, 0 );
+
+				OnBlockDestroyed( voxel.Position );
 			}
 			else
 			{
@@ -80,6 +82,11 @@ namespace Facepunch.CoreWars
 					effect.SetPosition( 0, sourcePosition );
 				}
 			}
+		}
+
+		protected virtual void OnBlockDestroyed( IntVector3 position )
+		{
+
 		}
 
 		protected virtual void DamageVoxelInDirection( float range, float damage )
