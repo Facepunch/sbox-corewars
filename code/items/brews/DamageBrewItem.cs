@@ -4,7 +4,8 @@ using System.IO;
 
 namespace Facepunch.CoreWars
 {
-	public abstract class DamageBrewItem : BrewItem
+	[Library( "item_brew_damage" )]
+	public class DamageBrewItem : BrewItem
 	{
 		public override string Icon => "textures/items/brew_damage.png";
 		public override string Name => "Damage Brew";

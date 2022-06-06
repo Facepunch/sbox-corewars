@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Facepunch.CoreWars
 {
-	public abstract class BrewItem : InventoryItem
+	public class BrewItem : InventoryItem
 	{
 		public override bool CanBeDropped => false;
 		public override ushort MaxStackSize => 4;
@@ -19,7 +19,10 @@ namespace Facepunch.CoreWars
 		{
 			if ( !string.IsNullOrEmpty( ConsumeSound ) )
 			{
-				player.PlaySound( ConsumeSound );
+				using ( Prediction.Off() )
+				{
+					player.PlaySound( ConsumeSound );
+				}
 			}
 
 			StackSize--;

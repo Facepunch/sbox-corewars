@@ -22,7 +22,7 @@ namespace Facepunch.CoreWars
 		[Net] public NetInventoryContainer ChestInventory { get; private set; }
 		[Net] public NetInventoryContainer EquipmentInventory { get; private set; }
 		[Net] public TeamCore Core { get; private set; }
-		[Net] public List<BaseBuff> Buffs { get; private set; }
+		[Net] public IList<BaseBuff> Buffs { get; private set; }
 
 		public Dictionary<ArmorSlot,BaseClothing> Armor { get; private set; }
 		public ProjectileSimulator Projectiles { get; private set; }
@@ -135,7 +135,7 @@ namespace Facepunch.CoreWars
 			client.Pawn = this;
 			CreateInventories();
 			Armor = new();
-			Buffs = new();
+			Buffs = new List<BaseBuff>();
 		}
 
 		public bool TryGiveWeapon<T>() where T : WeaponItem

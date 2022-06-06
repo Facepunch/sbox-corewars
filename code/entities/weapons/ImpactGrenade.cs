@@ -18,7 +18,7 @@ namespace Facepunch.CoreWars
 	}
 
 	[Library( "weapon_impact_grenade", Title = "Impact Grenade" )]
-	partial class ImpactGrenadeGrenade : BulletDropWeapon<BulletDropProjectile>
+	partial class ImpactGrenade : BulletDropWeapon<BulletDropProjectile>
 	{
 		public override WeaponConfig Config => new ImpactGrenadeConfig();
 		public override string ImpactEffect => "particles/weapons/boomer/boomer_impact.vpcf";
