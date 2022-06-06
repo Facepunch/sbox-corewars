@@ -9,7 +9,7 @@ namespace Facepunch.CoreWars
 	public class BlowtorchShopItem : BaseWeaponShopItem<BlowtorchItem>
 	{
 		public override string Name => "Blowtorch";
-		public override string Description => "A simple tool for quickly melting plastic";
+		public override string Description => "A simple tool for quickly melting plastic.";
 		public override Dictionary<Type, int> Costs => new()
 		{
 			[typeof( IronItem )] = 30

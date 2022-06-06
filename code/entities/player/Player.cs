@@ -146,11 +146,6 @@ namespace Facepunch.CoreWars
 			return BackpackInventory.Instance.Give( item );
 		}
 
-		public WeaponItem GetWeaponItem( Weapon weapon )
-		{
-			return FindItems<PortalGrenadeItem>().FirstOrDefault( i => i.Weapon == weapon );
-		}
-
 		public void TryGiveAmmo( AmmoType type, ushort amount )
 		{
 			var item = InventorySystem.CreateItem<AmmoItem>();

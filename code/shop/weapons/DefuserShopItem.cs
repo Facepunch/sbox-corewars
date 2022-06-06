@@ -9,7 +9,7 @@ namespace Facepunch.CoreWars
 	public class DefuserShopItem : BaseWeaponShopItem<DefuserItem>
 	{
 		public override string Name => "Defuser";
-		public override string Description => "A simple tool for defusing explosives";
+		public override string Description => "A simple tool for defusing explosives.";
 		public override Dictionary<Type, int> Costs => new()
 		{
 			[typeof( IronItem )] = 20
