@@ -7,7 +7,7 @@ using Sandbox;
 
 namespace Facepunch.CoreWars
 {
-	public abstract class BaseTeamUpgrade : BaseNetworkable, IPurchasableItem, IValid
+	public abstract class BaseTeamUpgrade : IPurchasableItem, IValid
 	{
 		public virtual string Description => string.Empty;
 		public virtual string Name => string.Empty;

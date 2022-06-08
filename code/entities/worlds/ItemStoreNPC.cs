@@ -14,7 +14,7 @@ namespace Facepunch.CoreWars
 	{
 		[EditorProperty] public Team Team { get; set; }
 
-		[Net] public List<BaseShopItem> Items { get; set; }
+		public List<BaseShopItem> Items { get; private set; } = new();
 
 		public string DisplayName => "Item Store";
 		public float MaxUseDistance => 300f;
@@ -36,16 +36,7 @@ namespace Facepunch.CoreWars
 			AddClothing( "models/citizen_clothes/glasses/stylish_glasses/models/stylish_glasses_gold.vmdl" );
 			AddClothing( "models/citizen_clothes/hair/hair_longbrown/models/hair_longbrown.vmdl" );
 
-			Items = new List<BaseShopItem>();
-
-			var types = TypeLibrary.GetTypes<BaseShopItem>();
-
-			foreach ( var type in types )
-			{
-				if ( type.IsAbstract || type.IsGenericType ) continue;
-				var item = TypeLibrary.Create<BaseShopItem>( type );
-				Items.Add( item );
-			}
+			AddAllItems();
 
 			base.Spawn();
 		}
@@ -53,6 +44,9 @@ namespace Facepunch.CoreWars
 		public override void ClientSpawn()
 		{
 			Nameplate = new Nameplate( this );
+
+			AddAllItems();
+
 			base.ClientSpawn();
 		}
 
@@ -81,6 +75,18 @@ namespace Facepunch.CoreWars
 		public void OnUsed( Player player )
 		{
 			OpenForClient( To.Single( player ) );
+		}
+
+		private void AddAllItems()
+		{
+			var types = TypeLibrary.GetTypes<BaseShopItem>();
+
+			foreach ( var type in types )
+			{
+				if ( type.IsAbstract || type.IsGenericType ) continue;
+				var item = TypeLibrary.Create<BaseShopItem>( type );
+				Items.Add( item );
+			}
 		}
 
 		[ClientRpc]
