@@ -16,6 +16,7 @@ namespace Facepunch.CoreWars
 		public virtual string MuzzleFlashEffect => "particles/pistol_muzzleflash.vpcf";
 		public virtual string CrosshairClass => "automatic";
 		public virtual string ImpactEffect => null;
+		public virtual bool ShouldRenderCrosshair => true;
 		public virtual int ClipSize => 16;
 		public virtual float AutoReloadDelay => 1.5f;
 		public virtual float ReloadTime => 3.0f;
@@ -324,25 +325,38 @@ namespace Facepunch.CoreWars
 
 		public virtual void RenderHud( Vector2 screenSize )
 		{
-			if ( Owner is not Player player ) return;
+			if ( Owner is not Player player )
+				return;
 
+			if ( ShouldRenderCrosshair )
+			{
+				RenderCrosshair( player, screenSize * 0.5f );
+			}
+		}
+
+		public virtual void RenderCrosshair( Player player, Vector2 center )
+		{
 			var draw = Render.Draw2D;
-			var center = screenSize * 0.5f;
-			var lastHit = player.TimeSinceLastHit.Relative;
-			var lastAttack = TimeSincePrimaryAttack.Relative;
-			var shootEase = Easing.EaseIn( lastAttack.LerpInverse( 0.2f, 0.0f ) );
-			var color = Color.Lerp( Color.Red, Color.Yellow, lastHit.LerpInverse( 0.0f, 0.4f ) );
+			var lastHitTime = player.TimeSinceLastHit.Relative;
+			var lastAttackTime = TimeSincePrimaryAttack.Relative;
+			var shootEase = Easing.EaseIn( lastAttackTime.LerpInverse( 0.2f, 0.0f ) );
+			var color = Color.Lerp( Color.Red, Color.White, lastHitTime.LerpInverse( 0.0f, 0.4f ) );
+
+			var hitEase = Easing.BounceIn( lastHitTime.LerpInverse( 0.5f, 0.0f ) );
+			var circleSize = 80f * hitEase;
+			var circleThickness = 32f * hitEase;
 
 			draw.BlendMode = BlendMode.Lighten;
-			draw.Color = color.WithAlpha( 0.2f + lastAttack.LerpInverse( 1.2f, 0 ) * 0.5f );
+			draw.Color = Color.Red;
+			draw.CircleEx( center, circleSize, circleSize - circleThickness );
+			draw.Color = color.WithAlpha( 0.2f + lastAttackTime.LerpInverse( 1.2f, 0 ) * 0.5f );
 
 			var length = 8.0f - shootEase * 2.0f;
-			var gap = 10.0f + shootEase * 30.0f;
-			var thickness = 2.0f;
+			var gap = 10.0f + shootEase * 50.0f;
+			var thickness = 6.0f;
 
 			draw.Line( thickness, center + Vector2.Left * gap, center + Vector2.Left * (length + gap) );
 			draw.Line( thickness, center - Vector2.Left * gap, center - Vector2.Left * (length + gap) );
-
 			draw.Line( thickness, center + Vector2.Up * gap, center + Vector2.Up * (length + gap) );
 			draw.Line( thickness, center - Vector2.Up * gap, center - Vector2.Up * (length + gap) );
 		}
