@@ -15,11 +15,19 @@ namespace Facepunch.CoreWars
 	{
 		[EditorProperty, Net] public Team Team { get; set; }
 
-		[Net] public List<BaseTeamUpgrade> Upgrades { get; set; }
+		[Net, Change( nameof( OnUpgradeTypesChanged ) )] protected List<int> UpgradeTypes { get; set; } = new();
+		protected List<BaseTeamUpgrade> InternalUpgrades { get; set; } = new();
+		public IReadOnlyList<BaseTeamUpgrade> Upgrades => InternalUpgrades;
 
 		public T FindUpgrade<T>() where T : BaseTeamUpgrade
 		{
 			return (Upgrades.FirstOrDefault( u => u is T ) as T);
+		}
+
+		public void AddUpgrade( BaseTeamUpgrade upgrade )
+		{
+			InternalUpgrades.Add( upgrade );
+			UpgradeTypes.Add( TypeLibrary.GetDescription( upgrade.GetType() ).Identity );
 		}
 
 		public int GetUpgradeTier( string group )
@@ -38,7 +46,8 @@ namespace Facepunch.CoreWars
 		{
 			Game.AddValidTeam( Team );
 			LifeState = LifeState.Alive;
-			Upgrades.Clear();
+			InternalUpgrades.Clear();
+			UpgradeTypes.Clear();
 			Health = 100f;
 		}
 
@@ -59,8 +68,6 @@ namespace Facepunch.CoreWars
 			Transmit = TransmitType.Always;
 			SetupPhysicsFromAABB( PhysicsMotionType.Keyframed, Model.Bounds.Mins, Model.Bounds.Maxs );
 
-			Upgrades = new List<BaseTeamUpgrade>();
-
 			base.Spawn();
 		}
 
@@ -79,6 +86,17 @@ namespace Facepunch.CoreWars
 		{
 			Game.RemoveValidTeam( Team );
 			LifeState = LifeState.Dead;
+		}
+
+		public virtual void OnUpgradeTypesChanged( List<int> oldTypes, List<int> newTypes )
+		{
+			InternalUpgrades.Clear();
+
+			foreach ( var index in newTypes )
+			{
+				var upgrade = TypeLibrary.Create<BaseTeamUpgrade>( index );
+				InternalUpgrades.Add( upgrade );
+			}
 		}
 
 		[Event.Tick.Client]

@@ -61,7 +61,7 @@ namespace Facepunch.CoreWars
 
 			if ( core.IsValid() )
 			{
-				core.Upgrades.Add( this );
+				core.AddUpgrade( this );
 			}
 		}
 	}

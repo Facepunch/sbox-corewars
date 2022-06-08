@@ -720,7 +720,7 @@ namespace Facepunch.CoreWars
 
 			if ( IsServer )
 			{
-				if ( Input.Down( InputButton.PrimaryAttack ) && NextActionTime )
+				if ( Input.Released( InputButton.PrimaryAttack ) && NextActionTime )
 				{
 					var container = HotbarInventory.Instance;
 					var item = container.GetFromSlot( CurrentHotbarIndex );
