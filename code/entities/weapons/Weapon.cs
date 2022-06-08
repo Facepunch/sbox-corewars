@@ -322,6 +322,31 @@ namespace Facepunch.CoreWars
 			}
 		}
 
+		public virtual void RenderHud( Vector2 screenSize )
+		{
+			if ( Owner is not Player player ) return;
+
+			var draw = Render.Draw2D;
+			var center = screenSize * 0.5f;
+			var lastHit = player.TimeSinceLastHit.Relative;
+			var lastAttack = TimeSincePrimaryAttack.Relative;
+			var shootEase = Easing.EaseIn( lastAttack.LerpInverse( 0.2f, 0.0f ) );
+			var color = Color.Lerp( Color.Red, Color.Yellow, lastHit.LerpInverse( 0.0f, 0.4f ) );
+
+			draw.BlendMode = BlendMode.Lighten;
+			draw.Color = color.WithAlpha( 0.2f + lastAttack.LerpInverse( 1.2f, 0 ) * 0.5f );
+
+			var length = 8.0f - shootEase * 2.0f;
+			var gap = 10.0f + shootEase * 30.0f;
+			var thickness = 2.0f;
+
+			draw.Line( thickness, center + Vector2.Left * gap, center + Vector2.Left * (length + gap) );
+			draw.Line( thickness, center - Vector2.Left * gap, center - Vector2.Left * (length + gap) );
+
+			draw.Line( thickness, center + Vector2.Up * gap, center + Vector2.Up * (length + gap) );
+			draw.Line( thickness, center - Vector2.Up * gap, center - Vector2.Up * (length + gap) );
+		}
+
 		public virtual void ShootBullet( float spread, float force, float damage, float bulletSize )
 		{
 			var forward = Owner.EyeRotation.Forward;

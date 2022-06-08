@@ -24,6 +24,7 @@ namespace Facepunch.CoreWars
 		[Net] public TeamCore Core { get; private set; }
 		[Net] public IList<BaseBuff> Buffs { get; private set; }
 
+		public RealTimeSince TimeSinceLastHit { get; private set; }
 		public Dictionary<ArmorSlot,BaseClothing> Armor { get; private set; }
 		public ProjectileSimulator Projectiles { get; private set; }
 		public DamageInfo LastDamageTaken { get; private set; }
@@ -387,7 +388,12 @@ namespace Facepunch.CoreWars
 		[ClientRpc]
 		public void ShowHitMarker( int hitboxGroup )
 		{
-			Crosshair.Current?.Hit( hitboxGroup );
+			if ( hitboxGroup == 1 )
+				Sound.FromScreen( "hitmarker.headshot" );
+			else
+				Sound.FromScreen( "hitmarker.hit" );
+
+			TimeSinceLastHit = 0f;
 		}
 
 		public void RespawnWhenAvailable()
@@ -403,6 +409,18 @@ namespace Facepunch.CoreWars
 			}
 
 			Buffs.Clear();
+		}
+
+		public virtual void RenderHud( Vector2 screenSize )
+		{
+			if ( ActiveChild is Weapon weapon && weapon.IsValid() )
+			{
+				weapon.RenderHud( screenSize );
+			}
+			else
+			{
+
+			}
 		}
 
 		public virtual void Reset()

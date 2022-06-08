@@ -207,6 +207,21 @@ namespace Facepunch.CoreWars
 			}
 		}
 
+		public override void RenderHud()
+		{
+			var pawn = Local.Pawn as Player;
+			if ( !pawn.IsValid() ) return;
+
+			var scale = Screen.Height / 1080.0f;
+			var screenSize = Screen.Size / scale;
+			var matrix = Matrix.CreateScale( scale );
+
+			using ( Render.Draw2D.MatrixScope( matrix ) )
+			{
+				pawn.RenderHud( screenSize );
+			}
+		}
+
 		public override void PostLevelLoaded()
 		{
 			if ( !IsServer )
