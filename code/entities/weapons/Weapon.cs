@@ -347,9 +347,9 @@ namespace Facepunch.CoreWars
 			var circleThickness = 32f * hitEase;
 
 			draw.BlendMode = BlendMode.Lighten;
-			draw.Color = Color.Red;
+			draw.Color = Color.Red.WithAlpha( 0.8f );
 			draw.CircleEx( center, circleSize, circleSize - circleThickness );
-			draw.Color = color.WithAlpha( 0.2f + lastAttackTime.LerpInverse( 1.2f, 0 ) * 0.5f );
+			draw.Color = color.WithAlpha( 0.4f + lastAttackTime.LerpInverse( 1f, 0 ) * 0.5f );
 
 			var length = 8.0f - shootEase * 2.0f;
 			var gap = 10.0f + shootEase * 50.0f;

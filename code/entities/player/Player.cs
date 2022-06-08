@@ -421,7 +421,7 @@ namespace Facepunch.CoreWars
 			{
 				var draw = Render.Draw2D;
 				draw.BlendMode = BlendMode.Lighten;
-				draw.Color = Color.Yellow.WithAlpha( 0.8f );
+				draw.Color = Color.Yellow.WithAlpha( 0.6f );
 				draw.Circle( screenSize * 0.5f, 6f );
 			}
 		}
