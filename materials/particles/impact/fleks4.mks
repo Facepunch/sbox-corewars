@@ -1,0 +1,193 @@
+packmode flat
+sequence 0
+frame fleks4.tga(0,0,63,63) fleks4.tga(0,0,63,63) fleks4.tga(0,0,63,63) fleks4.tga(0,0,63,63) 1.000000 noalphacrop
+
+sequence 1
+frame fleks4.tga(64,0,127,63) fleks4.tga(64,0,127,63) fleks4.tga(64,0,127,63) fleks4.tga(64,0,127,63) 1.000000 noalphacrop
+
+sequence 2
+frame fleks4.tga(128,0,191,63) fleks4.tga(128,0,191,63) fleks4.tga(128,0,191,63) fleks4.tga(128,0,191,63) 1.000000 noalphacrop
+
+sequence 3
+frame fleks4.tga(192,0,255,63) fleks4.tga(192,0,255,63) fleks4.tga(192,0,255,63) fleks4.tga(192,0,255,63) 1.000000 noalphacrop
+
+sequence 4
+frame fleks4.tga(256,0,319,63) fleks4.tga(256,0,319,63) fleks4.tga(256,0,319,63) fleks4.tga(256,0,319,63) 1.000000 noalphacrop
+
+sequence 5
+frame fleks4.tga(320,0,383,63) fleks4.tga(320,0,383,63) fleks4.tga(320,0,383,63) fleks4.tga(320,0,383,63) 1.000000 noalphacrop
+
+sequence 6
+frame fleks4.tga(384,0,447,63) fleks4.tga(384,0,447,63) fleks4.tga(384,0,447,63) fleks4.tga(384,0,447,63) 1.000000 noalphacrop
+
+sequence 7
+frame fleks4.tga(448,0,511,63) fleks4.tga(448,0,511,63) fleks4.tga(448,0,511,63) fleks4.tga(448,0,511,63) 1.000000 noalphacrop
+
+sequence 8
+frame fleks4.tga(0,64,63,127) fleks4.tga(0,64,63,127) fleks4.tga(0,64,63,127) fleks4.tga(0,64,63,127) 1.000000 noalphacrop
+
+sequence 9
+frame fleks4.tga(64,64,127,127) fleks4.tga(64,64,127,127) fleks4.tga(64,64,127,127) fleks4.tga(64,64,127,127) 1.000000 noalphacrop
+
+sequence 10
+frame fleks4.tga(128,64,191,127) fleks4.tga(128,64,191,127) fleks4.tga(128,64,191,127) fleks4.tga(128,64,191,127) 1.000000 noalphacrop
+
+sequence 11
+frame fleks4.tga(192,64,255,127) fleks4.tga(192,64,255,127) fleks4.tga(192,64,255,127) fleks4.tga(192,64,255,127) 1.000000 noalphacrop
+
+sequence 12
+frame fleks4.tga(256,64,319,127) fleks4.tga(256,64,319,127) fleks4.tga(256,64,319,127) fleks4.tga(256,64,319,127) 1.000000 noalphacrop
+
+sequence 13
+frame fleks4.tga(320,64,383,127) fleks4.tga(320,64,383,127) fleks4.tga(320,64,383,127) fleks4.tga(320,64,383,127) 1.000000 noalphacrop
+
+sequence 14
+frame fleks4.tga(384,64,447,127) fleks4.tga(384,64,447,127) fleks4.tga(384,64,447,127) fleks4.tga(384,64,447,127) 1.000000 noalphacrop
+
+sequence 15
+frame fleks4.tga(448,64,511,127) fleks4.tga(448,64,511,127) fleks4.tga(448,64,511,127) fleks4.tga(448,64,511,127) 1.000000 noalphacrop
+
+sequence 16
+frame fleks4.tga(0,128,63,191) fleks4.tga(0,128,63,191) fleks4.tga(0,128,63,191) fleks4.tga(0,128,63,191) 1.000000 noalphacrop
+
+sequence 17
+frame fleks4.tga(64,128,127,191) fleks4.tga(64,128,127,191) fleks4.tga(64,128,127,191) fleks4.tga(64,128,127,191) 1.000000 noalphacrop
+
+sequence 18
+frame fleks4.tga(128,128,191,191) fleks4.tga(128,128,191,191) fleks4.tga(128,128,191,191) fleks4.tga(128,128,191,191) 1.000000 noalphacrop
+
+sequence 19
+frame fleks4.tga(192,128,255,191) fleks4.tga(192,128,255,191) fleks4.tga(192,128,255,191) fleks4.tga(192,128,255,191) 1.000000 noalphacrop
+
+sequence 20
+frame fleks4.tga(256,128,319,191) fleks4.tga(256,128,319,191) fleks4.tga(256,128,319,191) fleks4.tga(256,128,319,191) 1.000000 noalphacrop
+
+sequence 21
+frame fleks4.tga(320,128,383,191) fleks4.tga(320,128,383,191) fleks4.tga(320,128,383,191) fleks4.tga(320,128,383,191) 1.000000 noalphacrop
+
+sequence 22
+frame fleks4.tga(384,128,447,191) fleks4.tga(384,128,447,191) fleks4.tga(384,128,447,191) fleks4.tga(384,128,447,191) 1.000000 noalphacrop
+
+sequence 23
+frame fleks4.tga(448,128,511,191) fleks4.tga(448,128,511,191) fleks4.tga(448,128,511,191) fleks4.tga(448,128,511,191) 1.000000 noalphacrop
+
+sequence 24
+frame fleks4.tga(0,192,63,255) fleks4.tga(0,192,63,255) fleks4.tga(0,192,63,255) fleks4.tga(0,192,63,255) 1.000000 noalphacrop
+
+sequence 25
+frame fleks4.tga(64,192,127,255) fleks4.tga(64,192,127,255) fleks4.tga(64,192,127,255) fleks4.tga(64,192,127,255) 1.000000 noalphacrop
+
+sequence 26
+frame fleks4.tga(128,192,191,255) fleks4.tga(128,192,191,255) fleks4.tga(128,192,191,255) fleks4.tga(128,192,191,255) 1.000000 noalphacrop
+
+sequence 27
+frame fleks4.tga(192,192,255,255) fleks4.tga(192,192,255,255) fleks4.tga(192,192,255,255) fleks4.tga(192,192,255,255) 1.000000 noalphacrop
+
+sequence 28
+frame fleks4.tga(256,192,319,255) fleks4.tga(256,192,319,255) fleks4.tga(256,192,319,255) fleks4.tga(256,192,319,255) 1.000000 noalphacrop
+
+sequence 29
+frame fleks4.tga(320,192,383,255) fleks4.tga(320,192,383,255) fleks4.tga(320,192,383,255) fleks4.tga(320,192,383,255) 1.000000 noalphacrop
+
+sequence 30
+frame fleks4.tga(384,192,447,255) fleks4.tga(384,192,447,255) fleks4.tga(384,192,447,255) fleks4.tga(384,192,447,255) 1.000000 noalphacrop
+
+sequence 31
+frame fleks4.tga(448,192,511,255) fleks4.tga(448,192,511,255) fleks4.tga(448,192,511,255) fleks4.tga(448,192,511,255) 1.000000 noalphacrop
+
+sequence 32
+frame fleks4.tga(0,256,63,319) fleks4.tga(0,256,63,319) fleks4.tga(0,256,63,319) fleks4.tga(0,256,63,319) 1.000000 noalphacrop
+
+sequence 33
+frame fleks4.tga(64,256,127,319) fleks4.tga(64,256,127,319) fleks4.tga(64,256,127,319) fleks4.tga(64,256,127,319) 1.000000 noalphacrop
+
+sequence 34
+frame fleks4.tga(128,256,191,319) fleks4.tga(128,256,191,319) fleks4.tga(128,256,191,319) fleks4.tga(128,256,191,319) 1.000000 noalphacrop
+
+sequence 35
+frame fleks4.tga(192,256,255,319) fleks4.tga(192,256,255,319) fleks4.tga(192,256,255,319) fleks4.tga(192,256,255,319) 1.000000 noalphacrop
+
+sequence 36
+frame fleks4.tga(256,256,319,319) fleks4.tga(256,256,319,319) fleks4.tga(256,256,319,319) fleks4.tga(256,256,319,319) 1.000000 noalphacrop
+
+sequence 37
+frame fleks4.tga(320,256,383,319) fleks4.tga(320,256,383,319) fleks4.tga(320,256,383,319) fleks4.tga(320,256,383,319) 1.000000 noalphacrop
+
+sequence 38
+frame fleks4.tga(384,256,447,319) fleks4.tga(384,256,447,319) fleks4.tga(384,256,447,319) fleks4.tga(384,256,447,319) 1.000000 noalphacrop
+
+sequence 39
+frame fleks4.tga(448,256,511,319) fleks4.tga(448,256,511,319) fleks4.tga(448,256,511,319) fleks4.tga(448,256,511,319) 1.000000 noalphacrop
+
+sequence 40
+frame fleks4.tga(0,320,63,383) fleks4.tga(0,320,63,383) fleks4.tga(0,320,63,383) fleks4.tga(0,320,63,383) 1.000000 noalphacrop
+
+sequence 41
+frame fleks4.tga(64,320,127,383) fleks4.tga(64,320,127,383) fleks4.tga(64,320,127,383) fleks4.tga(64,320,127,383) 1.000000 noalphacrop
+
+sequence 42
+frame fleks4.tga(128,320,191,383) fleks4.tga(128,320,191,383) fleks4.tga(128,320,191,383) fleks4.tga(128,320,191,383) 1.000000 noalphacrop
+
+sequence 43
+frame fleks4.tga(192,320,255,383) fleks4.tga(192,320,255,383) fleks4.tga(192,320,255,383) fleks4.tga(192,320,255,383) 1.000000 noalphacrop
+
+sequence 44
+frame fleks4.tga(256,320,319,383) fleks4.tga(256,320,319,383) fleks4.tga(256,320,319,383) fleks4.tga(256,320,319,383) 1.000000 noalphacrop
+
+sequence 45
+frame fleks4.tga(320,320,383,383) fleks4.tga(320,320,383,383) fleks4.tga(320,320,383,383) fleks4.tga(320,320,383,383) 1.000000 noalphacrop
+
+sequence 46
+frame fleks4.tga(384,320,447,383) fleks4.tga(384,320,447,383) fleks4.tga(384,320,447,383) fleks4.tga(384,320,447,383) 1.000000 noalphacrop
+
+sequence 47
+frame fleks4.tga(448,320,511,383) fleks4.tga(448,320,511,383) fleks4.tga(448,320,511,383) fleks4.tga(448,320,511,383) 1.000000 noalphacrop
+
+sequence 48
+frame fleks4.tga(0,384,63,447) fleks4.tga(0,384,63,447) fleks4.tga(0,384,63,447) fleks4.tga(0,384,63,447) 1.000000 noalphacrop
+
+sequence 49
+frame fleks4.tga(64,384,127,447) fleks4.tga(64,384,127,447) fleks4.tga(64,384,127,447) fleks4.tga(64,384,127,447) 1.000000 noalphacrop
+
+sequence 50
+frame fleks4.tga(128,384,191,447) fleks4.tga(128,384,191,447) fleks4.tga(128,384,191,447) fleks4.tga(128,384,191,447) 1.000000 noalphacrop
+
+sequence 51
+frame fleks4.tga(192,384,255,447) fleks4.tga(192,384,255,447) fleks4.tga(192,384,255,447) fleks4.tga(192,384,255,447) 1.000000 noalphacrop
+
+sequence 52
+frame fleks4.tga(256,384,319,447) fleks4.tga(256,384,319,447) fleks4.tga(256,384,319,447) fleks4.tga(256,384,319,447) 1.000000 noalphacrop
+
+sequence 53
+frame fleks4.tga(320,384,383,447) fleks4.tga(320,384,383,447) fleks4.tga(320,384,383,447) fleks4.tga(320,384,383,447) 1.000000 noalphacrop
+
+sequence 54
+frame fleks4.tga(384,384,447,447) fleks4.tga(384,384,447,447) fleks4.tga(384,384,447,447) fleks4.tga(384,384,447,447) 1.000000 noalphacrop
+
+sequence 55
+frame fleks4.tga(448,384,511,447) fleks4.tga(448,384,511,447) fleks4.tga(448,384,511,447) fleks4.tga(448,384,511,447) 1.000000 noalphacrop
+
+sequence 56
+frame fleks4.tga(0,448,63,511) fleks4.tga(0,448,63,511) fleks4.tga(0,448,63,511) fleks4.tga(0,448,63,511) 1.000000 noalphacrop
+
+sequence 57
+frame fleks4.tga(64,448,127,511) fleks4.tga(64,448,127,511) fleks4.tga(64,448,127,511) fleks4.tga(64,448,127,511) 1.000000 noalphacrop
+
+sequence 58
+frame fleks4.tga(128,448,191,511) fleks4.tga(128,448,191,511) fleks4.tga(128,448,191,511) fleks4.tga(128,448,191,511) 1.000000 noalphacrop
+
+sequence 59
+frame fleks4.tga(192,448,255,511) fleks4.tga(192,448,255,511) fleks4.tga(192,448,255,511) fleks4.tga(192,448,255,511) 1.000000 noalphacrop
+
+sequence 60
+frame fleks4.tga(256,448,319,511) fleks4.tga(256,448,319,511) fleks4.tga(256,448,319,511) fleks4.tga(256,448,319,511) 1.000000 noalphacrop
+
+sequence 61
+frame fleks4.tga(320,448,383,511) fleks4.tga(320,448,383,511) fleks4.tga(320,448,383,511) fleks4.tga(320,448,383,511) 1.000000 noalphacrop
+
+sequence 62
+frame fleks4.tga(384,448,447,511) fleks4.tga(384,448,447,511) fleks4.tga(384,448,447,511) fleks4.tga(384,448,447,511) 1.000000 noalphacrop
+
+sequence 63
+frame fleks4.tga(448,448,511,511) fleks4.tga(448,448,511,511) fleks4.tga(448,448,511,511) fleks4.tga(448,448,511,511) 1.000000 noalphacrop
+
