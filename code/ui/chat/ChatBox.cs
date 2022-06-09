@@ -101,7 +101,7 @@ namespace Facepunch.CoreWars
 		{
 			Current = this;
 
-			StyleSheet.Load( "/ui/ChatBox.scss" );
+			StyleSheet.Load( "/ui/chat/ChatBox.scss" );
 
 			Canvas = Add.Panel( "chat_canvas" );
 

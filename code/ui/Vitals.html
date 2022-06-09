@@ -1,15 +1,24 @@
 ﻿<link rel="stylesheet" href="./Vitals.scss" />
 
 <div>
-    <div class="health">
-        <div @ref="HealthBar" class="health-bar">
-
+  <div class="player-vitals">
+    <div class="vital health">
+      <Icon class="icon">favorite</Icon>
+      <div class="bar-wrapper">
+        <div @ref="HealthBar" class="bar">
+          <div class="mdi mdi-name"></div>
+          <label class="value" @ref="HealthValue">50%</label>
         </div>
+      </div>
     </div>
 
-    <div class="stamina">
-        <div @ref="StaminaBar" class="stamina-bar">
-
+    <div class="vital stamina">
+      <Icon class="icon">bolt</Icon>
+      <div class="bar-wrapper">
+        <div @ref="StaminaBar" class="bar">
+          <label class="value" @ref="StaminaValue">50%</label>
         </div>
+      </div>
     </div>
+  </div>
 </div>

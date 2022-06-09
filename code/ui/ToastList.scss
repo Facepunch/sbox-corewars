@@ -1,106 +1,139 @@
-﻿ToastList {
-    flex-direction: column;
-    flex-grow: 0;
-    position: absolute;
-    right: 64px;
-    bottom: 300px;
-    z-index: 10;
+﻿@import "./scss/base.scss";
 
-    KillFeedItem {
-        align-self: flex-end;
-        align-items: center;
-        background-color: rgba( 0 0 0 0.6 );
-        backdrop-filter-blur: 8px;
-        flex-direction: row;
-        border-radius: 2px;
-        margin-top: 8px;
-        padding: 8px 16px;
-        transition: all 1s ease-out;
-        opacity: 1;
-        bottom: 0;
+ToastList {
+  flex-direction: column;
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
 
-        &:intro {
-            opacity: 0;
-            bottom: -20px;
-        }
+.killfeed {
+  flex-direction: column-reverse;
+  transition: all 1s ease-out;
+  top: -100px;
+  right: 64px;
 
-        &:outro {
-            opacity: 0;
-            bottom: 20px;
-            transition: all 1s ease-out;
-        }
+  KillFeedItem {
+    align-self: flex-end;
+    align-items: center;
+    background-color: $box-bg;
+    border-radius: 4px;
+    padding: 0 8px;
+    margin-bottom: 4px;
+    transition: all 1s ease-out;
+    opacity: 1;
 
-        label, text {
-            color: #fff;
-            font-family: Roboto;
-            font-size: 24px;
-            flex-grow: 1;
-        }
-
-        .attacker {
-            flex-grow: 1;
-            font-family: Roboto;
-
-            &.hidden {
-                display: none;
-            }
-        }
-
-        .victim {
-            flex-grow: 1;
-        }
-
-        .icon {
-            width: 48px;
-            height: 48px;
-            margin-right: 16px;
-
-            &.has-attacker {
-                margin-left: 16px;
-            }
-        }
+    &:intro {
+      opacity: 0;
+      bottom: -8px;
     }
 
-    ToastItem {
-        align-self: flex-start;
-        align-items: center;
-        background-color: rgba( 0 0 0 0.6 );
-        backdrop-filter-blur: 8px;
-        border-radius: 2px;
-        flex-direction: row;
-        margin-top: 8px;
-        padding: 8px 16px;
-        transition: all 1s ease-out;
-        opacity: 1;
-        bottom: 0;
-
-        &:intro {
-            opacity: 0;
-            bottom: -20px;
-        }
-
-        &:outro {
-            opacity: 0;
-            bottom: 20px;
-            transition: all 1s ease-out;
-        }
-
-        .text {
-            color: white;
-            font-size: 24px;
-            font-family: Roboto;
-            margin-left: 8px;
-            flex-grow: 1;
-            margin-right: 16px;
-        }
-
-        .icon {
-            width: 48px;
-            height: 48px;
-
-            &.hidden {
-                display: none;
-            }
-        }
+    &:outro {
+      opacity: 0;
+      bottom: 8px;
+      transition: all 1s ease-out;
     }
+
+    label {
+      color: #fff;
+      font-size: 18px;
+      text-shadow: 0 2px 0 rgba(0, 0, 0, 0.5);
+
+      &.attacker {
+        margin-right: 8px;
+      }
+
+      &.victim {
+        margin-left: 8px;
+      }
+
+      &.team_red {
+        color: $red;
+      }
+      &.team_blue {
+        color: $blue;
+      }
+      &.team_green {
+        color: $green;
+      }
+      &.team_yellow {
+        color: $yellow;
+      }
+      &.team_orange {
+        color: $orange;
+      }
+      &.team_cyan {
+        color: $cyan;
+      }
+      &.team_purple {
+        color: $purple;
+      }
+      &.team_pink {
+        color: $pink;
+      }
+    }
+
+    &.is-suicide {
+      flex-direction: row-reverse;
+
+      .attacker {
+        display: none;
+      }
+
+      .victim {
+        margin-left: 0;
+        margin-right: 8px;
+      }
+    }
+  }
+}
+
+.toasts {
+  position: absolute;
+  flex-direction: column-reverse;
+  left: 64px;
+  top: 64px;
+
+  ToastItem {
+    align-self: flex-end;
+    align-items: center;
+    background-color: $box-bg;
+    border: 2px solid $box-border;
+    border-radius: 4px;
+    padding: 4px 8px;
+    margin-bottom: 4px;
+    transition: all 1s ease-out;
+    opacity: 1;
+
+    &:intro {
+      opacity: 0;
+      bottom: -20px;
+    }
+
+    &:outro {
+      opacity: 0;
+      bottom: 20px;
+      transition: all 1s ease-out;
+    }
+
+    .text {
+      color: #fff;
+      font-size: 18px;
+      text-shadow: 0 2px 0 rgba(0, 0, 0, 0.5);
+      margin-left: 8px;
+      margin-right: 6px;
+    }
+
+    .icon {
+      width: 32px;
+      height: 32px;
+
+      &.hidden {
+        display: none;
+      }
+    }
+  }
 }

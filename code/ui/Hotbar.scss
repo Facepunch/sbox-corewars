@@ -1,19 +1,21 @@
-﻿Hotbar {
-    position: absolute;
-    bottom: 32px;
-    display: flex;
-    flex-direction: row;
-    pointer-events: auto;
+﻿@import "./scss/_colours.scss";
 
-    InventorySlot {
-        margin-right: 16px;
+Hotbar {
+  position: absolute;
+  bottom: 32px;
+  display: flex;
+  flex-direction: row;
+  pointer-events: auto;
 
-        &:last-child {
-            margin-right: 0px;
-        }
+  InventorySlot {
+    margin-right: 16px;
+
+    &:last-child {
+      margin-right: 0px;
     }
+  }
 
-    &.hidden {
-        display: none;
-    }
+  &.hidden {
+    display: none;
+  }
 }

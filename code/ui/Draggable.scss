@@ -1,13 +1,22 @@
-﻿Draggable {
-    position: absolute;
-    width: 80px;
-    height: 80px;
-    pointer-events: none;
-    background-size: cover;
-    transform: translate( -50% -50% );
-    display: none;
+﻿@import "./scss/base.scss";
 
-    &.active {
-        display: flex;
-    }
+Draggable {
+  background-color: rgba($blue, 0.5);
+  border-radius: 8px;
+  position: absolute;
+  pointer-events: none;
+  background-size: 56;
+  background-repeat: no-repeat;
+  background-position: center;
+  backdrop-filter-blur: 24px;
+  display: none;
+  z-index: 101;
+
+  &.active {
+    display: flex;
+  }
+
+  &.invalid-drag {
+    background-color: rgba($red, 0.5);
+  }
 }

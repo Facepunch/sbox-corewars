@@ -13,12 +13,18 @@ namespace Facepunch.CoreWars
 		public Panel HealthBar { get; set; }
 		public Panel StaminaBar { get; set; }
 
+		public Label HealthValue { get; set; }
+		public Label StaminaValue { get; set; }
+
 		public override void Tick()
 		{
 			if ( Local.Pawn is Player player )
 			{
 				HealthBar.Style.Width = Length.Fraction( player.Health / 100f );
 				HealthBar.SetClass( "health-low", player.Health <= 15f );
+
+				HealthValue.Text = $"{player.Health.CeilToInt()}%";
+				StaminaValue.Text = $"{player.Stamina.CeilToInt()}%";
 
 				StaminaBar.Style.Width = Length.Fraction( player.Stamina / 100f );
 				StaminaBar.SetClass( "stamina-low", player.IsOutOfBreath );

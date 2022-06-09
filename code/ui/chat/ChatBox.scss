@@ -1,0 +1,244 @@
+﻿@import "../scss/base.scss";
+
+ChatBox {
+  position: absolute;
+  bottom: 100px;
+  left: 64px;
+  flex-direction: column;
+  width: 500px;
+  font-family: $font;
+  font-size: 13px;
+  pointer-events: none;
+  z-index: 8;
+
+  textentrycontainer {
+    background-color: $box-bg;
+    border: 2px solid $box-border;
+    border-radius: 10px;
+    opacity: 0;
+    width: 100%;
+    padding: 0;
+    position: relative;
+
+    tabtextentry {
+      font-size: 16px;
+      flex-shrink: 0;
+      text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+      flex-grow: 0;
+      color: white;
+      width: 100%;
+      padding: 8px 105px 8px 8px;
+    }
+
+    .channel {
+      background-color: $box-border;
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
+      margin-right: 10px;
+      font-size: 16px;
+      color: white;
+      padding: 8px;
+      min-width: 80px;
+      text-align: center;
+      position: relative;
+
+      &.team {
+        color: #fff;
+      }
+
+      &.all {
+        background-color: $gold;
+        color: $box-bg;
+      }
+    }
+  }
+
+  .chat_canvas {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+
+  &.open {
+    textentrycontainer {
+      opacity: 1;
+    }
+  }
+}
+
+chatentry {
+  margin-bottom: 0px;
+  color: white;
+  transition: all 0.1s ease-out;
+  opacity: 1;
+  max-height: 200px;
+  min-height: 42px;
+  flex-shrink: 0;
+  flex-grow: 0;
+  padding: 0 8px 0 0;
+  max-width: 100%;
+  transform: scale(1);
+  //backdrop-filter: $blur-medium;
+  font-family: $font;
+  margin-bottom: 2px;
+  flex-direction: row;
+
+  &:intro {
+    max-height: 0px;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-bottom: 0;
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  &:outro {
+    opacity: 0;
+    transition: all 2s ease-out;
+  }
+
+  image {
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    margin: 0;
+    padding: 0;
+    max-height: 42px;
+    max-width: 42px;
+    flex-shrink: 0;
+  }
+
+  .channel {
+    color: #fff;
+    align-self: flex-start;
+    min-height: 42px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    margin-left: 8px;
+    font-family: $font;
+    font-size: 16px;
+    color: #fff;
+    flex-shrink: 0;
+    padding: 0 8px;
+    min-width: 40px;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+
+    &.hidden {
+      display: none;
+    }
+  }
+
+  .name {
+    padding: 5px 0;
+    font-weight: 600;
+    font-size: 18px;
+    color: #fff;
+    flex-shrink: 0;
+    font-family: $font;
+    margin-left: 8px;
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.5);
+  }
+
+  .message {
+    color: white;
+    font-family: $font;
+    font-size: 18px;
+    flex-grow: 1;
+    margin-left: 8px;
+    padding-top: 5px;
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+  }
+
+  &.noname .name {
+    display: none;
+  }
+
+  &.noavatar image {
+    display: none;
+  }
+
+  &.tip {
+    background-color: $blue;
+  }
+
+  &.noavatar {
+    padding-left: 12px;
+  }
+
+  &.team_orange {
+    .channel {
+      background-color: $orange;
+    }
+
+    .name {
+      color: $orange;
+    }
+  }
+
+  &.team_green {
+    .channel {
+      background-color: $green;
+    }
+
+    .name {
+      color: $green;
+    }
+  }
+  &.team_purple {
+    .channel {
+      background-color: $purple;
+    }
+
+    .name {
+      color: $purple;
+    }
+  }
+  &.team_pink {
+    .channel {
+      background-color: $pink;
+    }
+
+    .name {
+      color: $pink;
+    }
+  }
+  &.team_cyan {
+    .channel {
+      background-color: $cyan;
+    }
+
+    .name {
+      color: $cyan;
+    }
+  }
+  &.team_yellow {
+    .channel {
+      background-color: $yellow;
+    }
+
+    .name {
+      color: $yellow;
+    }
+  }
+
+  &.team_red {
+    .channel {
+      background-color: $pink;
+    }
+
+    .name {
+      color: $pink;
+    }
+  }
+
+  &.team_blue {
+    .channel {
+      background-color: $blue;
+    }
+
+    .name {
+      color: $blue;
+    }
+  }
+}
