@@ -9,7 +9,7 @@ namespace Facepunch.CoreWars
 	{
 		public override bool RemoveOnDeath => true;
 		public override string WeaponName => "weapon_impact_grenade";
-		public override string Icon => "textures/items/impact_grenade.png";
+		public override string Icon => "textures/items/weapon_impact_grenade.png";
 		public override string Name => "Impact Grenade";
 	}
 }

@@ -3,6 +3,7 @@
 ToastList {
   flex-direction: column;
   position: absolute;
+  pointer-events: none;
   z-index: 10;
   top: 0;
   right: 0;
