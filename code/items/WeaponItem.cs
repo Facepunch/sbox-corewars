@@ -8,6 +8,9 @@ namespace Facepunch.CoreWars
 	{
 		public override bool CanBeDropped => false;
 
+		public virtual int ViewModelMaterialGroup => 0;
+		public virtual string WorldModelPath => null;
+		public virtual string ViewModelPath => null;
 		public virtual string WeaponName => string.Empty;
 		public virtual string Group => string.Empty;
 		public virtual int Tier => 0;

@@ -874,6 +874,11 @@ namespace Facepunch.CoreWars
 			else
 				ActiveChild = null;
 
+			if ( Input.Released( InputButton.Use ) )
+			{
+				CameraMode = new ThirdPersonCamera();
+			}
+
 			if ( IsClient )
 			{
 				if ( Input.Released( InputButton.Use ) )
@@ -913,12 +918,12 @@ namespace Facepunch.CoreWars
 
 		protected virtual void GiveInitialItems()
 		{
-			var longswords = FindItems<LongswordItemTier1>();
+			var swords = FindItems<SwordItemTier1>();
 
-			if ( !longswords.Any() )
+			if ( !swords.Any() )
 			{
-				var longsword = InventorySystem.CreateItem<LongswordItemTier1>();
-				TryGiveItem( longsword );
+				var sword = InventorySystem.CreateItem<SwordItemTier1>();
+				TryGiveItem( sword );
 			}
 		}
 

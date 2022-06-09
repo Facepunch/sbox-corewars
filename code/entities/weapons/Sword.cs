@@ -4,24 +4,24 @@ using Sandbox;
 namespace Facepunch.CoreWars
 {
 	[Library]
-	public class LongswordConfig : WeaponConfig
+	public class SwordConfig : WeaponConfig
 	{
-		public override string Name => "Longsword";
+		public override string Name => "Sword";
 		public override string Description => "Your every day melee weapon";
-		public override string Icon => "items/weapon_longsword.png";
-		public override string ClassName => "weapon_longsword";
+		public override string Icon => "textures/items/weapon_sword_1.png";
+		public override string ClassName => "weapon_sword";
 		public override AmmoType AmmoType => AmmoType.None;
 		public override WeaponType Type => WeaponType.Melee;
 		public override int Ammo => 0;
 		public override int Damage => 5;
 	}
 
-	[Library( "weapon_longsword", Title = "Longsword" )]
-	public partial class Longsword : Weapon
+	[Library( "weapon_sword", Title = "Sword" )]
+	public partial class Sword : Weapon
 	{
-		public override WeaponConfig Config => new LongswordConfig();
+		public override WeaponConfig Config => new SwordConfig();
 		public override string[] KillFeedReasons => new[] { "chopped", "slashed" };
-		public override string ViewModelPath => "models/weapons/v_crowbar.vmdl";
+		public override string ViewModelPath => "models/weapons/sword/v_sword01.vmdl";
 		public override DamageFlags DamageType => DamageFlags.Blunt;
 		public override float PrimaryRate => 1.5f;
 		public override float SecondaryRate => 1f;
@@ -31,7 +31,32 @@ namespace Facepunch.CoreWars
 		public override void Spawn()
 		{
 			base.Spawn();
-			SetModel( "models/weapons/w_crowbar.vmdl" );
+			SetModel( "models/weapons/sword/w_sword01.vmdl" );
+		}
+
+		public override void CreateViewModel()
+		{
+			Host.AssertClient();
+
+			if ( WeaponItem.IsValid() )
+			{
+				if ( !string.IsNullOrEmpty( WeaponItem.ViewModelPath ) )
+				{
+					ViewModelEntity = new ViewModel
+					{
+						EnableViewmodelRendering = true,
+						Position = Position,
+						Owner = Owner
+					};
+
+					ViewModelEntity.SetModel( WeaponItem.ViewModelPath );
+					ViewModelEntity.SetMaterialGroup( WeaponItem.ViewModelMaterialGroup );
+
+					return;
+				}
+			}
+
+			base.CreateViewModel();
 		}
 
 		public override void AttackPrimary()
@@ -44,7 +69,7 @@ namespace Facepunch.CoreWars
 
 			PlayAttackAnimation();
 			ShootEffects();
-			MeleeStrike( Config.Damage, 1.5f );
+			MeleeStrike( Config.Damage * WeaponItem.Tier, 1.5f * WeaponItem.Tier );
 			PlaySound( "melee.swing" );
 
 			TimeSincePrimaryAttack = 0;
@@ -63,6 +88,16 @@ namespace Facepunch.CoreWars
 				ViewModelEntity?.SetAnimParameter( "b_grounded", Owner.GroundEntity.IsValid() );
 				ViewModelEntity?.SetAnimParameter( "aim_pitch", Owner.EyeRotation.Pitch() );
 			}
+		}
+
+		protected override void OnWeaponItemChanged()
+		{
+			if ( !string.IsNullOrEmpty( WeaponItem.WorldModelPath ) )
+			{
+				SetModel( WeaponItem.WorldModelPath );
+			}
+
+			base.OnWeaponItemChanged();
 		}
 
 		protected override void ShootEffects()

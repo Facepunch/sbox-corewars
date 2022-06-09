@@ -29,8 +29,8 @@
 								to = "models/first_person/arms_materials/first_person_arms_light.vmat"
 							},
 							{
-								from = "06 - default.vmat"
-								to = "models/citizen_props/crowbar01.vmat"
+								from = "medw_swordsdaggers.vmat"
+								to = "models/weapons/sword/swords_crystal.vmat"
 							},
 						]
 						use_global_default = false
@@ -48,10 +48,10 @@
 					},
 					{
 						_class = "RenderMeshFile"
-						filename = "models/weapons/citizen_props/crowbar01.fbx"
-						import_translation = [ -12.0, 0.0, 10.0 ]
-						import_rotation = [ 0.0, 270.0, 0.0 ]
-						import_scale = 0.3937
+						filename = "models/weapons/sword/sword02.fbx"
+						import_translation = [ -4.0, 0.0, 1.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
 						align_origin_x_type = "None"
 						align_origin_y_type = "None"
 						align_origin_z_type = "None"

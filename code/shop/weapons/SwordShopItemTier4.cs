@@ -6,19 +6,19 @@ using System;
 namespace Facepunch.CoreWars
 {
 	[Library]
-	public class LongswordShopItemTier3 : BaseWeaponShopItem<LongswordItemTier3>
+	public class SwordShopItemTier4 : BaseWeaponShopItem<SwordItemTier4>
 	{
-		public override string Name => "Heavy Longsword";
-		public override string Description => "A heavy longsword for dealing melee damage.";
+		public override string Name => "Crystal Sword";
+		public override string Description => "A supercharged sword for dealing melee damage.";
 		public override Dictionary<Type, int> Costs => new()
 		{
-			[typeof( IronItem )] = 70
+			[typeof( IronItem )] = 60
 		};
 		public override Type RequiredUpgradeType => typeof( ArmoryUpgrade );
 
 		public override string GetIcon( Player player )
 		{
-			return "textures/items/weapon_longsword_3.png";
+			return "textures/items/weapon_sword_4.png";
 		}
 	}
 }

@@ -6,10 +6,10 @@ using System;
 namespace Facepunch.CoreWars
 {
 	[Library]
-	public class LongswordShopItemTier2 : BaseWeaponShopItem<LongswordItemTier2>
+	public class SwordShopItemTier2 : BaseWeaponShopItem<SwordItemTier2>
 	{
-		public override string Name => "Medium Longsword";
-		public override string Description => "A medium longsword for dealing melee damage.";
+		public override string Name => "Medium Sword";
+		public override string Description => "A medium sword for dealing melee damage.";
 		public override Dictionary<Type, int> Costs => new()
 		{
 			[typeof( IronItem )] = 20
@@ -17,7 +17,7 @@ namespace Facepunch.CoreWars
 
 		public override string GetIcon( Player player )
 		{
-			return "textures/items/weapon_longsword_2.png";
+			return "textures/items/weapon_sword_2.png";
 		}
 	}
 }
