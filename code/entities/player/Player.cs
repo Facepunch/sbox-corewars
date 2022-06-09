@@ -23,6 +23,7 @@ namespace Facepunch.CoreWars
 		[Net] public NetInventoryContainer EquipmentInventory { get; private set; }
 		[Net] public TeamCore Core { get; private set; }
 		[Net] public IList<BaseBuff> Buffs { get; private set; }
+		[Net] public Dictionary<string,int> Resources { get; private set; }
 
 		public RealTimeSince TimeSinceLastHit { get; private set; }
 		public Dictionary<ArmorSlot,BaseClothing> Armor { get; private set; }
@@ -135,8 +136,24 @@ namespace Facepunch.CoreWars
 			CurrentHotbarIndex = 0;
 			client.Pawn = this;
 			CreateInventories();
+			Resources = new Dictionary<string, int>();
 			Armor = new();
 			Buffs = new List<BaseBuff>();
+		}
+
+		public int GetResourceCount( Type type )
+		{
+			if ( Resources.TryGetValue( type.Name, out var count ) )
+			{
+				return count;
+			}
+
+			return 0;
+		}
+
+		public int GetResourceCount<T>() where T : ResourceItem
+		{
+			return GetResourceCount( typeof( T ) );
 		}
 
 		public bool TryGiveWeapon<T>() where T : WeaponItem
@@ -992,6 +1009,15 @@ namespace Facepunch.CoreWars
 					Buffs.RemoveAt( i );
 				}
 			}
+
+			UpdateResourceCount<IronItem>();
+			UpdateResourceCount<GoldItem>();
+			UpdateResourceCount<CrystalItem>();
+		}
+
+		protected void UpdateResourceCount<T>() where T : ResourceItem
+		{
+			Resources[ typeof(T).Name ] = FindItems<T>().Sum( i => (int)i.StackSize );
 		}
 
 		protected override void OnDestroy()

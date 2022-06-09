@@ -74,7 +74,7 @@ namespace Facepunch.CoreWars
 		{
 			if ( Local.Pawn is Player player )
 			{
-				return player.FindItems<T>().Sum( i => i.StackSize );
+				return player.GetResourceCount<T>();
 			}
 
 			return 0;

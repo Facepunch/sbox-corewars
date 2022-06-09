@@ -76,12 +76,7 @@ namespace Facepunch.CoreWars
 
 		public override void Tick()
 		{
-			if ( NextCheckState )
-			{
-				NextCheckState = 1f;
-				UpdateState();
-			}
-
+			UpdateState();
 			base.Tick();
 		}
 

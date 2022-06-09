@@ -37,6 +37,21 @@ namespace Facepunch.CoreWars
 			return valid.Max( u => u.Tier );
 		}
 
+		public bool HasPreviousUpgrade( string group, int tier )
+		{
+			return Upgrades.Any( u => u.Group == group && u.Tier == tier - 1 );
+		}
+
+		public bool HasNewerUpgrade( string group, int tier )
+		{
+			return Upgrades.Any( u => u.Group == group && u.Tier >= tier );
+		}
+
+		public bool HasUpgrade( Type type )
+		{
+			return Upgrades.Any( u => u.GetType() == type );
+		}
+
 		public bool HasUpgrade<T>() where T : BaseTeamUpgrade
 		{
 			return Upgrades.Any( u => u is T );

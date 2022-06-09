@@ -19,9 +19,9 @@ namespace Facepunch.CoreWars
 		{
 			foreach ( var kv in Costs )
 			{
-				var sum = player.FindItems( kv.Key ).Sum( i => i.StackSize );
+				var count = player.GetResourceCount( kv.Key );
 
-				if ( sum < kv.Value )
+				if ( count < kv.Value )
 					return false;
 			}
 
@@ -40,7 +40,7 @@ namespace Facepunch.CoreWars
 
 			if ( RequiredUpgradeType != null )
 			{
-				if ( !core.Upgrades.Any( u => u.GetType() == RequiredUpgradeType ) )
+				if ( !core.HasUpgrade( RequiredUpgradeType ) )
 					return false;
 			}
 

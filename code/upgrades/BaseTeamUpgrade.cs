@@ -22,9 +22,9 @@ namespace Facepunch.CoreWars
 		{
 			foreach ( var kv in Costs )
 			{
-				var sum = player.FindItems( kv.Key ).Sum( i => i.StackSize );
+				var count = player.GetResourceCount( kv.Key );
 
-				if ( sum < kv.Value )
+				if ( count < kv.Value )
 					return false;
 			}
 
@@ -41,15 +41,15 @@ namespace Facepunch.CoreWars
 			var core = player.Team.GetCore();
 			if ( !core.IsValid() ) return false;
 
-			if ( core.Upgrades.Any( u => u.GetType() == GetType() ) )
+			if ( core.HasUpgrade( GetType() ) )
 				return false;
 
 			if ( !string.IsNullOrEmpty( Group ) )
 			{
 				if ( Tier > 1 )
-					return core.Upgrades.Any( u => u.Group == Group && u.Tier == Tier - 1 );
+					return core.HasPreviousUpgrade( Group, Tier );
 				else
-					return !core.Upgrades.Any( u => u.Group == Group && u.Tier >= Tier );
+					return !core.HasNewerUpgrade( Group, Tier );
 			}
 
 			return true;
