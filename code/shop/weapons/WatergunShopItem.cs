@@ -6,10 +6,10 @@ using System;
 namespace Facepunch.CoreWars
 {
 	[Library]
-	public class CrowbarShopItemTier2 : BaseWeaponShopItem<CrowbarItemTier2>
+	public class WatergunShopItem : BaseWeaponShopItem<WatergunItem>
 	{
-		public override string Name => "Medium Crowbar";
-		public override string Description => "A medium crowbar for dealing melee damage.";
+		public override string Name => "Watergun";
+		public override string Description => "A simple tool for neutralizing Vortex Bombs.";
 		public override Dictionary<Type, int> Costs => new()
 		{
 			[typeof( IronItem )] = 20
@@ -17,7 +17,7 @@ namespace Facepunch.CoreWars
 
 		public override string GetIcon( Player player )
 		{
-			return "textures/items/weapon_crowbar_2.png";
+			return "textures/items/weapon_watergun.png";
 		}
 	}
 }

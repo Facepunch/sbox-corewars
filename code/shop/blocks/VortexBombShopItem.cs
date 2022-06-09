@@ -7,10 +7,10 @@ using Facepunch.CoreWars.Blocks;
 namespace Facepunch.CoreWars
 {
 	[Library]
-	public class ExplosivesShopItem : BaseBlockShopItem
+	public class VortexBombShopItem : BaseBlockShopItem
 	{
 		public override string Description => "A high strength timed explosives block.";
-		public override string Name => "Explosives";
+		public override string Name => "Vortex Bomb";
 		public override Dictionary<Type, int> Costs => new()
 		{
 			[typeof( IronItem )] = 40
@@ -19,7 +19,7 @@ namespace Facepunch.CoreWars
 
 		public override BlockType GetBlockType( Player player )
 		{
-			return VoxelWorld.Current.GetBlockType<ExplosivesBlock>();
+			return VoxelWorld.Current.GetBlockType<VortexBombBlock>();
 		}
 	}
 }

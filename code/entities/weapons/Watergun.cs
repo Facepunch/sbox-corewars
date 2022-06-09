@@ -5,20 +5,20 @@ using Sandbox;
 namespace Facepunch.CoreWars
 {
 	[Library]
-	public class DefuserConfig : WeaponConfig
+	public class WatergunConfig : WeaponConfig
 	{
-		public override string Name => "Defuser";
-		public override string Description => "For quickly defusing explosives";
-		public override string Icon => "items/weapon_defuser.png";
-		public override string ClassName => "weapon_defuser";
+		public override string Name => "Watergun";
+		public override string Description => "For quickly neutralizing Vortex Bombs";
+		public override string Icon => "items/weapon_watergun.png";
+		public override string ClassName => "weapon_watergun";
 		public override AmmoType AmmoType => AmmoType.None;
 		public override WeaponType Type => WeaponType.Melee;
 		public override int Ammo => 0;
 		public override int Damage => 30;
 	}
 
-	[Library( "weapon_defuser", Title = "Defuser" )]
-	public partial class Defuser : BlockDamageWeapon
+	[Library( "weapon_watergun", Title = "Watergun" )]
+	public partial class Watergun : BlockDamageWeapon
 	{
 		public override BuildingMaterialType PrimaryMaterialType => BuildingMaterialType.Explosives;
 		public override float SecondaryMaterialMultiplier => 0f;

@@ -4,11 +4,11 @@ using Sandbox;
 namespace Facepunch.CoreWars.Blocks
 {
 	[Library]
-	public class ExplosivesBlock : BaseBuildingBlock
+	public class VortexBombBlock : BaseBuildingBlock
 	{
-		public override string Icon => "textures/items/bomb.png";
-		public override string FriendlyName => "Explosives";
-		public override string ServerEntity => "cw_explosives";
+		public override string Icon => "textures/items/vortex_bomb.png";
+		public override string FriendlyName => "Vortex Bomb";
+		public override string ServerEntity => "cw_vortex_bomb";
 		public override bool IsTranslucent => true;
 		public override bool HasTexture => false;
 		public override BuildingMaterialType MaterialType => BuildingMaterialType.Explosives;

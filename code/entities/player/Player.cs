@@ -913,12 +913,12 @@ namespace Facepunch.CoreWars
 
 		protected virtual void GiveInitialItems()
 		{
-			var crowbars = FindItems<CrowbarItemTier1>();
+			var longswords = FindItems<LongswordItemTier1>();
 
-			if ( !crowbars.Any() )
+			if ( !longswords.Any() )
 			{
-				var crowbar = InventorySystem.CreateItem<CrowbarItemTier1>();
-				TryGiveItem( crowbar );
+				var longsword = InventorySystem.CreateItem<LongswordItemTier1>();
+				TryGiveItem( longsword );
 			}
 		}
 

@@ -6,21 +6,20 @@ using Sandbox;
 namespace Facepunch.CoreWars
 {
 	[Library]
-	public class ImpactGrenadeShopItem : BaseShopItem
+	public class PortalShopItem : BaseShopItem
 	{
-		public override string Name => "Impact Grenade";
-		public override string Description => "A grenade which can melt plastic and damage players.";
+		public override string Name => "Portal";
+		public override string Description => "Throwing it will transport you instantly to where it lands.";
 		public override int Quantity => 1;
 		public override Dictionary<Type, int> Costs => new()
 		{
-			[typeof( CrystalItem )] = 1,
-			[typeof( IronItem )] = 4
+			[typeof( CrystalItem )] = 1
 		};
 		public override Type RequiredUpgradeType => typeof( ArmoryUpgrade );
 
 		public override string GetIcon( Player player )
 		{
-			return "textures/items/impact_grenade.png";
+			return "textures/items/weapon_portal.png";
 		}
 
 		public override void OnPurchased( Player player )

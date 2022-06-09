@@ -10,8 +10,8 @@ using System.Linq;
 namespace Facepunch.CoreWars
 {
 	[Library]
-	[ClassName( "cw_explosives" )]
-	public partial class ExplosivesEntity : BlockEntity
+	[ClassName( "cw_vortex_bomb" )]
+	public partial class VortexBombEntity : BlockEntity
 	{
 		private TimeUntil TimeUntilExplode { get; set; }
 		private Particles Effect { get; set; }

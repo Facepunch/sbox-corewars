@@ -4,22 +4,22 @@ using Sandbox;
 namespace Facepunch.CoreWars
 {
 	[Library]
-	public class CrowbarConfig : WeaponConfig
+	public class LongswordConfig : WeaponConfig
 	{
-		public override string Name => "Crowbar";
+		public override string Name => "Longsword";
 		public override string Description => "Your every day melee weapon";
-		public override string Icon => "items/weapon_crowbar.png";
-		public override string ClassName => "weapon_crowbar";
+		public override string Icon => "items/weapon_longsword.png";
+		public override string ClassName => "weapon_longsword";
 		public override AmmoType AmmoType => AmmoType.None;
 		public override WeaponType Type => WeaponType.Melee;
 		public override int Ammo => 0;
 		public override int Damage => 5;
 	}
 
-	[Library( "weapon_crowbar", Title = "Crowbar" )]
-	public partial class Crowbar : Weapon
+	[Library( "weapon_longsword", Title = "Longsword" )]
+	public partial class Longsword : Weapon
 	{
-		public override WeaponConfig Config => new CrowbarConfig();
+		public override WeaponConfig Config => new LongswordConfig();
 		public override string[] KillFeedReasons => new[] { "chopped", "slashed" };
 		public override string ViewModelPath => "models/weapons/v_crowbar.vmdl";
 		public override DamageFlags DamageType => DamageFlags.Blunt;
