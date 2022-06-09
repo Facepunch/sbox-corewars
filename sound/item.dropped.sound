@@ -3,17 +3,17 @@
 	data = 
 	{
 		UI = false
-		Volume = 0.3
+		Volume = 0.15
 		VolumeRandom = 0
 		Pitch = 0.8
 		PitchRandom = 0.1
-		Decibels = 70
+		Decibels = 50
 		Sounds = 
 		[
 			resource:"sound/item.dropped.vsnd",
 		]
 		SelectionMode = 3
-		MaximumDistance = 1143.9335
-		MinimumDistance = 57.196674
+		MaximumDistance = 599.31305
+		MinimumDistance = 29.965652
 	}
 }
