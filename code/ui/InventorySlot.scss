@@ -26,6 +26,10 @@ InventorySlot {
     label {
       color: #fff;
     }
+
+    &.hidden {
+        display: none;
+    }
   }
 
   .icon {

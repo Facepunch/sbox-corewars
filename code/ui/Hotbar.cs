@@ -32,6 +32,7 @@ namespace Facepunch.CoreWars
 			for ( ushort i = 0; i < container.SlotLimit; i++ )
 			{
 				var slot = AddChild<InventorySlot>();
+				slot.SetDisplaySlot( i + 1 );
 				slot.Container = container;
 				slot.Slot = i;
 				Slots.Add( slot );

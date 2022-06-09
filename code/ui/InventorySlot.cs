@@ -19,9 +19,15 @@ namespace Facepunch.CoreWars
 		public string DefaultIcon { get; private set; }
 		public ArmorSlot ArmorSlot { get; private set; }
 		public Action<InventorySlot> OnSelected { get; set; }
+		public int DisplaySlot { get; private set; }
+		public Panel SlotPanel { get; set; }
+		public Label SlotLabel { get; set; }
 		public Panel Icon { get; set; }
 
-		public InventorySlot() { }
+		public InventorySlot()
+		{
+			SlotPanel.SetClass( "hidden", true );
+		}
 
 		public void SetItem( InventoryItem item )
 		{
@@ -46,7 +52,15 @@ namespace Facepunch.CoreWars
 			else
 				Icon.Style.BackgroundImage = null;
 
+			SlotPanel.SetClass( "hidden", DisplaySlot <= 0 );
+			SlotLabel.Text = DisplaySlot.ToString();
+
 			SetClass( "is-empty", false );
+		}
+
+		public void SetDisplaySlot( int slot )
+		{
+			DisplaySlot = slot;
 		}
 
 		public void SetArmorSlot( ArmorSlot slot )
