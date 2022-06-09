@@ -92,7 +92,7 @@ namespace Facepunch.CoreWars
 
 		protected override void OnWeaponItemChanged()
 		{
-			if ( !string.IsNullOrEmpty( WeaponItem.WorldModelPath ) )
+			if ( IsServer && WeaponItem.IsValid() && !string.IsNullOrEmpty( WeaponItem.WorldModelPath ) )
 			{
 				SetModel( WeaponItem.WorldModelPath );
 			}

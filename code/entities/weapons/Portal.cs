@@ -1,4 +1,5 @@
-﻿using Facepunch.Voxels;
+﻿using Facepunch.CoreWars.Utility;
+using Facepunch.Voxels;
 using Sandbox;
 using System.Linq;
 
@@ -20,12 +21,12 @@ namespace Facepunch.CoreWars
 	partial class Portal : BulletDropWeapon<BulletDropProjectile>
 	{
 		public override WeaponConfig Config => new PortalConfig();
-		public override string ImpactEffect => "particles/weapons/boomer/boomer_impact.vpcf";
+		public override string ImpactEffect => null;
 		public override string TrailEffect => "particles/weapons/portal_grenade/portal_grenade_trail/portal_grenade_trail.vpcf";
 		public override string ViewModelPath => "models/weapons/v_portal_grenade.vmdl";
 		public override int ViewModelMaterialGroup => 1;
 		public override string MuzzleFlashEffect => null;
-		public override string HitSound => "barage.explode";
+		public override string HitSound => null;
 		public override DamageFlags DamageType => DamageFlags.Blast;
 		public override float PrimaryRate => 1f;
 		public override float SecondaryRate => 1f;
@@ -38,6 +39,7 @@ namespace Facepunch.CoreWars
 		public override float ProjectileLifeTime => 4f;
 
 		private Player PlayerToTeleport { get; set; }
+		private bool HasBeenThrown { get; set; }
 
 		public override void Spawn()
 		{
@@ -49,16 +51,13 @@ namespace Facepunch.CoreWars
 		{
 			PlayAttackAnimation();
 			ShootEffects();
-			PlaySound( $"barage.launch" );
+			PlaySound( $"portal.launch" );
 
 			if ( IsServer && Owner is Player player )
 			{
-				if ( WeaponItem.IsValid() )
-				{
-					WeaponItem.Remove();
-				}
-
 				PlayerToTeleport = player;
+				HasBeenThrown = true;
+				EnableDrawing = false;
 			}
 
 			base.AttackPrimary();
@@ -77,25 +76,51 @@ namespace Facepunch.CoreWars
 
 		protected override void OnProjectileHit( BulletDropProjectile projectile, TraceResult trace )
 		{
-			var position = projectile.Position;
-			var explosion = Particles.Create( "particles/weapons/boomer/boomer_explosion.vpcf" );
-			explosion.SetPosition( 0, position - projectile.Velocity.Normal * projectile.Radius );
+			if ( IsClient ) return;
 
-			if ( !PlayerToTeleport.IsValid() )
+			var position = projectile.Position;
+			var player = PlayerToTeleport;
+
+			if ( !player.IsValid() )
 				return;
 
 			var world = VoxelWorld.Current;
 			var blockPosition = world.ToVoxelPosition( position );
 			var blockBelowType = world.GetAdjacentBlock( blockPosition, (int)BlockFace.Bottom );
 
-			trace = Trace.Ray( position, position + Vector3.Down * 32f )
-				.EntitiesOnly()
-				.Run();
-
-			if ( blockBelowType > 0 || trace.Hit )
+			if ( blockBelowType > 0 )
 			{
-				PlayerToTeleport.Position = position;
-				PlayerToTeleport.ResetInterpolation();
+				using ( Prediction.Off() )
+				{
+					var startFx = Particles.Create( "particles/weapons/portal_grenade/portal_spawn/portal_spawn.vpcf" );
+					startFx.SetPosition( 0, PlayerToTeleport.Position );
+					startFx.AutoDestroy( 3f );
+
+					var endFx = Particles.Create( "particles/weapons/portal_grenade/portal_spawn/portal_spawn.vpcf" );
+					endFx.SetPosition( 0, position );
+					endFx.AutoDestroy( 3f );
+
+					player.PlaySound( "portal.teleport" );
+				}
+
+				player.Position = position;
+				player.ResetInterpolation();
+
+				if ( WeaponItem.IsValid() )
+				{
+					WeaponItem.Remove();
+				}
+			}
+			else
+			{
+				using ( Prediction.Off() )
+				{
+					PlaySound( "portal.fail" );
+				}
+
+				PlayerToTeleport = null;
+				HasBeenThrown = false;
+				EnableDrawing = true;
 			}
 		}
 	}

@@ -30,6 +30,7 @@ namespace Facepunch.CoreWars
 		public ProjectileSimulator Projectiles { get; private set; }
 		public DamageInfo LastDamageTaken { get; private set; }
 		public TimeUntil NextActionTime { get; private set; }
+		public TimeSince LastPickupTime { get; private set; }
 		public string DisplayName => Client.Name;
 
 		public bool IsFriendly
@@ -982,6 +983,13 @@ namespace Facepunch.CoreWars
 
 			if ( remaining == 0 )
 			{
+				if ( LastPickupTime > 1f )
+				{
+					var effect = Particles.Create( "particles/gameplay/items/item_pick_up/item_pick_up.vpcf", this );
+					effect.SetEntity( 0, this );
+				}
+
+				LastPickupTime = 0f;
 				PlaySound( "item.pickup" );
 				itemEntity.Take();
 			}
