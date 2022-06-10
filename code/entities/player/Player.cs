@@ -780,8 +780,10 @@ namespace Facepunch.CoreWars
 
 								using ( Prediction.Off() )
 								{
+									var TeamColor = Team.GetColor();
 									var particles = Particles.Create( "particles/gameplay/blocks/block_placed/block_placed.vpcf" );
 									particles.SetPosition( 0, world.ToSourcePositionCenter( blockPosition ) );
+									particles.SetPosition( 6, TeamColor );
 									PlaySound( "block.place" );
 								}
 
