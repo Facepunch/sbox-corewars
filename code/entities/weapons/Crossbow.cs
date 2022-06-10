@@ -18,8 +18,8 @@ namespace Facepunch.CoreWars
 	{
 		public override WeaponConfig Config => new CrossbowConfig();
 		public override string[] KillFeedReasons => new[] { "shot", "blasted" };
-		public override string ImpactEffect => null;
-		public override string TrailEffect => "particles/weapons/crossbow/crowbow_trail.vpcf";
+		public override string ImpactEffect => "particles/weapons/crossbow/crossbow_impact.vpcf";
+		public override string TrailEffect => "particles/weapons/crossbow/crossbow_trail.vpcf";
 		public override string ViewModelPath => "weapons/rust_crossbow/v_rust_crossbow.vmdl";
 		public override int ViewModelMaterialGroup => 1;
 		public override string MuzzleFlashEffect => null;
