@@ -79,6 +79,12 @@ namespace Facepunch.CoreWars
 		protected override void OnMeleeAttackHit( Entity victim )
 		{
 			ViewModelEntity?.SetAnimParameter( "attack_has_hit", true );
+
+			if ( victim is Player target )
+				target.PlaySound( "melee.hitflesh" );
+			else
+				victim.PlaySound( "sword.hit" );
+
 			base.OnMeleeAttackHit( victim );
 		}
 	}

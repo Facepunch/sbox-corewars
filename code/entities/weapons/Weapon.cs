@@ -298,7 +298,7 @@ namespace Facepunch.CoreWars
 
 			foreach ( var trace in TraceBullet( Owner.EyePosition, Owner.EyePosition + forward * MeleeRange, 10f ) )
 			{
-				if ( !trace.Entity.IsValid() )
+				if ( !trace.Entity.IsValid() || trace.Entity.IsWorld )
 				{
 					OnMeleeAttackMissed( trace );
 					continue;
