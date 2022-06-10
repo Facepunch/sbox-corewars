@@ -2,9 +2,18 @@
 {
 	data = 
 	{
-		sounds = 
+		UI = false
+		Volume = 0.8
+		VolumeRandom = 0
+		Pitch = 1
+		PitchRandom = 0
+		Decibels = 70
+		Sounds = 
 		[
-			"sound/weapons/crossbow.fire.vsnd",
+			resource:"sound/weapons/crossbow.fire.vsnd",
 		]
+		SelectionMode = 3
+		MaximumDistance = 1143.9335
+		MinimumDistance = 57.196674
 	}
 }
