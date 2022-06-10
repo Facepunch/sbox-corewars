@@ -6,9 +6,6 @@ namespace Facepunch.CoreWars
 	[Library]
 	public class AxeConfig : WeaponConfig
 	{
-		public override string Name => "Axe";
-		public override string Description => "Your every day melee weapon";
-		public override string Icon => "items/weapon_axe.png";
 		public override string ClassName => "weapon_axe";
 		public override AmmoType AmmoType => AmmoType.None;
 		public override WeaponType Type => WeaponType.Melee;
@@ -16,7 +13,7 @@ namespace Facepunch.CoreWars
 		public override int Damage => 5;
 	}
 
-	[Library( "weapon_axe", Title = "Axe" )]
+	[Library( "weapon_axe" )]
 	public partial class Axe : BlockDamageWeapon
 	{
 		public override WeaponConfig Config => new AxeConfig();

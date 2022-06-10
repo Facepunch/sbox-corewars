@@ -7,9 +7,6 @@ namespace Facepunch.CoreWars
 	[Library]
 	public class PickaxeConfig : WeaponConfig
 	{
-		public override string Name => "Pickaxe";
-		public override string Description => "For breaking tougher blocks";
-		public override string Icon => "items/weapon_pickaxe.png";
 		public override string ClassName => "weapon_pickaxe";
 		public override AmmoType AmmoType => AmmoType.None;
 		public override WeaponType Type => WeaponType.Melee;
@@ -17,7 +14,7 @@ namespace Facepunch.CoreWars
 		public override int Damage => 20;
 	}
 
-	[Library( "weapon_pickaxe", Title = "Pickaxe" )]
+	[Library( "weapon_pickaxe" )]
 	public partial class Pickaxe : BlockDamageWeapon
 	{
 		public override WeaponConfig Config => new PickaxeConfig();

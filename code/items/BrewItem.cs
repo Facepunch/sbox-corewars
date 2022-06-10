@@ -9,6 +9,7 @@ namespace Facepunch.CoreWars
 		public override bool CanBeDropped => false;
 		public override ushort MaxStackSize => 4;
 		public virtual string ConsumeSound => "brew.consume";
+		public virtual string ConsumeEffect => null;
 
 		public override bool CanStackWith( InventoryItem other )
 		{
@@ -17,11 +18,17 @@ namespace Facepunch.CoreWars
 
 		public virtual void OnConsumed( Player player )
 		{
-			if ( !string.IsNullOrEmpty( ConsumeSound ) )
+			using ( Prediction.Off() )
 			{
-				using ( Prediction.Off() )
+				if ( !string.IsNullOrEmpty( ConsumeSound ) )
 				{
 					player.PlaySound( ConsumeSound );
+				}
+
+				if ( !string.IsNullOrEmpty( ConsumeEffect ) )
+				{
+					var effect = Particles.Create( ConsumeEffect, player );
+					effect.SetEntity( 0, player );
 				}
 			}
 

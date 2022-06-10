@@ -8,22 +8,19 @@ namespace Facepunch.CoreWars
 	[Library]
 	public class FireballConfig : WeaponConfig
 	{
-		public override string Name => "Fireball";
-		public override string Description => "Launches a fireball which can melt plastic and damage other players";
-		public override string Icon => "items/weapon_fireball.png";
 		public override string ClassName => "weapon_fireball";
 		public override AmmoType AmmoType => AmmoType.None;
 		public override WeaponType Type => WeaponType.Projectile;
 		public override int Damage => 50;
 	}
 
-	[Library( "weapon_fireball", Title = "Fireball" )]
+	[Library( "weapon_fireball" )]
 	partial class Fireball : BulletDropWeapon<BulletDropProjectile>
 	{
 		public override WeaponConfig Config => new FireballConfig();
-		public override string ImpactEffect => "particles/weapons/boomer/boomer_impact.vpcf";
-		public override string TrailEffect => "particles/weapons/portal_grenade/portal_grenade_trail/portal_grenade_trail.vpcf";
-		public override string ViewModelPath => "models/weapons/v_portal_grenade.vmdl";
+		public override string ImpactEffect => null;
+		public override string TrailEffect => "particles/weapons/fireball/fireball_trail.vpcf";
+		public override string ViewModelPath => "models/weapons/v_portal.vmdl";
 		public override int ViewModelMaterialGroup => 1;
 		public override string MuzzleFlashEffect => null;
 		public override string HitSound => "barage.explode";
@@ -33,7 +30,7 @@ namespace Facepunch.CoreWars
 		public override float Speed => 1300f;
 		public override float Gravity => 5f;
 		public override float InheritVelocity => 0f;
-		public override string ProjectileModel => "models/weapons/w_portal_grenade.vmdl";
+		public override string ProjectileModel => "models/weapons/w_portal.vmdl";
 		public override int ClipSize => 0;
 		public override float ReloadTime => 2.3f;
 		public override float ProjectileLifeTime => 4f;
@@ -78,7 +75,7 @@ namespace Facepunch.CoreWars
 			var world = VoxelWorld.Current;
 			var voxelPosition = world.ToVoxelPosition( position );
 
-			var explosion = Particles.Create( "particles/weapons/boomer/boomer_explosion.vpcf" );
+			var explosion = Particles.Create( "particles/weapons/fireball/fireball_explosion.vpcf" );
 			explosion.SetPosition( 0, position - projectile.Velocity.Normal * projectile.Radius );
 
 			DamageInRadius( position, 512f, Config.Damage, 10f );

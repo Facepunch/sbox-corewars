@@ -7,6 +7,7 @@ namespace Facepunch.CoreWars
 	[Library( "item_brew_damage" )]
 	public class DamageBrewItem : BrewItem
 	{
+		public override string ConsumeEffect => "particles/gameplay/brews/damage/damage_brew.vpcf";
 		public override string Icon => "textures/items/brew_damage.png";
 		public override string Name => "Damage Brew";
 

@@ -108,9 +108,6 @@ namespace Facepunch.CoreWars
 
 			if ( !string.IsNullOrEmpty( LaunchSoundName ) )
 				LaunchSound = PlaySound( LaunchSoundName );
-
-			if ( !string.IsNullOrEmpty( ModelName ) )
-				ModelEntity = new SceneObject( Map.Scene, ModelName );
 		}
 
         public virtual void Simulate()
@@ -225,9 +222,7 @@ namespace Facepunch.CoreWars
         protected override void OnDestroy()
 		{
 			Simulator?.Remove( this );
-
 			RemoveEffects();
-
 			base.OnDestroy();
 		}
 

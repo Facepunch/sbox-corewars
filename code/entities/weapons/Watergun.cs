@@ -7,9 +7,6 @@ namespace Facepunch.CoreWars
 	[Library]
 	public class WatergunConfig : WeaponConfig
 	{
-		public override string Name => "Watergun";
-		public override string Description => "For quickly neutralizing Vortex Bombs";
-		public override string Icon => "items/weapon_watergun.png";
 		public override string ClassName => "weapon_watergun";
 		public override AmmoType AmmoType => AmmoType.None;
 		public override WeaponType Type => WeaponType.Melee;
@@ -17,7 +14,7 @@ namespace Facepunch.CoreWars
 		public override int Damage => 30;
 	}
 
-	[Library( "weapon_watergun", Title = "Watergun" )]
+	[Library( "weapon_watergun" )]
 	public partial class Watergun : BlockDamageWeapon
 	{
 		public override BuildingMaterialType PrimaryMaterialType => BuildingMaterialType.Explosives;

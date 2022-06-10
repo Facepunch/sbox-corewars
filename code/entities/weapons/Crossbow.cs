@@ -6,9 +6,6 @@ namespace Facepunch.CoreWars
 	[Library]
 	public class CrossbowConfig : WeaponConfig
 	{
-		public override string Name => "Crossbow";
-		public override string Description => "Medium-range bolt launcher";
-		public override string Icon => "items/weapon_crossbow.png";
 		public override string ClassName => "weapon_crossbow";
 		public override AmmoType AmmoType => AmmoType.Bolt;
 		public override WeaponType Type => WeaponType.Projectile;
@@ -16,13 +13,13 @@ namespace Facepunch.CoreWars
 		public override int Damage => 40;
 	}
 
-	[Library( "weapon_crossbow", Title = "Crossbow" )]
-	public partial class Crossbow : BulletDropWeapon<BulletDropProjectile>
+	[Library( "weapon_crossbow" )]
+	public partial class Crossbow : BulletDropWeapon<CrossbowBoltProjectile>
 	{
 		public override WeaponConfig Config => new CrossbowConfig();
 		public override string[] KillFeedReasons => new[] { "shot", "blasted" };
-		public override string ImpactEffect => "particles/weapons/boomer/boomer_impact.vpcf";
-		public override string TrailEffect => "particles/weapons/boomer/boomer_projectile.vpcf";
+		public override string ImpactEffect => null;
+		public override string TrailEffect => "particles/weapons/crossbow/crowbow_trail.vpcf";
 		public override string ViewModelPath => "weapons/rust_crossbow/v_rust_crossbow.vmdl";
 		public override int ViewModelMaterialGroup => 1;
 		public override string MuzzleFlashEffect => null;
@@ -30,11 +27,11 @@ namespace Facepunch.CoreWars
 		public override DamageFlags DamageType => DamageFlags.Bullet;
 		public override float PrimaryRate => 0.3f;
 		public override float SecondaryRate => 1f;
-		public override float Speed => 1300f;
-		public override float Gravity => 5f;
+		public override float Speed => 1500f;
+		public override float Gravity => 6f;
 		public override float InheritVelocity => 0f;
 		public override string ReloadSoundName => "crossbow.reload";
-		public override string ProjectileModel => "weapons/rust_crossbow/rust_crossbow_bolt.vmdl";
+		public override string ProjectileModel => null;
 		public override int ClipSize => 1;
 		public override float ReloadTime => 2.3f;
 		public override float ProjectileLifeTime => 4f;
@@ -71,6 +68,19 @@ namespace Facepunch.CoreWars
 			anim.SetAnimParameter( "holdtype", 2 );
 		}
 
+		protected override void OnProjectileFired( CrossbowBoltProjectile projectile )
+		{
+			if ( IsClient && IsFirstPersonMode )
+			{
+				projectile.Position = EffectEntity.Position + EffectEntity.Rotation.Forward * 24f + EffectEntity.Rotation.Right * 8f + EffectEntity.Rotation.Down * 4f;
+			}
+		}
+
+		protected override Vector3? GetMuzzlePosition()
+		{
+			return Transform.PointToWorld( LocalPosition + LocalRotation.Right * 32f );
+		}
+
 		protected override void OnProjectileHit( BulletDropProjectile projectile, TraceResult trace )
 		{
 			if ( IsServer && trace.Entity is Player victim )
@@ -83,7 +93,7 @@ namespace Facepunch.CoreWars
 					.WithFlag( DamageType )
 					.UsingTraceResult( trace );
 
-				info.Damage = GetDamageFalloff( projectile.StartPosition.Distance( victim.Position ), Config.Damage );
+				info.Damage = GetDamageFalloff( projectile.StartPosition.Distance( victim.Position ), Config.Damage * WeaponItem.Tier );
 				victim.TakeDamage( info );
 			}
 		}

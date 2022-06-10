@@ -780,10 +780,9 @@ namespace Facepunch.CoreWars
 
 								using ( Prediction.Off() )
 								{
-									var TeamColor = Team.GetColor();
 									var particles = Particles.Create( "particles/gameplay/blocks/block_placed/block_placed.vpcf" );
 									particles.SetPosition( 0, world.ToSourcePositionCenter( blockPosition ) );
-									particles.SetPosition( 6, TeamColor );
+									particles.SetPosition( 6, Team.GetColor() );
 									PlaySound( "block.place" );
 								}
 
@@ -879,7 +878,10 @@ namespace Facepunch.CoreWars
 
 			if ( Input.Released( InputButton.Use ) )
 			{
-				CameraMode = new ThirdPersonCamera();
+				if ( CameraMode is ThirdPersonCamera )
+					CameraMode = new FirstPersonCamera();
+				else
+					CameraMode = new ThirdPersonCamera();
 			}
 
 			if ( IsClient )

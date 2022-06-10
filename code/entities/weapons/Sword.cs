@@ -6,9 +6,6 @@ namespace Facepunch.CoreWars
 	[Library]
 	public class SwordConfig : WeaponConfig
 	{
-		public override string Name => "Sword";
-		public override string Description => "Your every day melee weapon";
-		public override string Icon => "textures/items/weapon_sword_1.png";
 		public override string ClassName => "weapon_sword";
 		public override AmmoType AmmoType => AmmoType.None;
 		public override WeaponType Type => WeaponType.Melee;
@@ -16,7 +13,7 @@ namespace Facepunch.CoreWars
 		public override int Damage => 5;
 	}
 
-	[Library( "weapon_sword", Title = "Sword" )]
+	[Library( "weapon_sword" )]
 	public partial class Sword : Weapon
 	{
 		public override WeaponConfig Config => new SwordConfig();

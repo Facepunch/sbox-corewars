@@ -8,22 +8,19 @@ namespace Facepunch.CoreWars
 	[Library]
 	public class PortalConfig : WeaponConfig
 	{
-		public override string Name => "Portal";
-		public override string Description => "Instantly teleport to the place it is thrown";
-		public override string Icon => "items/weapon_portal.png";
 		public override string ClassName => "weapon_portal";
 		public override AmmoType AmmoType => AmmoType.None;
 		public override WeaponType Type => WeaponType.Projectile;
 		public override int Damage => 40;
 	}
 
-	[Library( "weapon_portal", Title = "Portal" )]
+	[Library( "weapon_portal" )]
 	partial class Portal : BulletDropWeapon<BulletDropProjectile>
 	{
 		public override WeaponConfig Config => new PortalConfig();
 		public override string ImpactEffect => null;
 		public override string TrailEffect => "particles/weapons/portal_grenade/portal_grenade_trail/portal_grenade_trail.vpcf";
-		public override string ViewModelPath => "models/weapons/v_portal_grenade.vmdl";
+		public override string ViewModelPath => "models/weapons/v_portal.vmdl";
 		public override int ViewModelMaterialGroup => 1;
 		public override string MuzzleFlashEffect => null;
 		public override string HitSound => null;
@@ -33,13 +30,14 @@ namespace Facepunch.CoreWars
 		public override float Speed => 1300f;
 		public override float Gravity => 5f;
 		public override float InheritVelocity => 0f;
-		public override string ProjectileModel => "models/weapons/w_portal_grenade.vmdl";
+		public override string ProjectileModel => "models/weapons/w_portal.vmdl";
 		public override int ClipSize => 0;
 		public override float ReloadTime => 2.3f;
 		public override float ProjectileLifeTime => 4f;
 
+		[Net, Predicted] private bool HasBeenThrown { get; set; }
+
 		private Player PlayerToTeleport { get; set; }
-		private bool HasBeenThrown { get; set; }
 
 		public override void Spawn()
 		{
@@ -49,6 +47,8 @@ namespace Facepunch.CoreWars
 
 		public override void AttackPrimary()
 		{
+			if ( HasBeenThrown ) return;
+
 			PlayAttackAnimation();
 			ShootEffects();
 			PlaySound( $"portal.launch" );
@@ -56,9 +56,10 @@ namespace Facepunch.CoreWars
 			if ( IsServer && Owner is Player player )
 			{
 				PlayerToTeleport = player;
-				HasBeenThrown = true;
 				EnableDrawing = false;
 			}
+
+			HasBeenThrown = true;
 
 			base.AttackPrimary();
 		}
@@ -76,6 +77,8 @@ namespace Facepunch.CoreWars
 
 		protected override void OnProjectileHit( BulletDropProjectile projectile, TraceResult trace )
 		{
+			HasBeenThrown = false;
+
 			if ( IsClient ) return;
 
 			var position = projectile.Position;
@@ -119,7 +122,6 @@ namespace Facepunch.CoreWars
 				}
 
 				PlayerToTeleport = null;
-				HasBeenThrown = false;
 				EnableDrawing = true;
 			}
 		}

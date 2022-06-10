@@ -45,13 +45,13 @@ namespace Facepunch.CoreWars
 
 			OnCreateProjectile( projectile );
 
-			var muzzle = GetAttachment( MuzzleAttachment );
 			var forward = player.EyeRotation.Forward;
 			var position = player.EyePosition + forward * 100f;
+			var muzzle = GetMuzzlePosition();
 
 			if ( muzzle.HasValue )
 			{
-				position = muzzle.Value.Position;
+				position = muzzle.Value;
 			}
 
 			var endPosition = player.EyePosition + forward * BulletRange;
@@ -66,6 +66,13 @@ namespace Facepunch.CoreWars
 
 			var velocity = (direction * Speed) + (player.Velocity * InheritVelocity);
 			projectile.Initialize( position, velocity, ProjectileRadius, OnProjectileHit );
+
+			OnProjectileFired( projectile );
+		}
+
+		protected virtual void OnProjectileFired( T projectile )
+		{
+
 		}
 
 		protected virtual float ModifyDamage( Entity victim, float damage )
@@ -87,6 +94,12 @@ namespace Facepunch.CoreWars
 
 				DealDamage( entity, position, direction * 100f * force, damage );
 			}
+		}
+
+		protected virtual Vector3? GetMuzzlePosition()
+		{
+			var muzzle = GetAttachment( MuzzleAttachment );
+			return muzzle.HasValue ? muzzle.Value.Position : null;
 		}
 
 		protected virtual void OnCreateProjectile( T projectile )

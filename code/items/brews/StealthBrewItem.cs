@@ -7,6 +7,7 @@ namespace Facepunch.CoreWars
 	[Library( "item_brew_stealth" )]
 	public class StealthBrewItem : BrewItem
 	{
+		public override string ConsumeEffect => "particles/gameplay/brews/stealth/stealth_brew.vpcf";
 		public override string Icon => "textures/items/brew_stealth.png";
 		public override string Name => "Stealth Brew";
 
