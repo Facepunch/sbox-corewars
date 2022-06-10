@@ -670,7 +670,7 @@
 	m_Children = 
 	[
 		{
-			m_ChildRef = resource:"particles/weapons/crossbow/crowbow_trail_a.vpcf"
+			m_ChildRef = resource:"particles/weapons/crossbow/crossbow_trail_a.vpcf"
 		},
 	]
 }
