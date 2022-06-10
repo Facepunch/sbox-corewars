@@ -2,9 +2,18 @@
 {
 	data = 
 	{
-		sounds = 
+		UI = false
+		Volume = 0.7
+		VolumeRandom = 0
+		Pitch = 1
+		PitchRandom = 0
+		Decibels = 65
+		Sounds = 
 		[
-			"sound/weapons/weapon.blowtorch.vsnd",
+			resource:"sound/weapons/weapon.blowtorch.vsnd",
 		]
+		SelectionMode = 3
+		MaximumDistance = 990.75903
+		MinimumDistance = 49.537952
 	}
 }

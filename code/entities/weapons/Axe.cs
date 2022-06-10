@@ -10,14 +10,14 @@ namespace Facepunch.CoreWars
 		public override AmmoType AmmoType => AmmoType.None;
 		public override WeaponType Type => WeaponType.Melee;
 		public override int Ammo => 0;
-		public override int Damage => 5;
+		public override int Damage => 10;
 	}
 
 	[Library( "weapon_axe" )]
 	public partial class Axe : BlockDamageWeapon
 	{
 		public override WeaponConfig Config => new AxeConfig();
-		public override string ViewModelPath => "models/weapons/v_crowbar.vmdl";
+		public override string ViewModelPath => "models/weapons/sword/v_sword01.vmdl";
 		public override DamageFlags DamageType => DamageFlags.Blunt;
 		public override float PrimaryRate => 2f;
 		public override float SecondaryRate => 1f;
@@ -28,7 +28,7 @@ namespace Facepunch.CoreWars
 		public override void Spawn()
 		{
 			base.Spawn();
-			SetModel( "models/weapons/w_crowbar.vmdl" );
+			SetModel( "models/weapons/sword/w_sword01.vmdl" );
 		}
 
 		public override void AttackPrimary()
@@ -65,6 +65,14 @@ namespace Facepunch.CoreWars
 
 			ViewModelEntity?.SetAnimParameter( "attack", true );
 			ViewModelEntity?.SetAnimParameter( "holdtype_attack", 1 );
+		}
+
+		protected override void OnMeleeAttackMissed( TraceResult trace )
+		{
+			if ( trace.Hit )
+			{
+				PlaySound( "sword.hit" );
+			}
 		}
 
 		protected override void OnMeleeAttackHit( Entity victim )

@@ -33,6 +33,14 @@ namespace Facepunch.CoreWars
 				damage *= SecondaryMaterialMultiplier;
 			}
 
+			if ( !string.IsNullOrEmpty( block.HitSound ) )
+			{
+				using ( Prediction.Off() )
+				{
+					PlaySound( block.HitSound );
+				}
+			}
+
 			if ( damage == 0 )
 			{
 				// We can't do no damage to blocks.
@@ -53,14 +61,6 @@ namespace Facepunch.CoreWars
 			state.LastDamageTime = 0f;
 			state.Health = (byte)newHealth;
 			state.IsDirty = true;
-
-			if ( !string.IsNullOrEmpty( block.HitSound ) )
-			{
-				using ( Prediction.Off() )
-				{
-					PlaySound( block.HitSound );
-				}
-			}
 
 			if ( state.Health <= 0 )
 			{

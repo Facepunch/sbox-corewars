@@ -2,9 +2,18 @@
 {
 	data = 
 	{
-		sounds = 
+		UI = false
+		Volume = 1
+		VolumeRandom = 0
+		Pitch = 1.2
+		PitchRandom = 0.1
+		Decibels = 50
+		Sounds = 
 		[
-			"sound/melee.hitstone.vsnd",
+			resource:"sound/melee.hitstone.vsnd",
 		]
+		SelectionMode = 3
+		MaximumDistance = 599.31305
+		MinimumDistance = 29.965652
 	}
 }

@@ -94,7 +94,13 @@ namespace Facepunch.CoreWars
 					.UsingTraceResult( trace );
 
 				info.Damage = GetDamageFalloff( projectile.StartPosition.Distance( victim.Position ), Config.Damage * WeaponItem.Tier );
+
 				victim.TakeDamage( info );
+				
+				using ( Prediction.Off() )
+				{
+					victim.PlaySound( "melee.hitflesh" );
+				}
 			}
 		}
 	}

@@ -2,9 +2,18 @@
 {
 	data = 
 	{
-		sounds = 
+		UI = false
+		Volume = 1
+		VolumeRandom = 0
+		Pitch = 1
+		PitchRandom = 0
+		Decibels = 50
+		Sounds = 
 		[
-			"sound/block.place.vsnd",
+			resource:"sound/block.place.vsnd",
 		]
+		SelectionMode = 3
+		MaximumDistance = 599.31305
+		MinimumDistance = 29.965652
 	}
 }

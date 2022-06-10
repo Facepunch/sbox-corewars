@@ -299,7 +299,10 @@ namespace Facepunch.CoreWars
 			foreach ( var trace in TraceBullet( Owner.EyePosition, Owner.EyePosition + forward * MeleeRange, 10f ) )
 			{
 				if ( !trace.Entity.IsValid() )
+				{
+					OnMeleeAttackMissed( trace );
 					continue;
+				}
 
 				if ( IsServer )
 				{
@@ -466,6 +469,8 @@ namespace Facepunch.CoreWars
 				.Size( radius )
 				.Run();
 		}
+
+		protected virtual void OnMeleeAttackMissed( TraceResult trace ) { }
 
 		protected virtual void OnMeleeAttackHit( Entity victim ) { }
 

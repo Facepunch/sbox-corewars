@@ -10,7 +10,7 @@ namespace Facepunch.CoreWars
 		public override AmmoType AmmoType => AmmoType.None;
 		public override WeaponType Type => WeaponType.Melee;
 		public override int Ammo => 0;
-		public override int Damage => 5;
+		public override int Damage => 15;
 	}
 
 	[Library( "weapon_sword" )]
@@ -105,12 +105,22 @@ namespace Facepunch.CoreWars
 			ViewModelEntity?.SetAnimParameter( "holdtype_attack", 1 );
 		}
 
+		protected override void OnMeleeAttackMissed( TraceResult trace )
+		{
+			if ( trace.Hit )
+			{
+				PlaySound( "sword.hit" );
+			}
+		}
+
 		protected override void OnMeleeAttackHit( Entity victim )
 		{
 			ViewModelEntity?.SetAnimParameter( "attack_has_hit", true );
 
 			if ( victim is Player target )
+			{
 				target.PlaySound( "melee.hitflesh" );
+			}
 
 			base.OnMeleeAttackHit( victim );
 		}
