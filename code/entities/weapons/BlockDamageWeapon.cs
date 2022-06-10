@@ -68,6 +68,11 @@ namespace Facepunch.CoreWars
 				{
 					var effect = Particles.Create( "particles/gameplay/blocks/block_destroyed/block_destroyed.vpcf" );
 					effect.SetPosition( 0, sourcePosition );
+
+					if ( !string.IsNullOrEmpty( block.DestroySound ) )
+					{
+						PlaySound( block.DestroySound );
+					}
 				}
 
 				world.SetBlockOnServer( voxel.Position, 0 );
