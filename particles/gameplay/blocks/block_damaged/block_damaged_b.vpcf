@@ -477,11 +477,6 @@
 			m_nOutputField = "4"
 			m_bDisableOperator = true
 		},
-		{
-			_class = "C_INIT_PositionOffset"
-			m_OffsetMin = [ 0.0, 0.0, 24.0 ]
-			m_OffsetMax = [ 0.0, 0.0, 24.0 ]
-		},
 	]
 	m_Operators = 
 	[

@@ -201,7 +201,7 @@
 			m_LocalCoordinateSystemSpeedMin = 
 			{
 				m_nType = "PVEC_TYPE_LITERAL"
-				m_vLiteralValue = [ -100.0, -100.0, 20.0 ]
+				m_vLiteralValue = [ -100.0, -100.0, 100.0 ]
 				m_LiteralColor = [ 0, 0, 0, 0 ]
 				m_nVectorAttribute = 6
 				m_vVectorAttributeScale = [ 1.0, 1.0, 1.0 ]
@@ -401,7 +401,7 @@
 			m_LocalCoordinateSystemSpeedMax = 
 			{
 				m_nType = "PVEC_TYPE_LITERAL"
-				m_vLiteralValue = [ 100.0, 100.0, 50.0 ]
+				m_vLiteralValue = [ 100.0, 100.0, 150.0 ]
 				m_LiteralColor = [ 0, 0, 0, 0 ]
 				m_nVectorAttribute = 6
 				m_vVectorAttributeScale = [ 1.0, 1.0, 1.0 ]
@@ -966,8 +966,8 @@
 		},
 		{
 			_class = "C_OP_BasicMovement"
-			m_Gravity = [ 0.0, 0.0, -300.0 ]
-			m_fDrag = 0.1
+			m_Gravity = [ 0.0, 0.0, -100.0 ]
+			m_fDrag = 0.07
 		},
 	]
 	m_Constraints = 
@@ -1607,6 +1607,12 @@
 	[
 		{
 			m_ChildRef = resource:"particles/gameplay/blocks/block_destroyed/block_destroyed_a.vpcf"
+		},
+		{
+			m_ChildRef = resource:"particles/gameplay/blocks/block_destroyed/block_destroyed_b.vpcf"
+		},
+		{
+			m_ChildRef = resource:"particles/gameplay/blocks/block_destroyed/block_destroyed_c.vpcf"
 		},
 	]
 }
