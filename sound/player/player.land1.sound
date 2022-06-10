@@ -6,12 +6,14 @@
 		Volume = 1
 		VolumeRandom = 0
 		Pitch = 1
-		PitchRandom = 0.1
-		DistanceMax = 500
+		PitchRandom = 0.05
+		Decibels = 70
 		Sounds = 
 		[
 			resource:"sound/player/player.land1.vsnd",
 		]
 		SelectionMode = 3
+		MaximumDistance = 1143.9335
+		MinimumDistance = 57.196674
 	}
 }
