@@ -1,4 +1,5 @@
 ﻿using Facepunch.CoreWars.Inventory;
+using Facepunch.CoreWars.Utility;
 using Sandbox;
 using System.IO;
 
@@ -28,6 +29,7 @@ namespace Facepunch.CoreWars
 				if ( !string.IsNullOrEmpty( ConsumeEffect ) )
 				{
 					var effect = Particles.Create( ConsumeEffect, player );
+					effect.AutoDestroy( 3f );
 					effect.SetEntity( 0, player );
 				}
 			}
