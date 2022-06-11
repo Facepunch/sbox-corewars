@@ -133,8 +133,6 @@ PS
 		#define DEPTH_STATE_ALREADY_SET
 	#endif
 
-	#define COLOR_SAMPLER_DEFINED
-
 	#include "common/pixel.hlsl"
 
 	CreateInputTexture2D( TextureAtlasColor, Srgb, 8, "", "_color", "Voxel Atlas,10/10", Default4( 1.0f, 1.0f, 1.0f, 1.0f ) );
@@ -317,14 +315,12 @@ PS
 			m.Roughness = vRma.r;
 			m.Metalness = vRma.g;
 			m.AmbientOcclusion = vRma.b;
-			m.BlendMask = 1.0f;
 			m.TintMask = 1.0f;
 			#if (S_ALPHA_TEST || S_TRANSLUCENT)
 				m.Opacity = vColor.a * g_GlobalOpacity;
 			#else
 				m.Opacity = g_GlobalOpacity;
 			#endif
-			m.TransmissiveMask = 1.0f;
 			m.Emission.rgb = vEmission;
 			
 			PixelOutput o = FinalizePixelMaterial( i, m );
