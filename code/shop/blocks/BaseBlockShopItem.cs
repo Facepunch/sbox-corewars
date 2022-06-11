@@ -11,6 +11,9 @@ namespace Facepunch.CoreWars
 {
 	public abstract class BaseBlockShopItem : BaseShopItem
 	{
+		public override string Name => GetBlockType( Local.Pawn as Player ).FriendlyName;
+		public override string Description => GetBlockType( Local.Pawn as Player ).Description;
+
 		public virtual BlockType GetBlockType( Player player )
 		{
 			return null;

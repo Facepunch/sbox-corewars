@@ -9,6 +9,9 @@ namespace Facepunch.CoreWars
 	{
 		public T ItemDefinition { get; private set; } = new T();
 
+		public override string Name => ItemDefinition.Name;
+		public override string Description => ItemDefinition.Description;
+
 		public override bool CanPurchase( Player player )
 		{
 			if ( !base.CanPurchase( player ) ) return false;
@@ -30,7 +33,7 @@ namespace Facepunch.CoreWars
 
 		public override string GetIcon( Player player )
 		{
-			return string.Empty;
+			return ItemDefinition.Icon;
 		}
 
 		public override void OnPurchased( Player player )

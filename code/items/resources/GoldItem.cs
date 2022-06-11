@@ -8,6 +8,7 @@ namespace Facepunch.CoreWars
 	public class GoldItem : ResourceItem
 	{
 		public override ushort MaxStackSize => 64;
+		public override string Description => "Solid gold bars used for purchasing team upgrades.";
 		public override string Name => "Gold";
 		public override string Icon => "textures/items/gold.png";
 

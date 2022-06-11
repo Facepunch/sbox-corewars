@@ -8,6 +8,7 @@ namespace Facepunch.CoreWars.Blocks
 	{
 		public override string DefaultTexture => "tempered_glass_01";
 		public override string FriendlyName => "Tempered Glass";
+		public override string Description => "An easily broken but blastproof defensive block.";
 		public override string DestroySound => "break.glass";
 		public override string HitSound => "melee.hitglass";
 		public override bool IsTranslucent => true;

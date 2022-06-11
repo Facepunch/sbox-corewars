@@ -8,17 +8,10 @@ namespace Facepunch.CoreWars
 	[Library]
 	public class SwordShopItemTier4 : BaseWeaponShopItem<SwordItemTier4>
 	{
-		public override string Name => "Crystal Sword";
-		public override string Description => "A supercharged sword for dealing melee damage.";
 		public override Dictionary<Type, int> Costs => new()
 		{
 			[typeof( IronItem )] = 60
 		};
 		public override Type RequiredUpgradeType => typeof( ArmoryUpgrade );
-
-		public override string GetIcon( Player player )
-		{
-			return "textures/items/weapon_sword_4.png";
-		}
 	}
 }

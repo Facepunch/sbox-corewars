@@ -8,6 +8,7 @@ namespace Facepunch.CoreWars
 	public class SpeedBrewItem : BrewItem
 	{
 		public override string ConsumeEffect => "particles/gameplay/brews/speed/speed_brew.vpcf";
+		public override string Description => "Gives a boost to movement speed for 30 seconds when consumed.";
 		public override string Icon => "textures/items/brew_speed.png";
 		public override string Name => "Speed Brew";
 

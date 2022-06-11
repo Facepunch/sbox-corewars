@@ -4,14 +4,10 @@ using Sandbox;
 namespace Facepunch.CoreWars.Blocks
 {
 	[Library]
-	public class YellowPlasticBlock : BaseBuildingBlock
+	public class YellowPlasticBlock : BasePlasticBlock
 	{
 		public override string DefaultTexture => "plastic_yellow_01";
 		public override string FriendlyName => "Yellow Plastic";
-		public override string DestroySound => "break.plastic";
-		public override string HitSound => "melee.hitplastic";
-		public override BuildingMaterialType MaterialType => BuildingMaterialType.Plastic;
-		public override float DamageMultiplier => 0.8f;
 	}
 }
 

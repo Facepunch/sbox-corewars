@@ -5,20 +5,22 @@ using Sandbox;
 using Sandbox.UI;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Facepunch.CoreWars
 {
+	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 	public partial class Game : Sandbox.Game
 	{
 		[Net] public StateSystem StateSystem { get; private set; }
 		[Net] public bool IsEditorMode { get; private set; }
 
-		public static new Game Current { get; private set; }
+		public new static Game Current { get; private set; }
 		public static RootPanel Hud { get; private set; }
 
-		private static HashSet<Team> ValidTeamSet = new();
+		private static readonly HashSet<Team> ValidTeamSet = new();
 
 		public static T GetStateAs<T>() where T : BaseState
 		{
@@ -138,9 +140,9 @@ namespace Facepunch.CoreWars
 
 			FileSystem.Data.CreateDirectory( "worlds" );
 
-			var success = await VoxelWorld.Current.LoadFromFile( FileSystem.Data, fileName );
+			var test = await VoxelWorld.Current.LoadFromFile( FileSystem.Data, fileName );
 
-			if ( !success )
+			if ( !test )
 			{
 				Log.Error( $"Unable to load world from disk ({fileName}), file does not exist!" );
 				return;

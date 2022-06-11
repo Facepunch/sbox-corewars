@@ -7,6 +7,8 @@ namespace Facepunch.CoreWars
 {
 	public abstract class BaseWeaponShopItem<T> : BaseShopItem where T : WeaponItem, new()
 	{
+		public override string Name => ItemDefinition.Name;
+		public override string Description => ItemDefinition.Description;
 		public virtual AmmoType AmmoType => AmmoType.None;
 		public virtual int AmmoAmount => 0;
 
@@ -36,7 +38,7 @@ namespace Facepunch.CoreWars
 
 		public override string GetIcon( Player player )
 		{
-			return string.Empty;
+			return ItemDefinition.Icon;
 		}
 
 		public override void OnPurchased( Player player )

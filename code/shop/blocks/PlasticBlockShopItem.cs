@@ -11,8 +11,6 @@ namespace Facepunch.CoreWars
 	[Library]
 	public class PlasticBlockShopItem : BaseBlockShopItem
 	{
-		public override string Description => "The cheapest but weakest block.";
-		public override string Name => "Plastic Block";
 		public override Dictionary<Type, int> Costs => new()
 		{
 			[typeof( IronItem )] = 8

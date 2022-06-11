@@ -8,6 +8,7 @@ namespace Facepunch.CoreWars
 	public class DamageBrewItem : BrewItem
 	{
 		public override string ConsumeEffect => "particles/gameplay/brews/damage/damage_brew.vpcf";
+		public override string Description => "Gives a boost to damage output for 30 seconds when consumed.";
 		public override string Icon => "textures/items/brew_damage.png";
 		public override string Name => "Damage Brew";
 

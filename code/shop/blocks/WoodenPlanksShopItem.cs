@@ -9,8 +9,6 @@ namespace Facepunch.CoreWars
 	[Library]
 	public class WoodenPlanksShopItem : BaseBlockShopItem
 	{
-		public override string Description => "A slightly stronger defensive block.";
-		public override string Name => "Wooden Planks";
 		public override Dictionary<Type, int> Costs => new()
 		{
 			[typeof( IronItem )] = 34

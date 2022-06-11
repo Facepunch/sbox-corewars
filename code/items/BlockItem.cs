@@ -12,6 +12,15 @@ namespace Facepunch.CoreWars
 
 		public override ushort MaxStackSize => 64;
 		public override bool RemoveOnDeath => true;
+		public override string Description
+		{
+			get
+			{
+				var world = VoxelWorld.Current;
+				if ( !world.IsValid() ) return "Invalid";
+				return world.GetBlockType( BlockId ).Description;
+			}
+		}
 
 		public override string Name
 		{

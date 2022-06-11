@@ -10,7 +10,7 @@ namespace Facepunch.CoreWars
 	[UseTemplate]
 	public partial class Draggable : Panel
 	{
-		public static Draggable Current { get; private set; }
+		private static Draggable Current { get; set; }
 
 		public static void Start( IDraggable draggable, DraggableMode mode )
 		{
@@ -59,8 +59,8 @@ namespace Facepunch.CoreWars
 
 		public void UpdatePosition()
 		{
-			Style.Left = Length.Pixels( Mouse.Position.x - 40 * ScaleFromScreen );
-			Style.Top = Length.Pixels( Mouse.Position.y - 40 * ScaleFromScreen );
+			Style.Left = Length.Pixels( (Mouse.Position.x - 120f) * ScaleFromScreen );
+			Style.Top = Length.Pixels( (Mouse.Position.y - 120f) * ScaleFromScreen );
 		}
 
 		public void SetMode( DraggableMode mode )

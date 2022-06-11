@@ -8,7 +8,7 @@ using System.Linq;
 namespace Facepunch.CoreWars
 {
 	[UseTemplate]
-	public partial class InventorySlot : Panel, IDraggable, IDroppable
+	public partial class InventorySlot : Panel, IDraggable, IDroppable, ITooltipProvider
 	{
 		public InventoryContainer Container { get; set; }
 		public ushort Slot { get; set; }
@@ -23,6 +23,8 @@ namespace Facepunch.CoreWars
 		public Panel SlotPanel { get; set; }
 		public Label SlotLabel { get; set; }
 		public Panel Icon { get; set; }
+		public string Description => Item.Description;
+		public string Name => Item.Name;
 
 		public InventorySlot()
 		{
@@ -126,6 +128,23 @@ namespace Facepunch.CoreWars
 			base.OnClick( e );
 		}
 
+		protected override void OnMouseOver( MousePanelEvent e )
+		{
+			if ( Item.IsValid() )
+			{
+				Tooltip.Show( this );
+			}
+			
+			base.OnMouseOver( e );
+		}
+
+		protected override void OnMouseOut( MousePanelEvent e )
+		{
+			Tooltip.Hide( this );
+
+			base.OnMouseOut( e );
+		}
+
 		protected override void OnRightClick( MousePanelEvent e )
 		{
 			if ( !Item.IsValid() ) return;
@@ -149,14 +168,12 @@ namespace Facepunch.CoreWars
 				return;
 
 			Draggable.Start( this, Input.Down( InputButton.Run ) ? DraggableMode.Split : DraggableMode.Move );
-
 			base.OnMouseDown( e );
 		}
 
 		protected override void OnMouseUp( MousePanelEvent e )
 		{
 			Draggable.Stop( this );
-
 			base.OnMouseUp( e );
 		}
 

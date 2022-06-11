@@ -11,6 +11,7 @@ namespace Facepunch.CoreWars
 		public override string ViewModelPath => "models/weapons/sword/v_sword01.vmdl";
 		public override string WeaponName => "weapon_sword";
 		public override bool RemoveOnDeath => true;
+		public override string Description => "A light sword for dealing melee damage.";
 		public override string Icon => "textures/items/weapon_sword_1.png";
 		public override string Name => "Light Sword";
 		public override string Group => "sword";

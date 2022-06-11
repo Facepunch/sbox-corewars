@@ -9,8 +9,6 @@ namespace Facepunch.CoreWars
 	[Library]
 	public class TemperedGlassShopItem : BaseBlockShopItem
 	{
-		public override string Description => "An easily broken but blastproof defensive block.";
-		public override string Name => "Tempered Glass";
 		public override Dictionary<Type, int> Costs => new()
 		{
 			[typeof( IronItem )] = 18

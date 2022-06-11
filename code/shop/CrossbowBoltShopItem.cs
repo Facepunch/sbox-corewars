@@ -8,8 +8,8 @@ namespace Facepunch.CoreWars
 	[Library]
 	public class CrossbowBoltShopItem : BaseShopItem
 	{
-		public override string Name => "Crossbow Bolt";
-		public override string Description => "Ammo for Crossbow weapons.";
+		public override string Name => AmmoType.Bolt.ToString();
+		public override string Description => AmmoType.Bolt.GetDescription();
 		public override int Quantity => 8;
 		public override Dictionary<Type, int> Costs => new()
 		{

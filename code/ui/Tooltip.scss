@@ -1,0 +1,40 @@
+﻿@import "./scss/base.scss";
+
+Tooltip {
+    pointer-events: none;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 200;
+
+    .container {
+        backdrop-filter-blur: 24px;
+        background-color: rgba(0 0 0 0.6);
+        border-radius: 8px;
+        position: absolute;
+        padding: 16px;
+        flex-direction: column;
+        display: none;
+        min-width: 200px;
+        align-items: center;
+        justify-content: center;
+
+        .name {
+            font-family: $font;
+            font-size: 24px;
+            color: $red;
+        }
+
+        .description {
+            font-family: $font;
+            max-width: 300px;
+            word-wrap: break-word;
+            font-size: 18px;
+            color: white;
+        }
+
+        &.active {
+            display: flex;
+        }
+    }
+}

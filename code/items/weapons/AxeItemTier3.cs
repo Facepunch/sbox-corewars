@@ -8,6 +8,7 @@ namespace Facepunch.CoreWars
 	public class AxeItemTier3 : WeaponItem
 	{
 		public override string WeaponName => "weapon_axe";
+		public override string Description => "A heavy axe for breaking wood.";
 		public override string Icon => "textures/items/weapon_axe_3.png";
 		public override string Name => "Heavy Axe";
 		public override string Group => "axe";

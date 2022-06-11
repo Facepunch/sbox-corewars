@@ -9,6 +9,7 @@ namespace Facepunch.CoreWars
 	{
 		public override string WeaponName => "weapon_axe";
 		public override string Icon => "textures/items/weapon_axe_1.png";
+		public override string Description => "A light damage axe for breaking wood.";
 		public override string Name => "Light Axe";
 		public override string Group => "axe";
 		public override int Tier => 1;
