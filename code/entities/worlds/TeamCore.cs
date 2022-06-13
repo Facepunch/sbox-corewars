@@ -102,11 +102,13 @@ namespace Facepunch.CoreWars
 
 		public override void TakeDamage( DamageInfo info )
 		{
+			/*
 			if ( !info.Attacker.IsValid() || info.Attacker is not Player attacker )
 				return;
 
 			if ( attacker.Team == Team )
 				return;
+			*/
 
 			base.TakeDamage( info );
 		}
@@ -140,6 +142,8 @@ namespace Facepunch.CoreWars
 		[ClientRpc]
 		protected void CreateDeathEffect()
 		{
+			PlaySound( "core.explode" );
+
 			Effect?.Destroy();
 			Effect = Particles.Create( "particles/gameplay/core/core_crystal/core_break/core_crystal_base.vpcf", this, "Core" );
 			Effect.SetPosition( 6, Team.GetColor() * 255f );

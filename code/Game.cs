@@ -78,8 +78,10 @@ namespace Facepunch.CoreWars
 		{
 			if ( ConsoleSystem.Caller.Pawn is Player player )
 			{
+				Log.Info( "yes" );
 				if ( player.Core.IsValid() )
 				{
+					Log.Info( "yes2" );
 					player.Core.TakeDamage( DamageInfo.Generic( 1000f ) );
 				}
 			}
