@@ -27,6 +27,7 @@ namespace Facepunch.CoreWars
 		public void Open()
 		{
 			if ( IsOpen ) return;
+			PlaySound( "upgrades.open" );
 			IDialog.Activate( this );
 			IsOpen = true;
 		}
@@ -83,6 +84,7 @@ namespace Facepunch.CoreWars
 		protected virtual void OnItemPurchased( IPurchasableItem item )
 		{
 			Player.BuyUpgradeCmd( NPC.NetworkIdent, item.GetType().Name );
+			Audio.Play( "item.purchase" );
 		}
 
 		protected override void PostTemplateApplied()

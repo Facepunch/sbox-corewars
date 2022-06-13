@@ -81,6 +81,8 @@ namespace Facepunch.CoreWars
 			storage.SetEntity( this );
 			storage.SetContainer( container );
 			storage.Open();
+
+			Audio.Play( "inventory.open" );
 		}
 	}
 }
