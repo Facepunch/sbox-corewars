@@ -708,7 +708,7 @@ namespace Facepunch.CoreWars
 		{
 			if ( info.Attacker is Player attacker )
 			{
-				if ( Team != Team.None && attacker.Team == Team )
+				if ( !Game.FriendlyFire && attacker.Team == Team )
 					return;
 
 				if ( attacker.Core.IsValid() )
@@ -875,14 +875,6 @@ namespace Facepunch.CoreWars
 				ActiveChild = weaponItem.Weapon;
 			else
 				ActiveChild = null;
-
-			if ( Input.Released( InputButton.Use ) )
-			{
-				if ( CameraMode is ThirdPersonCamera )
-					CameraMode = new FirstPersonCamera();
-				else
-					CameraMode = new ThirdPersonCamera();
-			}
 
 			if ( IsClient )
 			{
