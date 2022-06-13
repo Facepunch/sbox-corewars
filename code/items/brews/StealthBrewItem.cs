@@ -12,10 +12,10 @@ namespace Facepunch.CoreWars
 		public override string Icon => "textures/items/brew_stealth.png";
 		public override string Name => "Stealth Brew";
 
-		public override void OnConsumed( Player player )
+		public override void OnActivated( Player player )
 		{
 			player.GiveBuff( new StealthBuff() );
-			base.OnConsumed( player );
+			base.OnActivated( player );
 		}
 	}
 }

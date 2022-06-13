@@ -794,7 +794,7 @@ namespace Facepunch.CoreWars
 						}
 						else if ( item is BrewItem brewItem )
 						{
-							brewItem.OnConsumed( this );
+							brewItem.Consume( this );
 						}
 					}
 

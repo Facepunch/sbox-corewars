@@ -12,33 +12,55 @@ namespace Facepunch.CoreWars
 		public override Color Color => Color.Magenta;
 		public virtual string ConsumeSound => "brew.consume";
 		public virtual string ConsumeEffect => null;
+		public virtual string ActivateSound => "brew.activate";
+		public virtual float ActivateDelay => 0.4f;
 
-		public override bool CanStackWith( InventoryItem other )
+		public async void Consume( Player player )
 		{
-			return true;
-		}
+			StackSize--;
 
-		public virtual void OnConsumed( Player player )
-		{
+			if ( StackSize <= 0 )
+				Remove();
+
 			using ( Prediction.Off() )
 			{
 				if ( !string.IsNullOrEmpty( ConsumeSound ) )
 				{
 					player.PlaySound( ConsumeSound );
 				}
-
-				if ( !string.IsNullOrEmpty( ConsumeEffect ) )
-				{
-					var effect = Particles.Create( ConsumeEffect, player );
-					effect.AutoDestroy( 3f );
-					effect.SetEntity( 0, player );
-				}
 			}
 
-			StackSize--;
+			await GameTask.DelaySeconds( ActivateDelay );
 
-			if ( StackSize <= 0 )
-				Remove();
+			if ( !player.IsValid() )
+				return;
+
+			if ( !string.IsNullOrEmpty( ActivateSound ) )
+			{
+				player.PlaySound( ActivateSound );
+			}
+
+			if ( !string.IsNullOrEmpty( ConsumeEffect ) )
+			{
+				var effect = Particles.Create( ConsumeEffect, player );
+				effect.AutoDestroy( 3f );
+				effect.SetEntity( 0, player );
+			}
+
+			if ( player.LifeState == LifeState.Alive )
+			{
+				OnActivated( player );
+			}
+		}
+
+		public virtual void OnActivated( Player player )
+		{
+
+		}
+
+		public override bool CanStackWith( InventoryItem other )
+		{
+			return true;
 		}
 	}
 }
