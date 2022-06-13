@@ -1,6 +1,7 @@
 ﻿using Facepunch.CoreWars.Editor;
 using Facepunch.Voxels;
 using Sandbox;
+using System.IO;
 
 namespace Facepunch.CoreWars
 {
