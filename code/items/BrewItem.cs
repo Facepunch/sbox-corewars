@@ -9,6 +9,7 @@ namespace Facepunch.CoreWars
 	{
 		public override bool CanBeDropped => false;
 		public override ushort MaxStackSize => 4;
+		public override Color Color => Color.Magenta;
 		public virtual string ConsumeSound => "brew.consume";
 		public virtual string ConsumeEffect => null;
 

@@ -1,4 +1,6 @@
-﻿UpgradeStore {
+﻿@import "./scss/base.scss";
+
+UpgradeStore {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -21,9 +23,9 @@
 
         .title {
             margin-bottom: 32px;
-            font-family: Roboto;
-            font-size: 32px;
-            color: white;
+            color: $red;
+            font-family: $font;
+            font-size: 48px;
         }
 
         .currency {

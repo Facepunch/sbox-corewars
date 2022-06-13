@@ -11,6 +11,7 @@ namespace Facepunch.CoreWars
 		public override string Name => AmmoType.Bolt.ToString();
 		public override string Description => AmmoType.Bolt.GetDescription();
 		public override int Quantity => 8;
+		public override Color Color => Color.Yellow;
 		public override Dictionary<Type, int> Costs => new()
 		{
 			[typeof( IronItem )] = 16

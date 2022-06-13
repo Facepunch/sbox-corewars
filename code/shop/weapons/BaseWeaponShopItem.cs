@@ -9,6 +9,7 @@ namespace Facepunch.CoreWars
 	{
 		public override string Name => ItemDefinition.Name;
 		public override string Description => ItemDefinition.Description;
+		public override Color Color => ItemDefinition.Color;
 		public virtual AmmoType AmmoType => AmmoType.None;
 		public virtual int AmmoAmount => 0;
 

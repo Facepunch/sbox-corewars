@@ -11,6 +11,7 @@ namespace Facepunch.CoreWars
 
 		public override string Name => ItemDefinition.Name;
 		public override string Description => ItemDefinition.Description;
+		public override Color Color => ItemDefinition.Color;
 
 		public override bool CanPurchase( Player player )
 		{

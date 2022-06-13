@@ -13,6 +13,7 @@ namespace Facepunch.CoreWars
 		public virtual string Name => string.Empty;
 		public virtual string Group => string.Empty;
 		public virtual Dictionary<Type, int> Costs => new();
+		public virtual Color Color => Color.White;
 		public virtual int Quantity => 0;
 		public virtual int Tier => 1;
 

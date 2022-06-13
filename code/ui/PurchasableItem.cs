@@ -14,6 +14,7 @@ namespace Facepunch.CoreWars
 		public Action<IPurchasableItem> OnPurchaseClicked { get; set; }
 		public Button PurchaseButton { get; set; }
 		public string QuantityText => GetQuantityText();
+		public Label NameLabel { get; private set; }
 
 		private TimeUntil NextCheckState { get; set; }
 
@@ -45,6 +46,7 @@ namespace Facepunch.CoreWars
 				}
 			}
 
+			NameLabel.Style.FontColor = item.Color;
 			UpdateState();
 		}
 

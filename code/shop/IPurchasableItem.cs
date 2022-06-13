@@ -11,6 +11,7 @@ namespace Facepunch.CoreWars
 	{
 		public string Name { get; }
 		public string Description { get; }
+		public Color Color { get; }
 		public Dictionary<Type, int> Costs { get; }
 		public int Quantity { get; }
 

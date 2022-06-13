@@ -33,10 +33,12 @@ namespace Facepunch.CoreWars
 		public ITooltipProvider Provider { get; private set; }
 		public TimeSince TimeSinceShown { get; private set; }
 		public Panel Container { get; private set; }
+		public Label NameLabel { get; private set; }
 
 		public void SetProvider( ITooltipProvider provider )
 		{
 			Provider = provider;
+			NameLabel.Style.FontColor = provider.Color;
 		}
 
 		public Tooltip()

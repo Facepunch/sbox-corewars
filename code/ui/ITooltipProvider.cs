@@ -9,5 +9,6 @@ namespace Facepunch.CoreWars
 		public string Name { get; }
 		public string Description { get; }
 		public bool IsVisible { get; }
+		public Color Color { get; }
 	}
 }

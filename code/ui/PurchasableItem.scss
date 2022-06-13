@@ -1,4 +1,6 @@
-﻿$buttonColor: #1F85DE !default;
+﻿@import "./scss/base.scss";
+
+$buttonColor: #1F85DE !default;
 
 PurchasableItem {
     background-color: rgba( 50 50 50 0.4 );
@@ -37,12 +39,13 @@ PurchasableItem {
 
         .name {
             font-size: 28px;
-            font-family: Roboto;
+            font-family: $font;
             color: white;
         }
 
         .description {
-            margin-top: 8px;
+            margin-top: 12px;
+            font-family: $font;
             color: white;
         }
     }
@@ -50,12 +53,12 @@ PurchasableItem {
     .costs {
         position: absolute;
         justify-content: center;
-        pointer-events: none;
         align-items: center;
         display: flex;
         right: 8px;
 
         .container {
+            pointer-events: none;
             overflow: hidden;
 
             .cost {

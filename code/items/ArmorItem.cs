@@ -10,6 +10,7 @@ namespace Facepunch.CoreWars
 
 		public virtual float DamageMultiplier => 1f;
 		public virtual ArmorSlot ArmorSlot => ArmorSlot.None;
+		public override Color Color => Color.Cyan;
 		public virtual string ModelName => string.Empty;
 		public virtual int Tier => 0;
 

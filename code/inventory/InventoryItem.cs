@@ -17,6 +17,7 @@ namespace Facepunch.CoreWars.Inventory
 		public virtual bool RemoveOnDeath => false;
 		public virtual bool DropOnDeath => false;
 		public virtual bool CanBeDropped => true;
+		public virtual Color Color => Color.White;
 		public virtual string Name => string.Empty;
 		public virtual string Icon => string.Empty;
 

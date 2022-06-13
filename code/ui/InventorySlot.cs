@@ -25,6 +25,7 @@ namespace Facepunch.CoreWars
 		public Panel Icon { get; set; }
 		public string Description => Item.Description;
 		public string Name => Item.Name;
+		public Color Color => Item.Color;
 
 		public InventorySlot()
 		{
