@@ -73,16 +73,26 @@ namespace Facepunch.CoreWars
 			base.ClientSpawn();
 		}
 
+		[ConCmd.Server( "cw_core_revive" )]
+		public static void ReviveCoreCmd()
+		{
+			if ( ConsoleSystem.Caller.Pawn is Player player )
+			{
+				if ( player.Core.IsValid() )
+				{
+					player.Core.Reset();
+				}
+			}
+		}
+
 		[ConCmd.Server( "cw_explode_core" )]
 		public static void ExplodeCoreCmd()
 		{
 			if ( ConsoleSystem.Caller.Pawn is Player player )
 			{
-				Log.Info( "yes" );
 				if ( player.Core.IsValid() )
 				{
-					Log.Info( "yes2" );
-					player.Core.TakeDamage( DamageInfo.Generic( 1000f ) );
+					player.Core.Explode();
 				}
 			}
 		}

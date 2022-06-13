@@ -59,6 +59,13 @@ namespace Facepunch.CoreWars
 			return Upgrades.Any( u => u is T );
 		}
 
+		public void Explode()
+		{
+			Game.RemoveValidTeam( Team );
+			CreateDeathEffect();
+			LifeState = LifeState.Dead;
+		}
+
 		public virtual void Reset()
 		{
 			Game.AddValidTeam( Team );
@@ -102,23 +109,18 @@ namespace Facepunch.CoreWars
 
 		public override void TakeDamage( DamageInfo info )
 		{
-			/*
 			if ( !info.Attacker.IsValid() || info.Attacker is not Player attacker )
 				return;
 
 			if ( attacker.Team == Team )
 				return;
-			*/
 
 			base.TakeDamage( info );
 		}
 
 		public override void OnKilled()
 		{
-			Game.RemoveValidTeam( Team );
-
-			CreateDeathEffect();
-			LifeState = LifeState.Dead;
+			Explode();
 		}
 
 		public virtual void OnUpgradeTypesChanged( List<int> oldTypes, List<int> newTypes )
@@ -142,11 +144,19 @@ namespace Facepunch.CoreWars
 		[ClientRpc]
 		protected void CreateDeathEffect()
 		{
-			PlaySound( "core.explode" );
+			PlaySound( "core.explode1" );
 
 			Effect?.Destroy();
 			Effect = Particles.Create( "particles/gameplay/core/core_crystal/core_break/core_crystal_base.vpcf", this, "Core" );
 			Effect.SetPosition( 6, Team.GetColor() * 255f );
+
+			PlayExplodeSound();
+		}
+
+		protected async void PlayExplodeSound()
+		{
+			await Task.Delay( 900 );
+			PlaySound( "core.explode2" );
 		}
 
 		protected override void OnDestroy()

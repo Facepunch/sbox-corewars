@@ -122,8 +122,7 @@ namespace Facepunch.CoreWars
 
 				foreach ( var core in cores )
 				{
-					// TODO: Have this just call a method to blow it up.
-					core.TakeDamage( DamageInfo.Generic( 1000f ) );
+					core.Explode();
 				}
 			}
 			else if ( Stage == RoundStage.SuddenDeath )
