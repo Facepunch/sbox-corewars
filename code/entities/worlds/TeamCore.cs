@@ -62,6 +62,9 @@ namespace Facepunch.CoreWars
 		public virtual void Reset()
 		{
 			Game.AddValidTeam( Team );
+
+			EnableAllCollisions = true;
+			EnableDrawing = true;
 			LifeState = LifeState.Alive;
 			InternalUpgrades.Clear();
 			UpgradeTypes.Clear();
@@ -81,15 +84,17 @@ namespace Facepunch.CoreWars
 		public override void Spawn()
 		{
 			SetModel( "models/gameplay/base_core/base_core.vmdl" );
-
-			Effect = Particles.Create( "particles/gameplay/core/core_crystal/core_crystal.vpcf", this, "Core" );
-
-			Effect.SetPosition( 6, Team.GetColor() * 255f );
-			Transmit = TransmitType.Always;
-
 			SetupPhysicsFromAABB( PhysicsMotionType.Keyframed, Model.Bounds.Mins, Model.Bounds.Maxs );
 
+			Transmit = TransmitType.Always;
+
 			base.Spawn();
+		}
+
+		public override void ClientSpawn()
+		{
+			Effect = Particles.Create( "particles/gameplay/core/core_crystal/core_crystal.vpcf", this, "Core" );
+			base.ClientSpawn();
 		}
 
 		public override void TakeDamage( DamageInfo info )
@@ -106,6 +111,9 @@ namespace Facepunch.CoreWars
 		public override void OnKilled()
 		{
 			Game.RemoveValidTeam( Team );
+
+			EnableAllCollisions = false;
+			EnableDrawing = false;
 			LifeState = LifeState.Dead;
 		}
 
@@ -129,8 +137,7 @@ namespace Facepunch.CoreWars
 		[Event.Tick.Client]
 		protected virtual void ClientTick()
 		{
-			RenderColor = Team.GetColor();
-
+			Effect?.SetPosition( 6, Team.GetColor() * 255f );
 		}
 	}
 }
