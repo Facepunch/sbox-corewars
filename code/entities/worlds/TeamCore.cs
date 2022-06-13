@@ -141,7 +141,7 @@ namespace Facepunch.CoreWars
 		protected void CreateDeathEffect()
 		{
 			Effect?.Destroy();
-			Effect = Particles.Create( "particles/gameplay/core/core_crystal/core_crystal.vpcf", this, "Core" );
+			Effect = Particles.Create( "particles/gameplay/core/core_crystal/core_break/core_crystal_base.vpcf", this, "Core" );
 			Effect.SetPosition( 6, Team.GetColor() * 255f );
 		}
 
