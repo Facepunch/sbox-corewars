@@ -88,6 +88,7 @@ namespace Facepunch.CoreWars
 			else if ( Stage == RoundStage.GoldII )
 			{
 				Announcements.Send( To.Everyone, "Crystal II", "Crystal generators now generate faster!", RoundStage.CrystalII.GetIcon() );
+				Airdrop.Create();
 				NextStageTime = 300f * StageTimeMultiplier;
 				Stage = RoundStage.CrystalII;
 			}
@@ -100,6 +101,7 @@ namespace Facepunch.CoreWars
 			else if ( Stage == RoundStage.GoldIII )
 			{
 				Announcements.Send( To.Everyone, "Crystal III", "Crystal generators now generate even faster!", RoundStage.CrystalIII.GetIcon() );
+				Airdrop.Create();
 				NextStageTime = 300f * StageTimeMultiplier;
 				Stage = RoundStage.CrystalIII;
 			}
@@ -112,6 +114,7 @@ namespace Facepunch.CoreWars
 			else if ( Stage == RoundStage.NoCores )
 			{
 				Announcements.Send( To.Everyone, "Sudden Death", "All team Cores have self-destructed!", RoundStage.SuddenDeath.GetIcon() );
+				Airdrop.Create();
 				NextStageTime = 300f * StageTimeMultiplier;
 				Stage = RoundStage.SuddenDeath;
 
