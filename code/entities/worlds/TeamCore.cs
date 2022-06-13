@@ -80,6 +80,8 @@ namespace Facepunch.CoreWars
 		{
 			SetModel( "models/gameplay/base_core/base_core.vmdl" );
 
+			Particles.Create( "particles/gameplay/core/core_crystal/core_crystal.vpcf",this, "Core" );
+
 			Transmit = TransmitType.Always;
 			SetupPhysicsFromAABB( PhysicsMotionType.Keyframed, Model.Bounds.Mins, Model.Bounds.Maxs );
 
