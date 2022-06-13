@@ -1,12 +1,11 @@
-﻿using Facepunch.CoreWars.Editor;
+﻿using System.Collections.Generic;
 using Facepunch.Voxels;
 using Sandbox;
-using System.IO;
 using System.Linq;
 
 namespace Facepunch.CoreWars
 {
-	public partial class Airdrop : ModelEntity
+	public partial class Airdrop : ModelEntity, IUsable, IItemStore
 	{
 		[ConCmd.Server( "cw_create_airdrop" )]
 		public static void CreateAirdropCmd()
@@ -28,14 +27,25 @@ namespace Facepunch.CoreWars
 				airdrop.Position = airdrop.Position.WithZ( world.MaxSize.z * world.VoxelSize * 2f );
 
 				Hud.ToastAll( "An airdrop shop is incoming!", "textures/ui/airdrop.png" );
-
 				return true;
 			}
 
 			return false;
 		}
 
+		public List<BaseShopItem> Items { get; private set; } = new();
+		public float MaxUseDistance => 300f;
 		public bool HasLanded { get; private set; }
+
+		public bool IsUsable( Player player )
+		{
+			return true;
+		}
+
+		public void OnUsed( Player player )
+		{
+			OpenForClient( To.Single( player ) );
+		}
 
 		public override void Spawn()
 		{
@@ -43,8 +53,15 @@ namespace Facepunch.CoreWars
 			SetupPhysicsFromAABB( PhysicsMotionType.Keyframed, Model.Bounds.Mins, Model.Bounds.Maxs );
 
 			Transmit = TransmitType.Always;
+			AddAllItems();
 
 			base.Spawn();
+		}
+
+		public override void ClientSpawn()
+		{
+			AddAllItems();
+			base.ClientSpawn();
 		}
 
 		[Event.Tick.Server]
@@ -60,6 +77,27 @@ namespace Facepunch.CoreWars
 
 			Position = trace.EndPosition;
 			HasLanded = trace.Hit;
+		}
+
+		private void AddAllItems()
+		{
+			var types = TypeLibrary.GetTypes<BaseShopItem>();
+
+			foreach ( var type in types )
+			{
+				if ( type.IsAbstract || type.IsGenericType ) continue;
+				var description = TypeLibrary.GetDescription( type );
+				if ( !description.HasTag( "airdrop" ) ) continue;
+				var item = TypeLibrary.Create<BaseShopItem>( type );
+				Items.Add( item );
+			}
+		}
+
+		[ClientRpc]
+		private void OpenForClient()
+		{
+			AirdropStore.Current.SetAirdrop( this );
+			AirdropStore.Current.Open();
 		}
 	}
 }

@@ -10,7 +10,7 @@ namespace Facepunch.CoreWars
 {
 	[EditorEntity( Title = "Item Store NPC", EditorModel = "models/citizen/citizen.vmdl" )]
 	[Category( "Gameplay" )]
-	public partial class ItemStoreNPC : AnimatedEntity, ISourceEntity, IUsable, INameplate
+	public partial class ItemStoreNPC : AnimatedEntity, ISourceEntity, IUsable, INameplate, IItemStore
 	{
 		[EditorProperty] public Team Team { get; set; }
 

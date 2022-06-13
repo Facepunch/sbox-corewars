@@ -116,10 +116,10 @@ namespace Facepunch.CoreWars
 				return;
 
 			var entity = FindByIndex( index );
-			if ( entity is not ItemStoreNPC npc ) return;
-			if ( npc.Position.Distance( player.Position ) > npc.MaxUseDistance ) return;
+			if ( entity is not IItemStore store ) return;
+			if ( store.Position.Distance( player.Position ) > store.MaxUseDistance ) return;
 
-			var item = npc.Items.FirstOrDefault( i => i.GetType().Name == type );
+			var item = store.Items.FirstOrDefault( i => i.GetType().Name == type );
 			if ( item == null ) return;
 			if ( !item.CanAfford( player ) ) return;
 			if ( !item.CanPurchase( player ) ) return;
