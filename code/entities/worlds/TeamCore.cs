@@ -19,6 +19,8 @@ namespace Facepunch.CoreWars
 		protected List<BaseTeamUpgrade> InternalUpgrades { get; set; } = new();
 		public IReadOnlyList<BaseTeamUpgrade> Upgrades => InternalUpgrades;
 
+		private Particles Effect { get; set; }
+
 		public T FindUpgrade<T>() where T : BaseTeamUpgrade
 		{
 			return (Upgrades.FirstOrDefault( u => u is T ) as T);
@@ -80,9 +82,9 @@ namespace Facepunch.CoreWars
 		{
 			SetModel( "models/gameplay/base_core/base_core.vmdl" );
 
-			Particles.Create( "particles/gameplay/core/core_crystal/core_crystal.vpcf",this, "Core" );
-
+			Effect = Particles.Create( "particles/gameplay/core/core_crystal/core_crystal.vpcf", this, "Core" );
 			Transmit = TransmitType.Always;
+
 			SetupPhysicsFromAABB( PhysicsMotionType.Keyframed, Model.Bounds.Mins, Model.Bounds.Maxs );
 
 			base.Spawn();
@@ -114,6 +116,12 @@ namespace Facepunch.CoreWars
 				var upgrade = TypeLibrary.Create<BaseTeamUpgrade>( index );
 				InternalUpgrades.Add( upgrade );
 			}
+		}
+
+		protected override void OnDestroy()
+		{
+			Effect?.Destroy();
+			base.OnDestroy();
 		}
 
 		[Event.Tick.Client]
