@@ -73,6 +73,18 @@ namespace Facepunch.CoreWars
 			base.ClientSpawn();
 		}
 
+		[ConCmd.Server( "cw_explode_core" )]
+		public static void ExplodeCoreCmd()
+		{
+			if ( ConsoleSystem.Caller.Pawn is Player player )
+			{
+				if ( player.Core.IsValid() )
+				{
+					player.Core.TakeDamage( DamageInfo.Generic( 1000f ) );
+				}
+			}
+		}
+
 		[ConCmd.Server( "cw_editor_save" )]
 		public static void SaveEditorMapCmd( string fileName )
 		{
