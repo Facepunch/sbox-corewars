@@ -20,6 +20,7 @@ namespace Facepunch.CoreWars
 		public override WeaponConfig Config => new PickaxeConfig();
 		public override string ViewModelPath => "models/weapons/sword/v_sword01.vmdl";
 		public override DamageFlags DamageType => DamageFlags.Blunt;
+		public override float MeleeRange => 70f;
 		public override float PrimaryRate => 2f;
 		public override float SecondaryRate => 1f;
 		public override int ClipSize => 0;
