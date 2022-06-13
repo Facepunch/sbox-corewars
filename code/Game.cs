@@ -20,6 +20,9 @@ namespace Facepunch.CoreWars
 		public new static Game Current { get; private set; }
 		public static RootPanel Hud { get; private set; }
 
+		[ConVar.Server( "cw_friendly_fire", Saved = true )]
+		public static bool FriendlyFire { get; set; } = false;
+
 		private static readonly HashSet<Team> ValidTeamSet = new();
 
 		public static T GetStateAs<T>() where T : BaseState
