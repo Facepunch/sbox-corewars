@@ -83,6 +83,8 @@ namespace Facepunch.CoreWars
 			SetModel( "models/gameplay/base_core/base_core.vmdl" );
 
 			Effect = Particles.Create( "particles/gameplay/core/core_crystal/core_crystal.vpcf", this, "Core" );
+
+			Effect.SetPosition( 6, Team.GetColor() * 255f );
 			Transmit = TransmitType.Always;
 
 			SetupPhysicsFromAABB( PhysicsMotionType.Keyframed, Model.Bounds.Mins, Model.Bounds.Maxs );
@@ -128,6 +130,7 @@ namespace Facepunch.CoreWars
 		protected virtual void ClientTick()
 		{
 			RenderColor = Team.GetColor();
+
 		}
 	}
 }

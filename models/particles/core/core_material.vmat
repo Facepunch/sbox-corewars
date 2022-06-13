@@ -6,25 +6,25 @@ Layer0
 
 	//---- Color ----
 	g_flModelTintAmount "1.000"
-	g_vColorTint "[0.000000 1.000000 1.000000 1.000000]"
+	g_vColorTint "[1.000000 1.000000 1.000000 0.000000]"
 
 	//---- Core ----
-	g_flExponent "2.087"
+	g_flExponent "7.171"
 	g_flMaxThickness "1.000"
 	g_flMinThickness "0.500"
 	g_flRainbowBandMultiplier "0.107"
 	g_flRainbowColorMultiplier "32.000"
 	g_flRainbowSpeed "4.000"
 	g_flReflectance "0.000"
-	g_flRefractionScale "1.000"
+	g_flRefractionScale "5.003"
 
 	//---- Fade ----
 	g_flFadeExponent "1.000"
 
 	//---- Material ----
-	TextureColor "models/particles/core/space.png"
+	TextureColor "materials/default/default_color.tga"
 	TextureCurve "models/particles/core/core_curve.png"
-	TextureInteriorMap "materials/default/default_cube.pfm"
+	TextureInteriorMap "models/particles/core/space_sky.png"
 	TextureTintMask "materials/default/default.tga"
 
 	//---- Texture Coordinates ----

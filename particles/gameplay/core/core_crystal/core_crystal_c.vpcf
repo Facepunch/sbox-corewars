@@ -66,7 +66,7 @@
 			{
 				m_nType = "PF_TYPE_LITERAL"
 				m_nMapType = "PF_MAP_TYPE_DIRECT"
-				m_flLiteralValue = 5.0
+				m_flLiteralValue = 2.0
 				m_nControlPoint = 0
 				m_nScalarAttribute = 3
 				m_nVectorAttribute = 6
@@ -530,12 +530,10 @@
 		},
 		{
 			_class = "C_OP_SpinUpdate"
-			m_bDisableOperator = true
 		},
 		{
 			_class = "C_OP_Spin"
-			m_nSpinRateDegrees = 20
-			m_bDisableOperator = true
+			m_nSpinRateDegrees = 1
 		},
 	]
 	m_Renderers = 
