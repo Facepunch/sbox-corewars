@@ -50,6 +50,7 @@ PurchasableItem {
     .costs {
         position: absolute;
         justify-content: center;
+        pointer-events: none;
         align-items: center;
         display: flex;
         right: 8px;

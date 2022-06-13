@@ -5,7 +5,6 @@ using System.IO;
 namespace Facepunch.CoreWars
 {
 	[Library( "item_brew_stealth" )]
-	[Tag( "airdrop" )]
 	public class StealthBrewItem : BrewItem
 	{
 		public override string ConsumeEffect => "particles/gameplay/brews/stealth/stealth_brew.vpcf";
