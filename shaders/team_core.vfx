@@ -128,20 +128,19 @@ PS
     
     float g_flExponent< Default( 2.0f ); Range(0.0f, 16.0f); UiGroup( "Core,10/Fresnel,10/1" ); >;
     float g_flReflectance< Default( 0.0f ); Range(0.0f, 2.0f); UiGroup( "Core,10/Fresnel,10/2" ); >;
-    float2 g_vInteriorScale< Default2( 1.0f, 1.0f ); Range2(0.0f, 0.0f, 100.0f, 100.0f); UiGroup( "Core,10/Fresnel,10/2" ); >;
+    float g_flRefractionScale< Default(1.0f); Range(0.0f, 8.0f); UiGroup( "Core,10/Fresnel,10/3" ); >;
 
     float g_flRainbowSpeed< Default( 4.0f ); Range(0.0f, 32.0f); UiGroup( "Core,30/Rainbow,10/1" ); >;
     float g_flRainbowBandMultiplier< Default( 1.0f ); Range(0.0f, 32.0f); UiGroup( "Core,30/Rainbow,10/2" ); >;
     float g_flRainbowColorMultiplier< Default( 1.0f ); Range(0.0f, 32.0f); UiGroup( "Core,30/Rainbow,10/3" ); >;
+    float g_flCurveAmount< Default(0.503f); Range(0.0f, 1.0f); UiGroup( "Core,30/Rainbow,10/4" ); >;
 
-    float2 RadialCordinates( float3 vPosition )
-    {
-        float3 n = normalize(vPosition);
-        float longitude = atan2(n.y, n.x);
-        float lattitude = acos(n.z);
-        float2 sphereCoordinates = float2(longitude, lattitude) / 3.1415926f;
-        return float2((sphereCoordinates.x * 0.5f + 0.5f), 1.0f - sphereCoordinates.y);
-    }
+	CreateInputTextureCube( TextureInteriorMap, Linear, 8, "", "_cube", "Material,10/30", Default3( 0.5, 0.5, 0.5 ) );
+	CreateTextureCube( g_tCubeMap ) < Channel( RGB, Box( TextureInteriorMap ), Linear ); OutputFormat( RGBA16161616F ); SrgbRead( false ); >;
+	DECLARE_TEXTURE_DIM_VAR( g_tCubeMap );
+
+    CreateInputTexture2D( TextureCurve, Linear, 8, "", "_curve",  "Material,10/40", Default( 0.5 ) );
+    CreateTexture2DWithoutSampler( g_tCurve ) < Channel( R, Box( TextureCurve ), Linear ); OutputFormat( BC7 ); SrgbRead( false ); >;
 
 	//
 	// Main
@@ -153,19 +152,16 @@ PS
         float3 PositionWithOffsetWs = i.vPositionWithOffsetWs.xyz;
         float3 PositionWs = PositionWithOffsetWs + g_vCameraPositionWs;
 
-
+        float flCurve = Tex2DLevelS( g_tCurve, g_sBilinearWrap, i.vTextureCoords, 0 ).r * 2.0f - 1.0f;
 
         const float3 vRayOrigin = g_vCameraPositionWs;
         const float3 vRayDirection = CalculatePositionToCameraDirWs( g_vCameraPositionWs - i.vPositionWithOffsetWs ); 
 
         float fRefractionFresnel = CalculateNormalizedFresnel( g_flReflectance, g_flExponent, PositionWs, normalize( i.vNormalWs.xyz ) );
-        float2 vSphereUvs = RadialCordinates( vRayDirection * 1.0f ) * g_vInteriorScale;
-        float3 vTexColor = Tex2DLevelS( g_tColor, g_sBilinearWrap, vSphereUvs, 0 ).rgb;
-        
-
+        float3 vTexColor = TexCubeLevel( g_tCubeMap, normalize(vRayDirection + (i.vNormalWs * (flCurve * g_flRefractionScale))), 0 ).rgb;
         vColor.rgb = (fRefractionFresnel * i.vVertexColor) + ((1.0f - fRefractionFresnel) * vTexColor);
 
-        if( i.nIsOutline )
+        if( i.nIsOutline)
         {
             float3 UP = float3(0,0,-1);
             float zUpAmount = dot(PositionWithOffsetWs, UP) + (g_flTime * g_flRainbowSpeed);

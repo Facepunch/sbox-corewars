@@ -16,13 +16,15 @@ Layer0
 	g_flRainbowColorMultiplier "32.000"
 	g_flRainbowSpeed "4.000"
 	g_flReflectance "0.000"
-	g_vInteriorScale "[20.000 10.000]"
+	g_flRefractionScale "1.000"
 
 	//---- Fade ----
 	g_flFadeExponent "1.000"
 
 	//---- Material ----
 	TextureColor "models/particles/core/space.png"
+	TextureCurve "models/particles/core/core_curve.png"
+	TextureInteriorMap "materials/default/default_cube.pfm"
 	TextureTintMask "materials/default/default.tga"
 
 	//---- Texture Coordinates ----
