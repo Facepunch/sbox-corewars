@@ -910,7 +910,7 @@
 			{
 				m_nType = "PVEC_TYPE_LITERAL_COLOR"
 				m_vLiteralValue = [ 0.0, 0.0, 0.0 ]
-				m_LiteralColor = [ 255, 99, 71, 255 ]
+				m_LiteralColor = [ 0, 250, 154, 255 ]
 				m_nVectorAttribute = 6
 				m_vVectorAttributeScale = [ 1.0, 1.0, 1.0 ]
 				m_nControlPoint = 0
@@ -1252,7 +1252,7 @@
 			{
 				m_nType = "PVEC_TYPE_LITERAL_COLOR"
 				m_vLiteralValue = [ 0.0, 0.0, 0.0 ]
-				m_LiteralColor = [ 255, 99, 71, 255 ]
+				m_LiteralColor = [ 0, 255, 255, 255 ]
 				m_nVectorAttribute = 6
 				m_vVectorAttributeScale = [ 1.0, 1.0, 1.0 ]
 				m_nControlPoint = 0
@@ -1548,7 +1548,7 @@
 	m_Children = 
 	[
 		{
-			m_ChildRef = resource:"particles/weapons/fireball/fireball_explosion_d.vpcf"
+			m_ChildRef = resource:"particles/gameplay/core/core_crystal/core_break/core_crystal_base_ea.vpcf"
 		},
 	]
 }
