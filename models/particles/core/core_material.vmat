@@ -9,10 +9,10 @@ Layer0
 	g_vColorTint "[1.000000 1.000000 1.000000 0.000000]"
 
 	//---- Core ----
-	g_flExponent "7.171"
+	g_flExponent "3.500"
 	g_flMaxThickness "1.000"
 	g_flMinThickness "0.500"
-	g_flRainbowBandMultiplier "0.107"
+	g_flRainbowBandMultiplier "1.500"
 	g_flRainbowColorMultiplier "32.000"
 	g_flRainbowSpeed "4.000"
 	g_flReflectance "0.000"
