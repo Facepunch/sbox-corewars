@@ -63,8 +63,7 @@ namespace Facepunch.CoreWars
 		{
 			Game.AddValidTeam( Team );
 
-			EnableAllCollisions = true;
-			EnableDrawing = true;
+			CreateCoreEffect();
 			LifeState = LifeState.Alive;
 			InternalUpgrades.Clear();
 			UpgradeTypes.Clear();
@@ -93,7 +92,11 @@ namespace Facepunch.CoreWars
 
 		public override void ClientSpawn()
 		{
-			Effect = Particles.Create( "particles/gameplay/core/core_crystal/core_crystal.vpcf", this, "Core" );
+			if ( LifeState == LifeState.Alive )
+			{
+				CreateCoreEffect();
+			}
+			
 			base.ClientSpawn();
 		}
 
@@ -112,8 +115,7 @@ namespace Facepunch.CoreWars
 		{
 			Game.RemoveValidTeam( Team );
 
-			EnableAllCollisions = false;
-			EnableDrawing = false;
+			CreateDeathEffect();
 			LifeState = LifeState.Dead;
 		}
 
@@ -126,6 +128,21 @@ namespace Facepunch.CoreWars
 				var upgrade = TypeLibrary.Create<BaseTeamUpgrade>( index );
 				InternalUpgrades.Add( upgrade );
 			}
+		}
+
+		[ClientRpc]
+		protected void CreateCoreEffect()
+		{
+			Effect?.Destroy();
+			Effect = Particles.Create( "particles/gameplay/core/core_crystal/core_crystal.vpcf", this, "Core" );
+		}
+
+		[ClientRpc]
+		protected void CreateDeathEffect()
+		{
+			Effect?.Destroy();
+			Effect = Particles.Create( "particles/gameplay/core/core_crystal/core_crystal.vpcf", this, "Core" );
+			Effect.SetPosition( 6, Team.GetColor() * 255f );
 		}
 
 		protected override void OnDestroy()
