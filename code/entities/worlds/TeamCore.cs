@@ -14,11 +14,13 @@ namespace Facepunch.CoreWars
 	public partial class TeamCore : ModelEntity, ISourceEntity, IResettable
 	{
 		[EditorProperty, Net] public Team Team { get; set; }
+		[Net] public float MaxHealth { get; private set; } = 200f;
 
 		[Net, Change( nameof( OnUpgradeTypesChanged ) )] protected List<int> UpgradeTypes { get; set; } = new();
 		protected List<BaseTeamUpgrade> InternalUpgrades { get; set; } = new();
 		public IReadOnlyList<BaseTeamUpgrade> Upgrades => InternalUpgrades;
 
+		private TimeUntil NextAutoHeal { get; set; }
 		private Particles Effect { get; set; }
 
 		public T FindUpgrade<T>() where T : BaseTeamUpgrade
@@ -74,7 +76,7 @@ namespace Facepunch.CoreWars
 			LifeState = LifeState.Alive;
 			InternalUpgrades.Clear();
 			UpgradeTypes.Clear();
-			Health = 100f;
+			Health = MaxHealth;
 		}
 
 		public virtual void Serialize( BinaryWriter writer )
@@ -109,11 +111,16 @@ namespace Facepunch.CoreWars
 
 		public override void TakeDamage( DamageInfo info )
 		{
+			if ( LifeState == LifeState.Dead )
+				return;
+
 			if ( !info.Attacker.IsValid() || info.Attacker is not Player attacker )
 				return;
 
-			if ( attacker.Team == Team )
+			if ( !Game.FriendlyFire && attacker.Team == Team )
 				return;
+
+			PlaySound( "core.hit" );
 
 			base.TakeDamage( info );
 		}
@@ -163,6 +170,16 @@ namespace Facepunch.CoreWars
 		{
 			Effect?.Destroy();
 			base.OnDestroy();
+		}
+
+		[Event.Tick.Server]
+		protected virtual void ServerTick()
+		{
+			if ( LifeState == LifeState.Alive && NextAutoHeal )
+			{
+				NextAutoHeal = 0.5f;
+				Health = Math.Min( Health + 1f, MaxHealth );
+			}
 		}
 
 		[Event.Tick.Client]
