@@ -3,17 +3,17 @@
 	data = 
 	{
 		UI = false
-		Volume = 0.05
+		Volume = 0.4
 		VolumeRandom = 0
-		Pitch = 0.8
+		Pitch = 1
 		PitchRandom = 0.1
-		Decibels = 50
+		Decibels = 80
 		Sounds = 
 		[
-			resource:"sound/item.dropped.vsnd",
+			resource:"sound/brew.activate.vsnd",
 		]
 		SelectionMode = 3
-		MaximumDistance = 599.31305
-		MinimumDistance = 29.965652
+		MaximumDistance = 1484.3214
+		MinimumDistance = 74.21607
 	}
 }
