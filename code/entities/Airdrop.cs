@@ -126,22 +126,19 @@ namespace Facepunch.CoreWars
 		[Event.Tick.Server]
 		protected virtual void ServerTick()
 		{
-			if ( HasLanded )
-			{
-				if ( TimeUntilDestroy )
-				{
-					Delete();
-				}
-
-				return;
-			}
-
 			var velocity = Vector3.Down * 300f * Time.Delta;
 			var trace = Trace.Sweep( PhysicsBody, Transform, Transform.WithPosition( Position + velocity ) )
 				.Ignore( this )
 				.Run();
 
 			Position = trace.EndPosition;
+
+			if ( HasLanded )
+			{
+				if ( TimeUntilDestroy ) Delete();
+				return;
+			}
+
 			HasLanded = trace.Hit;
 
 			if ( !HasLanded && !HasPlayedLandSound )
@@ -149,7 +146,7 @@ namespace Facepunch.CoreWars
 				var ticksPerSecond = (1f / Time.Delta);
 
 				// Let's check if we're going to land shortly.
-				trace = Trace.Sweep( PhysicsBody, Transform, Transform.WithPosition( Position + velocity * (ticksPerSecond * 0.8f) ) )
+				trace = Trace.Sweep( PhysicsBody, Transform, Transform.WithPosition( Position + velocity * (ticksPerSecond * 0.85f) ) )
 					.Ignore( this )
 					.Run();
 
