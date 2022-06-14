@@ -148,6 +148,8 @@ namespace Facepunch.CoreWars
 			if ( !Game.FriendlyFire && attacker.Team == Team )
 				return;
 
+			FloatingDamage.Show( this, info.Damage, info.Position );
+
 			PlaySound( "core.hit" );
 
 			base.TakeDamage( info );

@@ -742,6 +742,8 @@ namespace Facepunch.CoreWars
 
 				var hitboxGroup = GetHitboxGroup( info.HitboxIndex );
 				attacker.ShowHitMarker( To.Single( attacker ), hitboxGroup );
+
+				FloatingDamage.Show( this, info.Damage, info.Position );
 			}
 
 			LastDamageTaken = info;
