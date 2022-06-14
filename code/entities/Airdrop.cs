@@ -35,11 +35,15 @@ namespace Facepunch.CoreWars
 		}
 
 		[Net] public RealTimeUntil TimeUntilDestroy { get; private set; }
+		[Net] public bool HasLanded { get; private set; }
 
 		public float TimeToLiveFor { get; private set; } = 180f;
 		public List<BaseShopItem> Items { get; private set; } = new();
 		public float MaxUseDistance => 300f;
-		public bool HasLanded { get; private set; }
+
+		private bool HasPlayedLandSound { get; set; }
+		private Sound FallingSound { get; set; }
+		private Particles Effect { get; set; }
 
 		public bool IsUsable( Player player )
 		{
@@ -53,6 +57,8 @@ namespace Facepunch.CoreWars
 
 		public virtual void RenderHud( Vector2 screenSize )
 		{
+			if ( !HasLanded ) return;
+
 			var draw = Render.Draw2D;
 			var position = (WorldSpaceBounds.Center + Vector3.Up * 96f).ToScreen();
 			var iconSize = 64f;
@@ -97,6 +103,11 @@ namespace Facepunch.CoreWars
 			Transmit = TransmitType.Always;
 			AddAllItems();
 
+			Effect = Particles.Create( "particles/gameplay/air_drop/air_drop.vpcf", this );
+			Effect.SetEntity( 0, this );
+
+			FallingSound = PlaySound( "airdrop.falling" );
+
 			base.Spawn();
 		}
 
@@ -104,6 +115,12 @@ namespace Facepunch.CoreWars
 		{
 			AddAllItems();
 			base.ClientSpawn();
+		}
+
+		protected override void OnDestroy()
+		{
+			Effect?.Destroy();
+			base.OnDestroy();
 		}
 
 		[Event.Tick.Server]
@@ -120,14 +137,35 @@ namespace Facepunch.CoreWars
 			}
 
 			var velocity = Vector3.Down * 300f * Time.Delta;
-			var position = Position + velocity;
-			var trace = Trace.Sweep( PhysicsBody, Transform, Transform.WithPosition( position ) )
+			var trace = Trace.Sweep( PhysicsBody, Transform, Transform.WithPosition( Position + velocity ) )
 				.Ignore( this )
 				.Run();
 
-			TimeUntilDestroy = TimeToLiveFor;
 			Position = trace.EndPosition;
 			HasLanded = trace.Hit;
+
+			if ( !HasLanded && !HasPlayedLandSound )
+			{
+				var ticksPerSecond = (1f / Time.Delta);
+
+				// Let's check if we're going to land shortly.
+				trace = Trace.Sweep( PhysicsBody, Transform, Transform.WithPosition( Position + velocity * (ticksPerSecond * 0.8f) ) )
+					.Ignore( this )
+					.Run();
+
+				if ( trace.Hit )
+				{
+					HasPlayedLandSound = true;
+					PlaySound( "airdrop.land" );
+				}
+			}
+
+			if ( HasLanded )
+			{
+				TimeUntilDestroy = TimeToLiveFor;
+				FallingSound.Stop();
+				Effect?.Destroy();
+			}
 		}
 
 		private void AddAllItems()
