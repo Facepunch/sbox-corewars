@@ -18,8 +18,8 @@ namespace Facepunch.CoreWars
 	{
 		public override WeaponConfig Config => new CrossbowConfig();
 		public override string[] KillFeedReasons => new[] { "shot", "blasted" };
-		public override string ImpactEffect => "particles/weapons/crossbow/crossbow_impact.vpcf";
-		public override string TrailEffect => "particles/weapons/crossbow/crossbow_trail.vpcf";
+		public override string ImpactEffect => GetImpactEffect();
+		public override string TrailEffect => GetTrailEffect();
 		public override string ViewModelPath => "weapons/rust_crossbow/v_rust_crossbow.vmdl";
 		public override int ViewModelMaterialGroup => 1;
 		public override string MuzzleFlashEffect => null;
@@ -102,6 +102,26 @@ namespace Facepunch.CoreWars
 					victim.PlaySound( "melee.hitflesh" );
 				}
 			}
+		}
+
+		private string GetTrailEffect()
+		{
+			if ( WeaponItem.IsValid() && WeaponItem.Tier == 2 )
+			{
+				return "particles/weapons/crossbow/tier2/crossbow_trail_2.vpcf";
+			}
+
+			return "particles/weapons/crossbow/crossbow_trail.vpcf";
+		}
+
+		private string GetImpactEffect()
+		{
+			if ( WeaponItem.IsValid() && WeaponItem.Tier == 2 )
+			{
+				return "particles/weapons/crossbow/tier2/crossbow_impact_2.vpcf";
+			}
+
+			return "particles/weapons/crossbow/crossbow_impact.vpcf";
 		}
 	}
 }
