@@ -13,6 +13,9 @@ namespace Facepunch.CoreWars
 	[Category( "Generators" )]
 	public class CrystalGenerator : BaseGenerator, ISourceEntity
 	{
+		protected override string HudIconPath => "textures/items/crystal.png";
+		protected override bool ShowHudIcon => true;
+
 		private Particles Effect { get; set; }
 
 		public override void Spawn()

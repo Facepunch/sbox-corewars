@@ -1,5 +1,6 @@
 ﻿using Facepunch.CoreWars.Editor;
 using Facepunch.CoreWars.Inventory;
+using Facepunch.CoreWars.Utility;
 using Facepunch.Voxels;
 using Sandbox;
 using System;
@@ -8,13 +9,18 @@ using System.Linq;
 
 namespace Facepunch.CoreWars
 {
-	public partial class BaseGenerator : ModelEntity, ISourceEntity, IResettable
+	public partial class BaseGenerator : ModelEntity, ISourceEntity, IResettable, IHudRenderer
 	{
-		private TimeUntil NextGenerateTime { get; set; }
+		protected virtual string HudIconPath => null;
+		protected virtual bool ShowHudIcon => false;
+
+		[Net] public RealTimeUntil NextGenerateTime { get; protected set; }
+		[Net] public float NextGenerateDuration { get; protected set; }
 
 		public virtual void Reset()
 		{
-			NextGenerateTime = GetNextGenerateTime();
+			NextGenerateDuration = GetNextGenerateTime();
+			NextGenerateTime = NextGenerateDuration;
 		}
 
 		public virtual void Serialize( BinaryWriter writer )
@@ -25,6 +31,47 @@ namespace Facepunch.CoreWars
 		public virtual void Deserialize( BinaryReader reader )
 		{
 
+		}
+
+		public virtual void RenderHud( Vector2 screenSize )
+		{
+			if ( !ShowHudIcon || string.IsNullOrEmpty( HudIconPath ) )
+				return;
+
+			var draw = Render.Draw2D;
+			var position = (WorldSpaceBounds.Center + Vector3.Up * 96f).ToScreen();
+			var iconSize = 32f;
+			var iconAlpha = 1f;
+
+			position.x *= screenSize.x;
+			position.y *= screenSize.y;
+			position.x -= iconSize * 0.5f;
+			position.y -= iconSize * 0.5f;
+
+			var distanceToPawn = Local.Pawn.Position.Distance( Position );
+
+			if ( distanceToPawn <= 1024f )
+			{
+				iconAlpha = distanceToPawn.Remap( 512f, 1024, 0f, 1f );
+			}
+
+			draw.Color = Color.White.WithAlpha( iconAlpha );
+			draw.BlendMode = BlendMode.Normal;
+			draw.Image( HudIconPath, new Rect( position.x, position.y, iconSize, iconSize ) );
+
+			var outerBox = new Rect( position.x, position.y + iconSize + 8f, iconSize, 8f );
+			var innerBox = outerBox.Shrink( 2f, 2f, 2f, 2f );
+			var fraction = (1f / NextGenerateDuration) * NextGenerateTime;
+
+			innerBox.width *= fraction;
+
+			var innerColor = Color.Lerp( Color.Green, Color.Red, fraction );
+
+			draw.Color = Color.Black.WithAlpha( iconAlpha );
+			draw.Box( outerBox, new Vector4( 2f, 2f, 2f, 2f ) );
+
+			draw.Color = innerColor.WithAlpha( iconAlpha * 0.7f );
+			draw.Box( innerBox );
 		}
 
 		protected void Generate<T>( int stackSize ) where T : ResourceItem
@@ -56,7 +103,8 @@ namespace Facepunch.CoreWars
 			if ( NextGenerateTime )
 			{
 				GenerateItems();
-				NextGenerateTime = GetNextGenerateTime();
+				NextGenerateDuration = GetNextGenerateTime();
+				NextGenerateTime = NextGenerateDuration;
 			}
 
 			OnGeneratorTick();

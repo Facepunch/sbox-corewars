@@ -34,6 +34,9 @@ namespace Facepunch.CoreWars
 			return false;
 		}
 
+		[Net] public RealTimeUntil TimeUntilDestroy { get; private set; }
+
+		public float TimeToLiveFor { get; private set; } = 180f;
 		public List<BaseShopItem> Items { get; private set; } = new();
 		public float MaxUseDistance => 300f;
 		public bool HasLanded { get; private set; }
@@ -51,7 +54,7 @@ namespace Facepunch.CoreWars
 		public virtual void RenderHud( Vector2 screenSize )
 		{
 			var draw = Render.Draw2D;
-			var position = WorldSpaceBounds.Center.ToScreen();
+			var position = (WorldSpaceBounds.Center + Vector3.Up * 96f).ToScreen();
 			var iconSize = 64f;
 			var iconAlpha = 1f;
 
@@ -64,12 +67,26 @@ namespace Facepunch.CoreWars
 
 			if ( distanceToPawn <= 800f )
 			{
-				iconAlpha = distanceToPawn.Remap( 300f, 800f, 0f, 1f );
+				iconAlpha = distanceToPawn.Remap( 512f, 1024, 0f, 1f );
 			}
 
 			draw.Color = Color.White.WithAlpha( iconAlpha );
 			draw.BlendMode = BlendMode.Normal;
 			draw.Image( "textures/ui/airdrop.png", new Rect( position.x, position.y, iconSize, iconSize ) );
+
+			var outerBox = new Rect( position.x, position.y + iconSize + 16f, iconSize, 16f );
+			var innerBox = outerBox.Shrink( 4f, 4f, 4f, 4f );
+			var fraction = (1f / TimeToLiveFor) * TimeUntilDestroy;
+
+			innerBox.width *= fraction;
+
+			var innerColor = Color.Lerp( Color.Red, Color.Green, fraction );
+
+			draw.Color = Color.Black.WithAlpha( iconAlpha );
+			draw.Box( outerBox, new Vector4( 4f, 4f, 4f, 4f ) );
+
+			draw.Color = innerColor.WithAlpha( iconAlpha * 0.7f );
+			draw.Box( innerBox );
 		}
 
 		public override void Spawn()
@@ -92,7 +109,15 @@ namespace Facepunch.CoreWars
 		[Event.Tick.Server]
 		protected virtual void ServerTick()
 		{
-			if ( HasLanded ) return;
+			if ( HasLanded )
+			{
+				if ( TimeUntilDestroy )
+				{
+					Delete();
+				}
+
+				return;
+			}
 
 			var velocity = Vector3.Down * 300f * Time.Delta;
 			var position = Position + velocity;
@@ -100,6 +125,7 @@ namespace Facepunch.CoreWars
 				.Ignore( this )
 				.Run();
 
+			TimeUntilDestroy = TimeToLiveFor;
 			Position = trace.EndPosition;
 			HasLanded = trace.Hit;
 		}

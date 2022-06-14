@@ -1,4 +1,5 @@
 ﻿using Facepunch.CoreWars.Editor;
+using Facepunch.CoreWars.Utility;
 using System.Collections.Generic;
 using Facepunch.Voxels;
 using Sandbox;
@@ -11,7 +12,7 @@ namespace Facepunch.CoreWars
 {
 	[EditorEntity( Title = "Team Core", EditorModel = "models/gameplay/base_core/base_core.vmdl" )]
 	[Category( "Team Entities" )]
-	public partial class TeamCore : ModelEntity, ISourceEntity, IResettable
+	public partial class TeamCore : ModelEntity, ISourceEntity, IResettable, IHudRenderer
 	{
 		[EditorProperty, Net] public Team Team { get; set; }
 		[Net] public float MaxHealth { get; private set; } = 200f;
@@ -87,6 +88,33 @@ namespace Facepunch.CoreWars
 		public virtual void Deserialize( BinaryReader reader )
 		{
 			Team = (Team)reader.ReadByte();
+		}
+
+		public virtual void RenderHud( Vector2 screenSize )
+		{
+			if ( Local.Pawn is not Player player || player.Team != Team )
+				return;
+
+			var draw = Render.Draw2D;
+			var position = (WorldSpaceBounds.Center + Vector3.Up * 96f).ToScreen();
+			var iconSize = 64f;
+			var iconAlpha = 1f;
+
+			position.x *= screenSize.x;
+			position.y *= screenSize.y;
+			position.x -= iconSize * 0.5f;
+			position.y -= iconSize * 0.5f;
+
+			var distanceToPawn = Local.Pawn.Position.Distance( Position );
+
+			if ( distanceToPawn <= 1024f )
+			{
+				iconAlpha = distanceToPawn.Remap( 512f, 1024, 0f, 1f );
+			}
+
+			draw.Color = Color.White.WithAlpha( iconAlpha );
+			draw.BlendMode = BlendMode.Normal;
+			draw.Image( "textures/ui/logo_spinner.png", new Rect( position.x, position.y, iconSize, iconSize ) );
 		}
 
 		public override void Spawn()

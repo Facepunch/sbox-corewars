@@ -13,6 +13,9 @@ namespace Facepunch.CoreWars
 	[Category( "Generators" )]
 	public class GoldGenerator : BaseGenerator
 	{
+		protected override string HudIconPath => "textures/items/gold.png";
+		protected override bool ShowHudIcon => true;
+
 		private Particles Effect { get; set; }
 
 		public override void Spawn()
