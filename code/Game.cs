@@ -248,6 +248,14 @@ namespace Facepunch.CoreWars
 			using ( Render.Draw2D.MatrixScope( matrix ) )
 			{
 				pawn.RenderHud( screenSize );
+
+				foreach ( var entity in All.OfType<IHudRenderer>() )
+				{
+					if ( entity.IsValid() )
+					{
+						entity.RenderHud( screenSize );
+					}
+				}
 			}
 		}
 
