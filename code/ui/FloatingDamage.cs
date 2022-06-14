@@ -15,7 +15,7 @@ namespace Facepunch.CoreWars
 			// Don't show damage that happened to us.
 			if ( entity.IsLocalPawn ) return;
 
-			var panel = FloatingDamage.Rent();
+			var panel = Rent();
 
 			panel.SetLifeTime( Rand.Float( 2f, 3f ) );
 			panel.SetDamage( damage );
