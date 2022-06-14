@@ -9,7 +9,6 @@ namespace Facepunch.CoreWars.Utility
 		/// </summary>
 		public static void Image( this Sandbox.Render.Render2D self, string texture, Rect rect )
 		{
-			self.Material = null;
 			self.Texture = Texture.Load( FileSystem.Mounted, texture );
 			self.Quad( rect.TopLeft, rect.TopRight, rect.BottomRight, rect.BottomLeft );
 		}
