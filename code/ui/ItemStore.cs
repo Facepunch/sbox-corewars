@@ -45,6 +45,8 @@ namespace Facepunch.CoreWars
 
 			ItemContainer.DeleteChildren( true );
 
+			npc.Items.Sort( ( a, b ) => a.SortOrder.CompareTo( b.SortOrder ) );
+
 			foreach ( var item in npc.Items )
 			{
 				var panel = ItemContainer.AddChild<PurchasableItem>( "item" );

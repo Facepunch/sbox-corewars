@@ -17,6 +17,7 @@ namespace Facepunch.CoreWars
 
 		public bool CanAfford( Player player );
 		public string GetIcon( Player player );
+		public bool IsLocked( Player player );
 		public bool CanPurchase( Player player );
 		public void OnPurchased( Player player );
 	}

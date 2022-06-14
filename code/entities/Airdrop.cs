@@ -159,6 +159,9 @@ namespace Facepunch.CoreWars
 
 			if ( HasLanded )
 			{
+				var landFx = Particles.Create( "particles/gameplay/air_drop/air_drop_land/air_drop_land.vpcf", this );
+				landFx.SetEntity( 0, this );
+
 				TimeUntilDestroy = TimeToLiveFor;
 				FallingSound.Stop();
 				Effect?.Destroy();

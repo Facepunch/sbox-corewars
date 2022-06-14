@@ -37,6 +37,13 @@ namespace Facepunch.CoreWars
 			return string.Empty;
 		}
 
+		public virtual bool IsLocked( Player player )
+		{
+			var core = player.Team.GetCore();
+			if ( !core.IsValid() ) return false;
+			return false;
+		}
+
 		public virtual bool CanPurchase( Player player )
 		{
 			var core = player.Team.GetCore();

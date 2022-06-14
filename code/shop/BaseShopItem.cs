@@ -14,6 +14,7 @@ namespace Facepunch.CoreWars
 		public virtual string Name => string.Empty;
 		public virtual Dictionary<Type, int> Costs => new();
 		public virtual Color Color => Color.White;
+		public virtual int SortOrder => 1;
 		public virtual int Quantity => 1;
 
 		public virtual bool CanAfford( Player player )
@@ -29,6 +30,20 @@ namespace Facepunch.CoreWars
 			return true;
 		}
 
+		public virtual bool IsLocked( Player player )
+		{
+			var core = player.Team.GetCore();
+			if ( !core.IsValid() ) return false;
+
+			if ( RequiredUpgradeType != null )
+			{
+				if ( !core.HasUpgrade( RequiredUpgradeType ) )
+					return true;
+			}
+
+			return false;
+		}
+
 		public virtual string GetIcon( Player player )
 		{
 			return string.Empty;
@@ -38,12 +53,6 @@ namespace Facepunch.CoreWars
 		{
 			var core = player.Team.GetCore();
 			if ( !core.IsValid() ) return false;
-
-			if ( RequiredUpgradeType != null )
-			{
-				if ( !core.HasUpgrade( RequiredUpgradeType ) )
-					return false;
-			}
 
 			return true;
 		}

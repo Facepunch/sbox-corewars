@@ -13,6 +13,7 @@ namespace Facepunch.CoreWars
 	{
 		public override string Name => GetBlockType( Local.Pawn as Player ).FriendlyName;
 		public override string Description => GetBlockType( Local.Pawn as Player ).Description;
+		public override int SortOrder => 2;
 
 		public virtual BlockType GetBlockType( Player player )
 		{
