@@ -28,7 +28,7 @@ namespace Facepunch.CoreWars
 
 		public override void ClientSpawn()
 		{
-			Effect = Particles.Create( "particles/gameplay/vortex_bomb/vortex_bomb.vpcf", this );
+			Effect = Particles.Create( "particles/gameplay/vortex_bomb/vortex_bomb_base.vpcf", this );
 			Effect.SetEntity( 0, this );
 
 			Sound = PlaySound( "vortexbomb.loop" );
