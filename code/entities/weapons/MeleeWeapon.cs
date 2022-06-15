@@ -40,7 +40,7 @@ namespace Facepunch.CoreWars
 			TimeSincePrimaryAttack = 0;
 			TimeSinceSecondaryAttack = 0;
 
-			player.ReduceStamina( StaminaLossPerSwing )
+			player.ReduceStamina( StaminaLossPerSwing );
 		}
 
 		public override void CreateViewModel()
