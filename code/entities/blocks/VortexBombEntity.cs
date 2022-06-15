@@ -31,7 +31,7 @@ namespace Facepunch.CoreWars
 			Effect = Particles.Create( "particles/gameplay/vortex_bomb/vortex_bomb.vpcf", this );
 			Effect.SetEntity( 0, this );
 
-			Sound = PlaySound( "explosives.tick" );
+			Sound = PlaySound( "vortexbomb.loop" );
 
 			UpdateEffect();
 
@@ -41,7 +41,6 @@ namespace Facepunch.CoreWars
 		[Event.Tick.Client]
 		protected virtual void UpdateEffect()
 		{
-			Log.Info( TimeUntilExplode / 4f );
 			Effect?.SetPosition( 10, new Vector3( TimeUntilExplode / 4f, 0f, 0f ) );
 			Effect?.SetPosition( 11, new Vector3( TimeUntilExplode / 4f, 0f, 0f ) );
 		}

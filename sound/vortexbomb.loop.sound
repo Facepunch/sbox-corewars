@@ -6,12 +6,14 @@
 		Volume = 1
 		VolumeRandom = 0
 		Pitch = 1
-		PitchRandom = 0.1
-		DistanceMax = 1024
+		PitchRandom = 0
+		Decibels = 90
 		Sounds = 
 		[
-			resource:"sound/explosives.tick.vsnd",
+			resource:"sound/vortexbomb.loop.vsnd",
 		]
 		SelectionMode = 3
+		MaximumDistance = 1870.0942
+		MinimumDistance = 93.504715
 	}
 }
