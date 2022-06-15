@@ -42,7 +42,7 @@ namespace Facepunch.CoreWars
 		public override void Spawn()
 		{
 			base.Spawn();
-			SetModel( "models/weapons/w_portal_grenade.vmdl" );
+			SetModel( "models/weapons/w_portal.vmdl" );
 		}
 
 		public override void AttackPrimary()

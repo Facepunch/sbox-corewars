@@ -7,9 +7,8 @@ using Facepunch.CoreWars.Blocks;
 namespace Facepunch.CoreWars
 {
 	[Library]
-	public class VortexBombShopItem : BaseBlockShopItem
+	public class VortexBombShopItem : BaseWeaponShopItem<VortexBombItem>
 	{
-		public override Color Color => ColorPalette.Abilities;
 		public override int SortOrder => 3;
 
 		public override Dictionary<Type, int> Costs => new()
@@ -17,10 +16,5 @@ namespace Facepunch.CoreWars
 			[typeof( IronItem )] = 40
 		};
 		public override int Quantity => 1;
-
-		public override BlockType GetBlockType( Player player )
-		{
-			return VoxelWorld.Current.GetBlockType<VortexBombBlock>();
-		}
 	}
 }
