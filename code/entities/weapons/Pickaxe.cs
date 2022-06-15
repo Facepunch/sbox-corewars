@@ -49,6 +49,31 @@ namespace Facepunch.CoreWars
 			TimeSinceSecondaryAttack = 0;
 		}
 
+		public override void CreateViewModel()
+		{
+			Host.AssertClient();
+
+			if ( WeaponItem.IsValid() )
+			{
+				if ( !string.IsNullOrEmpty( WeaponItem.ViewModelPath ) )
+				{
+					ViewModelEntity = new ViewModel
+					{
+						EnableViewmodelRendering = true,
+						Position = Position,
+						Owner = Owner
+					};
+
+					ViewModelEntity.SetModel( WeaponItem.ViewModelPath );
+					ViewModelEntity.SetMaterialGroup( WeaponItem.ViewModelMaterialGroup );
+
+					return;
+				}
+			}
+
+			base.CreateViewModel();
+		}
+
 		public override void SimulateAnimator( PawnAnimator anim )
 		{
 			anim.SetAnimParameter( "holdtype", 5 );
@@ -59,6 +84,17 @@ namespace Facepunch.CoreWars
 				ViewModelEntity?.SetAnimParameter( "b_grounded", Owner.GroundEntity.IsValid() );
 				ViewModelEntity?.SetAnimParameter( "aim_pitch", Owner.EyeRotation.Pitch() );
 			}
+		}
+
+		protected override void OnWeaponItemChanged()
+		{
+			if ( IsServer && WeaponItem.IsValid() && !string.IsNullOrEmpty( WeaponItem.WorldModelPath ) )
+			{
+				SetModel( WeaponItem.WorldModelPath );
+				SetMaterialGroup( WeaponItem.WorldModelMaterialGroup );
+			}
+
+			base.OnWeaponItemChanged();
 		}
 
 		protected override void ShootEffects()

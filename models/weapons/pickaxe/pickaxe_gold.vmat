@@ -4,15 +4,18 @@ Layer0
 {
 	shader "complex.vfx"
 
+	//---- PBR ----
+	F_SPECULAR 1
+
 	//---- Ambient Occlusion ----
 	g_flAmbientOcclusionDirectDiffuse "0.000"
 	g_flAmbientOcclusionDirectSpecular "0.000"
-	TextureAmbientOcclusion "materials/default/default_ao.tga"
+	TextureAmbientOcclusion "models/weapons/pickaxe/pickaxe_ao.tga"
 
 	//---- Color ----
 	g_flModelTintAmount "1.000"
 	g_vColorTint "[1.000000 1.000000 1.000000 0.000000]"
-	TextureColor "models/weapons/sword/sword_color.png"
+	TextureColor "models/weapons/pickaxe/pickaxe_gold_color.tga"
 
 	//---- Fade ----
 	g_flFadeExponent "1.000"
@@ -28,10 +31,10 @@ Layer0
 	g_flMetalness "0.000"
 
 	//---- Normal ----
-	TextureNormal "models/weapons/sword/sword_normal.png"
+	TextureNormal "models/weapons/pickaxe/pickaxe_normal.tga"
 
 	//---- Roughness ----
-	TextureRoughness "models/weapons/sword/swords_rough.png"
+	TextureRoughness "models/weapons/pickaxe/pickaxe_rough.tga"
 
 	//---- Texture Coordinates ----
 	g_nScaleTexCoordUByModelScaleAxis "0"

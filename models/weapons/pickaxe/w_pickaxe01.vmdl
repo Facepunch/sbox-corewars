@@ -23,12 +23,23 @@
 					},
 					{
 						_class = "MaterialGroup"
+						name = "gold"
+						remaps = 
+						[
+							{
+								from = "models/weapons/pickaxe/pickaxe.vmat"
+								to = "models/weapons/pickaxe/pickaxe_gold.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
 						name = "crystal"
 						remaps = 
 						[
 							{
-								from = "pickaxe.vmat"
-								to = "models/weapons/pickaxe/pickaxe.vmat"
+								from = "models/weapons/pickaxe/pickaxe.vmat"
+								to = "models/weapons/pickaxe/pickaxe_crystal.vmat"
 							},
 						]
 					},

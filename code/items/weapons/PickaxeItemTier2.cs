@@ -8,6 +8,10 @@ namespace Facepunch.CoreWars
 	public class PickaxeItemTier2 : WeaponItem
 	{
 		public override string WeaponName => "weapon_pickaxe";
+		public override int WorldModelMaterialGroup => 1;
+		public override int ViewModelMaterialGroup => 1;
+		public override string WorldModelPath => "models/weapons/pickaxe/w_pickaxe01.vmdl";
+		public override string ViewModelPath => "models/weapons/pickaxe/v_pickaxe01.vmdl";
 		public override string Description => "A medium pickaxe for breaking defensive blocks.";
 		public override Color Color => ColorPalette.Tools;
 		public override string Icon => "textures/items/weapon_pickaxe_2.png";
