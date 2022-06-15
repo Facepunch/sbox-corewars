@@ -2,8 +2,8 @@
 
 InventorySlot {
     transition: all 0.1s ease-in;
-    background-color: $box-bg;
     border: 2px solid $box-border;
+    background: linear-gradient(rgba(#000000, 0.7), rgba($box-bg, 0.7));
     justify-content: center;
     align-items: center;
     width: 80px;

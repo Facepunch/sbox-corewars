@@ -1,7 +1,8 @@
-﻿using Sandbox;
+﻿using Facepunch.CoreWars.Utility;
+using Sandbox;
 using Sandbox.UI;
-using System;
 using Sandbox.UI.Construct;
+using System;
 
 namespace Facepunch.CoreWars
 {
@@ -60,6 +61,11 @@ namespace Facepunch.CoreWars
 					else
 						Icon.Style.BackgroundImage = null;
 				}
+
+				if ( item.Color == Color.White )
+					Style.SetLinearGradientBackground( Color.Black, 0.5f, new Color( 0.2f ), 0.5f );
+				else
+					Style.SetLinearGradientBackground( item.Color, 0.5f, new Color( 0.2f ), 0.5f );
 
 				Style.BorderColor = Item.Color.WithAlpha( 0.6f );
 			}

@@ -32,7 +32,6 @@ PurchasableItem {
 
     &:hover {
         transition: all 0.1s ease-out;
-        background: linear-gradient(rgba($red, 0.5), rgba($box-bg, 0.5));
         box-shadow: 0 4px 0 rgba(0, 0, 0, 0.7);
         border-color: $red;
         transform: translateY(-5px);
@@ -42,11 +41,7 @@ PurchasableItem {
     &.disabled {
         background-color: rgba( 50 0 0 0.6 );
         border: 2px solid rgba( 0 0 0 0.6 );
-        opacity: 0.4;
-
-        .icon {
-            opacity: 0.4;
-        }
+        opacity: 0.2;
     }
 
     &.hidden {

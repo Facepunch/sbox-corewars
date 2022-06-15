@@ -1,4 +1,5 @@
 ﻿using Facepunch.CoreWars.Inventory;
+using Facepunch.CoreWars.Utility;
 using Facepunch.Voxels;
 using Sandbox;
 using Sandbox.UI;
@@ -43,6 +44,9 @@ namespace Facepunch.CoreWars
 				else
 					Icon.Style.BackgroundImage = null;
 
+				Style.SetLinearGradientBackground( Color.Black, 0.5f, new Color( 0.2f ), 0.5f );
+				Style.BorderColor = null;
+
 				SetClass( "is-empty", true );
 
 				return;
@@ -57,6 +61,13 @@ namespace Facepunch.CoreWars
 
 			SlotPanel.SetClass( "hidden", DisplaySlot <= 0 );
 			SlotLabel.Text = DisplaySlot.ToString();
+
+			if ( item.Color == Color.White )
+				Style.SetLinearGradientBackground( Color.Black, 0.5f, new Color( 0.2f ), 0.5f );
+			else
+				Style.SetLinearGradientBackground( item.Color, 0.5f, new Color( 0.2f ), 0.5f );
+
+			Style.BorderColor = Item.Color.WithAlpha( 0.6f );
 
 			SetClass( "is-empty", false );
 		}
