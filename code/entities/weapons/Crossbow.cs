@@ -81,7 +81,7 @@ namespace Facepunch.CoreWars
 			return Transform.PointToWorld( LocalPosition + LocalRotation.Right * 32f );
 		}
 
-		protected override void OnProjectileHit( BulletDropProjectile projectile, TraceResult trace )
+		protected override void OnProjectileHit( CrossbowBoltProjectile projectile, TraceResult trace )
 		{
 			if ( IsServer && trace.Entity is Player victim )
 			{

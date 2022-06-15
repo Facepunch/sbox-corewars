@@ -15,27 +15,13 @@ namespace Facepunch.CoreWars
 	}
 
 	[Library( "weapon_portal" )]
-	partial class Portal : BulletDropWeapon<BulletDropProjectile>
+	partial class Portal : Throwable<BulletDropProjectile>
 	{
 		public override WeaponConfig Config => new PortalConfig();
-		public override string ImpactEffect => null;
 		public override string TrailEffect => "particles/weapons/portal_grenade/portal_grenade_trail/portal_grenade_trail.vpcf";
-		public override string ViewModelPath => "models/weapons/v_portal.vmdl";
-		public override int ViewModelMaterialGroup => 1;
-		public override string MuzzleFlashEffect => null;
+		public override string ThrowSound => "portal.launch";
 		public override string HitSound => null;
 		public override DamageFlags DamageType => DamageFlags.Blast;
-		public override float PrimaryRate => 1f;
-		public override float SecondaryRate => 1f;
-		public override float Speed => 1300f;
-		public override float Gravity => 5f;
-		public override float InheritVelocity => 0f;
-		public override string ProjectileModel => "models/weapons/w_portal.vmdl";
-		public override int ClipSize => 0;
-		public override float ReloadTime => 2.3f;
-		public override float ProjectileLifeTime => 4f;
-
-		[Net, Predicted] private bool HasBeenThrown { get; set; }
 
 		private Player PlayerToTeleport { get; set; }
 
@@ -45,54 +31,29 @@ namespace Facepunch.CoreWars
 			SetModel( "models/weapons/w_portal.vmdl" );
 		}
 
-		public override void AttackPrimary()
+		protected override void OnThrown()
 		{
-			if ( HasBeenThrown ) return;
-
-			PlayAttackAnimation();
-			ShootEffects();
-			PlaySound( $"portal.launch" );
-
 			if ( IsServer && Owner is Player player )
 			{
 				PlayerToTeleport = player;
 				EnableDrawing = false;
 			}
-
-			HasBeenThrown = true;
-
-			base.AttackPrimary();
-		}
-
-		public override void CreateViewModel()
-		{
-			base.CreateViewModel();
-			ViewModelEntity?.SetAnimParameter( "deploy", true );
-		}
-
-		public override void SimulateAnimator( PawnAnimator anim )
-		{
-			anim.SetAnimParameter( "holdtype", 5 );
 		}
 
 		protected override void OnProjectileHit( BulletDropProjectile projectile, TraceResult trace )
 		{
-			HasBeenThrown = false;
-
 			if ( IsClient ) return;
 
 			var position = projectile.Position;
-			var player = PlayerToTeleport;
-
-			if ( !player.IsValid() )
-				return;
-
 			var world = VoxelWorld.Current;
 			var blockPosition = world.ToVoxelPosition( position );
 			var blockBelowType = world.GetAdjacentBlock( blockPosition, (int)BlockFace.Bottom );
 
 			if ( blockBelowType > 0 )
 			{
+				var player = PlayerToTeleport;
+				if ( !player.IsValid() ) return;
+
 				using ( Prediction.Off() )
 				{
 					var startFx = Particles.Create( "particles/weapons/portal_grenade/portal_spawn/portal_spawn.vpcf" );
@@ -116,13 +77,14 @@ namespace Facepunch.CoreWars
 			}
 			else
 			{
+				PlayerToTeleport = null;
+				HasBeenThrown = false;
+				EnableDrawing = true;
+
 				using ( Prediction.Off() )
 				{
 					PlaySound( "portal.fail" );
 				}
-
-				PlayerToTeleport = null;
-				EnableDrawing = true;
 			}
 		}
 	}

@@ -15,68 +15,24 @@ namespace Facepunch.CoreWars
 	}
 
 	[Library( "weapon_fireball" )]
-	partial class Fireball : BulletDropWeapon<BulletDropProjectile>
+	public partial class Fireball : Throwable<BulletDropProjectile>
 	{
 		public override WeaponConfig Config => new FireballConfig();
-		public override string ImpactEffect => null;
 		public override string TrailEffect => "particles/weapons/fireball/fireball_trail.vpcf";
-		public override string ViewModelPath => "models/weapons/v_portal.vmdl";
-		public override int ViewModelMaterialGroup => 1;
-		public override string MuzzleFlashEffect => null;
-		public override string HitSound => "barage.explode";
+		public override string ThrowSound => "fireball.launch";
+		public override string HitSound => "fireball.hit";
 		public override DamageFlags DamageType => DamageFlags.Blast;
-		public override float PrimaryRate => 1f;
-		public override float SecondaryRate => 1f;
-		public override float Speed => 1300f;
-		public override float Gravity => 5f;
-		public override float InheritVelocity => 0f;
-		public override string ProjectileModel => "models/weapons/w_portal.vmdl";
-		public override int ClipSize => 0;
-		public override float ReloadTime => 2.3f;
-		public override float ProjectileLifeTime => 4f;
-
-		public override void Spawn()
-		{
-			base.Spawn();
-			SetModel( "models/weapons/w_portal.vmdl" );
-		}
-
-		public override void AttackPrimary()
-		{
-			PlayAttackAnimation();
-			ShootEffects();
-			PlaySound( $"barage.launch" );
-
-			if ( IsServer && Owner is Player player )
-			{
-				if ( WeaponItem.IsValid() )
-				{
-					WeaponItem.Remove();
-				}
-			}
-
-			base.AttackPrimary();
-		}
-
-		public override void CreateViewModel()
-		{
-			base.CreateViewModel();
-			ViewModelEntity?.SetAnimParameter( "deploy", true );
-		}
-
-		public override void SimulateAnimator( PawnAnimator anim )
-		{
-			anim.SetAnimParameter( "holdtype", 5 );
-		}
 
 		protected override void OnProjectileHit( BulletDropProjectile projectile, TraceResult trace )
 		{
 			var position = projectile.Position;
-			var world = VoxelWorld.Current;
-			var voxelPosition = world.ToVoxelPosition( position );
-
 			var explosion = Particles.Create( "particles/weapons/fireball/fireball_explosion.vpcf" );
 			explosion.SetPosition( 0, position - projectile.Velocity.Normal * projectile.Radius );
+
+			if ( IsClient ) return;
+
+			var world = VoxelWorld.Current;
+			var voxelPosition = world.ToVoxelPosition( position );
 
 			DamageInRadius( position, 512f, Config.Damage, 10f );
 
@@ -99,6 +55,8 @@ namespace Facepunch.CoreWars
 					}
 				}
 			}
+
+			base.OnProjectileHit( projectile, trace );
 		}
 	}
 }

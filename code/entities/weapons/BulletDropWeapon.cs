@@ -65,7 +65,7 @@ namespace Facepunch.CoreWars
 			direction = direction.Normal;
 
 			var velocity = (direction * Speed) + (player.Velocity * InheritVelocity);
-			projectile.Initialize( position, velocity, ProjectileRadius, OnProjectileHit );
+			projectile.Initialize( position, velocity, ProjectileRadius, ( p, t ) => OnProjectileHit( (T)p, t ) );
 
 			OnProjectileFired( projectile );
 		}
@@ -107,7 +107,7 @@ namespace Facepunch.CoreWars
 
 		}
 
-		protected virtual void OnProjectileHit( BulletDropProjectile projectile, TraceResult trace )
+		protected virtual void OnProjectileHit( T projectile, TraceResult trace )
 		{
 			if ( IsServer && trace.Entity.IsValid() )
 			{
