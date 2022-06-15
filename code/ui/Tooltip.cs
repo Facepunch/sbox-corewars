@@ -40,6 +40,15 @@ namespace Facepunch.CoreWars
 		public void SetProvider( ITooltipProvider provider )
 		{
 			Provider = provider;
+			NameLabel.Style.TextShadow = new ShadowList();
+			NameLabel.Style.TextShadow.Add( new Shadow()
+			{
+				Color = Color.Lerp( provider.Color, Color.Black, 0.3f ).WithAlpha( 0.3f ),
+				OffsetX = 0f,
+				OffsetY = 0f,
+				Spread = 3f,
+				Blur = 8f
+			} );
 			NameLabel.Style.FontColor = provider.Color;
 		}
 
