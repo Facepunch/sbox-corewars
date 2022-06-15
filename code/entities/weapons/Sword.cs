@@ -14,7 +14,7 @@ namespace Facepunch.CoreWars
 	}
 
 	[Library( "weapon_sword" )]
-	public partial class Sword : Weapon
+	public partial class Sword : MeleeWeapon
 	{
 		public override WeaponConfig Config => new SwordConfig();
 		public override string[] KillFeedReasons => new[] { "chopped", "slashed" };
