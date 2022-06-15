@@ -9,6 +9,9 @@ namespace Facepunch.CoreWars
 	[Library]
 	public class VortexBombShopItem : BaseBlockShopItem
 	{
+		public override Color Color => ColorPalette.Abilities;
+		public override int SortOrder => 3;
+
 		public override Dictionary<Type, int> Costs => new()
 		{
 			[typeof( IronItem )] = 40
