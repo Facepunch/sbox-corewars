@@ -20,7 +20,7 @@ namespace Facepunch.CoreWars
 		public override string[] KillFeedReasons => new[] { "chopped", "slashed" };
 		public override string ViewModelPath => "models/weapons/sword/v_sword01.vmdl";
 		public override DamageFlags DamageType => DamageFlags.Blunt;
-		public override float MeleeRange => 70f;
+		public override float MeleeRange => 80f;
 		public override float PrimaryRate => 1.5f;
 		public override float SecondaryRate => 1f;
 		public override int ClipSize => 0;

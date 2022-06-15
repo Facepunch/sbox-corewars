@@ -41,7 +41,7 @@ namespace Facepunch.CoreWars
 		{
 			if ( IsServer && WeaponItem.IsValid() )
 			{
-				DamageVoxelInDirection( 100f, Config.Damage );
+				DamageVoxelInDirection( 80f, Config.Damage );
 			}
 
 			if ( SparksParticles == null )

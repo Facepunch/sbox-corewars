@@ -98,7 +98,7 @@ namespace Facepunch.CoreWars
 		{
 			var world = VoxelWorld.Current;
 
-			if ( !world.GetBlockInDirection( Input.Position, Input.Rotation.Forward, out var position, range ) )
+			if ( !world.GetBlockInDirection( Input.Position, Input.Rotation.Forward, out var position, range / world.VoxelSize ) )
 			{
 				return;
 			}
