@@ -795,9 +795,9 @@ namespace Facepunch.CoreWars
 								}
 							}
 						}
-						else if ( item is BrewItem brewItem )
+						else if ( item is IConsumableItem consumable )
 						{
-							brewItem.Consume( this );
+							consumable.Consume( this );
 						}
 					}
 
@@ -1152,29 +1152,49 @@ namespace Facepunch.CoreWars
 
 		private void UpdateHotbarSlotKeys()
 		{
+			var index = CurrentHotbarIndex;
+
 			if ( Input.Pressed( InputButton.Slot1 ) )
-				CurrentHotbarIndex = (ushort)Math.Min( 0, HotbarInventory.Instance.SlotLimit - 1 );
+				index = (ushort)Math.Min( 0, HotbarInventory.Instance.SlotLimit - 1 );
 
 			if ( Input.Pressed( InputButton.Slot2 ) )
-				CurrentHotbarIndex = (ushort)Math.Min( 1, HotbarInventory.Instance.SlotLimit - 1 );
+				index = (ushort)Math.Min( 1, HotbarInventory.Instance.SlotLimit - 1 );
 
 			if ( Input.Pressed( InputButton.Slot3 ) )
-				CurrentHotbarIndex = (ushort)Math.Min( 2, HotbarInventory.Instance.SlotLimit - 1 );
+				index = (ushort)Math.Min( 2, HotbarInventory.Instance.SlotLimit - 1 );
 
 			if ( Input.Pressed( InputButton.Slot4 ) )
-				CurrentHotbarIndex = (ushort)Math.Min( 3, HotbarInventory.Instance.SlotLimit - 1 );
+				index = (ushort)Math.Min( 3, HotbarInventory.Instance.SlotLimit - 1 );
 
 			if ( Input.Pressed( InputButton.Slot5 ) )
-				CurrentHotbarIndex = (ushort)Math.Min( 4, HotbarInventory.Instance.SlotLimit - 1 );
+				index = (ushort)Math.Min( 4, HotbarInventory.Instance.SlotLimit - 1 );
 
 			if ( Input.Pressed( InputButton.Slot6 ) )
-				CurrentHotbarIndex = (ushort)Math.Min( 5, HotbarInventory.Instance.SlotLimit - 1 );
+				index = (ushort)Math.Min( 5, HotbarInventory.Instance.SlotLimit - 1 );
 
 			if ( Input.Pressed( InputButton.Slot7 ) )
-				CurrentHotbarIndex = (ushort)Math.Min( 6, HotbarInventory.Instance.SlotLimit - 1 );
+				index = (ushort)Math.Min( 6, HotbarInventory.Instance.SlotLimit - 1 );
 
 			if ( Input.Pressed( InputButton.Slot8 ) )
-				CurrentHotbarIndex = (ushort)Math.Min( 7, HotbarInventory.Instance.SlotLimit - 1 );
+				index = (ushort)Math.Min( 7, HotbarInventory.Instance.SlotLimit - 1 );
+
+			if ( index != CurrentHotbarIndex )
+			{
+				var container = HotbarInventory.Instance;
+				var item = container.GetFromSlot( index );
+
+				if ( item is IConsumableItem consumable )
+				{
+					if ( IsServer )
+					{
+						consumable.Consume( this );
+					}
+
+					return;
+				}
+
+				CurrentHotbarIndex = index;
+			}
 		}
 	}
 }
