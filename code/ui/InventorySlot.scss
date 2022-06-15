@@ -41,6 +41,14 @@ InventorySlot {
         pointer-events: none;
     }
 
+    &.is-block {
+        .icon {
+            width: 70px;
+            height: 70px;
+            border-radius: $border-radius-default;
+        }
+    }
+
     .stacksize {
         position: absolute;
         pointer-events: none;

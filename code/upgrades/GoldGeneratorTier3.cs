@@ -11,6 +11,7 @@ namespace Facepunch.CoreWars
 	public class GoldGeneratorTier3 : BaseTeamUpgrade
 	{
 		public override string Name => "200% Gold Generator Speed";
+		public override Color Color => ColorPalette.Resources;
 		public override string Description => "Your team's generator spawns Gold 200% faster.";
 		public override Dictionary<Type, int> Costs => new()
 		{

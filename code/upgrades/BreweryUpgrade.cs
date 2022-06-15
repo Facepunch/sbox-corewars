@@ -11,6 +11,7 @@ namespace Facepunch.CoreWars
 	public class BreweryUpgrade : BaseTeamUpgrade
 	{
 		public override string Name => "Brewery";
+		public override Color Color => ColorPalette.Brews;
 		public override string Description => "Unlock special consumable brews.";
 		public override Dictionary<Type, int> Costs => new()
 		{

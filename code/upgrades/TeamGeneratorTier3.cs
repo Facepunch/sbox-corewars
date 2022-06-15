@@ -11,6 +11,7 @@ namespace Facepunch.CoreWars
 	public class TeamGeneratorTier3 : BaseTeamUpgrade
 	{
 		public override string Name => "Crystal Generator";
+		public override Color Color => ColorPalette.Resources;
 		public override string Description => "Your team's generator occasionally spawns Crystals.";
 		public override Dictionary<Type, int> Costs => new()
 		{

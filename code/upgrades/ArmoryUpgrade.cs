@@ -11,6 +11,7 @@ namespace Facepunch.CoreWars
 	public class ArmoryUpgrade : BaseTeamUpgrade
 	{
 		public override string Name => "Armory";
+		public override Color Color => ColorPalette.Weapons;
 		public override string Description => "Unlock new weapons and items to purchase.";
 		public override Dictionary<Type, int> Costs => new()
 		{

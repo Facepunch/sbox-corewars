@@ -69,6 +69,7 @@ namespace Facepunch.CoreWars
 
 			Style.BorderColor = Item.Color.WithAlpha( 0.6f );
 
+			SetClass( "is-block", item is BlockItem );
 			SetClass( "is-empty", false );
 		}
 

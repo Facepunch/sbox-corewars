@@ -62,12 +62,7 @@ namespace Facepunch.CoreWars
 						Icon.Style.BackgroundImage = null;
 				}
 
-				if ( item.Color == Color.White )
-					Style.SetLinearGradientBackground( Color.Black, 0.5f, new Color( 0.2f ), 0.5f );
-				else
-					Style.SetLinearGradientBackground( item.Color, 0.5f, new Color( 0.2f ), 0.5f );
-
-				Style.BorderColor = Item.Color.WithAlpha( 0.6f );
+				SetClass( "is-block", item is BaseBlockShopItem );
 			}
 
 			UpdateState();
@@ -176,6 +171,23 @@ namespace Facepunch.CoreWars
 
 		private void UpdateState()
 		{
+			var isPurchaseDisabled = IsPurchaseDisabled();
+
+			if ( isPurchaseDisabled )
+			{
+				Style.SetLinearGradientBackground( Color.Black, 0.5f, new Color( 0.2f ), 0.5f );
+				Style.BorderColor = Color.Black.WithAlpha( 0.6f );
+			}
+			else
+			{
+				if ( Item.Color == Color.White )
+					Style.SetLinearGradientBackground( Color.Black, 0.5f, new Color( 0.2f ), 0.5f );
+				else
+					Style.SetLinearGradientBackground( Item.Color, 0.5f, new Color( 0.2f ), 0.5f );
+
+				Style.BorderColor = Item.Color.WithAlpha( 0.6f );
+			}
+
 			SetClass( "disabled", IsPurchaseDisabled() );
 			SetClass( "hidden", IsHidden() );
 		}
