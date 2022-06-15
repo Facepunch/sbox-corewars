@@ -26,6 +26,7 @@ Tooltip {
         }
 
         .description {
+            margin-top: -12px;
             font-family: $font;
             max-width: 400px;
             word-wrap: break-word;
@@ -54,6 +55,10 @@ Tooltip {
                 label {
                     font-size: 20px;
                     color: white;
+
+                    &.unaffordable {
+                        color: crimson;
+                    }
                 }
             }
         }
