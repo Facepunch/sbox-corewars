@@ -14,16 +14,23 @@
 						remaps = 
 						[
 							{
-								from = "viewmodelarms_light.vmat"
-								to = "models/first_person/arms_materials/first_person_arms_light.vmat"
-							},
-							{
 								from = "medw_swordsdaggers.vmat"
 								to = "models/weapons/sword/sword.vmat"
 							},
 						]
 						use_global_default = false
 						global_default_material = ""
+					},
+					{
+						_class = "MaterialGroup"
+						name = "crystal"
+						remaps = 
+						[
+							{
+								from = "models/weapons/sword/sword.vmat"
+								to = "models/weapons/sword/swords_crystal.vmat"
+							},
+						]
 					},
 				]
 			},
@@ -33,6 +40,7 @@
 				[
 					{
 						_class = "RenderMeshFile"
+						name = "Sword1"
 						filename = "models/weapons/sword/sword03.fbx"
 						import_translation = [ -4.0, 0.0, 1.0 ]
 						import_rotation = [ 0.0, 0.0, 0.0 ]
@@ -41,6 +49,57 @@
 						align_origin_y_type = "None"
 						align_origin_z_type = "None"
 						parent_bone = "hold_R"
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "Sword2"
+						filename = "models/weapons/sword/sword01.fbx"
+						import_translation = [ -4.0, 0.0, 1.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = "hold_r"
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "Sword3"
+						filename = "models/weapons/sword/sword02.fbx"
+						import_translation = [ -4.0, 0.0, 1.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = "hold_r"
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "Sword4"
+						filename = "models/weapons/sword/sword02.fbx"
+						import_translation = [ -4.0, 0.0, 1.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = "hold_r"
 						import_filter = 
 						{
 							exclude_by_default = false
@@ -79,6 +138,52 @@
 						origin = [ 0.0, 0.0, 0.0 ]
 						angles = [ 0.0, 0.0, 0.0 ]
 						do_not_discard = true
+					},
+				]
+			},
+			{
+				_class = "BodyGroupList"
+				children = 
+				[
+					{
+						_class = "BodyGroup"
+						name = "tier"
+						children = 
+						[
+							{
+								_class = "BodyGroupChoice"
+								name = "Sword1"
+								meshes = 
+								[
+									"Sword1",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "Sword2"
+								meshes = 
+								[
+									"Sword2",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "Sword3"
+								meshes = 
+								[
+									"Sword3",
+								]
+							},
+							{
+								_class = "BodyGroupChoice"
+								name = "Sword4"
+								meshes = 
+								[
+									"Sword4",
+								]
+							},
+						]
+						hidden_in_tools = false
 					},
 				]
 			},

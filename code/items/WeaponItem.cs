@@ -9,6 +9,7 @@ namespace Facepunch.CoreWars
 		public override bool CanBeDropped => false;
 		public override Color Color => ColorPalette.Weapons;
 
+		public virtual int WorldModelMaterialGroup => 0;
 		public virtual int ViewModelMaterialGroup => 0;
 		public virtual string WorldModelPath => null;
 		public virtual string ViewModelPath => null;

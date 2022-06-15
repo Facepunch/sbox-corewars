@@ -29,6 +29,7 @@ namespace Facepunch.CoreWars
 		public override void Spawn()
 		{
 			base.Spawn();
+
 			SetModel( "models/weapons/sword/w_sword01.vmdl" );
 		}
 
@@ -48,6 +49,7 @@ namespace Facepunch.CoreWars
 					};
 
 					ViewModelEntity.SetModel( WeaponItem.ViewModelPath );
+					ViewModelEntity.SetBodyGroup( "tier", WeaponItem.Tier - 1 );
 					ViewModelEntity.SetMaterialGroup( WeaponItem.ViewModelMaterialGroup );
 
 					return;
@@ -93,6 +95,8 @@ namespace Facepunch.CoreWars
 			if ( IsServer && WeaponItem.IsValid() && !string.IsNullOrEmpty( WeaponItem.WorldModelPath ) )
 			{
 				SetModel( WeaponItem.WorldModelPath );
+				SetBodyGroup( "tier", WeaponItem.Tier - 1 );
+				SetMaterialGroup( WeaponItem.WorldModelMaterialGroup );
 			}
 
 			base.OnWeaponItemChanged();
