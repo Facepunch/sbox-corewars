@@ -25,7 +25,9 @@ namespace Facepunch.CoreWars
 			{
 				if ( item.IsLocked( player ) )
 				{
-					var symbolCharacters = new string[] { "a", "b", "c", "d", "e", "f", "g", "h", "i", "P" };
+					Rand.SetSeed( item.GetHashCode() );
+
+					var symbolCharacters = new string[] { "𐆓", "𐆕", "𐆖", "𐆗", "𐆙", "𐆚", "𐆛", "𐆜", "𐆠", "𐅍", "𐅍", "𐅡", "𐅍", "𐹳", "𐅢" };
 					var randomDescription = string.Empty;
 					var randomDescriptionCount = Rand.Int( 16, 24 );
 					var randomName = string.Empty;
@@ -110,12 +112,14 @@ namespace Facepunch.CoreWars
 
 				if ( Item.IsLocked( player ) )
 				{
-					tooltip.DescriptionLabel.Style.FontFamily = "Wingdings";
-					tooltip.NameLabel.Style.FontFamily = "Wingdings";
+					tooltip.DescriptionLabel.Style.FontFamily = "NotoSansSymbols2-Regular";
+					tooltip.NameLabel.Style.FontFamily = "NotoSansSymbols2-Regular";
 					AddRequirementToTooltip( tooltip );
 				}
-
-				AddCostsToTooltip( tooltip );
+				else
+				{
+					AddCostsToTooltip( tooltip );
+				}
 			}
 
 			base.OnMouseOver( e );
@@ -134,6 +138,9 @@ namespace Facepunch.CoreWars
 
 		private void AddCostsToTooltip( Tooltip tooltip )
 		{
+			if ( Local.Pawn is not Player player )
+				return;
+
 			var costContainer = tooltip.Container.AddChild<Panel>( "costs" );
 
 			foreach ( var kv in Item.Costs )
@@ -145,7 +152,9 @@ namespace Facepunch.CoreWars
 				var panel = costContainer.Add.Panel( "cost" );
 
 				panel.Add.Image( itemType.Icon, "icon" );
-				panel.Add.Label( $"x{itemCost}", "value" );
+
+				var value = panel.Add.Label( $"x{itemCost}", "value" );
+				value.SetClass( "unaffordable", player.GetResourceCount( kv.Key ) < kv.Value );
 			}
 		}
 
