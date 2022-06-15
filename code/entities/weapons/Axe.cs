@@ -17,7 +17,7 @@ namespace Facepunch.CoreWars
 	public partial class Axe : BlockDamageWeapon
 	{
 		public override WeaponConfig Config => new AxeConfig();
-		public override string ViewModelPath => "models/weapons/sword/v_sword01.vmdl";
+		public override string ViewModelPath => "models/weapons/axe/v_axe01.vmdl";
 		public override DamageFlags DamageType => DamageFlags.Blunt;
 		public override float MeleeRange => 80f;
 		public override float PrimaryRate => 2f;
@@ -29,7 +29,7 @@ namespace Facepunch.CoreWars
 		public override void Spawn()
 		{
 			base.Spawn();
-			SetModel( "models/weapons/sword/w_sword01.vmdl" );
+			SetModel( "models/weapons/axe/w_axe01.vmdl" );
 		}
 
 		public override void AttackPrimary()
