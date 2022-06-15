@@ -17,13 +17,12 @@ namespace Facepunch.CoreWars
 	public partial class VortexBomb : BlockPlaceWeapon<VortexBombBlock>
 	{
 		public override WeaponConfig Config => new FireballConfig();
-		public override string ViewModelPath => "models/weapons/v_portal.vmdl";
+		public override string ViewModelPath => null;
 		public override int ViewModelMaterialGroup => 1;
 
 		public override void Spawn()
 		{
 			base.Spawn();
-			SetModel( "models/weapons/w_portal.vmdl" );
 		}
 
 		public override void AttackPrimary()

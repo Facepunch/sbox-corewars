@@ -13,15 +13,14 @@ namespace Facepunch.CoreWars
 	[ClassName( "cw_vortex_bomb" )]
 	public partial class VortexBombEntity : BlockEntity
 	{
-		private TimeUntil TimeUntilExplode { get; set; }
+		[Net] public RealTimeUntil TimeUntilExplode { get; private set; }
+
 		private Particles Effect { get; set; }
 		private Sound Sound { get; set; }
 
 		public override void Initialize()
 		{
-			SetModel( "models/weapons/tnt_block/tnt_block.vmdl" );
 			CenterOnBlock( true, false );
-
 			TimeUntilExplode = 4f;
 
 			base.Initialize();
@@ -29,12 +28,22 @@ namespace Facepunch.CoreWars
 
 		public override void ClientSpawn()
 		{
-			Effect = Particles.Create( "particles/weapons/tnt/tnt_tick/tnt_tick.vpcf", this );
+			Effect = Particles.Create( "particles/gameplay/vortex_bomb/vortex_bomb.vpcf", this );
 			Effect.SetEntity( 0, this );
 
 			Sound = PlaySound( "explosives.tick" );
 
+			UpdateEffect();
+
 			base.ClientSpawn();
+		}
+
+		[Event.Tick.Client]
+		protected virtual void UpdateEffect()
+		{
+			Log.Info( TimeUntilExplode / 4f );
+			Effect?.SetPosition( 10, new Vector3( TimeUntilExplode / 4f, 0f, 0f ) );
+			Effect?.SetPosition( 11, new Vector3( TimeUntilExplode / 4f, 0f, 0f ) );
 		}
 
 		[Event.Tick.Server]
