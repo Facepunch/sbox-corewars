@@ -7,15 +7,14 @@ PurchasableItem {
     display: flex;
     flex-direction: row;
     border-radius: 2px;
-    padding: 16px;
+    padding: 8px;
     width: 100%;
     height: 100px;
-    justify-content: center;
     align-items: center;
 
     .icon {
-        width: 64px;
-        height: 64px;
+        width: 90px;
+        height: 90px;
         background-size: cover;
 
         .quantity {
@@ -33,8 +32,6 @@ PurchasableItem {
     .info {
         flex-direction: column;
         margin-left: 32px;
-        width: 100%;
-        height: 100%;
         display: flex;
 
         .name {
@@ -44,7 +41,6 @@ PurchasableItem {
         }
 
         .description {
-            margin-top: 12px;
             font-family: $font;
             color: white;
         }

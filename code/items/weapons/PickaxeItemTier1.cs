@@ -9,6 +9,7 @@ namespace Facepunch.CoreWars
 	{
 		public override string WeaponName => "weapon_pickaxe";
 		public override string Description => "A light damage pickaxe for breaking defensive blocks.";
+		public override Color Color => ColorPalette.Tools;
 		public override string Icon => "textures/items/weapon_pickaxe_1.png";
 		public override string Name => "Light Pickaxe";
 		public override string Group => "pickaxe";

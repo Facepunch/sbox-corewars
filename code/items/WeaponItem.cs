@@ -7,7 +7,7 @@ namespace Facepunch.CoreWars
 	public class WeaponItem : InventoryItem
 	{
 		public override bool CanBeDropped => false;
-		public override Color Color => Color.Red;
+		public override Color Color => ColorPalette.Weapons;
 
 		public virtual int ViewModelMaterialGroup => 0;
 		public virtual string WorldModelPath => null;

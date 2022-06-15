@@ -6,7 +6,7 @@ using System;
 namespace Facepunch.CoreWars
 {
 	[Library]
-	public class WatergunShopItem : BaseWeaponShopItem<WatergunItem>
+	public class NeutralizerShopItem : BaseWeaponShopItem<NeutralizerItem>
 	{
 		public override Dictionary<Type, int> Costs => new()
 		{

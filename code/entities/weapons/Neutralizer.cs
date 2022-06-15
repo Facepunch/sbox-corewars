@@ -5,21 +5,21 @@ using Sandbox;
 namespace Facepunch.CoreWars
 {
 	[Library]
-	public class WatergunConfig : WeaponConfig
+	public class NeutralizerConfig : WeaponConfig
 	{
-		public override string ClassName => "weapon_watergun";
+		public override string ClassName => "weapon_neutralizer";
 		public override AmmoType AmmoType => AmmoType.None;
 		public override WeaponType Type => WeaponType.Melee;
 		public override int Ammo => 0;
 		public override int Damage => 30;
 	}
 
-	[Library( "weapon_watergun" )]
-	public partial class Watergun : BlockDamageWeapon
+	[Library( "weapon_neutralizer" )]
+	public partial class Neutralizer : BlockDamageWeapon
 	{
 		public override BuildingMaterialType PrimaryMaterialType => BuildingMaterialType.Explosives;
 		public override float SecondaryMaterialMultiplier => 0f;
-		public override WeaponConfig Config => new BlowtorchConfig();
+		public override WeaponConfig Config => new NeutralizerConfig();
 		public override string ViewModelPath => "weapons/rust_smg/v_rust_smg.vmdl";
 		public override DamageFlags DamageType => DamageFlags.Burn;
 		public override float PrimaryRate => 5f;

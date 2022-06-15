@@ -9,6 +9,7 @@ namespace Facepunch.CoreWars
 	{
 		public override string WeaponName => "weapon_axe";
 		public override string Description => "A medium axe for breaking wood.";
+		public override Color Color => ColorPalette.Tools;
 		public override string Icon => "textures/items/weapon_axe_2.png";
 		public override string Name => "Medium Axe";
 		public override string Group => "axe";
