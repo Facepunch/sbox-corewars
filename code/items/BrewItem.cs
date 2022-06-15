@@ -5,7 +5,7 @@ using System.IO;
 
 namespace Facepunch.CoreWars
 {
-	public class BrewItem : InventoryItem
+	public class BrewItem : InventoryItem, IConsumableItem
 	{
 		public override bool CanBeDropped => false;
 		public override ushort MaxStackSize => 4;
@@ -13,7 +13,7 @@ namespace Facepunch.CoreWars
 		public virtual string ConsumeSound => "brew.consume";
 		public virtual string ConsumeEffect => null;
 		public virtual string ActivateSound => "brew.activate";
-		public virtual float ActivateDelay => 0.4f;
+		public virtual float ActivateDelay => 0.5f;
 
 		public async void Consume( Player player )
 		{
