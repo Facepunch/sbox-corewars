@@ -27,10 +27,35 @@ Tooltip {
 
         .description {
             font-family: $font;
-            max-width: 300px;
+            max-width: 400px;
             word-wrap: break-word;
-            font-size: 18px;
+            font-size: 20px;
             color: white;
+        }
+
+        .requirement {
+            font-family: $font;
+            font-size: 20px;
+            color: crimson;
+        }
+
+        .costs {
+            .cost {
+                justify-content: center;
+                align-items: center;
+                display: flex;
+
+                .icon {
+                    width: 32px;
+                    height: 32px;
+                    margin-right: 8px;
+                }
+
+                label {
+                    font-size: 20px;
+                    color: white;
+                }
+            }
         }
 
         &.active {

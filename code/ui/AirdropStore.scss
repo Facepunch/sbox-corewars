@@ -19,10 +19,8 @@ AirdropStore {
         justify-content: center;
         flex-direction: column;
         pointer-events: all;
-        width: 60%;
 
         .title {
-            margin-bottom: 32px;
             color: $red;
             font-family: $font;
             font-size: 48px;
@@ -63,15 +61,19 @@ AirdropStore {
 
         .container {
             display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            overflow: scroll;
-            width: 100%;
+            flex-direction: row;
+            flex-wrap: wrap;
+            flex-shrink: 1;
+            max-width: 660px;
+            min-width: 472px;
 
             PurchasableItem {
+                margin-right: 10px;
                 margin-top: 10px;
-                flex-grow: 0;
-                flex-shrink: 0;
+            }
+
+            &:last-child {
+                margin-right: 0px;
             }
         }
     }

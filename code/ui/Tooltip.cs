@@ -8,17 +8,18 @@ namespace Facepunch.CoreWars
 	{
 		private static Tooltip Current { get; set; }
 
-		public static void Show( ITooltipProvider provider )
+		public static Tooltip Show( ITooltipProvider provider )
 		{
 			if ( Current == null || Current.Provider != provider )
 			{
 				var tooltip = new Tooltip();
 				tooltip.SetProvider( provider );
 				Hud.Current.AddChild( tooltip );
-				return;
+				return tooltip;
 			}
 
 			Current.TimeSinceShown = 0f;
+			return Current;
 		}
 
 		public static void Hide( ITooltipProvider provider )
@@ -33,6 +34,7 @@ namespace Facepunch.CoreWars
 		public ITooltipProvider Provider { get; private set; }
 		public TimeSince TimeSinceShown { get; private set; }
 		public Panel Container { get; private set; }
+		public Label DescriptionLabel { get; private set; }
 		public Label NameLabel { get; private set; }
 
 		public void SetProvider( ITooltipProvider provider )

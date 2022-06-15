@@ -19,10 +19,8 @@ UpgradeStore {
         justify-content: center;
         flex-direction: column;
         pointer-events: all;
-        width: 60%;
 
         .title {
-            margin-bottom: 32px;
             color: $red;
             font-family: $font;
             font-size: 48px;
@@ -63,15 +61,26 @@ UpgradeStore {
 
         .container {
             display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            overflow: scroll;
-            width: 100%;
+            flex-direction: row;
+            flex-wrap: wrap;
+            flex-shrink: 1;
+            max-width: 800px;
+            min-width: 472px;
 
             PurchasableItem {
+                margin-right: 10px;
                 margin-top: 10px;
-                flex-grow: 0;
-                flex-shrink: 0;
+                width: 120px;
+                height: 120px;
+
+                .icon {
+                    width: 110px;
+                    height: 110px;
+                }
+            }
+
+            &:last-child {
+                margin-right: 0px;
             }
         }
     }
