@@ -20,7 +20,7 @@ namespace Facepunch.CoreWars
 
 		public override void Initialize()
 		{
-			CenterOnBlock( true, false );
+			CenterOnBlock( true, true );
 			TimeUntilExplode = 4f;
 
 			base.Initialize();
@@ -41,8 +41,9 @@ namespace Facepunch.CoreWars
 		[Event.Tick.Client]
 		protected virtual void UpdateEffect()
 		{
-			Effect?.SetPosition( 10, new Vector3( TimeUntilExplode / 4f, 0f, 0f ) );
-			Effect?.SetPosition( 11, new Vector3( TimeUntilExplode / 4f, 0f, 0f ) );
+			var fraction = TimeUntilExplode / 4f;
+			Effect?.SetPosition( 10, new Vector3( fraction ) );
+			Effect?.SetPosition( 11, new Vector3( fraction ) );
 		}
 
 		[Event.Tick.Server]
