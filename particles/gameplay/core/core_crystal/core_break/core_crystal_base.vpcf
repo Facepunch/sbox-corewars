@@ -2,6 +2,12 @@
 {
 	_class = "CParticleSystemDefinition"
 	m_nBehaviorVersion = 10
+	m_controlPointConfigurations = 
+	[
+		{
+			m_name = "preview"
+		},
+	]
 	m_Children = 
 	[
 		{
@@ -25,6 +31,10 @@
 			m_flDelay = 1.0
 		},
 		{
+			m_ChildRef = resource:"particles/gameplay/core/core_crystal/core_break/core_crystal_base_j.vpcf"
+			m_flDelay = 1.0
+		},
+		{
 			m_ChildRef = resource:"particles/gameplay/core/core_crystal/core_break/core_crystal_base_f.vpcf"
 		},
 		{
@@ -36,12 +46,6 @@
 		},
 		{
 			m_ChildRef = resource:"particles/gameplay/core/core_crystal/core_break/core_crystal_base_i.vpcf"
-		},
-	]
-	m_controlPointConfigurations = 
-	[
-		{
-			m_name = "preview"
 		},
 	]
 }

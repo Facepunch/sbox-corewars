@@ -821,6 +821,9 @@
 	m_Children = 
 	[
 		{
+			m_ChildRef = resource:"particles/gameplay/core/core_crystal/core_crystal_h.vpcf"
+		},
+		{
 			m_ChildRef = resource:"particles/gameplay/core/core_crystal/core_crystal_g.vpcf"
 		},
 		{
