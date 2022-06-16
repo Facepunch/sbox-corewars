@@ -22,6 +22,23 @@ namespace Facepunch.CoreWars
 		public override string ThrowSound => "fireball.launch";
 		public override string HitSound => "fireball.hit";
 		public override DamageFlags DamageType => DamageFlags.Blast;
+		
+		private Particles HandEffect { get; set; }
+
+		public override void ActiveStart( Entity owner )
+		{
+			base.ActiveStart( owner );
+
+			HandEffect?.Destroy();
+			HandEffect = Particles.Create( "particles/weapons/fireball/view_fireball/view_fireball.vpcf", EffectEntity, "FireBallAttach" );
+		}
+
+		public override void ActiveEnd( Entity entity, bool dropped )
+		{
+			HandEffect?.Destroy();
+
+			base.ActiveEnd( entity, dropped );
+		}
 
 		protected override void OnProjectileHit( BulletDropProjectile projectile, TraceResult trace )
 		{
