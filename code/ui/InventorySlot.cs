@@ -35,7 +35,9 @@ namespace Facepunch.CoreWars
 
 		public void SetItem( InventoryItem item )
 		{
-			Item = item;
+			// Early out if we already have this item, there's no need to process this again.
+			if ( Item == item )
+				return;
 
 			if ( !item.IsValid() )
 			{
@@ -47,7 +49,10 @@ namespace Facepunch.CoreWars
 				Style.SetLinearGradientBackground( Color.Black, 0.5f, new Color( 0.2f ), 0.5f );
 				Style.BorderColor = null;
 
+				SetClass( "is-block", false );
 				SetClass( "is-empty", true );
+
+				Item = null;
 
 				return;
 			}
@@ -67,10 +72,11 @@ namespace Facepunch.CoreWars
 			else
 				Style.SetLinearGradientBackground( item.Color, 0.5f, new Color( 0.2f ), 0.5f );
 
-			Style.BorderColor = Item.Color.WithAlpha( 0.6f );
+			Style.BorderColor = item.Color.WithAlpha( 0.6f );
 
 			SetClass( "is-block", item is BlockItem );
 			SetClass( "is-empty", false );
+			Item = item;
 		}
 
 		public void SetDisplaySlot( int slot )

@@ -16,6 +16,7 @@ namespace Facepunch.CoreWars
 		public string QuantityText => GetQuantityText();
 		public string Name { get; private set; }
 		public string Description { get; private set; }
+		public bool WasDisabled { get; private set; }
 		public Color Color => Item.Color;
 
 		public void SetItem( IPurchasableItem item )
@@ -65,7 +66,7 @@ namespace Facepunch.CoreWars
 				SetClass( "is-block", item is BaseBlockShopItem );
 			}
 
-			UpdateState();
+			UpdateState( true );
 		}
 
 		public bool IsHidden()
@@ -169,11 +170,18 @@ namespace Facepunch.CoreWars
 			return string.Empty;
 		}
 
-		private void UpdateState()
+		private void UpdateState( bool shouldForceUpdate = false )
 		{
-			var isPurchaseDisabled = IsPurchaseDisabled();
+			var isDisabled = IsPurchaseDisabled();
 
-			if ( isPurchaseDisabled )
+			SetClass( "disabled", isDisabled );
+			SetClass( "hidden", IsHidden() );
+
+			// Early out to avoid processing if our state is the same.
+			if ( !shouldForceUpdate && isDisabled == WasDisabled )
+				return;
+
+			if ( isDisabled )
 			{
 				Style.SetLinearGradientBackground( Color.Black, 0.5f, new Color( 0.2f ), 0.5f );
 				Style.BorderColor = Color.Black.WithAlpha( 0.6f );
@@ -188,8 +196,7 @@ namespace Facepunch.CoreWars
 				Style.BorderColor = Item.Color.WithAlpha( 0.6f );
 			}
 
-			SetClass( "disabled", IsPurchaseDisabled() );
-			SetClass( "hidden", IsHidden() );
+			WasDisabled = isDisabled;
 		}
 	}
 }

@@ -5,9 +5,9 @@ namespace Facepunch.CoreWars.Inventory
 	public class NetInventoryItem : BaseNetworkable, INetworkSerializer, IValid
 	{
 		public InventoryItem Instance { get; private set; }
-		public bool Initialized { get; private set; }
 
 		public bool IsValid => Instance.IsValid();
+		public uint Version { get; private set; }
 
 		public NetInventoryItem()
 		{
@@ -21,16 +21,21 @@ namespace Facepunch.CoreWars.Inventory
 
 		public void Read( ref NetRead read )
 		{
-			if ( Initialized ) return;
+			var version = read.Read<uint>();
 			var totalBytes = read.Read<int>();
 			var output = new byte[totalBytes];
-			Instance = InventoryItem.Deserialize( read.ReadUnmanagedArray( output ) );
-			Initialized = true;
+			read.ReadUnmanagedArray( output );
+
+			if ( Version == version ) return;
+
+			Instance = InventoryItem.Deserialize( output );
+			Version = version;
 		}
 
 		public void Write( NetWrite write )
 		{
 			var serialized = Instance.Serialize();
+			write.Write( ++Version );
 			write.Write( serialized.Length );
 			write.Write( serialized );
 		}
