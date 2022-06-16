@@ -15,6 +15,7 @@ namespace Facepunch.CoreWars
 	public partial class Player : Sandbox.Player, IResettable, INameplate
 	{
 		[Net, Change( nameof( OnTeamChanged ) )] public Team Team { get; private set; }
+		[Net] public Dictionary<StatModifier, float> Modifiers { get; private set; }
 		[Net, Predicted] public ushort CurrentHotbarIndex { get; private set; }
 		[Net, Predicted] public bool IsOutOfBreath { get; set; }
 		[Net, Predicted] public float Stamina { get; set; }
@@ -138,6 +139,7 @@ namespace Facepunch.CoreWars
 			CurrentHotbarIndex = 0;
 			client.Pawn = this;
 			CreateInventories();
+			Modifiers = new Dictionary<StatModifier, float>();
 			Resources = new Dictionary<string, int>();
 			Armor = new();
 			Buffs = new List<BaseBuff>();
@@ -209,6 +211,35 @@ namespace Facepunch.CoreWars
 			{
 				BackpackInventory.Instance.Stack( item );
 			}
+		}
+
+		public void AddModifier( StatModifier modifier, float value )
+		{
+			if ( Modifiers.TryGetValue( modifier, out var current ) )
+			{
+				value = current + value;
+			}
+
+			Modifiers[modifier] = value;
+		}
+
+		public void TakeModifier( StatModifier modifier, float value )
+		{
+			if ( Modifiers.TryGetValue( modifier, out var current ) )
+			{
+				value = current - value;
+				Modifiers[modifier] = value;
+			}
+		}
+
+		public float GetModifier( StatModifier modifier )
+		{
+			if ( Modifiers.TryGetValue( modifier, out var value ) )
+			{
+				return 1f + value;
+			}
+
+			return 1f;
 		}
 
 		public bool TryGiveArmor( ArmorItem item )
@@ -744,6 +775,8 @@ namespace Facepunch.CoreWars
 			{
 				if ( !Game.FriendlyFire && attacker.Team == Team )
 					return;
+
+				info.Damage *= attacker.GetModifier( StatModifier.Damage );
 
 				if ( attacker.Core.IsValid() )
 				{

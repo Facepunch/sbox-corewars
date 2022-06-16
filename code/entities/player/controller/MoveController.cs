@@ -145,6 +145,9 @@ namespace Facepunch.CoreWars
 
 			if ( player.IsValid() )
 			{
+				var modifier = player.GetModifier( StatModifier.Speed );
+				WishVelocity *= modifier;
+
 				if ( Input.Down( InputButton.Duck ) && !Input.Down( InputButton.Run ) && WishVelocity.Length > 1f )
 					player.ReduceStamina( 10f * Time.Delta );
 				else

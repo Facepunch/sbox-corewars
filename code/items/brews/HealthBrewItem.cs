@@ -9,7 +9,7 @@ namespace Facepunch.CoreWars
 	public class HealthBrewItem : BrewItem
 	{
 		public override string ConsumeEffect => "particles/gameplay/brews/health/health_brew.vpcf";
-		public override string Description => "Restores 30% of maximum health when consumed.";
+		public override string Description => "Uses stamina to restore 30% of maximum health when consumed.";
 		public override string Icon => "textures/items/brew_health.png";
 		public override string Name => "Health Brew";
 
@@ -17,6 +17,7 @@ namespace Facepunch.CoreWars
 		{
 			player.Health += 30f;
 			player.Health = Math.Min( player.Health, 100f );
+			player.ReduceStamina( 100f );
 
 			base.OnActivated( player );
 		}

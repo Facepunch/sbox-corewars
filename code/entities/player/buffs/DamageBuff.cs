@@ -9,11 +9,21 @@ namespace Facepunch.CoreWars
 
 		public override void OnActivated( Player player )
 		{
+			if ( IsServer )
+			{
+				player.AddModifier( StatModifier.Damage, 0.15f );
+			}
+
 			base.OnActivated( player );
 		}
 
 		public override void OnExpired( Player player )
 		{
+			if ( IsServer )
+			{
+				player.TakeModifier( StatModifier.Damage, 0.15f );
+			}
+
 			base.OnExpired( player );
 		}
 	}
