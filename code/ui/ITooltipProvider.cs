@@ -8,6 +8,7 @@ namespace Facepunch.CoreWars
 	{
 		public string Name { get; }
 		public string Description { get; }
+		public ItemTag[] Tags { get; }
 		public bool IsVisible { get; }
 		public Color Color { get; }
 	}

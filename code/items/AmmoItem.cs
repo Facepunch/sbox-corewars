@@ -11,6 +11,7 @@ namespace Facepunch.CoreWars
 
 		public override string Description => AmmoType.GetDescription();
 		public override bool RemoveOnDeath => true;
+		public override ItemTag[] Tags => new ItemTag[] { ItemTag.CanDrop };
 		public override string WorldModel => "models/weapons/w_shotblast.vmdl";
 		public override Color Color => ColorPalette.Ammo;
 		public override ushort MaxStackSize => 60;

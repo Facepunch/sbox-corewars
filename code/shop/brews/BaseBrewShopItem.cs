@@ -8,6 +8,7 @@ namespace Facepunch.CoreWars
 	public class BaseBrewShopItem<T> : BaseShopItem where T : BrewItem, new()
 	{
 		public override string Name => ItemDefinition.Name;
+		public override ItemTag[] Tags => ItemDefinition.Tags;
 		public override string Description => ItemDefinition.Description;
 		public override Color Color => ItemDefinition.Color;
 		public override int SortOrder => 7;

@@ -10,6 +10,7 @@ namespace Facepunch.CoreWars
 	{
 		public override string Name => AmmoType.Bolt.ToString();
 		public override string Description => AmmoType.Bolt.GetDescription();
+		public override ItemTag[] Tags => new ItemTag[] { ItemTag.CanDrop };
 		public override int Quantity => 8;
 		public override Color Color => ColorPalette.Ammo;
 		public override int SortOrder => 4;

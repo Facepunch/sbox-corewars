@@ -19,14 +19,44 @@ Tooltip {
         align-items: center;
         justify-content: center;
 
-        .name {
-            font-family: $font;
-            font-size: 24px;
-            color: $red;
+        .header {
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+
+            .name {
+                font-family: $font;
+                font-size: 24px;
+                color: $red;
+            }
+
+            .tags {
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+                margin-top: -8px;
+
+                .tag {
+                    border-radius: 4px;
+                    opacity: 0.6;
+
+                    .name {
+                        margin-right: 4px;
+                        margin-left: 4px;
+                        font-size: 18px;
+                        font-family: Arial;
+                    }
+
+                    margin-right: 4px;
+
+                    &:last-child {
+                        margin-right: 0px;
+                    }
+                }
+            }
         }
 
         .description {
-            margin-top: -12px;
             font-family: $font;
             max-width: 400px;
             word-wrap: break-word;
@@ -41,19 +71,25 @@ Tooltip {
         }
 
         .costs {
+            background-color: rgba( 255 255 255 0.01 );
+            border-radius: 4px;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+
             .cost {
                 justify-content: center;
                 align-items: center;
                 display: flex;
 
                 .icon {
-                    width: 32px;
-                    height: 32px;
+                    width: 40px;
+                    height: 40px;
                     margin-right: 8px;
                 }
 
                 label {
-                    font-size: 20px;
+                    font-size: 24px;
                     color: white;
 
                     &.unaffordable {

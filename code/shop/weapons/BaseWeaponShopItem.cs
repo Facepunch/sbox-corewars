@@ -8,6 +8,7 @@ namespace Facepunch.CoreWars
 	public abstract class BaseWeaponShopItem<T> : BaseShopItem where T : WeaponItem, new()
 	{
 		public override string Name => ItemDefinition.Name;
+		public override ItemTag[] Tags => ItemDefinition.Tags;
 		public override string Description => ItemDefinition.Description;
 		public override Color Color => ItemDefinition.Color;
 		public override int SortOrder => 3;

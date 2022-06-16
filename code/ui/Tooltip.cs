@@ -1,5 +1,6 @@
 ﻿using Sandbox;
 using Sandbox.UI;
+using Sandbox.UI.Construct;
 
 namespace Facepunch.CoreWars
 {
@@ -33,6 +34,7 @@ namespace Facepunch.CoreWars
 
 		public ITooltipProvider Provider { get; private set; }
 		public TimeSince TimeSinceShown { get; private set; }
+		public Panel TagContainer { get; private set; }
 		public Panel Container { get; private set; }
 		public Label DescriptionLabel { get; private set; }
 		public Label NameLabel { get; private set; }
@@ -50,6 +52,21 @@ namespace Facepunch.CoreWars
 				Blur = 8f
 			} );
 			NameLabel.Style.FontColor = provider.Color;
+
+			if ( provider.Tags.Length > 0 )
+			{
+				foreach ( var tag in provider.Tags )
+				{
+					var panel = TagContainer.Add.Panel( "tag" );
+					var label = panel.Add.Label( tag.Name, "name" );
+					panel.Style.BackgroundColor = Color.Lerp( tag.Color, Color.Black, 0.7f );
+					label.Style.FontColor = Color.Lerp( tag.Color, Color.Black, 0.3f );
+				}
+			}
+			else
+			{
+				TagContainer.Delete();
+			}
 		}
 
 		public Tooltip()

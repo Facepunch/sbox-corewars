@@ -10,6 +10,7 @@ namespace Facepunch.CoreWars.Inventory
 		public bool IsWorldEntity { get; private set; }
 		public string ClassName { get; set; }
 
+		public virtual ItemTag[] Tags => new ItemTag[0];
 		public virtual ushort DefaultStackSize => 1;
 		public virtual ushort MaxStackSize => 1;
 		public virtual string WorldModel => string.Empty;

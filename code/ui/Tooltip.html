@@ -2,7 +2,11 @@
 
 <div>
     <div @ref="Container" class="container">
-        <label @ref="NameLabel" class="name" @text="Provider.Name"></label>
+        <div class="header">
+            <label @ref="NameLabel" class="name" @text="Provider.Name"></label>
+            <div @ref="TagContainer" class="tags"></div>
+        </div>
+
         <label @ref="DescriptionLabel" class="description" @text="Provider.Description"></label>
     </div>
 </div>

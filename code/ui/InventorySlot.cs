@@ -25,6 +25,7 @@ namespace Facepunch.CoreWars
 		public Label SlotLabel { get; set; }
 		public Panel Icon { get; set; }
 		public string Description => Item.Description;
+		public ItemTag[] Tags => Item.Tags;
 		public string Name => Item.Name;
 		public Color Color => Item.Color;
 

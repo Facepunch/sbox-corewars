@@ -12,6 +12,7 @@ namespace Facepunch.CoreWars
 
 		public override ushort MaxStackSize => 64;
 		public override bool RemoveOnDeath => true;
+		public override bool CanBeDropped => false;
 		public override Color Color => ColorPalette.Blocks;
 		public override string Description
 		{

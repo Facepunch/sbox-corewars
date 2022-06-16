@@ -17,6 +17,7 @@ namespace Facepunch.CoreWars
 		public string Name { get; private set; }
 		public string Description { get; private set; }
 		public bool WasDisabled { get; private set; }
+		public ItemTag[] Tags => Item.Tags;
 		public Color Color => Item.Color;
 
 		public void SetItem( IPurchasableItem item )
