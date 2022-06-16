@@ -4,11 +4,11 @@ InventorySlot {
     transition: all 0.1s ease-in;
     border: 2px solid $box-border;
     background: linear-gradient(rgba(#000000, 0.7), rgba($box-bg, 0.7));
+    border-radius: $border-radius-default;
     justify-content: center;
     align-items: center;
     width: 80px;
     height: 80px;
-    border-radius: $border-radius-default;
 
     .key-number {
         background-color: $box-border;

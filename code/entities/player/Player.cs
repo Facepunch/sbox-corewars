@@ -408,7 +408,7 @@ namespace Facepunch.CoreWars
 		{
 			foreach ( var buff in oldBuffs )
 			{
-				if ( !newBuffs.Contains( buff ) )
+				if ( !newBuffs.Contains( buff ) && buff != null )
 				{
 					buff.OnExpired( this );
 				}
@@ -416,7 +416,7 @@ namespace Facepunch.CoreWars
 
 			foreach ( var buff in newBuffs )
 			{
-				if ( !oldBuffs.Contains( buff ) )
+				if ( !oldBuffs.Contains( buff ) && buff != null )
 				{
 					buff.OnActivated( this );
 				}

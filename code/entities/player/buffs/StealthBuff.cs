@@ -5,6 +5,8 @@ namespace Facepunch.CoreWars
 {
 	public partial class StealthBuff : BaseBuff
 	{
+		public override string Icon => "textures/items/brew_stealth.png";
+
 		private Particles Effect { get; set; }
 
 		public override void OnActivated( Player player )
@@ -19,6 +21,8 @@ namespace Facepunch.CoreWars
 				Effect?.Destroy();
 				Effect = Particles.Create( "particles/player/cloaked.vpcf" );
 			}
+
+			base.OnActivated( player );
 		}
 
 		public override void OnExpired( Player player )
@@ -29,6 +33,8 @@ namespace Facepunch.CoreWars
 			}
 
 			Effect?.Destroy();
+
+			base.OnExpired( player );
 		}
 	}
 }
