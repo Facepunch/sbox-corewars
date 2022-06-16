@@ -7,6 +7,7 @@ namespace Facepunch.CoreWars
 {
 	public class BrewItem : InventoryItem, IConsumableItem
 	{
+		public override bool RemoveOnDeath => true;
 		public override bool CanBeDropped => false;
 		public override ushort MaxStackSize => 4;
 		public override Color Color => ColorPalette.Brews;
