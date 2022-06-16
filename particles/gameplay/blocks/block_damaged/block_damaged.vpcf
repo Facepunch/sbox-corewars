@@ -1319,6 +1319,7 @@
 				}
 			}
 			m_hTexture = resource:"materials/particles/impact/fleks4.vtex"
+			m_bDisableOperator = true
 		},
 		{
 			_class = "C_OP_RenderSprites"
@@ -1414,6 +1415,7 @@
 				}
 			}
 			m_hTexture = resource:"materials/particles/impact/fleks4.vtex"
+			m_bDisableOperator = true
 		},
 		{
 			_class = "C_OP_RenderSprites"
@@ -1510,6 +1512,7 @@
 				}
 			}
 			m_hTexture = resource:"materials/particles/impact/fleks3.vtex"
+			m_bDisableOperator = true
 		},
 		{
 			_class = "C_OP_RenderTrails"
@@ -1696,6 +1699,7 @@
 				}
 			}
 			m_hTexture = resource:"materials/particles/beam_generic_7.vtex"
+			m_bDisableOperator = true
 		},
 	]
 	m_Children = 

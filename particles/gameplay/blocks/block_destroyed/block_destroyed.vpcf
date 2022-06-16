@@ -1614,5 +1614,8 @@
 		{
 			m_ChildRef = resource:"particles/gameplay/blocks/block_destroyed/block_destroyed_c.vpcf"
 		},
+		{
+			m_ChildRef = resource:"particles/gameplay/blocks/block_destroyed/block_destroyed_d.vpcf"
+		},
 	]
 }
