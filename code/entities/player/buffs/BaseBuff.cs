@@ -7,6 +7,9 @@ namespace Facepunch.CoreWars
 	{
 		[Net] public RealTimeUntil TimeUntilExpired { get; set; }
 
+		public bool IsServer => Host.IsServer;
+		public bool IsClient => Host.IsClient;
+
 		public virtual float Duration => 30f;
 
 		public virtual void OnActivated( Player player )

@@ -23,7 +23,7 @@ namespace Facepunch.CoreWars
 		[Net] public NetInventoryContainer ChestInventory { get; private set; }
 		[Net] public NetInventoryContainer EquipmentInventory { get; private set; }
 		[Net] public TeamCore Core { get; private set; }
-		[Net] public IList<BaseBuff> Buffs { get; private set; }
+		[Net, Change] public IList<BaseBuff> Buffs { get; private set; }
 		[Net] public Dictionary<string,int> Resources { get; private set; }
 
 		public RealTimeSince TimeSinceLastHit { get; private set; }
@@ -404,6 +404,25 @@ namespace Facepunch.CoreWars
 			SetTeam( team );
 		}
 
+		public void OnBuffsChanged( IList<BaseBuff> oldBuffs, IList<BaseBuff> newBuffs )
+		{
+			foreach ( var buff in oldBuffs )
+			{
+				if ( !newBuffs.Contains( buff ) )
+				{
+					buff.OnExpired( this );
+				}
+			}
+
+			foreach ( var buff in newBuffs )
+			{
+				if ( !oldBuffs.Contains( buff ) )
+				{
+					buff.OnActivated( this );
+				}
+			}
+		}
+
 		[ClientRpc]
 		public void ShowHitMarker( int hitboxGroup )
 		{
@@ -418,6 +437,20 @@ namespace Facepunch.CoreWars
 		public void RespawnWhenAvailable()
 		{
 			IsWaitingToRespawn = true;
+		}
+
+		public void RemoveBuff<T>() where T : BaseBuff
+		{
+			for ( var i = Buffs.Count - 1; i >= 0; i-- )
+			{
+				var buff = Buffs[i];
+
+				if ( buff is T )
+				{
+					buff.OnExpired( this );
+					Buffs.RemoveAt( i );
+				}
+			}
 		}
 
 		public void ClearBuffs()
@@ -744,6 +777,8 @@ namespace Facepunch.CoreWars
 				attacker.ShowHitMarker( To.Single( attacker ), hitboxGroup );
 
 				FloatingDamage.Show( this, info.Damage, info.Position );
+
+				RemoveBuff<StealthBuff>();
 			}
 
 			LastDamageTaken = info;
@@ -762,6 +797,11 @@ namespace Facepunch.CoreWars
 
 			if ( IsServer )
 			{
+				if ( Input.Pressed( InputButton.PrimaryAttack ) && ActiveChild is Weapon )
+				{
+					RemoveBuff<StealthBuff>();
+				}
+
 				if ( Input.Released( InputButton.PrimaryAttack ) && NextActionTime )
 				{
 					var container = HotbarInventory.Instance;
