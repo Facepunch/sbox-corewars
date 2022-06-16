@@ -1,0 +1,36 @@
+// THIS FILE IS AUTO-GENERATED
+
+Layer0
+{
+	shader "team_core.vfx"
+
+	//---- Color ----
+	g_flModelTintAmount "1.000"
+	g_vColorTint "[1.000000 1.000000 1.000000 0.000000]"
+
+	//---- Core ----
+	g_flExponent "2.000"
+	g_flMaxThickness "3.000"
+	g_flMinThickness "0.200"
+	g_flRainbowBandMultiplier "1.000"
+	g_flRainbowColorMultiplier "1.000"
+	g_flRainbowSpeed "4.000"
+	g_flReflectance "0.000"
+	g_flRefractionScale "1.000"
+
+	//---- Fade ----
+	g_flFadeExponent "1.000"
+
+	//---- Material ----
+	TextureColor "materials/default/default_color.tga"
+	TextureCurve "materials/default/default.tga"
+	TextureInteriorMap "materials/default/default_cube.pfm"
+	TextureTintMask "materials/default/default.tga"
+
+	//---- Texture Coordinates ----
+	g_nScaleTexCoordUByModelScaleAxis "0"
+	g_nScaleTexCoordVByModelScaleAxis "0"
+	g_vTexCoordOffset "[0.000 0.000]"
+	g_vTexCoordScale "[1.000 1.000]"
+	g_vTexCoordScrollSpeed "[0.000 0.000]"
+}
