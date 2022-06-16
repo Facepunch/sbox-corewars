@@ -38,7 +38,7 @@ namespace Facepunch.CoreWars
 		{
 			if ( Queue.Count > 0 )
 			{
-				Audio.Play( "ui.announcement" );
+				Audio.Play( "announcement.show" );
 				var item = Queue.Dequeue();
 				item.EndTime = Time.Now + 5f;
 				Container.AddChild( item );

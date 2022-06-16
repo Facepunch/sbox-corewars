@@ -31,6 +31,7 @@ namespace Facepunch.CoreWars
 
 		public void AddUpgrade( BaseTeamUpgrade upgrade )
 		{
+			Announcements.Send( Team.GetTo(), $"{upgrade.Name} Unlocked", upgrade.Description, upgrade.GetIcon( null ) );
 			InternalUpgrades.Add( upgrade );
 			UpgradeTypes.Add( TypeLibrary.GetDescription( upgrade.GetType() ).Identity );
 		}
