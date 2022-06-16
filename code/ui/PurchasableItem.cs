@@ -17,7 +17,7 @@ namespace Facepunch.CoreWars
 		public string Name { get; private set; }
 		public string Description { get; private set; }
 		public bool WasDisabled { get; private set; }
-		public ItemTag[] Tags => Item.Tags;
+		public ItemTag[] Tags { get; private set; }
 		public Color Color => Item.Color;
 
 		public void SetItem( IPurchasableItem item )
@@ -48,6 +48,7 @@ namespace Facepunch.CoreWars
 
 					Description = randomDescription;
 					Name = randomName;
+					Tags = new ItemTag[0];
 
 					Icon.Style.SetBackgroundImage( "textures/ui/unknown.png" );
 				}
@@ -55,6 +56,7 @@ namespace Facepunch.CoreWars
 				{
 					Description = item.Description;
 					Name = item.Name;
+					Tags = item.Tags;
 
 					var icon = item.GetIcon( player );
 

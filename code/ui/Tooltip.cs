@@ -82,7 +82,7 @@ namespace Facepunch.CoreWars
 		public void UpdatePosition()
 		{
 			Container.Style.Left = Length.Pixels( (Mouse.Position.x + 40f) * ScaleFromScreen );
-			Container.Style.Top = Length.Pixels( (Mouse.Position.y - 40f) * ScaleFromScreen );
+			Container.Style.Top = Length.Pixels( (Mouse.Position.y - 100f) * ScaleFromScreen );
 		}
 
 		protected override void FinalLayoutChildren()
