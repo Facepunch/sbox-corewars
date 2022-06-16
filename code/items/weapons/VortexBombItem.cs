@@ -8,7 +8,6 @@ namespace Facepunch.CoreWars
 	public class VortexBombItem : WeaponItem
 	{
 		public override bool RemoveOnDeath => true;
-		public override ItemTag[] Tags => new ItemTag[0];
 		public override string WeaponName => "weapon_vortex_bomb";
 		public override Color Color => ColorPalette.Abilities;
 		public override string Description => "A high damage explosive block which can only be defused with a Neutralizer.";

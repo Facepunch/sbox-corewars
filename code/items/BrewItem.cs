@@ -9,7 +9,6 @@ namespace Facepunch.CoreWars
 	{
 		public override bool RemoveOnDeath => true;
 		public override bool CanBeDropped => true;
-		public override ItemTag[] Tags => new ItemTag[] { ItemTag.CanDrop };
 		public override ushort MaxStackSize => 4;
 		public override Color Color => ColorPalette.Brews;
 		public virtual string ConsumeSound => "brew.consume";

@@ -15,6 +15,5 @@ namespace Facepunch.CoreWars
 		public override string Icon => "textures/items/weapon_neutralizer.png";
 		public override string Name => "Neutralizer";
 		public override bool RemoveOnDeath => true;
-		public override ItemTag[] Tags => new ItemTag[0];
 	}
 }

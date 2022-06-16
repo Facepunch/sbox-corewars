@@ -7,7 +7,6 @@ namespace Facepunch.CoreWars
 	public class ArmorItem : InventoryItem
 	{
 		public override bool CanBeDropped => false;
-		public override ItemTag[] Tags => new ItemTag[] { ItemTag.Soulbound };
 		public override Color Color => ColorPalette.Armor;
 		public virtual float DamageMultiplier => 1f;
 		public virtual ArmorSlot ArmorSlot => ArmorSlot.None;

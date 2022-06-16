@@ -8,7 +8,6 @@ namespace Facepunch.CoreWars
 	{
 		public override bool CanBeDropped => false;
 		public override Color Color => ColorPalette.Weapons;
-		public override ItemTag[] Tags => new ItemTag[] { ItemTag.Soulbound };
 
 		public virtual int WorldModelMaterialGroup => 0;
 		public virtual int ViewModelMaterialGroup => 0;

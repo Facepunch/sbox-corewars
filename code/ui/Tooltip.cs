@@ -53,7 +53,7 @@ namespace Facepunch.CoreWars
 			} );
 			NameLabel.Style.FontColor = provider.Color;
 
-			if ( provider.Tags.Length > 0 )
+			if ( provider.Tags != null && provider.Tags.Length > 0 )
 			{
 				foreach ( var tag in provider.Tags )
 				{

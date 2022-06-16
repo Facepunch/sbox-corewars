@@ -1,5 +1,6 @@
 ﻿using Sandbox;
 using System.IO;
+using System.Collections.Generic;
 
 namespace Facepunch.CoreWars.Inventory
 {
@@ -10,7 +11,6 @@ namespace Facepunch.CoreWars.Inventory
 		public bool IsWorldEntity { get; private set; }
 		public string ClassName { get; set; }
 
-		public virtual ItemTag[] Tags => new ItemTag[0];
 		public virtual ushort DefaultStackSize => 1;
 		public virtual ushort MaxStackSize => 1;
 		public virtual string WorldModel => string.Empty;
@@ -21,6 +21,8 @@ namespace Facepunch.CoreWars.Inventory
 		public virtual Color Color => Color.White;
 		public virtual string Name => string.Empty;
 		public virtual string Icon => string.Empty;
+
+		public ItemTag[] Tags { get; private set; }
 
 		public static InventoryItem Deserialize( byte[] data )
 		{
@@ -127,6 +129,12 @@ namespace Facepunch.CoreWars.Inventory
 			}
 		}
 
+		public virtual void BuildTags( List<ItemTag> tags )
+		{
+			if ( CanBeDropped ) tags.Add( ItemTag.CanDrop );
+			if ( !RemoveOnDeath ) tags.Add( ItemTag.Soulbound );
+		}
+
 		public virtual bool IsSameType( InventoryItem other )
 		{
 			return (GetType() == other.GetType());
@@ -168,7 +176,9 @@ namespace Facepunch.CoreWars.Inventory
 
 		public virtual void OnCreated()
 		{
-
+			var tags = new List<ItemTag>();
+			BuildTags( tags );
+			Tags = tags.ToArray();
 		}
 	}
 }

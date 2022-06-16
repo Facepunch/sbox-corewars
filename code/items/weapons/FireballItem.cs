@@ -8,7 +8,6 @@ namespace Facepunch.CoreWars
 	public class FireballItem : WeaponItem
 	{
 		public override bool RemoveOnDeath => true;
-		public override ItemTag[] Tags => new ItemTag[0];
 		public override string WeaponName => "weapon_fireball";
 		public override Color Color => ColorPalette.Abilities;
 		public override string Description => "A fireball which can melt plastic and damage other players.";

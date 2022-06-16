@@ -48,7 +48,7 @@ namespace Facepunch.CoreWars
 
 					Description = randomDescription;
 					Name = randomName;
-					Tags = new ItemTag[0];
+					Tags = null;
 
 					Icon.Style.SetBackgroundImage( "textures/ui/unknown.png" );
 				}

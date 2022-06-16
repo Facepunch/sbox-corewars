@@ -13,7 +13,6 @@ namespace Facepunch.CoreWars
 		public override int ViewModelMaterialGroup => 1;
 		public override string WeaponName => "weapon_sword";
 		public override bool RemoveOnDeath => true;
-		public override ItemTag[] Tags => new ItemTag[0];
 		public override string Description => "A supercharged sword for dealing melee damage.";
 		public override string Icon => "textures/items/weapon_sword_4.png";
 		public override string Name => "Crystal Sword";
