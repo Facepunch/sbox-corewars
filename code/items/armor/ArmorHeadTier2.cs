@@ -12,7 +12,7 @@ namespace Facepunch.CoreWars
 		public override string Name => "Medium Head Armor";
 		public override string Description => "A medium protection head armor piece.";
 		public override string Icon => "textures/items/armor_head_2.png";
-		public override string ModelName => "models/citizen_clothes/hat/hat_securityhelmet.vmdl";
+		public override string PrimaryModel => "models/citizen_clothes/hat/hat_securityhelmet.vmdl";
 		public override int Tier => 2;
 	}
 }

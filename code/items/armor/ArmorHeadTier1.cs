@@ -12,7 +12,7 @@ namespace Facepunch.CoreWars
 		public override string Name => "Light Head Armor";
 		public override string Description => "A low protection head armor piece.";
 		public override string Icon => "textures/items/armor_head_1.png";
-		public override string ModelName => "models/citizen_clothes/hat/balaclava/models/balaclava.vmdl";
+		public override string PrimaryModel => "models/citizen_clothes/hat/balaclava/models/balaclava.vmdl";
 		public override int Tier => 1;
 	}
 }

@@ -12,7 +12,7 @@ namespace Facepunch.CoreWars
 		public override string Name => "Heavy Chest Armor";
 		public override string Description => "A heavy protection chest armor piece.";
 		public override string Icon => "textures/items/armor_chest_3.png";
-		public override string ModelName => "models/citizen_clothes/vest/chest_armour/models/chest_armour.vmdl";
+		public override string PrimaryModel => "models/citizen_clothes/vest/chest_armour/models/chest_armour.vmdl";
 		public override int Tier => 3;
 	}
 }

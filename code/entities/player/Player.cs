@@ -28,7 +28,7 @@ namespace Facepunch.CoreWars
 		[Net] public Dictionary<string,int> Resources { get; private set; }
 
 		public RealTimeSince TimeSinceLastHit { get; private set; }
-		public Dictionary<ArmorSlot,BaseClothing> Armor { get; private set; }
+		public Dictionary<ArmorSlot,List<BaseClothing>> Armor { get; private set; }
 		public ProjectileSimulator Projectiles { get; private set; }
 		public DamageInfo LastDamageTaken { get; private set; }
 		public TimeUntil NextActionTime { get; private set; }
@@ -1158,19 +1158,39 @@ namespace Facepunch.CoreWars
 			return Storage.Current.IsOpen ? Storage.Current.StorageContainer : BackpackInventory.Instance;
 		}
 
+		private void AddClothingToArmorSlot( ArmorSlot slot, BaseClothing clothing )
+		{
+			if ( !Armor.TryGetValue( slot, out var models ) )
+			{
+				models = new List<BaseClothing>();
+				Armor[slot] = models;
+			}
+
+			models.Add( clothing );
+		}
+
 		private void OnEquipmentItemGiven( ushort slot, InventoryItem instance )
 		{
 			if ( instance is ArmorItem armor )
 			{
-				if ( Armor.TryGetValue( armor.ArmorSlot, out var model ) )
+				if ( Armor.TryGetValue( armor.ArmorSlot, out var models ) )
 				{
+					foreach ( var model in models )
+					{
+						model.Delete();
+					}
+
 					Armor.Remove( armor.ArmorSlot );
-					model.Delete();
 				}
 
-				if ( !string.IsNullOrEmpty( armor.ModelName ) )
+				if ( !string.IsNullOrEmpty( armor.PrimaryModel ) )
 				{
-					Armor.Add( armor.ArmorSlot, AttachClothing( armor.ModelName ) );
+					AddClothingToArmorSlot( armor.ArmorSlot, AttachClothing( armor.PrimaryModel ) );
+				}
+
+				if ( !string.IsNullOrEmpty( armor.SecondaryModel ) )
+				{
+					AddClothingToArmorSlot( armor.ArmorSlot, AttachClothing( armor.SecondaryModel ) );
 				}
 			}
 		}
@@ -1179,10 +1199,14 @@ namespace Facepunch.CoreWars
 		{
 			if ( instance is ArmorItem armor && !EquipmentInventory.Is( instance.Container ) )
 			{
-				if ( Armor.TryGetValue( armor.ArmorSlot, out var model ) )
+				if ( Armor.TryGetValue( armor.ArmorSlot, out var models ) )
 				{
+					foreach ( var model in models )
+					{
+						model.Delete();
+					}
+
 					Armor.Remove( armor.ArmorSlot );
-					model.Delete();
 				}
 			}
 		}
