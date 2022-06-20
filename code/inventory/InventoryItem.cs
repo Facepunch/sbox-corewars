@@ -131,8 +131,11 @@ namespace Facepunch.CoreWars.Inventory
 
 		public virtual void BuildTags( List<ItemTag> tags )
 		{
-			if ( CanBeDropped ) tags.Add( ItemTag.CanDrop );
-			if ( !RemoveOnDeath ) tags.Add( ItemTag.Soulbound );
+			if ( CanBeDropped )
+				tags.Add( ItemTag.CanDrop );
+
+			if ( !RemoveOnDeath && !DropOnDeath )
+				tags.Add( ItemTag.Soulbound );
 		}
 
 		public virtual bool IsSameType( InventoryItem other )
