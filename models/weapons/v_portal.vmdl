@@ -45,6 +45,7 @@
 					{
 						_class = "RenderPrimitiveSphere"
 						name = "Sphere"
+						disabled = true
 						parent_bone = "hold_R"
 						material_name = "dev/helper/testgrid.vmat"
 						origin = [ -1.442022, -2.334196, 0.83429 ]
@@ -328,6 +329,21 @@
 					{
 						_class = "Prefab"
 						target_file = "models/first_person/prefabs/first_person_arms_bodygrouplist.vmdl_prefab"
+					},
+				]
+			},
+			{
+				_class = "AttachmentList"
+				children = 
+				[
+					{
+						_class = "Attachment"
+						name = "FireBallAttach"
+						parent_bone = "hold_R"
+						relative_origin = [ -0.357578, -1.346543, 2.348297 ]
+						relative_angles = [ -0.002813, 0.002293, -0.00735 ]
+						weight = 1.0
+						ignore_rotation = false
 					},
 				]
 			},

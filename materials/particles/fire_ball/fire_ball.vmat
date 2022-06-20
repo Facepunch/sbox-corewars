@@ -1,0 +1,36 @@
+// THIS FILE IS AUTO-GENERATED
+
+Layer0
+{
+	shader "team_core.vfx"
+
+	//---- Color ----
+	g_flModelTintAmount "1.000"
+	g_vColorTint "[0.713726 0.380392 0.000000 1.000000]"
+
+	//---- Core ----
+	g_flExponent "1.605"
+	g_flMaxThickness "1.338"
+	g_flMinThickness "0.023"
+	g_flRainbowBandMultiplier "0.000"
+	g_flRainbowColorMultiplier "0.000"
+	g_flRainbowSpeed "0.642"
+	g_flReflectance "2.000"
+	g_flRefractionScale "3.344"
+
+	//---- Fade ----
+	g_flFadeExponent "1.000"
+
+	//---- Material ----
+	TextureColor "[1.000000 0.549020 0.000000 1.000000]"
+	TextureCurve "models/particles/vortex_bomb/vortex_bomb_curve.png"
+	TextureInteriorMap "materials/particles/fire_ball/fire_ball_envmap.png"
+	TextureTintMask "materials/default/default.tga"
+
+	//---- Texture Coordinates ----
+	g_nScaleTexCoordUByModelScaleAxis "0"
+	g_nScaleTexCoordVByModelScaleAxis "0"
+	g_vTexCoordOffset "[0.000 0.000]"
+	g_vTexCoordScale "[1.000 1.000]"
+	g_vTexCoordScrollSpeed "[0.100 0.100]"
+}
