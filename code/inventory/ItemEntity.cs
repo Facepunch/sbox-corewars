@@ -76,7 +76,7 @@ namespace Facepunch.CoreWars.Inventory
 
 		public override void ClientSpawn()
 		{
-			Effect = Particles.Create( "particles/gameplay/items/item_on_ground/generic/items_on_ground.vpcf", this );
+			Effect = Particles.Create( "particles/gameplay/items/item_on_ground/generic/items_on_ground.vpcf" );
 			Effect.SetPosition( 0, WorldSpaceBounds.Center );
 
 			if ( Item.Instance.IsValid() )
@@ -93,6 +93,7 @@ namespace Facepunch.CoreWars.Inventory
 		{
 			IconPosition = WorldSpaceBounds.Center + Vector3.Up * (12f + MathF.Sin( Time.Now ) * 8f);
 			Effect?.SetPosition( 0, IconPosition );
+			Effect?.SetForward( 0, Vector3.Up );
 		}
 
 		protected override void OnDestroy()
