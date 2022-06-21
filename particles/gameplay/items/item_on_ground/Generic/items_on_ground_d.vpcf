@@ -1541,6 +1541,13 @@
 			m_flEndScale = 0.1
 			m_flBias = 0.6
 		},
+		{
+			_class = "C_OP_RemapCPtoVector"
+			m_nCPInput = 6
+			m_nFieldOutput = "6"
+			m_vInputMax = [ 255.0, 255.0, 255.0 ]
+			m_vOutputMax = [ 1.0, 1.0, 1.0 ]
+		},
 	]
 	m_Constraints = 
 	[
