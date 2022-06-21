@@ -11,6 +11,7 @@ namespace Facepunch.CoreWars
 	public class ItemWorldIcon : WorldPanel
 	{
 		public Panel Container { get; private set; }
+		public Panel Glow { get; private set; }
 		public Image Icon { get; private set; }
 		public ItemEntity Entity { get; private set; }
 
@@ -18,8 +19,27 @@ namespace Facepunch.CoreWars
 		{
 			StyleSheet.Load( "/ui/ItemWorldIcon.scss" );
 			Container = Add.Panel( "container" );
+			Glow = Container.Add.Panel( "glow" );
 			Entity = entity;
 			Icon = Container.Add.Image( entity.Item.Instance.Icon, "icon" );
+
+			var item = entity.Item.Instance;
+
+			if ( item.IsValid() )
+			{
+				var shadowList = new ShadowList();
+				var shadow = new Shadow()
+				{
+					OffsetX = 0f,
+					OffsetY = 0f,
+					Blur = 24f,
+					Spread = 0f,
+					Color = item.Color.Saturate( 1f ).WithAlpha( 0.3f )
+				};
+				shadowList.Add( shadow );
+
+				Glow.Style.BoxShadow = shadowList;
+			}
 		}
 
 		public override void Tick()

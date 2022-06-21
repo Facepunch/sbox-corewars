@@ -841,6 +841,7 @@
 		},
 		{
 			m_ChildRef = resource:"particles/gameplay/items/item_on_ground/generic/items_on_ground_c.vpcf"
+			m_bDisableChild = true
 		},
 		{
 			m_ChildRef = resource:"particles/gameplay/items/item_on_ground/generic/items_on_ground_d.vpcf"
