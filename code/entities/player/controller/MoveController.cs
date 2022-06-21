@@ -10,15 +10,14 @@ namespace Facepunch.CoreWars
 		[Net] public float SprintSpeed { get; set; }
 		[Net, Predicted] public IntVector3 BlockPosition { get; set; }
 
-		public float FallDamageThreshold { get; set; } = 600f;
-		public float MinUpSlopeAngle { get; set; } = 100f;
+		public float FallDamageThreshold { get; set; } = 250f;
 		public float MoveSpeedScale { get; set; } = 1f;
-		public float Acceleration { get; set; } = 10f;
+		public float Acceleration { get; set; } = 8f;
 		public float AirAcceleration { get; set; } = 24f;
-		public float GroundFriction { get; set; } = 4f;
+		public float GroundFriction { get; set; } = 6f;
 		public float StopSpeed { get; set; } = 100f;
 		public float FallDamageMin { get; set; } = 0f;
-		public float FallDamageMax { get; set; } = 400f;
+		public float FallDamageMax { get; set; } = 100f;
 		public float StayOnGroundAngle { get; set; } = 270f;
 		public float GroundAngle { get; set; } = 46f;
 		public float StepSize { get; set; } = 28f;
@@ -40,7 +39,10 @@ namespace Facepunch.CoreWars
 		protected bool IsTouchingLadder { get; set; }
 		protected Vector3 LadderNormal { get; set; }
 
-		public MoveDuck Duck;
+		public MoveDuck Duck { get; private set; }
+
+		public bool IsServer => Host.IsServer;
+		public bool IsClient => Host.IsClient;
 
 		public MoveController()
 		{
@@ -540,7 +542,7 @@ namespace Facepunch.CoreWars
 
 				if ( !wasOnGround )
 				{
-					var fallVelocity = PreVelocity.z + Gravity;
+					var fallVelocity = PreVelocity.z + (Gravity * 0.5f);
 					var threshold = -FallDamageThreshold;
 
 					if ( fallVelocity < threshold )
@@ -570,7 +572,7 @@ namespace Facepunch.CoreWars
 
 		private void OnTakeFallDamage( float fraction )
 		{
-			if ( Host.IsServer )
+			if ( IsServer )
 			{
 				var damage = new DamageInfo()
 					.WithAttacker( Pawn )

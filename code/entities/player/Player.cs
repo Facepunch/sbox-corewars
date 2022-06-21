@@ -682,8 +682,8 @@ namespace Facepunch.CoreWars
 				LifeState = LifeState.Alive;
 				Controller = new MoveController
 				{
-					WalkSpeed = 195f,
-					SprintSpeed = 375f
+					WalkSpeed = 200f,
+					SprintSpeed = 325f
 				};
 				Stamina = 100f;
 				Health = 100f;
@@ -773,6 +773,14 @@ namespace Facepunch.CoreWars
 		{
 			if ( info.Attacker is Player attacker )
 			{
+				if ( attacker == this && info.Flags.HasFlag( DamageFlags.Fall ) )
+				{
+					RemoveBuff<StealthBuff>();
+					LastDamageTaken = info;
+					base.TakeDamage( info );
+					return;
+				}
+
 				if ( !Game.FriendlyFire && attacker.Team == Team )
 					return;
 
@@ -810,12 +818,10 @@ namespace Facepunch.CoreWars
 				attacker.ShowHitMarker( To.Single( attacker ), hitboxGroup );
 
 				FloatingDamage.Show( this, info.Damage, info.Position );
-
 				RemoveBuff<StealthBuff>();
 			}
 
 			LastDamageTaken = info;
-
 			base.TakeDamage( info );
 		}
 
