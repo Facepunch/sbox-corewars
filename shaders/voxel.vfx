@@ -66,7 +66,7 @@ struct PixelInput
 	float2 vTexCoord : TEXCOORD9;
 	uint nTextureIndex : TEXCOORD10;
 	int3 vPositionOs : TEXCOORD11;
-	int iNormal : TEXCOORD12;
+	int iNormal : TEXCOORD15;
 };
 
 //=========================================================================================================================
@@ -79,9 +79,8 @@ VS
 	PixelInput MainVs( INSTANCED_SHADER_PARAMS( VertexInput i ) )
 	{
 		int3 chunkPosition = int3( i.vData.y & 63, (i.vData.y >> 6) & 63, (i.vData.y >> 12) & 63 );
-
 		float3 position = float3( float( i.vData.x & ( 63 ) ), float( ( i.vData.x >> 6 ) & ( 63 ) ), float( ( i.vData.x >> 12 ) & ( 63 ) ) );
-		int texindex = int( ( i.vData.x >> 18 ) & ( 31 ) );
+		int texindex = int( ( i.vData.x >> 18 ) & ( 0x1ff ) );
 		int normal = int( ( i.vData.x >> 27 ) & ( 7 ) );
 
 		i.vPositionOs = position * g_flVoxelSize;
@@ -323,8 +322,8 @@ PS
 			#endif
 			m.Emission.rgb = vEmission;
 			
-			PixelOutput o = FinalizePixelMaterial( i, m );
-			return o;
+			ShadingModelValveStandard sm;
+			return FinalizePixelMaterial( i, m, sm );
 
 		}
 		#endif

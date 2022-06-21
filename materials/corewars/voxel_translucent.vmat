@@ -41,9 +41,6 @@ Layer0
 	g_vTexCoordScale "[1.000 1.000]"
 	g_vTexCoordScrollSpeed "[0.000 0.000]"
 
-	//---- Translucent ----
-	g_flOpacityScale "1.000"
-
 	//---- Voxel Atlas ----
 	TextureAtlasAmbientOcclusion "textures/blocks/corewars/blocks_ao.png"
 	TextureAtlasColor "textures/blocks/corewars/blocks_color.png"

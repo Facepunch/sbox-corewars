@@ -12,7 +12,7 @@ namespace Facepunch.CoreWars
 		public override string Name => "Light Legs Armor";
 		public override string Description => "A low protection legs armor piece.";
 		public override string Icon => "textures/items/armor_legs_1.png";
-		public override string SecondaryModel => "models/citizen_clothes/trousers/trousers.jeans.vmdl";
+		//public override string SecondaryModel => "models/citizen_clothes/trousers/trousers.jeans.vmdl";
 		public override string PrimaryModel => "models/citizen_clothes/trousers/cardboardtrousers/models/cardboard_trousers.vmdl";
 		public override int Tier => 1;
 	}
