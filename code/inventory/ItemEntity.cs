@@ -76,13 +76,14 @@ namespace Facepunch.CoreWars.Inventory
 
 		public override void ClientSpawn()
 		{
+			Effect = Particles.Create( "particles/gameplay/items/item_on_ground/generic/items_on_ground.vpcf", this );
+			Effect.SetPosition( 0, WorldSpaceBounds.Center );
+
 			if ( Item.Instance.IsValid() )
 			{
 				Icon = new ItemWorldIcon( this );
+				Effect.SetPosition( 6, Item.Instance.Color );
 			}
-
-			Effect = Particles.Create( "particles/gameplay/items/item_on_ground/item_on_ground.vpcf", this );
-			Effect.SetPosition( 0, WorldSpaceBounds.Center );
 
 			base.ClientSpawn();
 		}
