@@ -22,7 +22,22 @@ namespace Facepunch.CoreWars.Inventory
 		public virtual string Name => string.Empty;
 		public virtual string Icon => string.Empty;
 
-		public ItemTag[] Tags { get; private set; }
+		private ItemTag[] InternalTags;
+
+		public ItemTag[] Tags
+		{
+			get
+			{
+				if ( InternalTags == null )
+				{
+					var tags = new List<ItemTag>();
+					BuildTags( tags );
+					InternalTags = tags.ToArray();
+				}
+
+				return InternalTags;
+			}
+		}
 
 		public static InventoryItem Deserialize( byte[] data )
 		{
@@ -179,9 +194,7 @@ namespace Facepunch.CoreWars.Inventory
 
 		public virtual void OnCreated()
 		{
-			var tags = new List<ItemTag>();
-			BuildTags( tags );
-			Tags = tags.ToArray();
+
 		}
 	}
 }

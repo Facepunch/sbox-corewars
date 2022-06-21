@@ -26,11 +26,8 @@ namespace Facepunch.CoreWars.Inventory
 			else
 			{
 				SetupPhysicsFromSphere( PhysicsMotionType.Dynamic, Vector3.Zero, 8f );
-
-				PhysicsBody.LinearDrag = 1f;
-				PhysicsBody.LinearDamping = 0.9f;
-				PhysicsBody.AngularDrag = 1f;
-				PhysicsBody.LinearDamping = 0.9f;
+				PhysicsBody.LinearDamping = 4f;
+				PhysicsBody.LinearDamping = 4f;
 			}
 
 			PickupTrigger = new PickupTrigger
@@ -81,7 +78,7 @@ namespace Facepunch.CoreWars.Inventory
 			if ( Item.Instance.IsValid() )
 			{
 				Icon = new ItemWorldIcon( this );
-				Effect.SetPosition( 6, Item.Instance.Color * 255f );
+				Effect.SetPosition( 6, Item.Instance.Color.Saturate( 1f ) * 255f );
 			}
 
 			base.ClientSpawn();
