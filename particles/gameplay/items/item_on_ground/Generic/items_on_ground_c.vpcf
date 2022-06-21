@@ -493,7 +493,7 @@
 			{
 				m_nType = "PF_TYPE_LITERAL"
 				m_nMapType = "PF_MAP_TYPE_DIRECT"
-				m_flLiteralValue = 7.5
+				m_flLiteralValue = 7.0
 				m_nControlPoint = 0
 				m_nScalarAttribute = 3
 				m_nVectorAttribute = 6
@@ -579,7 +579,7 @@
 					m_vDomainMaxs = [ 0.0, 0.0 ]
 				}
 			}
-			m_hTexture = resource:"materials/particle/particle_ring_wave_2.vtex"
+			m_hTexture = resource:"materials/particles/ring_wave_subtle.vtex"
 			m_flSelfIllumAmount = 
 			{
 				m_nType = "PF_TYPE_LITERAL"
@@ -635,7 +635,7 @@
 			{
 				m_nType = "PF_TYPE_LITERAL"
 				m_nMapType = "PF_MAP_TYPE_DIRECT"
-				m_flLiteralValue = 6.5
+				m_flLiteralValue = 7.0
 				m_nControlPoint = 0
 				m_nScalarAttribute = 3
 				m_nVectorAttribute = 6
