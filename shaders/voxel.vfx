@@ -171,8 +171,8 @@ PS
 	CreateTexture3DWithoutSampler( g_tLightmapAdjacent4 ) < Channel( R, None( TextureLightmapTop ), Linear ); OutputFormat( R32F ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
 	CreateTexture3DWithoutSampler( g_tLightmapAdjacent5 ) < Channel( R, None( TextureLightmapBottom ), Linear ); OutputFormat( R32F ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
 
-	float g_VoxelOpacity< Range(0.0f, 1.0f); Default(1.0f); >;
-	float g_VoxelBrightness< Range(0.0f, 1.0f); Default(1.0f); >;
+	float g_flVoxelOpacity< Range(0.0f, 1.0f); Default(1.0f); >;
+	float g_flVoxelBrightness< Range(0.0f, 1.0f); Default(1.0f); >;
 
 	BoolAttribute( DoNotCastShadows, F_DO_NOT_CAST_SHADOWS ? true : false );
 
@@ -309,16 +309,15 @@ PS
 				brightness = 0.8f;
 				
 			Material m = GatherMaterial( i );
-			m.Albedo.rgb = vColor.rgb * saturate(0.007f + torchColor + Sunlight * brightness * g_VoxelBrightness);
+			m.Albedo.rgb = vColor.rgb * saturate(0.007f + torchColor + Sunlight * brightness * g_flVoxelBrightness);
 			m.Normal = Tex2DLevelS( g_tAtlasNormal, g_sPointSampler, vTexCoordAtlas, 0 ).rgb;
 			m.Roughness = vRma.r;
 			m.Metalness = vRma.g;
 			m.AmbientOcclusion = vRma.b;
+			m.Opacity = g_flVoxelOpacity;
 			m.TintMask = 1.0f;
 			#if (S_ALPHA_TEST || S_TRANSLUCENT)
-				m.Opacity = vColor.a * g_VoxelOpacity;
-			#else
-				m.Opacity = g_VoxelOpacity;
+				m.Opacity = vColor.a * g_flVoxelOpacity;
 			#endif
 			m.Emission.rgb = vEmission;
 			

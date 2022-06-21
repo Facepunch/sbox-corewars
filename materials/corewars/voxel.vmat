@@ -12,9 +12,9 @@ Layer0
 	F_PREPASS_ALPHA_TEST 1
 
 	g_flTextureAtlasCellSize "64.000"
+	g_flVoxelBrightness "1.000"
+	g_flVoxelOpacity "1.000"
 	g_flVoxelSize "48.000"
-	g_VoxelBrightness "1.000"
-	g_VoxelOpacity "1.000"
 
 	//---- Color ----
 	g_flModelTintAmount "1.000"
@@ -62,9 +62,9 @@ Layer0
 
 	DynamicParams
 	{
+		g_flVoxelBrightness "VoxelBrightness"
+		g_flVoxelOpacity "VoxelOpacity"
 		g_flVoxelSize "VoxelSize"
-		g_VoxelBrightness "GlobalBrightness"
-		g_VoxelOpacity "GlobalOpacity"
 		TextureLightmap "Lightmap"
 		TextureLightmapBottom "LightMapBottom"
 		TextureLightmapEast "LightMapEast"
