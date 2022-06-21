@@ -25,14 +25,14 @@ namespace Facepunch.CoreWars
 		private static Dictionary<Team, Color> ColorMap = new()
 		{
 			{ Team.None, Color.White },
-			{ Team.Blue, Color.Blue },
-			{ Team.Red, Color.Red },
-			{ Team.Orange, Color.Orange },
-			{ Team.Green, Color.Green },
-			{ Team.Purple, new Color( 0x6603fc ).WithAlpha( 1f ) },
-			{ Team.Pink, new Color( 0xce03fc ).WithAlpha( 1f ) },
-			{ Team.Cyan, Color.Cyan },
-			{ Team.Yellow, Color.Yellow }
+			{ Team.Blue, new Color( 0x59adf6 ).WithAlpha( 1f ) },
+			{ Team.Red, new Color( 0xff6961 ).WithAlpha( 1f ) },
+			{ Team.Orange, new Color( 0xffb480 ).WithAlpha( 1f ) },
+			{ Team.Green, new Color( 0x42d6a4 ).WithAlpha( 1f ) },
+			{ Team.Purple, new Color( 0x9d94ff ).WithAlpha( 1f ) },
+			{ Team.Pink, new Color( 0xc780e8 ).WithAlpha( 1f ) },
+			{ Team.Cyan, new Color( 0x08cad1 ).WithAlpha( 1f ) },
+			{ Team.Yellow, new Color( 0xf8f38d ).WithAlpha( 1f ) }
 		};
 
 		private static Dictionary<Team, TeamCore> Cores = new();
