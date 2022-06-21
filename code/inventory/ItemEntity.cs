@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using Facepunch.CoreWars.Utility;
 
 namespace Facepunch.CoreWars.Inventory
 {
@@ -75,10 +76,11 @@ namespace Facepunch.CoreWars.Inventory
 			Effect = Particles.Create( "particles/gameplay/items/item_on_ground/generic/items_on_ground.vpcf" );
 			Effect.SetPosition( 0, WorldSpaceBounds.Center );
 
+			Icon = new ItemWorldIcon( this );
+
 			if ( Item.Instance.IsValid() )
 			{
-				Icon = new ItemWorldIcon( this );
-				Effect.SetPosition( 6, Item.Instance.Color.Saturate( 1f ) * 255f );
+				Effect.SetPosition( 6, Item.Instance.Color.Saturate( 1.5f ) * 255f );
 			}
 
 			base.ClientSpawn();
