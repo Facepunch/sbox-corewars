@@ -171,8 +171,8 @@ PS
 	CreateTexture3DWithoutSampler( g_tLightmapAdjacent4 ) < Channel( R, None( TextureLightmapTop ), Linear ); OutputFormat( R32F ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
 	CreateTexture3DWithoutSampler( g_tLightmapAdjacent5 ) < Channel( R, None( TextureLightmapBottom ), Linear ); OutputFormat( R32F ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
 
-	float g_GlobalOpacity< Range(0.0f, 1.0f); Default(1.0f); >;
-	float g_GlobalBrightness< Range(0.0f, 1.0f); Default(1.0f); >;
+	float g_VoxelOpacity< Range(0.0f, 1.0f); Default(1.0f); >;
+	float g_VoxelBrightness< Range(0.0f, 1.0f); Default(1.0f); >;
 
 	BoolAttribute( DoNotCastShadows, F_DO_NOT_CAST_SHADOWS ? true : false );
 
@@ -299,26 +299,26 @@ PS
 
 			float3 vRma = Tex2DLevelS( g_tAtlasRma, g_sPointSampler, vTexCoordAtlas, 0 ).rgb;
 			float3 vEmission = Tex2DLevelS( g_tAtlasEmission, g_sPointSampler, vTexCoordAtlas, 0 ).rgb;
-			float brightness = 0.8f;
+			float brightness = 1.0f;
 			
 			if ( i.iNormal == 1 )
-				brightness = 0.5f;
-			else if ( i.iNormal == 2 || i.iNormal == 3 )
 				brightness = 0.6f;
-			else if ( i.iNormal == 4 || i.iNormal == 5 )
+			else if ( i.iNormal == 2 || i.iNormal == 3 )
 				brightness = 0.7f;
+			else if ( i.iNormal == 4 || i.iNormal == 5 )
+				brightness = 0.8f;
 				
-			Material m;
-			m.Albedo.rgb = vColor.rgb * saturate(0.007f + torchColor + Sunlight * brightness * g_GlobalBrightness);
+			Material m = GatherMaterial( i );
+			m.Albedo.rgb = vColor.rgb * saturate(0.007f + torchColor + Sunlight * brightness * g_VoxelBrightness);
 			m.Normal = Tex2DLevelS( g_tAtlasNormal, g_sPointSampler, vTexCoordAtlas, 0 ).rgb;
 			m.Roughness = vRma.r;
 			m.Metalness = vRma.g;
 			m.AmbientOcclusion = vRma.b;
 			m.TintMask = 1.0f;
 			#if (S_ALPHA_TEST || S_TRANSLUCENT)
-				m.Opacity = vColor.a * g_GlobalOpacity;
+				m.Opacity = vColor.a * g_VoxelOpacity;
 			#else
-				m.Opacity = g_GlobalOpacity;
+				m.Opacity = g_VoxelOpacity;
 			#endif
 			m.Emission.rgb = vEmission;
 			
