@@ -509,15 +509,18 @@ namespace Facepunch.CoreWars
 			}
 		}
 
-		public virtual void Reset()
+		public virtual void ClearInventories()
 		{
 			EquipmentInventory.Instance.RemoveAll();
 			BackpackInventory.Instance.RemoveAll();
 			HotbarInventory.Instance.RemoveAll();
 			ChestInventory.Instance.RemoveAll();
+		}
 
+		public virtual void Reset()
+		{
 			Client.SetInt( "kills", 0 );
-
+			ClearInventories();
 			ClearBuffs();
 		}
 
@@ -671,6 +674,8 @@ namespace Facepunch.CoreWars
 					EnableCollisions = false
 				};
 				LifeState = LifeState.Dead;
+
+				ClearInventories();
 			}
 			else
 			{

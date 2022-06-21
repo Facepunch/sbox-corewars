@@ -80,8 +80,8 @@ namespace Facepunch.CoreWars
 			draw.BlendMode = BlendMode.Normal;
 			draw.Image( "textures/ui/airdrop.png", new Rect( position.x, position.y, iconSize, iconSize ) );
 
-			var outerBox = new Rect( position.x, position.y + iconSize + 16f, iconSize, 16f );
-			var innerBox = outerBox.Shrink( 4f, 4f, 4f, 4f );
+			var outerBox = new Rect( position.x, position.y + iconSize + 8f, iconSize, 6f );
+			var innerBox = outerBox.Shrink( 2f, 2f, 2f, 2f );
 			var fraction = (1f / TimeToLiveFor) * TimeUntilDestroy;
 
 			innerBox.width *= fraction;
