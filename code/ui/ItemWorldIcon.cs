@@ -32,9 +32,9 @@ namespace Facepunch.CoreWars
 				{
 					OffsetX = 0f,
 					OffsetY = 0f,
-					Blur = 24f,
+					Blur = 64f,
 					Spread = 0f,
-					Color = item.Color.Saturate( 0.3f ).WithAlpha( 0.2f )
+					Color = item.Color.Saturate( 0.5f ).WithAlpha( 0.5f )
 				};
 				shadowList.Add( shadow );
 
