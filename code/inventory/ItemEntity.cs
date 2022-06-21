@@ -70,7 +70,6 @@ namespace Facepunch.CoreWars.Inventory
 		public override void Spawn()
 		{
 			TimeUntilCanPickup = 1f;
-
 			base.Spawn();
 		}
 
@@ -82,7 +81,7 @@ namespace Facepunch.CoreWars.Inventory
 			if ( Item.Instance.IsValid() )
 			{
 				Icon = new ItemWorldIcon( this );
-				Effect.SetPosition( 6, Item.Instance.Color );
+				Effect.SetPosition( 6, Item.Instance.Color * 255f );
 			}
 
 			base.ClientSpawn();
@@ -91,13 +90,15 @@ namespace Facepunch.CoreWars.Inventory
 		[Event.Tick.Client]
 		protected virtual void ClientTick()
 		{
-			IconPosition = WorldSpaceBounds.Center + Vector3.Up * (12f + MathF.Sin( Time.Now ) * 8f);
+			IconPosition = WorldSpaceBounds.Center + Vector3.Up * (8f + MathF.Sin( Time.Now ) * 8f);
 			Effect?.SetPosition( 0, IconPosition );
-			Effect?.SetForward( 0, Vector3.Up );
+			Effect?.SetForward( 0, Vector3.Forward );
 		}
 
 		protected override void OnDestroy()
 		{
+			Effect?.Destroy( true );
+
 			Icon?.Delete();
 			Icon = null;
 

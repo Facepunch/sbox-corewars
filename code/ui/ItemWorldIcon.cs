@@ -37,7 +37,7 @@ namespace Facepunch.CoreWars
 
 			transform.Position = Entity.IconPosition;
 			transform.Rotation = targetRotation;
-			transform.Scale = 2f;
+			transform.Scale = 1.5f;
 
 			Transform = transform;
 
