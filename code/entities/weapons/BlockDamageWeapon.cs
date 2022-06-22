@@ -9,7 +9,7 @@ namespace Facepunch.CoreWars
 		public virtual BuildingMaterialType PrimaryMaterialType => BuildingMaterialType.Plastic;
 		public virtual float SecondaryMaterialMultiplier => 0.3f;
 
-		protected virtual void DamageVoxel( Voxel voxel, float damage )
+		protected virtual void DamageVoxel( Voxel voxel, float damage, bool showEffects = true )
 		{
 			var world = VoxelWorld.Current;
 			var block = voxel.GetBlockType() as BaseBuildingBlock;
@@ -66,8 +66,11 @@ namespace Facepunch.CoreWars
 			{
 				using ( Prediction.Off() )
 				{
-					var effect = Particles.Create( "particles/gameplay/blocks/block_destroyed/block_destroyed.vpcf" );
-					effect.SetPosition( 0, sourcePosition );
+					if ( showEffects )
+					{
+						var effect = Particles.Create( "particles/gameplay/blocks/block_destroyed/block_destroyed.vpcf" );
+						effect.SetPosition( 0, sourcePosition );
+					}
 
 					if ( !string.IsNullOrEmpty( block.DestroySound ) )
 					{
@@ -79,7 +82,7 @@ namespace Facepunch.CoreWars
 
 				OnBlockDestroyed( voxel.Position );
 			}
-			else
+			else if ( showEffects )
 			{
 				using ( Prediction.Off() )
 				{
@@ -94,7 +97,7 @@ namespace Facepunch.CoreWars
 
 		}
 
-		protected virtual void DamageVoxelInDirection( float range, float damage )
+		protected virtual void DamageVoxelInDirection( float range, float damage, bool showEffects = true )
 		{
 			var world = VoxelWorld.Current;
 
@@ -107,7 +110,7 @@ namespace Facepunch.CoreWars
 
 			if ( voxel.IsValid )
 			{
-				DamageVoxel( voxel, damage );
+				DamageVoxel( voxel, damage, showEffects );
 			}
 		}
 	}

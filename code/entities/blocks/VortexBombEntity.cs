@@ -14,6 +14,7 @@ namespace Facepunch.CoreWars
 	public partial class VortexBombEntity : BlockEntity
 	{
 		[Net] public RealTimeUntil TimeUntilExplode { get; private set; }
+		[Net] public bool IsBeingNeutralized { get; private set; }
 
 		private bool HasExploded { get; set; }
 		private Particles Effect { get; set; }
@@ -57,15 +58,30 @@ namespace Facepunch.CoreWars
 		[Event.Tick.Client]
 		protected virtual void UpdateEffect()
 		{
-			var fraction = TimeUntilExplode / 4f;
-			Effect?.SetPosition( 10, new Vector3( fraction ) );
-			Effect?.SetPosition( 11, new Vector3( fraction ) );
+			if ( !IsBeingNeutralized )
+			{
+				var fraction = TimeUntilExplode / 4f;
+				Effect?.SetPosition( 10, new Vector3( fraction ) );
+				Effect?.SetPosition( 11, new Vector3( fraction ) );
+			}
+			else
+			{
+				Effect?.SetPosition( 10, new Vector3( 1f ) );
+				Effect?.SetPosition( 11, new Vector3( 1f ) );
+			}
 		}
 
 		[Event.Tick.Server]
 		protected virtual void ServerTick()
 		{
-			if ( !TimeUntilExplode || HasExploded )
+			var state = World.GetState<BuildingBlockState>( BlockPosition );
+
+			if ( state.IsValid() && state.LastDamageTime < 1f )
+				IsBeingNeutralized = true;
+			else
+				IsBeingNeutralized = false;
+
+			if ( !TimeUntilExplode || HasExploded || IsBeingNeutralized )
 				return;
 
 			DoExplodeEffect();

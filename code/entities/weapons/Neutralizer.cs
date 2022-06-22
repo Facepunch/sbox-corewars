@@ -11,7 +11,7 @@ namespace Facepunch.CoreWars
 		public override AmmoType AmmoType => AmmoType.None;
 		public override WeaponType Type => WeaponType.Melee;
 		public override int Ammo => 0;
-		public override int Damage => 30;
+		public override int Damage => 10;
 	}
 
 	[Library( "weapon_neutralizer" )]
@@ -41,7 +41,7 @@ namespace Facepunch.CoreWars
 		{
 			if ( IsServer && WeaponItem.IsValid() )
 			{
-				DamageVoxelInDirection( 80f, Config.Damage );
+				DamageVoxelInDirection( 100f, Config.Damage );
 			}
 
 			if ( ParticleEffect == null )
