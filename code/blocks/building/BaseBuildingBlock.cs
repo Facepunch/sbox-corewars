@@ -3,7 +3,7 @@ using Sandbox;
 
 namespace Facepunch.CoreWars.Blocks
 {
-	public class BaseBuildingBlock : BlockType
+	public abstract class BaseBuildingBlock : BlockType
 	{
 		public virtual BuildingMaterialType MaterialType => BuildingMaterialType.Unbreakable;
 		public virtual string DestroySound => null;

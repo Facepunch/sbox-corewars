@@ -3,8 +3,7 @@ using Sandbox;
 
 namespace Facepunch.CoreWars.Blocks
 {
-	[Library]
-	public class BasePlasticBlock : BaseBuildingBlock
+	public abstract class BasePlasticBlock : BaseBuildingBlock
 	{
 		public override string Description => "The cheapest but weakest block.";
 		public override string DestroySound => "break.plastic";
