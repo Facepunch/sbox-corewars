@@ -110,6 +110,11 @@ namespace Facepunch.CoreWars
 
 			Canvas = Add.Panel( "chat_canvas" );
 
+			if ( Game.Current.IsEditorMode )
+			{
+				Channel = ChatBoxChannel.All;
+			}
+
 			TextEntry = AddChild<TextEntryContainer>();
 			TextEntry.Input.AddEventListener( "onsubmit", () => Submit() );
 			TextEntry.Input.AddEventListener( "onblur", () => CloseOnBlur() );
@@ -117,11 +122,6 @@ namespace Facepunch.CoreWars
 			TextEntry.Input.AllowEmojiReplace = true;
 			TextEntry.Input.OnTabPressed += OnTabPressed;
 			TextEntry.SetChannel( Channel );
-
-			if ( Game.Current.IsEditorMode )
-			{
-				Channel = ChatBoxChannel.All;
-			}
 
 			Chat.OnOpenChat += Open;
 		}
