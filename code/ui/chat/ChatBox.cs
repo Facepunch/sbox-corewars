@@ -1,4 +1,5 @@
 ﻿
+using Facepunch.CoreWars.Editor;
 using Sandbox;
 using Sandbox.Hooks;
 using Sandbox.UI;
@@ -81,18 +82,22 @@ namespace Facepunch.CoreWars
 			var caller = ConsoleSystem.Caller;
 			Assert.NotNull( caller );
 
-			if ( caller.Pawn is not Player player )
-				return;
-
 			if ( message.Contains( '\n' ) || message.Contains( '\r' ) )
 				return;
 
 			Log.Info( $"{caller}: {message}" );
 
-			if ( channel == ChatBoxChannel.All )
-				AddChatEntry( To.Everyone, caller.Name, message, $"avatar:{ConsoleSystem.Caller.PlayerId}", player.Team.GetHudClass() );
-			else
-				AddChatEntry( player.Team.GetTo(), caller.Name, message, $"avatar:{ConsoleSystem.Caller.PlayerId}", player.Team.GetHudClass(), channel );
+			if ( caller.Pawn is Player player )
+			{
+				if ( channel == ChatBoxChannel.All )
+					AddChatEntry( To.Everyone, caller.Name, message, $"avatar:{ConsoleSystem.Caller.PlayerId}", player.Team.GetHudClass() );
+				else
+					AddChatEntry( player.Team.GetTo(), caller.Name, message, $"avatar:{ConsoleSystem.Caller.PlayerId}", player.Team.GetHudClass(), channel );
+			}	
+			else if ( caller.Pawn is EditorPlayer )
+			{
+				AddChatEntry( To.Everyone, caller.Name, message, $"avatar:{ConsoleSystem.Caller.PlayerId}", Team.Orange.GetHudClass() );
+			}
 		}
 
 		public ChatBoxChannel Channel { get; private set; } = ChatBoxChannel.Team;
@@ -174,6 +179,13 @@ namespace Facepunch.CoreWars
 
 		private void OnTabPressed()
 		{
+			if ( Local.Pawn is EditorPlayer )
+			{
+				Channel = ChatBoxChannel.All;
+				TextEntry.SetChannel( Channel );
+				return;
+			}
+
 			if ( Channel == ChatBoxChannel.All )
 				Channel = ChatBoxChannel.Team;
 			else
