@@ -15,6 +15,7 @@ namespace Facepunch.CoreWars
 	{
 		[Net] public RealTimeUntil TimeUntilExplode { get; private set; }
 
+		private bool HasExploded { get; set; }
 		private Particles Effect { get; set; }
 		private Sound Sound { get; set; }
 
@@ -38,6 +39,21 @@ namespace Facepunch.CoreWars
 			base.ClientSpawn();
 		}
 
+		[ClientRpc]
+		protected async void DoExplodeEffect()
+		{
+			var explosion = Particles.Create( "particles/gameplay/vortex_bomb/explode/vortex_explode_bomb_base.vpcf" );
+			explosion.SetPosition( 0, Position );
+
+			await Task.DelaySeconds( 0.2f );
+			Sound.FromWorld( "vortexbomb.beforeexplode", Position );
+			Sound.Stop();
+
+			await Task.DelaySeconds( 0.8f );
+			Sound.FromWorld( "vortexbomb.explode", Position );
+			Effect?.Destroy( true );
+		}
+
 		[Event.Tick.Client]
 		protected virtual void UpdateEffect()
 		{
@@ -49,13 +65,20 @@ namespace Facepunch.CoreWars
 		[Event.Tick.Server]
 		protected virtual void ServerTick()
 		{
-			if ( !TimeUntilExplode ) return;
+			if ( !TimeUntilExplode || HasExploded )
+				return;
 
-			var explosion = Particles.Create( "particles/explosion.vpcf" );
-			explosion.SetPosition( 0, Position );
+			DoExplodeEffect();
+			DestroyAfter( 1f );
+
+			HasExploded = true;
+		}
+
+		protected async void DestroyAfter( float delay )
+		{
+			await Task.DelaySeconds( delay );
 
 			World.SetBlockOnServer( BlockPosition, 0 );
-			Sound.FromWorld( "barage.explode", Position );
 
 			for ( var i = 0; i < 6; i++ )
 			{
@@ -79,7 +102,7 @@ namespace Facepunch.CoreWars
 
 		protected override void OnDestroy()
 		{
-			Effect?.Destroy();
+			Effect?.Destroy( true );
 			Sound.Stop();
 
 			base.OnDestroy();

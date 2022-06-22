@@ -25,12 +25,6 @@ namespace Facepunch.CoreWars
 
 		private Player PlayerToTeleport { get; set; }
 
-		public override void Spawn()
-		{
-			base.Spawn();
-			SetModel( "models/weapons/w_portal.vmdl" );
-		}
-
 		protected override void OnThrown()
 		{
 			if ( IsServer && Owner is Player player )
