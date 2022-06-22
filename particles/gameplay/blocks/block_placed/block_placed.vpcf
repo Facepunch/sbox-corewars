@@ -67,7 +67,7 @@
 			{
 				m_nType = "PF_TYPE_LITERAL"
 				m_nMapType = "PF_MAP_TYPE_DIRECT"
-				m_flLiteralValue = 48.0
+				m_flLiteralValue = 64.0
 				m_nControlPoint = 0
 				m_nScalarAttribute = 3
 				m_nVectorAttribute = 6
@@ -112,7 +112,7 @@
 			{
 				m_nType = "PF_TYPE_LITERAL"
 				m_nMapType = "PF_MAP_TYPE_DIRECT"
-				m_flLiteralValue = 48.0
+				m_flLiteralValue = 64.0
 				m_nControlPoint = 0
 				m_nScalarAttribute = 3
 				m_nVectorAttribute = 6
@@ -262,8 +262,8 @@
 				m_nScalarAttribute = 3
 				m_nVectorAttribute = 6
 				m_nVectorComponent = 0
-				m_flRandomMin = 0.75
-				m_flRandomMax = 0.85
+				m_flRandomMin = 0.5
+				m_flRandomMax = 0.5
 				m_nRandomMode = "PF_RANDOM_MODE_CONSTANT"
 				m_flLOD0 = 0.0
 				m_flLOD1 = 0.0
@@ -328,7 +328,7 @@
 			{
 				m_nType = "PF_TYPE_LITERAL"
 				m_nMapType = "PF_MAP_TYPE_DIRECT"
-				m_flLiteralValue = 200.0
+				m_flLiteralValue = 500.0
 				m_nControlPoint = 0
 				m_nScalarAttribute = 3
 				m_nVectorAttribute = 6
@@ -469,6 +469,7 @@
 				}
 			}
 			m_hTexture = resource:"materials/particles/impact/fleks4.vtex"
+			m_bDisableOperator = true
 		},
 		{
 			_class = "C_OP_RenderSprites"
@@ -564,6 +565,7 @@
 				}
 			}
 			m_hTexture = resource:"materials/particles/impact/fleks4.vtex"
+			m_bDisableOperator = true
 		},
 		{
 			_class = "C_OP_RenderSprites"
@@ -660,6 +662,7 @@
 				}
 			}
 			m_hTexture = resource:"materials/particles/impact/fleks3.vtex"
+			m_bDisableOperator = true
 		},
 		{
 			_class = "C_OP_RenderTrails"
