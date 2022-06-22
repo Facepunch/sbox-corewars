@@ -16,7 +16,7 @@ namespace Facepunch.CoreWars
 		public string GoldAmount => GetResourceCount<GoldItem>().ToString();
 		public string CrystalAmount => GetResourceCount<CrystalItem>().ToString();
 		public Panel ItemContainer { get; set; }
-		public TeamUpgradesNPC NPC { get; set; }
+		public TeamUpgradesEntity Entity { get; set; }
 		public bool IsOpen { get; set; }
 
 		public UpgradeStore()
@@ -39,13 +39,13 @@ namespace Facepunch.CoreWars
 			IsOpen = false;
 		}
 
-		public void SetNPC( TeamUpgradesNPC npc )
+		public void SetEntity( TeamUpgradesEntity entity )
 		{
-			NPC = npc;
+			Entity = entity;
 
 			ItemContainer.DeleteChildren( true );
 
-			foreach ( var item in npc.Upgrades )
+			foreach ( var item in entity.Upgrades )
 			{
 				var panel = ItemContainer.AddChild<PurchasableItem>( "item" );
 				panel.OnPurchaseClicked += OnItemPurchased;
@@ -57,9 +57,9 @@ namespace Facepunch.CoreWars
 		{
 			if ( Local.Pawn is not Player player ) return;
 
-			if ( NPC.IsValid() )
+			if ( Entity.IsValid() )
 			{
-				var distance = NPC.Position.Distance( player.Position );
+				var distance = Entity.Position.Distance( player.Position );
 
 				if ( distance >= 300f )
 				{
@@ -83,7 +83,7 @@ namespace Facepunch.CoreWars
 
 		protected virtual void OnItemPurchased( IPurchasableItem item )
 		{
-			Player.BuyUpgradeCmd( NPC.NetworkIdent, item.GetType().Name );
+			Player.BuyUpgradeCmd( Entity.NetworkIdent, item.GetType().Name );
 			Audio.Play( "item.purchase" );
 		}
 
@@ -91,9 +91,9 @@ namespace Facepunch.CoreWars
 		{
 			base.PostTemplateApplied();
 
-			if ( NPC.IsValid() )
+			if ( Entity.IsValid() )
 			{
-				SetNPC( NPC );
+				SetEntity( Entity );
 			}
 
 			BindClass( "hidden", () => !IsOpen );

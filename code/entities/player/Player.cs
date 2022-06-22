@@ -95,7 +95,7 @@ namespace Facepunch.CoreWars
 				return;
 
 			var entity = FindByIndex( index );
-			if ( entity is not TeamUpgradesNPC npc ) return;
+			if ( entity is not TeamUpgradesEntity npc ) return;
 			if ( npc.Position.Distance( player.Position ) > npc.MaxUseDistance ) return;
 
 			var item = npc.Upgrades.FirstOrDefault( i => i.GetType().Name == type );

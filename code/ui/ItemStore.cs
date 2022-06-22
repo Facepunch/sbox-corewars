@@ -16,7 +16,7 @@ namespace Facepunch.CoreWars
 		public string GoldAmount => GetResourceCount<GoldItem>().ToString();
 		public string CrystalAmount => GetResourceCount<CrystalItem>().ToString();
 		public Panel ItemContainer { get; set; }
-		public ItemStoreNPC NPC { get; set; }
+		public ItemStoreEntity Entity { get; set; }
 		public bool IsOpen { get; set; }
 
 		public ItemStore()
@@ -39,15 +39,15 @@ namespace Facepunch.CoreWars
 			IsOpen = false;
 		}
 
-		public void SetNPC( ItemStoreNPC npc )
+		public void SetEntity( ItemStoreEntity entity )
 		{
-			NPC = npc;
+			Entity = entity;
 
 			ItemContainer.DeleteChildren( true );
 
-			npc.Items.Sort( ( a, b ) => a.SortOrder.CompareTo( b.SortOrder ) );
+			entity.Items.Sort( ( a, b ) => a.SortOrder.CompareTo( b.SortOrder ) );
 
-			foreach ( var item in npc.Items )
+			foreach ( var item in entity.Items )
 			{
 				var panel = ItemContainer.AddChild<PurchasableItem>( "item" );
 				panel.OnPurchaseClicked += OnItemPurchased;
@@ -59,9 +59,9 @@ namespace Facepunch.CoreWars
 		{
 			if ( Local.Pawn is not Player player ) return;
 
-			if ( NPC.IsValid() )
+			if ( Entity.IsValid() )
 			{
-				var distance = NPC.Position.Distance( player.Position );
+				var distance = Entity.Position.Distance( player.Position );
 
 				if ( distance >= 300f )
 				{
@@ -85,7 +85,7 @@ namespace Facepunch.CoreWars
 
 		protected virtual void OnItemPurchased( IPurchasableItem item )
 		{
-			Player.BuyItemCmd( NPC.NetworkIdent, item.GetType().Name );
+			Player.BuyItemCmd( Entity.NetworkIdent, item.GetType().Name );
 			Audio.Play( "item.purchase" );
 		}
 
@@ -93,9 +93,9 @@ namespace Facepunch.CoreWars
 		{
 			base.PostTemplateApplied();
 
-			if ( NPC.IsValid() )
+			if ( Entity.IsValid() )
 			{
-				SetNPC( NPC );
+				SetEntity( Entity );
 			}
 
 			BindClass( "hidden", () => !IsOpen );

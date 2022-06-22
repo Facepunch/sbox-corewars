@@ -8,15 +8,16 @@ using System.ComponentModel;
 
 namespace Facepunch.CoreWars
 {
-	[EditorEntity( Title = "Item Store NPC", EditorModel = "models/gameplay/temp/team_shrines/team_shrine.vmdl" )]
+	[EditorEntity( Title = "Team Upgrades", EditorModel = "models/gameplay/temp/team_shrines/team_shrine.vmdl" )]
 	[Category( "Gameplay" )]
-	public partial class ItemStoreNPC : AnimatedEntity, ISourceEntity, IUsable, INameplate, IItemStore
+	[Alias( "TeamUpgradesNPC" )]
+	public partial class TeamUpgradesEntity : AnimatedEntity, ISourceEntity, IUsable, INameplate
 	{
 		[EditorProperty] public Team Team { get; set; }
 
-		public List<BaseShopItem> Items { get; private set; } = new();
+		public List<BaseTeamUpgrade> Upgrades { get; private set; } = new();
 
-		public string DisplayName => "Item Store";
+		public string DisplayName => "Team Upgrades";
 		public float MaxUseDistance => 300f;
 		public bool IsFriendly => true;
 
@@ -29,7 +30,7 @@ namespace Facepunch.CoreWars
 
 			Transmit = TransmitType.Always;
 
-			AddAllItems();
+			AddAllUpgrades();
 
 			base.Spawn();
 		}
@@ -37,7 +38,7 @@ namespace Facepunch.CoreWars
 		public override void ClientSpawn()
 		{
 			Nameplate = new Nameplate( this );
-			AddAllItems();
+			AddAllUpgrades();
 			base.ClientSpawn();
 		}
 
@@ -68,23 +69,23 @@ namespace Facepunch.CoreWars
 			OpenForClient( To.Single( player ) );
 		}
 
-		private void AddAllItems()
+		private void AddAllUpgrades()
 		{
-			var types = TypeLibrary.GetTypes<BaseShopItem>();
+			var types = TypeLibrary.GetTypes<BaseTeamUpgrade>();
 
 			foreach ( var type in types )
 			{
 				if ( type.IsAbstract || type.IsGenericType ) continue;
-				var item = TypeLibrary.Create<BaseShopItem>( type );
-				Items.Add( item );
+				var upgrade = TypeLibrary.Create<BaseTeamUpgrade>( type );
+				Upgrades.Add( upgrade );
 			}
 		}
 
 		[ClientRpc]
 		private void OpenForClient()
 		{
-			ItemStore.Current.SetNPC( this );
-			ItemStore.Current.Open();
+			UpgradeStore.Current.SetEntity( this );
+			UpgradeStore.Current.Open();
 		}
 	}
 }
