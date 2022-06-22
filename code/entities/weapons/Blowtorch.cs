@@ -26,9 +26,9 @@ namespace Facepunch.CoreWars
 		public override BuildingMaterialType PrimaryMaterialType => BuildingMaterialType.Plastic;
 		public override float SecondaryMaterialMultiplier => 0f;
 
-		private RealTimeUntil DestroyFlameTime { get; set; }
-		private Particles FlameParticles { get; set; }
-		private Sound? FlameSound { get; set; }
+		private RealTimeUntil DestroyEffectTime { get; set; }
+		private Particles ParticleEffect { get; set; }
+		private Sound? SoundEffect { get; set; }
 
 		public override void Spawn()
 		{
@@ -43,18 +43,18 @@ namespace Facepunch.CoreWars
 				DamageVoxelInDirection( 80f, Config.Damage );
 			}
 
-			if ( FlameParticles == null )
+			if ( ParticleEffect == null )
 			{
-				FlameParticles = Particles.Create( "particles/weapons/blowtorch/blowtorch_flame.vpcf" );
-				FlameParticles.SetEntityAttachment( 0, EffectEntity, "muzzle" );
+				ParticleEffect = Particles.Create( "particles/weapons/blowtorch/blowtorch_flame.vpcf" );
+				ParticleEffect.SetEntityAttachment( 0, EffectEntity, "muzzle" );
 			}
 
-			if ( !FlameSound.HasValue )
+			if ( !SoundEffect.HasValue )
 			{
-				FlameSound = PlaySound( "weapon.blowtorch" );
+				SoundEffect = PlaySound( "weapon.blowtorch" );
 			}
 
-			DestroyFlameTime = 0.5f;
+			DestroyEffectTime = 0.5f;
 			TimeSincePrimaryAttack = 0;
 			TimeSinceSecondaryAttack = 0;
 		}
@@ -74,28 +74,28 @@ namespace Facepunch.CoreWars
 		[Event.Tick]
 		protected virtual void Tick()
 		{
-			if ( DestroyFlameTime && FlameParticles != null )
+			if ( DestroyEffectTime && ParticleEffect != null )
 			{
-				if ( FlameSound.HasValue )
+				if ( SoundEffect.HasValue )
 				{
-					FlameSound.Value.Stop();
-					FlameSound = null;
+					SoundEffect.Value.Stop();
+					SoundEffect = null;
 				}
 
-				FlameParticles?.Destroy();
-				FlameParticles = null;
+				ParticleEffect?.Destroy();
+				ParticleEffect = null;
 			}
 		}
 
 		protected override void OnDestroy()
 		{
-			if ( FlameSound.HasValue )
+			if ( SoundEffect.HasValue )
 			{
-				FlameSound.Value.Stop();
-				FlameSound = null;
+				SoundEffect.Value.Stop();
+				SoundEffect = null;
 			}
 
-			FlameParticles?.Destroy();
+			ParticleEffect?.Destroy();
 			base.OnDestroy();
 		}
 	}

@@ -27,9 +27,9 @@ namespace Facepunch.CoreWars
 		public override int ClipSize => 0;
 		public override bool IsMelee => true;
 
-		private RealTimeUntil DestroySparksTime { get; set; }
-		private Particles SparksParticles { get; set; }
-		private Sound? SparksSound { get; set; }
+		private RealTimeUntil DestroyEffectTime { get; set; }
+		private Particles ParticleEffect { get; set; }
+		private Sound? EffectSound { get; set; }
 
 		public override void Spawn()
 		{
@@ -44,18 +44,18 @@ namespace Facepunch.CoreWars
 				DamageVoxelInDirection( 80f, Config.Damage );
 			}
 
-			if ( SparksParticles == null )
+			if ( ParticleEffect == null )
 			{
-				SparksParticles = Particles.Create( "particles/weapons/blowtorch/blowtorch_flame.vpcf" );
-				SparksParticles.SetEntityAttachment( 0, EffectEntity, "muzzle" );
+				ParticleEffect = Particles.Create( "particles/weapons/neutralizer/neutralizer_flame.vpcf" );
+				ParticleEffect.SetEntityAttachment( 0, EffectEntity, "muzzle" );
 			}
 
-			if ( !SparksSound.HasValue )
+			if ( !EffectSound.HasValue )
 			{
-				SparksSound = PlaySound( "weapon.defuser" );
+				EffectSound = PlaySound( "weapon.defuser" );
 			}
 
-			DestroySparksTime = 0.5f;
+			DestroyEffectTime = 0.5f;
 			TimeSincePrimaryAttack = 0;
 			TimeSinceSecondaryAttack = 0;
 		}
@@ -75,16 +75,16 @@ namespace Facepunch.CoreWars
 		[Event.Tick]
 		protected virtual void Tick()
 		{
-			if ( DestroySparksTime && SparksParticles != null )
+			if ( DestroyEffectTime && ParticleEffect != null )
 			{
-				if ( SparksSound.HasValue )
+				if ( EffectSound.HasValue )
 				{
-					SparksSound.Value.Stop();
-					SparksSound = null;
+					EffectSound.Value.Stop();
+					EffectSound = null;
 				}
 
-				SparksParticles?.Destroy();
-				SparksParticles = null;
+				ParticleEffect?.Destroy();
+				ParticleEffect = null;
 			}
 		}
 
@@ -98,13 +98,13 @@ namespace Facepunch.CoreWars
 
 		protected override void OnDestroy()
 		{
-			if ( SparksSound.HasValue )
+			if ( EffectSound.HasValue )
 			{
-				SparksSound.Value.Stop();
-				SparksSound = null;
+				EffectSound.Value.Stop();
+				EffectSound = null;
 			}
 
-			SparksParticles?.Destroy();
+			ParticleEffect?.Destroy();
 			base.OnDestroy();
 		}
 	}

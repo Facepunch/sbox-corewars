@@ -97,7 +97,7 @@ namespace Facepunch.CoreWars
 
 		public override void Spawn()
 		{
-			SetModel( "models/rust_props/wooden_crates/wooden_crate_d.vmdl" );
+			SetModel( "models/gameplay/temp/shrine_test/air_drop_shrine.vmdl" );
 			SetupPhysicsFromAABB( PhysicsMotionType.Keyframed, Model.Bounds.Mins, Model.Bounds.Maxs );
 
 			Transmit = TransmitType.Always;

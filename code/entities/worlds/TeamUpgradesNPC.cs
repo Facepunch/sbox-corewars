@@ -8,7 +8,7 @@ using System.ComponentModel;
 
 namespace Facepunch.CoreWars
 {
-	[EditorEntity( Title = "Team Upgrades NPC", EditorModel = "models/citizen/citizen.vmdl" )]
+	[EditorEntity( Title = "Team Upgrades NPC", EditorModel = "models/gameplay/temp/team_shrines/team_shrine.vmdl" )]
 	[Category( "Gameplay" )]
 	public partial class TeamUpgradesNPC : AnimatedEntity, ISourceEntity, IUsable, INameplate
 	{
@@ -24,17 +24,10 @@ namespace Facepunch.CoreWars
 
 		public override void Spawn()
 		{
-			SetModel( "models/citizen/citizen.vmdl" );
+			SetModel( "models/gameplay/temp/team_shrines/team_shrine.vmdl" );
 			SetupPhysicsFromAABB( PhysicsMotionType.Keyframed, Model.Bounds.Mins, Model.Bounds.Maxs );
 
 			Transmit = TransmitType.Always;
-
-			AddClothing( "models/citizen_clothes/shirt/chainmail/models/chainmail.vmdl" );
-			AddClothing( "models/citizen_clothes/trousers/legarmour/models/leg_armour.vmdl" );
-			AddClothing( "models/citizen_clothes/vest/tactical_vest/models/tactical_vest.vmdl" );
-			AddClothing( "models/citizen_clothes/shoes/trainers/trainers.vmdl" );
-			AddClothing( "models/citizen_clothes/glasses/stylish_glasses/models/stylish_glasses_gold.vmdl" );
-			AddClothing( "models/citizen_clothes/hair/hair_longbrown/models/hair_longbrown.vmdl" );
 
 			AddAllUpgrades();
 
@@ -44,9 +37,7 @@ namespace Facepunch.CoreWars
 		public override void ClientSpawn()
 		{
 			Nameplate = new Nameplate( this );
-
 			AddAllUpgrades();
-
 			base.ClientSpawn();
 		}
 
