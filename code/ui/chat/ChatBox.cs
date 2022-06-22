@@ -118,6 +118,11 @@ namespace Facepunch.CoreWars
 			TextEntry.Input.OnTabPressed += OnTabPressed;
 			TextEntry.SetChannel( Channel );
 
+			if ( Game.Current.IsEditorMode )
+			{
+				Channel = ChatBoxChannel.All;
+			}
+
 			Chat.OnOpenChat += Open;
 		}
 
@@ -179,7 +184,7 @@ namespace Facepunch.CoreWars
 
 		private void OnTabPressed()
 		{
-			if ( Local.Pawn is EditorPlayer )
+			if ( Game.Current.IsEditorMode )
 			{
 				Channel = ChatBoxChannel.All;
 				TextEntry.SetChannel( Channel );
