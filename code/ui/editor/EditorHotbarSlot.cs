@@ -1,4 +1,5 @@
 ﻿using Facepunch.CoreWars.Inventory;
+using Facepunch.CoreWars.Utility;
 using Facepunch.Voxels;
 using Sandbox;
 using Sandbox.UI;
@@ -8,23 +9,30 @@ using System;
 namespace Facepunch.CoreWars.Editor
 {
 	[UseTemplate]
-	public partial class EditorHotbarSlot : Panel, IDroppable
+	public partial class EditorHotbarSlot : Panel, IDroppable, ITooltipProvider
 	{
 		public ushort Slot { get; set; }
 		public byte BlockId { get; set; }
 		public bool IsSelected { get; set; }
+		public BlockType BlockType { get; set; }
+
+		public string Description => BlockType.Description;
+		public ItemTag[] Tags { get; set; }
+		public string Name => BlockType.FriendlyName;
+		public Color Color => Color.White;
 
 		public EditorHotbarSlot() { }
 
 		public void SetBlockId( byte blockId )
 		{
+			BlockType = VoxelWorld.Current.GetBlockType( blockId );
 			BlockId = blockId;
+			Tags = BlockType.GetItemTags();
 
-			var block = VoxelWorld.Current.GetBlockType( blockId );
-			var icon = $"textures/blocks/corewars/color/{ block.DefaultTexture }.png";
-
-			if ( !string.IsNullOrEmpty( icon ) )
+			if ( !string.IsNullOrEmpty( BlockType.DefaultTexture ) )
 			{
+				var icon = $"textures/blocks/corewars/color/{BlockType.DefaultTexture}.png";
+
 				if ( FileSystem.Mounted.FileExists( icon ) )
 				{
 					Style.SetBackgroundImage( icon );
@@ -55,6 +63,22 @@ namespace Facepunch.CoreWars.Editor
 			{
 				EditorPlayer.SetHotbarBlockId( Slot, (int)item.BlockId );
 			}
+		}
+
+		protected override void OnMouseOver( MousePanelEvent e )
+		{
+			if ( BlockType.IsValid() )
+			{
+				Tooltip.Show( this );
+			}
+
+			base.OnMouseOver( e );
+		}
+
+		protected override void OnMouseOut( MousePanelEvent e )
+		{
+			Tooltip.Hide( this );
+			base.OnMouseOut( e );
 		}
 	}
 }

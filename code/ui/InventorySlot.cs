@@ -163,7 +163,6 @@ namespace Facepunch.CoreWars
 		protected override void OnMouseOut( MousePanelEvent e )
 		{
 			Tooltip.Hide( this );
-
 			base.OnMouseOut( e );
 		}
 

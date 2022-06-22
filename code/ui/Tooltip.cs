@@ -15,7 +15,7 @@ namespace Facepunch.CoreWars
 			{
 				var tooltip = new Tooltip();
 				tooltip.SetProvider( provider );
-				Hud.Current.AddChild( tooltip );
+				Game.Hud.AddChild( tooltip );
 				return tooltip;
 			}
 
@@ -52,6 +52,8 @@ namespace Facepunch.CoreWars
 				Blur = 8f
 			} );
 			NameLabel.Style.FontColor = provider.Color;
+
+			DescriptionLabel.SetClass( "hidden", string.IsNullOrEmpty( provider.Description ) );
 
 			if ( provider.Tags != null && provider.Tags.Length > 0 )
 			{
