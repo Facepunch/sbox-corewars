@@ -151,7 +151,7 @@ namespace Facepunch.CoreWars
 
 		public override void Tick()
 		{
-			if ( NextTipTime )
+			if ( NextTipTime && !Game.Current.IsEditorMode )
 			{
 				ShowRandomTip();
 				NextTipTime = Rand.Float( 45f, 60f );

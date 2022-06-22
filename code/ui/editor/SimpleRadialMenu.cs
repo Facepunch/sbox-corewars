@@ -142,6 +142,8 @@ namespace Facepunch.CoreWars.Editor
 				var tx = new PanelTransform();
 				tx.AddScale( distanceToScale );
 				item.Style.Transform = tx;
+
+				item.Style.ZIndex = item.IsSelected ? 2 : 0;
 			}
 
 			base.Tick();

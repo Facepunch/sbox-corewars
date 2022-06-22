@@ -12,6 +12,7 @@ namespace Facepunch.CoreWars.Editor
 	{
 		public byte BlockId { get; set; }
 		public float IconSize => Box.Rect.Size.Length;
+		public Panel Icon { get; set; }
 
 		public EditorBlockItem() { }
 
@@ -24,13 +25,13 @@ namespace Facepunch.CoreWars.Editor
 
 			if ( !string.IsNullOrEmpty( icon ) )
 			{
-				Style.SetBackgroundImage( icon );
-				Style.BackgroundSizeX = Length.Cover;
-				Style.BackgroundSizeY = Length.Cover;
+				Icon.Style.SetBackgroundImage( icon );
+				Icon.Style.BackgroundSizeX = Length.Cover;
+				Icon.Style.BackgroundSizeY = Length.Cover;
 			}
 			else
 			{
-				Style.BackgroundImage = null;
+				Icon.Style.BackgroundImage = null;
 			}
 		}
 

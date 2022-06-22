@@ -1,4 +1,6 @@
-﻿EditorBlockList {
+﻿@import "../scss/base.scss";
+
+EditorBlockList {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -8,9 +10,7 @@
     pointer-events: none;
 
     .modal {
-        backdrop-filter-blur: 32px;
-        background-color: rgba( 0 0 0 0.8 );
-        border-radius: 2px;
+        border-radius: 4px;
         padding: 8px;
         width: 40%;
         height: 50%;
@@ -19,12 +19,14 @@
         align-items: center;
         flex-direction: column;
         pointer-events: all;
+        backdrop-filter-blur: 24px;
+        background-color: rgba(0, 0, 0, 0.8);
 
         .title {
             margin-bottom: 32px;
-            font-family: Roboto;
+            font-family: $font;
             font-size: 48px;
-            color: white;
+            color: $red;
         }
 
         .items {

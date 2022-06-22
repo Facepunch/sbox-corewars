@@ -1,4 +1,6 @@
-﻿ToolSelectorMenu {
+﻿@import "../scss/base.scss";
+
+ToolSelectorMenu {
     width: 500px;
     height: 500px;
     background-color: rgba( 0 0 0 0.8 );
@@ -11,7 +13,7 @@
 
     .dot {
         position: absolute;
-        background-color: white;
+        background-color: $red;
         width: 16px;
         height: 16px;
         border-radius: 50%;
@@ -27,13 +29,13 @@
         justify-content: center;
 
         .title {
-            font-family: Roboto;
+            font-family: $font;
             font-size: 32px;
-            color: wheat;
+            color: $red;
         }
 
         .description {
-            font-family: Roboto;
+            font-family: $font;
             font-size: 20px;
             color: white;
         }
