@@ -8,7 +8,7 @@ namespace Facepunch.CoreWars
 	public abstract partial class Throwable<T> : BulletDropWeapon<T> where T : BulletDropProjectile, new()
 	{
 		public override string ImpactEffect => null;
-		public override string ViewModelPath => "models/weapons/v_portal.vmdl";
+		public override string ViewModelPath => "models/weapons/v_held_item.vmdl";
 		public override int ViewModelMaterialGroup => 1;
 		public override string MuzzleFlashEffect => null;
 		public override float PrimaryRate => 1f;
@@ -16,7 +16,7 @@ namespace Facepunch.CoreWars
 		public override float Speed => 1300f;
 		public override float Gravity => 5f;
 		public override float InheritVelocity => 0f;
-		public override string ProjectileModel => "models/weapons/w_portal.vmdl";
+		public override string ProjectileModel => string.Empty;
 		public override int ClipSize => 0;
 		public override float ReloadTime => 2.3f;
 		public override float ProjectileLifeTime => 4f;
@@ -27,7 +27,7 @@ namespace Facepunch.CoreWars
 		public override void Spawn()
 		{
 			base.Spawn();
-			SetModel( "models/weapons/w_portal.vmdl" );
+			SetModel( "models/weapons/w_held_item.vmdl" );
 		}
 
 		public override void AttackPrimary()

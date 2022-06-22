@@ -6,43 +6,6 @@
 		children = 
 		[
 			{
-				_class = "RenderMeshList"
-				children = 
-				[
-					{
-						_class = "RenderPrimitiveSphere"
-						name = "Sphere"
-						parent_bone = ""
-						material_name = "dev/helper/testgrid.vmat"
-						origin = [ 0.0, 0.0, 0.0 ]
-						angles = [ 0.0, 0.0, 0.0 ]
-						max_u = 1.0
-						max_v = 1.0
-						radius = 4.0
-						segments_u = 8
-						segments_v = 8
-					},
-				]
-			},
-			{
-				_class = "PhysicsShapeList"
-				children = 
-				[
-					{
-						_class = "PhysicsShapeCapsule"
-						parent_bone = ""
-						surface_prop = "metal.weapon"
-						collision_group = ""
-						collision_interact_as = ""
-						collision_interact_with = ""
-						collision_interact_exclude = ""
-						radius = 3.0
-						point0 = [ -1.21507, 0.231125, 0.204849 ]
-						point1 = [ 0.939484, 0.198402, 0.183071 ]
-					},
-				]
-			},
-			{
 				_class = "Skeleton"
 				children = 
 				[
@@ -67,6 +30,34 @@
 						relative_angles = [ 0.0, 0.0, 0.0 ]
 						weight = 1.0
 						ignore_rotation = false
+					},
+					{
+						_class = "Attachment"
+						name = "hold"
+						parent_bone = "hold_r"
+						relative_origin = [ 0.0, 0.0, 0.0 ]
+						relative_angles = [ 0.0, 0.0, 0.0 ]
+						weight = 1.0
+						ignore_rotation = false
+					},
+				]
+			},
+			{
+				_class = "RenderMeshList"
+				children = 
+				[
+					{
+						_class = "RenderPrimitiveSphere"
+						name = "placeholder"
+						parent_bone = "hold_r"
+						material_name = "dev/helper/testgrid.vmat"
+						origin = [ 0.0, 0.0, 0.0 ]
+						angles = [ 0.0, 0.0, 0.0 ]
+						max_u = 1.0
+						max_v = 1.0
+						radius = 0.001
+						segments_u = 16
+						segments_v = 16
 					},
 				]
 			},

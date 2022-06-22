@@ -29,15 +29,20 @@ namespace Facepunch.CoreWars
 		{
 			base.ActiveStart( owner );
 
-			HandEffect?.Destroy();
-			HandEffect = Particles.Create( "particles/weapons/fireball/view_fireball/view_fireball.vpcf", EffectEntity, "FireBallAttach" );
+			HandEffect?.Destroy( true );
+			HandEffect = Particles.Create( "particles/weapons/fireball/view_fireball/view_fireball.vpcf", EffectEntity, "hold" );
 		}
 
 		public override void ActiveEnd( Entity entity, bool dropped )
 		{
-			HandEffect?.Destroy();
-
+			HandEffect?.Destroy( true );
 			base.ActiveEnd( entity, dropped );
+		}
+
+		protected override void OnProjectileFired( BulletDropProjectile projectile )
+		{
+			HandEffect?.Destroy( true );
+			base.OnProjectileFired( projectile );
 		}
 
 		protected override void OnProjectileHit( BulletDropProjectile projectile, TraceResult trace )

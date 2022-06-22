@@ -338,7 +338,7 @@
 				[
 					{
 						_class = "Attachment"
-						name = "FireBallAttach"
+						name = "hold"
 						parent_bone = "hold_R"
 						relative_origin = [ -0.357578, -1.346543, 2.348297 ]
 						relative_angles = [ -0.002813, 0.002293, -0.00735 ]
