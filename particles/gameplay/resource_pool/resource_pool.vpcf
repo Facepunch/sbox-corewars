@@ -2492,6 +2492,7 @@
 	[
 		{
 			m_ChildRef = resource:"particles/gameplay/resource_pool/resource_pool_a.vpcf"
+			m_bDisableChild = true
 		},
 	]
 }
