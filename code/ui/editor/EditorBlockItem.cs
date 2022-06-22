@@ -21,10 +21,10 @@ namespace Facepunch.CoreWars.Editor
 			BlockId = blockId;
 
 			var block = VoxelWorld.Current.GetBlockType( blockId );
-			var icon = $"textures/blocks/corewars/color/{ block.DefaultTexture }.png";
 
-			if ( !string.IsNullOrEmpty( icon ) )
+			if ( !string.IsNullOrEmpty( block.DefaultTexture ) )
 			{
+				var icon = $"textures/blocks/corewars/color/{block.DefaultTexture}.png";
 				Icon.Style.SetBackgroundImage( icon );
 				Icon.Style.BackgroundSizeX = Length.Cover;
 				Icon.Style.BackgroundSizeY = Length.Cover;
