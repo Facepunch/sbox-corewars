@@ -23,6 +23,7 @@ namespace Facepunch.CoreWars
 		public override void Spawn()
 		{
 			base.Spawn();
+			SetModel( "models/weapons/w_held_item.vmdl" );
 		}
 
 		public override void AttackPrimary()
