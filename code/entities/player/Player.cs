@@ -674,6 +674,7 @@ namespace Facepunch.CoreWars
 					EnableCollisions = false
 				};
 				LifeState = LifeState.Dead;
+				Velocity = Vector3.Zero;
 
 				ClearInventories();
 			}
