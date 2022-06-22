@@ -1,4 +1,6 @@
-﻿EditorSaveDialog {
+﻿@import "../scss/base.scss";
+
+EditorSaveDialog {
     backdrop-filter-blur: 16px;
     position: absolute;
     width: 100%;
@@ -21,9 +23,9 @@
 
         .title {
             margin-bottom: 32px;
-            font-family: Roboto;
+            font-family: $font;
             font-size: 64px;
-            color: white;
+            color: $editor;
         }
 
         .container {

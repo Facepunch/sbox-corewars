@@ -1,4 +1,6 @@
-﻿EditorBlockData {
+﻿@import "../scss/base.scss";
+
+EditorBlockData {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -19,9 +21,9 @@
         .title {
             margin-bottom: 48px;
             margin-top: 32px;
-            font-family: Roboto;
+            font-family: $font;
             font-size: 32px;
-            color: white;
+            color: $editor;
         }
 
         .form {

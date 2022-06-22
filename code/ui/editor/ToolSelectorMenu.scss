@@ -13,7 +13,7 @@ ToolSelectorMenu {
 
     .dot {
         position: absolute;
-        background-color: $red;
+        background-color: $editor;
         width: 16px;
         height: 16px;
         border-radius: 50%;
@@ -31,7 +31,7 @@ ToolSelectorMenu {
         .title {
             font-family: $font;
             font-size: 32px;
-            color: $red;
+            color: $editor;
         }
 
         .description {
