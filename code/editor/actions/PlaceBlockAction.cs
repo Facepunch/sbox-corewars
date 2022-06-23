@@ -8,14 +8,16 @@ namespace Facepunch.CoreWars.Editor
 
 		private IntVector3 Position { get; set; }
 		private BlockState OldBlockState { get; set; }
+		private BlockFace Direction { get; set; }
 		private byte OldBlockId { get; set; }
 		private byte BlockId { get; set; }
 
-		public void Initialize( IntVector3 position, byte blockId )
+		public void Initialize( IntVector3 position, byte blockId, BlockFace direction )
 		{
 			var world = VoxelWorld.Current;
 			OldBlockState = world.GetState<BlockState>( position );
 			OldBlockId = world.GetBlock( position );
+			Direction = direction;
 			Position = position;
 			BlockId = blockId;
 		}
@@ -23,8 +25,7 @@ namespace Facepunch.CoreWars.Editor
 		public override void Perform()
 		{
 			var world = VoxelWorld.Current;
-			world.SetBlockOnServer( Position, BlockId );
-
+			world.SetBlockOnServer( Position, BlockId, (int)Direction );
 			base.Perform();
 		}
 
@@ -33,7 +34,6 @@ namespace Facepunch.CoreWars.Editor
 			var world = VoxelWorld.Current;
 			world.SetBlockOnServer( Position, OldBlockId );
 			world.SetState( Position, OldBlockState );
-
 			base.Undo();
 		}
 	}

@@ -34,7 +34,7 @@ namespace Facepunch.CoreWars.Editor
 
 			foreach ( var block in blocks )
 			{
-				if ( block.HasTexture && block.ShowInEditor )
+				if ( block.ShowInEditor )
 				{
 					var item = Items.AddChild<EditorBlockItem>();
 					item.SetBlockId( block.BlockId );

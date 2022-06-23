@@ -1,0 +1,45 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+{
+	data = 
+	{
+		FriendlyName = "Dev Stairs"
+		Description = ""
+		Textures = 
+		{
+			Default = ""
+			Top = ""
+			Bottom = ""
+			North = ""
+			East = ""
+			South = ""
+			West = ""
+		}
+		Aliases = null
+		ModelOverride = resource:"models/maps/stairs/dev/dev_stairs.vmdl"
+		ModelFacesDirection = true
+		Icon = null
+		IsTranslucent = false
+		UseTransparency = false
+		IsPassable = true
+		AttenuatesSunLight = false
+		Sounds = 
+		{
+		}
+		RedLight = 0
+		GreenLight = 0
+		BlueLight = 0
+		RedFilter = 1
+		GreenFilter = 1
+		BlueFilter = 1
+		DetailModels = null
+		DetailSpawnChance = 0
+		DetailScale = 1
+		FaceToTexture = 
+		{
+		}
+		LightLevel = 
+		{
+		}
+		LightFilter = "1,1,1"
+	}
+}

@@ -304,11 +304,12 @@ namespace Facepunch.CoreWars.Editor
 						var shouldCenterOnX = !Input.Down( InputButton.Run );
 						var shouldCenterOnY = !Input.Down( InputButton.Duck );
 						var aimSourcePosition = world.ToSourcePositionCenter( aimVoxelPosition, shouldCenterOnX, shouldCenterOnY, false );
+						var model = Model.Load( CurrentAttribute.EditorModel );
 
 						if ( Input.Down( InputButton.Flashlight ) )
 						{
 							var topSourcePosition = world.ToSourcePosition( aimVoxelPosition ) + world.VoxelSize;
-							aimSourcePosition.z = topSourcePosition.z - SelectedEntity.Model.Bounds.Size.z;
+							aimSourcePosition.z = topSourcePosition.z - model.Bounds.Size.z;
 						}
 
 						var action = new PlaceEntityAction();

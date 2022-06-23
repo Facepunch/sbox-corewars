@@ -56,9 +56,10 @@ namespace Facepunch.CoreWars.Editor
 			if ( IsServer && NextBlockPlace )
 			{
 				var aimVoxelPosition = GetAimVoxelPosition( 4f );
+				var direction = GetTargetBlockFace( 4f );
 
 				var action = new PlaceBlockAction();
-				action.Initialize( aimVoxelPosition, Player.SelectedBlockId );
+				action.Initialize( aimVoxelPosition, Player.SelectedBlockId, direction );
 
 				Player.Perform( action );
 

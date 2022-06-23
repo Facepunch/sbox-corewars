@@ -10,7 +10,7 @@ namespace Facepunch.CoreWars.Blocks
 		public override string FriendlyName => "Vortex Bomb";
 		public override string ServerEntity => "cw_vortex_bomb";
 		public override bool IsTranslucent => true;
-		public override bool HasTexture => false;
+		public override bool HideMesh => true;
 		public override BuildingMaterialType MaterialType => BuildingMaterialType.Explosives;
 
 		public override bool ShouldCullFace( BlockFace face, BlockType neighbour )

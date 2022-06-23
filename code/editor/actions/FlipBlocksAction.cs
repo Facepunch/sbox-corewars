@@ -93,8 +93,8 @@ namespace Facepunch.CoreWars.Editor
 						var position = new IntVector3( x, y, z );
 						var localPosition = GetLocalPosition( x, y, z );
 						var newIndex = GetArrayIndex( localPosition.x, localPosition.y, localPosition.z );
-						world.SetBlockOnServer( position, NewBlockIds[newIndex] );
 						world.SetState( position, NewBlockStates[newIndex] );
+						world.SetBlockOnServer( position, NewBlockIds[newIndex], 0, false );
 					}
 				}
 			}
@@ -115,8 +115,8 @@ namespace Facepunch.CoreWars.Editor
 						var position = new IntVector3( x, y, z );
 						var localPosition = GetLocalPosition( x, y, z );
 						var oldIndex = GetArrayIndex( localPosition.x, localPosition.y, localPosition.z );
-						world.SetBlockOnServer( position, OldBlockIds[oldIndex] );
 						world.SetState( position, OldBlockStates[oldIndex] );
+						world.SetBlockOnServer( position, OldBlockIds[oldIndex], 0, false );
 					}
 				}
 			}

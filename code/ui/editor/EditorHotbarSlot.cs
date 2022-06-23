@@ -35,10 +35,13 @@ namespace Facepunch.CoreWars.Editor
 			SlotPanel.SetClass( "hidden", displaySlot <= 0 );
 			SlotLabel.Text = displaySlot.ToString();
 
-			if ( !string.IsNullOrEmpty( BlockType.DefaultTexture ) )
-			{
-				var icon = $"textures/blocks/corewars/color/{BlockType.DefaultTexture}.png";
+			var icon = $"textures/blocks/corewars/color/{BlockType.DefaultTexture}.png";
 
+			if ( !string.IsNullOrEmpty( BlockType.Icon ) )
+				icon = BlockType.Icon;
+
+			if ( !string.IsNullOrEmpty( icon ) )
+			{
 				if ( FileSystem.Mounted.FileExists( icon ) )
 				{
 					Style.SetBackgroundImage( icon );

@@ -168,7 +168,7 @@ namespace Facepunch.CoreWars.Editor
 			{
 				var block = VoxelWorld.Current.GetBlockType( blockId );
 
-				if ( block.HasTexture && block.ShowInEditor )
+				if ( block.ShowInEditor )
 				{
 					validBlocks.Add( block );
 				}

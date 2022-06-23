@@ -63,13 +63,12 @@ namespace Facepunch.CoreWars.Editor
 			for ( var i = 0; i < TargetPositions.Length; i++ )
 			{
 				world.SetBlockOnServer( SourcePositions[i], 0 );
-				world.SetState<BlockState>( SourcePositions[i], null );
 			}
 
 			for ( var i = 0; i < TargetPositions.Length; i++ )
 			{
-				world.SetBlockOnServer( TargetPositions[i], OldSourceBlockIds[i] );
 				world.SetState( TargetPositions[i], OldSourceBlockStates[i] );
+				world.SetBlockOnServer( TargetPositions[i], OldSourceBlockIds[i], 0, false );
 			}
 
 			base.Perform();
@@ -81,14 +80,14 @@ namespace Facepunch.CoreWars.Editor
 
 			for ( var i = 0; i < TargetPositions.Length; i++ )
 			{
-				world.SetBlockOnServer( TargetPositions[i], OldTargetBlockIds[i] );
 				world.SetState( TargetPositions[i], OldTargetBlockStates[i] );
+				world.SetBlockOnServer( TargetPositions[i], OldTargetBlockIds[i], 0, false );
 			}
 
 			for ( var i = 0; i < TargetPositions.Length; i++ )
 			{
-				world.SetBlockOnServer( SourcePositions[i], OldSourceBlockIds[i] );
 				world.SetState( SourcePositions[i], OldSourceBlockStates[i] );
+				world.SetBlockOnServer( SourcePositions[i], OldSourceBlockIds[i], 0, false );
 			}
 
 			base.Undo();
