@@ -3,7 +3,6 @@
 //=========================================================================================================================
 HEADER
 {
-	DevShader = true;
 	CompileTargets = ( IS_SM_50 && ( PC || VULKAN ) );
 	Description = "Voxel";
 	DebugInfo = false;
