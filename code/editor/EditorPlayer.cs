@@ -332,6 +332,8 @@ namespace Facepunch.CoreWars.Editor
 			EditorBounds?.Delete();
 			EditorBounds = null;
 
+			Nameplate?.Delete();
+
 			base.OnDestroy();
 		}
 
