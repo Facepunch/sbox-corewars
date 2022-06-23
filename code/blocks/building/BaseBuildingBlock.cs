@@ -10,6 +10,8 @@ namespace Facepunch.CoreWars.Blocks
 		public virtual string HitSound => null;
 		public virtual float DamageMultiplier => 1f;
 
+		public override bool ShowInEditor => false;
+
 		public override BlockState CreateState()
 		{
 			return new BuildingBlockState();

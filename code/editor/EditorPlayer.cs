@@ -48,7 +48,13 @@ namespace Facepunch.CoreWars.Editor
 				{
 					for ( var i = 0; i < storedHotbarInfo.Length; i++ )
 					{
-						HotbarBlockIds[i] = (byte)storedHotbarInfo[i];
+						var blockId = (byte)storedHotbarInfo[i];
+						var block = VoxelWorld.Current.GetBlockType( blockId );
+
+						if ( block.ShowInEditor )
+							HotbarBlockIds[i] = blockId;
+						else
+							HotbarBlockIds[i] = 0;
 					}
 				}
 			}
