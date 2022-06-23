@@ -10,12 +10,12 @@ Layer0
 	//---- Ambient Occlusion ----
 	g_flAmbientOcclusionDirectDiffuse "0.000"
 	g_flAmbientOcclusionDirectSpecular "0.000"
-	TextureAmbientOcclusion "models/weapons/pickaxe/pickaxe_ao.tga"
+	TextureAmbientOcclusion "models/weapons/pickaxe/pickaxe_ao.png"
 
 	//---- Color ----
 	g_flModelTintAmount "1.000"
 	g_vColorTint "[1.000000 1.000000 1.000000 0.000000]"
-	TextureColor "models/weapons/pickaxe/pickaxe_crystal_color.tga"
+	TextureColor "models/weapons/pickaxe/pickaxe_crystal_color.png"
 
 	//---- Fade ----
 	g_flFadeExponent "1.000"
@@ -31,10 +31,10 @@ Layer0
 	g_flMetalness "0.000"
 
 	//---- Normal ----
-	TextureNormal "models/weapons/pickaxe/pickaxe_normal.tga"
+	TextureNormal "models/weapons/pickaxe/pickaxe_normal.png"
 
 	//---- Roughness ----
-	TextureRoughness "models/weapons/pickaxe/pickaxe_rough.tga"
+	TextureRoughness "models/weapons/pickaxe/pickaxe_rough.png"
 
 	//---- Texture Coordinates ----
 	g_nScaleTexCoordUByModelScaleAxis "0"
