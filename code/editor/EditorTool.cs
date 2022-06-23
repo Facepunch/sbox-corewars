@@ -38,6 +38,7 @@ namespace Facepunch.CoreWars.Editor
 		{
 			var display = EditorToolDisplay.Current;
 			display?.AddHotkey( InputButton.Use, "Aim Voxel Align" );
+			display?.AddHotkey( InputButton.Flashlight, "Double Range" );
 		}
 
 		public virtual void OnDeselected()
@@ -51,6 +52,8 @@ namespace Facepunch.CoreWars.Editor
 
 		protected IntVector3 GetAimVoxelPosition( float range )
 		{
+			if ( Input.Down( InputButton.Flashlight ) ) range *= 2f;
+
 			var distance = VoxelWorld.Current.VoxelSize * range;
 			var aimVoxelPosition = VoxelWorld.Current.ToVoxelPosition( Input.Position + Input.Rotation.Forward * distance );
 

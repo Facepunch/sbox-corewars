@@ -189,8 +189,8 @@ namespace Facepunch.CoreWars.Editor
 			}
 		}
 
-		[Event.Tick.Client]
-		protected virtual void ClientTick()
+		[Event.Frame]
+		protected virtual void OnFrame()
 		{
 			if ( TryGetTargetEntity( out var target, out var trace ) )
 			{
@@ -211,16 +211,16 @@ namespace Facepunch.CoreWars.Editor
 				var entityType = target.GetType();
 				var worldBounds = target.WorldSpaceBounds;
 
-				DebugOverlay.Box( worldBounds.Mins, worldBounds.Maxs, outlineColor, Time.Delta, false );
+				DebugOverlay.Box( worldBounds.Mins, worldBounds.Maxs, outlineColor, 0f, false );
 
 				if ( Mode == EntitiesToolMode.Remove )
-					DebugOverlay.Text( $"Delete {entityType.Name}", trace.EndPosition, Color.Red, Time.Delta );
+					DebugOverlay.Text( $"Delete {entityType.Name}", trace.EndPosition, Color.Red );
 				else if ( Mode == EntitiesToolMode.DataEditor )
-					DebugOverlay.Text( $"Edit {entityType.Name}", trace.EndPosition, Color.Cyan, Time.Delta );
+					DebugOverlay.Text( $"Edit {entityType.Name}", trace.EndPosition, Color.Cyan );
 				else if ( Mode == EntitiesToolMode.MoveAndRotate )
-					DebugOverlay.Text( $"Move {entityType.Name}", trace.EndPosition, Color.Yellow, Time.Delta );
+					DebugOverlay.Text( $"Move {entityType.Name}", trace.EndPosition, Color.Yellow );
 				else
-					DebugOverlay.Text( entityType.Name, trace.EndPosition, Time.Delta );
+					DebugOverlay.Text( entityType.Name, trace.EndPosition );
 			}
 		}
 

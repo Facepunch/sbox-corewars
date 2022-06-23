@@ -75,6 +75,8 @@ namespace Facepunch.CoreWars.Editor
 				Player.Camera.ZoomOut = 1f;
 			}
 
+			Event.Register( this );
+
 			StartPosition = null;
 			EndPosition = null;
 			Stage = MoveStage.Select;
@@ -84,11 +86,33 @@ namespace Facepunch.CoreWars.Editor
 		{
 			base.OnDeselected();
 
+			Event.Unregister( this );
+
 			if ( IsClient )
 			{
 				Player.Camera.ZoomOut = 0f;
 				VoxelWorld.Current.GlobalOpacity = 1f;
 				AreaGhost?.Delete();
+			}
+		}
+
+		[Event.Frame]
+		protected virtual void OnFrame()
+		{
+			var world = VoxelWorld.Current;
+
+			if ( world.IsValid() && AreaGhost.IsValid() && Stage == MoveStage.Move )
+			{
+				var size = AreaGhost.WorldBBox.Size;
+				var width = (size.x / world.VoxelSize).CeilToInt();
+				var height = (size.y / world.VoxelSize).CeilToInt();
+				var depth = (size.z / world.VoxelSize).CeilToInt();
+				var center = AreaGhost.WorldBBox.Center;
+
+				DebugOverlay.Text( $"Width: {width}", center + new Vector3( size.x * 0.5f, 0f, 0f ), Color.Red );
+				DebugOverlay.Text( $"Height: {height}", center + new Vector3( 0f, size.y * 0.5f, 0f ), Color.Green );
+				DebugOverlay.Text( $"Depth: {depth}", center + new Vector3( 0f, 0f, size.z * 0.5f ), Color.Cyan );
+				DebugOverlay.Axis( center, Rotation.Identity, size.Length * 0.25f, 0f, false );
 			}
 		}
 

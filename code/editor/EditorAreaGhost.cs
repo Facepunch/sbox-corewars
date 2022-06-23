@@ -10,9 +10,8 @@ namespace Facepunch.CoreWars.Editor
 		public BBox StartBlock { get; set; }
 		public BBox EndBlock { get; set; }
 		public Color Color { get; set; }
-
-		private BBox LocalBBox { get; set; }
-		private BBox WorldBBox { get; set; }
+		public BBox LocalBBox { get; set; }
+		public BBox WorldBBox { get; set; }
 
 		public override void DoRender( SceneObject sceneObject )
 		{
