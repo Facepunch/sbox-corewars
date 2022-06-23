@@ -15,6 +15,8 @@ namespace Facepunch.CoreWars.Editor
 		public byte BlockId { get; set; }
 		public bool IsSelected { get; set; }
 		public BlockType BlockType { get; set; }
+		public Panel SlotPanel { get; set; }
+		public Label SlotLabel { get; set; }
 
 		public string Description => BlockType.Description;
 		public ItemTag[] Tags { get; set; }
@@ -28,6 +30,10 @@ namespace Facepunch.CoreWars.Editor
 			BlockType = VoxelWorld.Current.GetBlockType( blockId );
 			BlockId = blockId;
 			Tags = BlockType.GetItemTags();
+
+			var displaySlot = Slot + 1;
+			SlotPanel.SetClass( "hidden", displaySlot <= 0 );
+			SlotLabel.Text = displaySlot.ToString();
 
 			if ( !string.IsNullOrEmpty( BlockType.DefaultTexture ) )
 			{
