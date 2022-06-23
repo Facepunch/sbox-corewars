@@ -5,6 +5,7 @@ using Sandbox;
 using Sandbox.UI;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Facepunch.CoreWars.Editor
 {
@@ -15,7 +16,9 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void Populate()
 		{
-			var available = TypeLibrary.GetTypes<EditorTool>();
+			var available = TypeLibrary.GetTypes<EditorTool>().ToList();
+
+			available.Sort( ( a, b ) => a.Name.CompareTo( b.Name ) );
 
 			foreach ( var type in available )
 			{
