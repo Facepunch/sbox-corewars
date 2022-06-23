@@ -64,7 +64,10 @@ namespace Facepunch.CoreWars.Editor
 			{
 				world.SetBlockOnServer( SourcePositions[i], 0 );
 				world.SetState<BlockState>( SourcePositions[i], null );
+			}
 
+			for ( var i = 0; i < TargetPositions.Length; i++ )
+			{
 				world.SetBlockOnServer( TargetPositions[i], OldSourceBlockIds[i] );
 				world.SetState( TargetPositions[i], OldSourceBlockStates[i] );
 			}
@@ -80,7 +83,10 @@ namespace Facepunch.CoreWars.Editor
 			{
 				world.SetBlockOnServer( TargetPositions[i], OldTargetBlockIds[i] );
 				world.SetState( TargetPositions[i], OldTargetBlockStates[i] );
+			}
 
+			for ( var i = 0; i < TargetPositions.Length; i++ )
+			{
 				world.SetBlockOnServer( SourcePositions[i], OldSourceBlockIds[i] );
 				world.SetState( SourcePositions[i], OldSourceBlockStates[i] );
 			}
