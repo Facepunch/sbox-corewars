@@ -62,11 +62,11 @@ namespace Facepunch.CoreWars.Editor
 
 			for ( var i = 0; i < TargetPositions.Length; i++ )
 			{
-				world.SetBlockOnServer( TargetPositions[i], OldSourceBlockIds[i] );
-				world.SetState( TargetPositions[i], OldSourceBlockStates[i] );
-
 				world.SetBlockOnServer( SourcePositions[i], 0 );
 				world.SetState<BlockState>( SourcePositions[i], null );
+
+				world.SetBlockOnServer( TargetPositions[i], OldSourceBlockIds[i] );
+				world.SetState( TargetPositions[i], OldSourceBlockStates[i] );
 			}
 
 			base.Perform();
