@@ -1237,7 +1237,7 @@ namespace Facepunch.CoreWars
 		private IntVector3? GetBlockPosition( Vector3 eyePosition, Vector3 direction )
 		{
 			var world = VoxelWorld.Current;
-			var range = 3;
+			var range = 3.5f;
 			var face = world.Trace( eyePosition * (1.0f / world.VoxelSize), direction, range, out var position, out var _ );
 
 			if ( face == BlockFace.Invalid )
@@ -1249,7 +1249,7 @@ namespace Facepunch.CoreWars
 				{
 					var currentPosition = belowPosition;
 
-					for ( var i = 0; i < range; i++ )
+					for ( var i = 0; i < range.FloorToInt(); i++ )
 					{
 						var neighborPosition = currentPosition;
 
