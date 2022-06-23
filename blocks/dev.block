@@ -13,9 +13,13 @@
 		IsTranslucent = false
 		UseTransparency = false
 		IsPassable = false
-		LightLevel = "0,0,0"
-		LightFilter = "1,1,1"
 		AttenuatesSunLight = false
+		RedLight = 0
+		GreenLight = 0
+		BlueLight = 0
+		RedFilter = 1
+		GreenFilter = 1
+		BlueFilter = 1
 		DetailModels = 
 		[
 			resource:"models/rust_nature/overgrowth/patch_grass_small.vmdl",
@@ -24,5 +28,9 @@
 		]
 		DetailSpawnChance = 0.05
 		DetailScale = 0.5
+		LightLevel = 
+		{
+		}
+		LightFilter = "1,1,1"
 	}
 }
