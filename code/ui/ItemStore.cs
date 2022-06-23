@@ -86,7 +86,7 @@ namespace Facepunch.CoreWars
 		protected virtual void OnItemPurchased( IPurchasableItem item )
 		{
 			Player.BuyItemCmd( Entity.NetworkIdent, item.GetType().Name );
-			Audio.Play( "item.purchase" );
+			Util.Play( "item.purchase" );
 		}
 
 		protected override void PostTemplateApplied()

@@ -152,21 +152,21 @@ namespace Facepunch.CoreWars
 		{
 			ClearSelectedSlots();
 			slot.IsSelected = true;
-			Audio.Play( "inventory.select" );
+			Util.Play( "inventory.select" );
 		}
 
 		protected virtual void OnEquipmentSlotSelected( InventorySlot slot )
 		{
 			ClearSelectedSlots();
 			slot.IsSelected = true;
-			Audio.Play( "inventory.select" );
+			Util.Play( "inventory.select" );
 		}
 
 		protected virtual void OnHotbarSlotSelected( InventorySlot slot )
 		{
 			ClearSelectedSlots();
 			slot.IsSelected = true;
-			Audio.Play( "inventory.select" );
+			Util.Play( "inventory.select" );
 		}
 
 		protected override void PostTemplateApplied()

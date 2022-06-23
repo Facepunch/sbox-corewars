@@ -141,7 +141,7 @@ namespace Facepunch.CoreWars
 			else
 				InventorySystem.SendSplitInventoryEvent( slot.Container, Container, slot.Slot, Slot );
 
-			Audio.Play( "inventory.move" );
+			Util.Play( "inventory.move" );
 		}
 
 		protected override void OnClick( MousePanelEvent e )
@@ -178,7 +178,7 @@ namespace Facepunch.CoreWars
 			if ( transferContainer.IsValid() )
 			{
 				InventorySystem.SendTransferInventoryEvent( container, transferContainer, Item.SlotId );
-				Audio.Play( "inventory.move" );
+				Util.Play( "inventory.move" );
 			}
 
 			base.OnRightClick( e );

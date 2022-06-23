@@ -198,7 +198,7 @@ namespace Facepunch.CoreWars
 			}
 
 			if ( !string.IsNullOrEmpty( HitSound ) )
-				Audio.Play( HitSound, Position );
+				Util.Play( HitSound, Position );
 		}
 
 		[Event.Tick.Client]

@@ -1,0 +1,27 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+{
+	data = 
+	{
+		FriendlyName = "Dev Block"
+		Description = ""
+		DefaultTexture = "dev_grid"
+		IsTranslucent = false
+		AttenuatesSunLight = false
+		UseTransparency = false
+		IsPassable = false
+		LightLevel = "0,0,0"
+		LightFilter = "1,1,1"
+		Aliases = 
+		[
+			"DevBlock",
+		]
+		DetailModels = 
+		[
+			resource:"models/rust_nature/overgrowth/patch_grass_small.vmdl",
+			resource:"models/rust_nature/overgrowth/patch_grass_tall.vmdl",
+			resource:"models/rust_nature/overgrowth/cracks_grass_b.vmdl",
+		]
+		DetailSpawnChance = 0.05
+		Icon = null
+	}
+}

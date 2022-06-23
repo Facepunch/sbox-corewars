@@ -2,7 +2,7 @@
 
 namespace Facepunch.CoreWars
 {
-	public static partial class Audio
+	public static partial class Util
 	{
 		public static void Play( Player player, string sound )
 		{

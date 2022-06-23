@@ -82,7 +82,7 @@ namespace Facepunch.CoreWars
 			storage.SetContainer( container );
 			storage.Open();
 
-			Audio.Play( "inventory.open" );
+			Util.Play( "inventory.open" );
 		}
 	}
 }

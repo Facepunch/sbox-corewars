@@ -34,15 +34,13 @@ namespace Facepunch.CoreWars.Editor
 			Items.DeleteChildren();
 
 			var world = VoxelWorld.Current;
-			var blockIds = world.BlockTypes.Values;
+			var blocks = world.BlockData.Values;
 
-			foreach ( var blockId in blockIds )
+			foreach ( var block in blocks )
 			{
-				var block = world.GetBlockType( blockId );
 				if ( !block.HasTexture ) continue;
-
 				var item = Items.AddChild<EditorBlockItem>();
-				item.SetBlockId( blockId );
+				item.SetBlockId( block.BlockId );
 			}
 		}
 

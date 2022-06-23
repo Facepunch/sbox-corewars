@@ -53,7 +53,7 @@ namespace Facepunch.CoreWars
 			storage.SetContainer( player.ChestInventory.Instance );
 			storage.Open();
 
-			Audio.Play( "inventory.open" );
+			Util.Play( "inventory.open" );
 		}
 	}
 }
