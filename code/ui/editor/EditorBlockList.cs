@@ -1,9 +1,6 @@
-﻿using Facepunch.CoreWars.Editor;
-using Facepunch.CoreWars.Inventory;
-using Facepunch.Voxels;
+﻿using Facepunch.Voxels;
 using Sandbox;
 using Sandbox.UI;
-using System.Collections.Generic;
 
 namespace Facepunch.CoreWars.Editor
 {
@@ -19,7 +16,6 @@ namespace Facepunch.CoreWars.Editor
 			Current?.Delete();
 			Current = new EditorBlockList();
 			Current.PopulateItems();
-
 			Game.Hud.AddChild( Current );
 		}
 
@@ -38,18 +34,17 @@ namespace Facepunch.CoreWars.Editor
 
 			foreach ( var block in blocks )
 			{
-				if ( !block.HasTexture || !block.ShowInEditor )
-					continue;
-
-				var item = Items.AddChild<EditorBlockItem>();
-				item.SetBlockId( block.BlockId );
+				if ( block.HasTexture && block.ShowInEditor )
+				{
+					var item = Items.AddChild<EditorBlockItem>();
+					item.SetBlockId( block.BlockId );
+				}
 			}
 		}
 
 		protected override void OnBlur( PanelEvent e )
 		{
 			Delete();
-
 			base.OnBlur( e );
 		}
 

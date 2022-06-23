@@ -3,15 +3,13 @@ using Facepunch.Voxels;
 using Sandbox;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 
 namespace Facepunch.CoreWars.Editor
 {
 	public partial class EditorPlayer : Sandbox.Player
 	{
-		[ConVar.ClientData( Name = "cw_hotbarblocks", Saved = true )]
-		public static string HotbarBlocks { get; set; } = "[]";
-
 		[Net, Predicted] public int CurrentHotbarIndex { get; private set; }
 		[Net] public IList<byte> HotbarBlockIds { get; set; }
 		[Net, Change( nameof( OnToolChanged ) )] public EditorTool Tool { get; private set; }
@@ -38,31 +36,6 @@ namespace Facepunch.CoreWars.Editor
 
 		public EditorPlayer( Client client ) : this()
 		{
-			var hotbarBlocksClientData = client.GetClientData( "cw_hotbarblocks", "[]" );
-
-			try
-			{
-				var storedHotbarInfo = JsonSerializer.Deserialize<int[]>( hotbarBlocksClientData );
-
-				if ( storedHotbarInfo != null )
-				{
-					for ( var i = 0; i < storedHotbarInfo.Length; i++ )
-					{
-						var blockId = (byte)storedHotbarInfo[i];
-						var block = VoxelWorld.Current.GetBlockType( blockId );
-
-						if ( block.ShowInEditor )
-							HotbarBlockIds[i] = blockId;
-						else
-							HotbarBlockIds[i] = 0;
-					}
-				}
-			}
-			catch ( Exception e )
-			{
-				Log.Warning( e );
-			}
-
 			UndoStack = new( 20 );
 			RedoStack = new( 20 );
 			Tools = new();
@@ -195,7 +168,7 @@ namespace Facepunch.CoreWars.Editor
 			{
 				var block = VoxelWorld.Current.GetBlockType( blockId );
 
-				if ( block.HasTexture )
+				if ( block.HasTexture && block.ShowInEditor )
 				{
 					validBlocks.Add( block );
 				}
