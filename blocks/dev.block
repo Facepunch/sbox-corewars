@@ -23,6 +23,9 @@
 		UseTransparency = false
 		IsPassable = false
 		AttenuatesSunLight = false
+		Sounds = 
+		{
+		}
 		RedLight = 0
 		GreenLight = 0
 		BlueLight = 0
@@ -37,7 +40,9 @@
 		]
 		DetailSpawnChance = 0.05
 		DetailScale = 0.5
-		FaceToTexture = null
+		FaceToTexture = 
+		{
+		}
 		LightLevel = 
 		{
 		}

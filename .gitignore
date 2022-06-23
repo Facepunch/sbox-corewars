@@ -10,5 +10,4 @@ tools_*_*.bin
 release.zip
 *.los
 .vs
-*.generated.*
 *.*_c

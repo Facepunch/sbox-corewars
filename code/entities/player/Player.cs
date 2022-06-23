@@ -43,6 +43,7 @@ namespace Facepunch.CoreWars
 			}
 		}
 
+		private TimeSince TimeSinceLastFootstep { get; set; }
 		private TimeSince TimeSinceBackpackOpen { get; set; }
 		private bool IsBackpackToggleMode { get; set; }
 		private bool IsWaitingToRespawn { get; set; }
@@ -461,6 +462,12 @@ namespace Facepunch.CoreWars
 			TimeSinceLastHit = 0f;
 		}
 
+		public BlockType GetBlockBelow()
+		{
+			var world = VoxelWorld.Current;
+			return world.GetBlockType( world.ToVoxelPosition( Position ) + Chunk.BlockDirections[1] );
+		}
+
 		public void RespawnWhenAvailable()
 		{
 			IsWaitingToRespawn = true;
@@ -581,6 +588,46 @@ namespace Facepunch.CoreWars
 			SetMaterialGroup( Rand.Int( MaterialGroupCount - 1 ) );
 
 			base.Spawn();
+		}
+
+		public override void OnAnimEventFootstep( Vector3 position, int foot, float volume )
+		{
+			if ( LifeState == LifeState.Dead || !IsClient )
+				return;
+
+			if ( TimeSinceLastFootstep < 0.2f )
+				return;
+
+			var block = GetBlockBelow();
+
+			if ( block is not AirBlock )
+			{
+				var sound = foot == 0 ? block.FootLeftSound : block.FootRightSound;
+
+				if ( !string.IsNullOrEmpty( sound ) )
+				{
+					Sound.FromWorld( sound, position ).SetVolume( volume );
+					return;
+				}
+			}
+
+			volume *= FootstepVolume();
+
+			TimeSinceLastFootstep = 0f;
+
+			var trace = Trace.Ray( position, position + Vector3.Down * 20f )
+				.Radius( 1 )
+				.Ignore( this )
+				.Run();
+
+			if ( !trace.Hit ) return;
+
+			trace.Surface.DoFootstep( this, trace, foot, volume );
+		}
+
+		public override float FootstepVolume()
+		{
+			return Velocity.WithZ( 0f ).Length.LerpInverse( 0f, 200f ) * 0.3f;
 		}
 
 		public override void OnKilled()
