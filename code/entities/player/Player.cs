@@ -1,14 +1,9 @@
-﻿using Facepunch.CoreWars.Blocks;
-using Facepunch.CoreWars.Inventory;
-using Facepunch.CoreWars.Utility;
+﻿using Facepunch.CoreWars.Inventory;
 using Facepunch.Voxels;
 using Sandbox;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Facepunch.CoreWars
 {
@@ -52,6 +47,7 @@ namespace Facepunch.CoreWars
 		private bool IsBackpackToggleMode { get; set; }
 		private bool IsWaitingToRespawn { get; set; }
 		private bool ShouldResetEyeRotation { get; set; }
+		private BlockGhost BlockGhost { get; set; }
 		private Nameplate Nameplate { get; set; }
 
 		public Player() : base()
@@ -831,14 +827,90 @@ namespace Facepunch.CoreWars
 			base.TakeDamage( info );
 		}
 
-		protected virtual void SimulateGameState( Client client )
+		protected virtual void SimulateBlockGhost( Client client )
 		{
 			var world = VoxelWorld.Current;
+			var container = HotbarInventory.Instance;
+			var blockItem = container.GetFromSlot( CurrentHotbarIndex ) as BlockItem;
 
+			if ( blockItem.IsValid() )
+			{
+				var position = GetBlockPosition( Input.Position, Input.Rotation.Forward );
+				var ghost = GetOrCreateBlockGhost();
+
+				if ( position.HasValue )
+				{
+					var block = world.GetBlockType( position.Value );
+
+					if ( block is AirBlock )
+					{
+						ghost.EnableDrawing = true;
+						ghost.Position = world.ToSourcePosition( position.Value );
+					}
+					else
+					{
+						ghost.EnableDrawing = false;
+					}
+				}
+				else
+				{
+					ghost.EnableDrawing = false;
+				}
+			}
+			else
+			{
+				DestroyBlockGhost();
+			}
+		}
+
+		protected virtual void TryPlaceBlockItem( Client client, BlockItem item, Vector3 eyePosition, Vector3 direction )
+		{
+			var position = GetBlockPosition( Input.Position, Input.Rotation.Forward );
+			if ( !position.HasValue ) return;
+
+			var world = VoxelWorld.Current;
+			var block = world.GetBlockType( position.Value );
+			if ( block is not AirBlock ) return;
+
+			var bbox = world.ToSourceBBox( position.Value );
+
+			if ( !FindInBox( bbox ).Any() )
+			{
+				var sourcePosition = world.ToSourcePosition( position.Value );
+
+				if ( CanBuildAt( sourcePosition ) )
+				{
+					item.StackSize--;
+
+					world.SetBlockOnServer( position.Value, item.BlockId );
+
+					using ( Prediction.Off() )
+					{
+						var particles = Particles.Create( "particles/gameplay/blocks/block_placed/block_placed.vpcf" );
+						particles.SetPosition( 0, world.ToSourcePositionCenter( position.Value ) );
+						particles.SetPosition( 6, Team.GetColor() );
+						PlaySound( "block.place" );
+					}
+
+					if ( item.StackSize <= 0 )
+					{
+						InventorySystem.RemoveItem( item );
+					}
+				}
+			}
+		}
+
+		protected virtual void SimulateGameState( Client client )
+		{
 			if ( Stamina <= 10f )
 				IsOutOfBreath = true;
 			else if ( IsOutOfBreath && Stamina >= 40f )
 				IsOutOfBreath = false;
+
+			if ( IsClient )
+			{
+				SimulateBlockGhost( client );
+			}
 
 			if ( IsServer )
 			{
@@ -856,29 +928,7 @@ namespace Facepunch.CoreWars
 					{
 						if ( item is BlockItem blockItem )
 						{
-							var success = world.SetBlockInDirection( Input.Position, Input.Rotation.Forward, blockItem.BlockId, out var blockPosition, true, 5f, ( position ) =>
-							{
-								var sourcePosition = world.ToSourcePosition( position );
-								return CanBuildAt( sourcePosition );
-							} );
-
-							if ( success )
-							{
-								item.StackSize--;
-
-								using ( Prediction.Off() )
-								{
-									var particles = Particles.Create( "particles/gameplay/blocks/block_placed/block_placed.vpcf" );
-									particles.SetPosition( 0, world.ToSourcePositionCenter( blockPosition ) );
-									particles.SetPosition( 6, Team.GetColor() );
-									PlaySound( "block.place" );
-								}
-
-								if ( item.StackSize <= 0 )
-								{
-									InventorySystem.RemoveItem( item );
-								}
-							}
+							TryPlaceBlockItem( client, blockItem, Input.Position, Input.Rotation.Forward );
 						}
 						else if ( item is IConsumableItem consumable )
 						{
@@ -1168,6 +1218,67 @@ namespace Facepunch.CoreWars
 		private InventoryContainer GetHotbarTransferTarget( InventoryItem item )
 		{
 			return Storage.Current.IsOpen ? Storage.Current.StorageContainer : BackpackInventory.Instance;
+		}
+
+		private BlockGhost GetOrCreateBlockGhost()
+		{
+			if ( BlockGhost.IsValid() ) return BlockGhost;
+			BlockGhost = new();
+			return BlockGhost;
+		}
+
+		private void DestroyBlockGhost()
+		{
+			if ( !BlockGhost.IsValid() ) return;
+			BlockGhost.Delete();
+			BlockGhost = null;
+		}
+
+		private IntVector3? GetBlockPosition( Vector3 eyePosition, Vector3 direction )
+		{
+			var world = VoxelWorld.Current;
+			var range = 3;
+			var face = world.Trace( eyePosition * (1.0f / world.VoxelSize), direction, range, out var position, out var _ );
+
+			if ( face == BlockFace.Invalid )
+			{
+				var belowPosition = world.ToVoxelPosition( Position ) + Chunk.BlockDirections[1];
+				var belowBlock = world.GetBlockType( belowPosition );
+
+				if ( belowBlock.BlockId > 0 )
+				{
+					var currentPosition = belowPosition;
+
+					for ( var i = 0; i < range; i++ )
+					{
+						var neighborPosition = currentPosition;
+
+						if ( direction.x < -0.25f )
+							neighborPosition -= Chunk.BlockDirections[(int)BlockFace.North];
+						else if ( direction.x > 0.25f )
+							neighborPosition -= Chunk.BlockDirections[(int)BlockFace.South];
+
+						if ( direction.y < -0.25f )
+							neighborPosition -= Chunk.BlockDirections[(int)BlockFace.East];
+						else if ( direction.y > 0.25f )
+							neighborPosition -= Chunk.BlockDirections[(int)BlockFace.West];
+
+						var neighborBlock = world.GetBlockType( neighborPosition );
+
+						if ( neighborBlock is AirBlock )
+							return neighborPosition;
+
+						currentPosition = neighborPosition;
+					}
+				}
+
+				return null;
+			}
+			else
+			{
+				var adjacentPosition = position + Chunk.BlockDirections[(int)face];
+				return adjacentPosition;
+			}
 		}
 
 		private void AddClothingToArmorSlot( ArmorSlot slot, BaseClothing clothing )
