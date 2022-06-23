@@ -23,6 +23,7 @@ EditorHotbarSlot {
         align-items: center;
         justify-content: center;
         pointer-events: none;
+        font-family: $font;
 
         label {
             color: #fff;

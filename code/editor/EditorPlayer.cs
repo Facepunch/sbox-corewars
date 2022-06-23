@@ -8,7 +8,7 @@ using System.Text.Json;
 
 namespace Facepunch.CoreWars.Editor
 {
-	public partial class EditorPlayer : Sandbox.Player
+	public partial class EditorPlayer : Sandbox.Player, INameplate
 	{
 		[Net, Predicted] public int CurrentHotbarIndex { get; private set; }
 		[Net] public IList<byte> HotbarBlockIds { get; set; }
@@ -23,6 +23,11 @@ namespace Facepunch.CoreWars.Editor
 		public Dictionary<int,EditorTool> Tools { get; private set; }
 
 		private EditorBounds EditorBounds { get; set; }
+		private Nameplate Nameplate { get; set; }
+
+		public string DisplayName => Client.Name;
+		public bool IsFriendly => true;
+		public Team Team => Team.Orange;
 
 		public EditorPlayer() : base()
 		{
@@ -100,6 +105,8 @@ namespace Facepunch.CoreWars.Editor
 
 		public void SetActiveTool( EditorTool tool )
 		{
+			Host.AssertServer();
+
 			if ( Tool.IsValid() )
 			{
 				Tool.OnDeselected();
@@ -129,6 +136,8 @@ namespace Facepunch.CoreWars.Editor
 
 		protected virtual void OnToolChanged( EditorTool previous, EditorTool next )
 		{
+			if ( !IsLocalPawn ) return;
+
 			if ( previous.IsValid() )
 			{
 				previous.OnDeselected();
@@ -196,6 +205,8 @@ namespace Facepunch.CoreWars.Editor
 			{
 				EditorHotbar.Current?.Initialize( HotbarBlockIds.Count );
 			}
+
+			Nameplate = new Nameplate( this );
 
 			EditorBounds = new EditorBounds
 			{
@@ -313,10 +324,13 @@ namespace Facepunch.CoreWars.Editor
 
 		protected override void OnDestroy()
 		{
+			if ( IsServer || IsLocalPawn )
+			{
+				Tool?.OnDeselected();
+			}
+
 			EditorBounds?.Delete();
 			EditorBounds = null;
-
-			Tool?.OnDeselected();
 
 			base.OnDestroy();
 		}
