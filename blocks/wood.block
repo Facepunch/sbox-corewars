@@ -2,13 +2,13 @@
 {
 	data = 
 	{
-		FriendlyName = "Dev Block"
+		FriendlyName = "Wood"
 		Description = ""
 		Textures = 
 		{
-			Default = "dev_grid"
-			Top = ""
-			Bottom = ""
+			Default = "tree_01"
+			Top = "tree_top_01"
+			Bottom = "tree_top_01"
 			North = ""
 			East = ""
 			South = ""
@@ -16,7 +16,7 @@
 		}
 		Aliases = 
 		[
-			"DevBlock",
+			"WoodBlock",
 		]
 		Icon = null
 		IsTranslucent = false
@@ -29,15 +29,12 @@
 		RedFilter = 1
 		GreenFilter = 1
 		BlueFilter = 1
-		DetailModels = 
-		[
-			resource:"models/rust_nature/overgrowth/patch_grass_small.vmdl",
-			resource:"models/rust_nature/overgrowth/patch_grass_tall.vmdl",
-			resource:"models/rust_nature/overgrowth/cracks_grass_b.vmdl",
-		]
-		DetailSpawnChance = 0.05
-		DetailScale = 0.5
-		FaceToTexture = null
+		DetailModels = null
+		DetailSpawnChance = 0
+		DetailScale = 1
+		FaceToTexture = 
+		{
+		}
 		LightLevel = 
 		{
 		}

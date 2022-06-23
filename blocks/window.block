@@ -2,11 +2,11 @@
 {
 	data = 
 	{
-		FriendlyName = "Dev Block"
+		FriendlyName = "Window"
 		Description = ""
 		Textures = 
 		{
-			Default = "dev_grid"
+			Default = "window_01"
 			Top = ""
 			Bottom = ""
 			North = ""
@@ -16,10 +16,10 @@
 		}
 		Aliases = 
 		[
-			"DevBlock",
+			"WindowBlock",
 		]
 		Icon = null
-		IsTranslucent = false
+		IsTranslucent = true
 		UseTransparency = false
 		IsPassable = false
 		AttenuatesSunLight = false
@@ -29,14 +29,9 @@
 		RedFilter = 1
 		GreenFilter = 1
 		BlueFilter = 1
-		DetailModels = 
-		[
-			resource:"models/rust_nature/overgrowth/patch_grass_small.vmdl",
-			resource:"models/rust_nature/overgrowth/patch_grass_tall.vmdl",
-			resource:"models/rust_nature/overgrowth/cracks_grass_b.vmdl",
-		]
-		DetailSpawnChance = 0.05
-		DetailScale = 0.5
+		DetailModels = null
+		DetailSpawnChance = 0
+		DetailScale = 1
 		FaceToTexture = null
 		LightLevel = 
 		{
