@@ -57,8 +57,8 @@ namespace Facepunch.CoreWars.Editor
 
 			foreach ( var position in Positions )
 			{
-				world.SetBlockOnServer( position, OldBlockIds[currentIndex] );
 				world.SetState( position, OldBlockStates[currentIndex] );
+				world.SetBlockOnServerKeepState( position, OldBlockIds[currentIndex] );
 				currentIndex++;
 			}
 

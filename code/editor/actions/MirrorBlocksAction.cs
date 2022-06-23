@@ -126,7 +126,7 @@ namespace Facepunch.CoreWars.Editor
 						position = world.ToVoxelPosition( sourcePosition );
 
 						world.SetState( position, NewTargetBlockStates[newIndex] );
-						world.SetBlockOnServer( position, NewTargetBlockIds[newIndex], 0, false );
+						world.SetBlockOnServerKeepState( position, NewTargetBlockIds[newIndex] );
 					}
 				}
 			}
@@ -167,7 +167,7 @@ namespace Facepunch.CoreWars.Editor
 						position = world.ToVoxelPosition( sourcePosition );
 
 						world.SetState( position, OldTargetBlockStates[oldIndex] );
-						world.SetBlockOnServer( position, OldTargetBlockIds[oldIndex], 0, false );
+						world.SetBlockOnServerKeepState( position, OldTargetBlockIds[oldIndex] );
 					}
 				}
 			}

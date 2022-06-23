@@ -82,7 +82,7 @@ namespace Facepunch.CoreWars.Editor
 			for ( var i = 0; i < TargetPositions.Length; i++ )
 			{
 				world.SetState( TargetPositions[i], NewBlockStates[i] );
-				world.SetBlockOnServer( TargetPositions[i], NewBlockIds[i], 0, false );
+				world.SetBlockOnServerKeepState( TargetPositions[i], NewBlockIds[i] );
 			}
 
 			if ( ShouldCopyEntities )
@@ -100,7 +100,7 @@ namespace Facepunch.CoreWars.Editor
 			for ( var i = 0; i < TargetPositions.Length; i++ )
 			{
 				world.SetState( TargetPositions[i], OldBlockStates[i] );
-				world.SetBlockOnServer( TargetPositions[i], OldBlockIds[i], 0, false );
+				world.SetBlockOnServerKeepState( TargetPositions[i], OldBlockIds[i] );
 			}
 
 			foreach ( var entityId in EntityIds )
