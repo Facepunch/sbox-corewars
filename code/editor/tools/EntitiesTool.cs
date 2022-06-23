@@ -110,7 +110,7 @@ namespace Facepunch.CoreWars.Editor
 						if ( Input.Down( InputButton.Flashlight ) )
 						{
 							var topSourcePosition = world.ToSourcePosition( aimVoxelPosition ) + world.VoxelSize;
-							aimSourcePosition.z = topSourcePosition.z - SelectedEntity.Model.Bounds.Size.z;
+							aimSourcePosition.z = topSourcePosition.z - GhostEntity.Model.Bounds.Size.z;
 						}
 
 						GhostEntity.Position = aimSourcePosition;
