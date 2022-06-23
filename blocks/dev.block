@@ -4,17 +4,18 @@
 	{
 		FriendlyName = "Dev Block"
 		Description = ""
-		DefaultTexture = "dev_grid"
-		IsTranslucent = false
-		AttenuatesSunLight = false
-		UseTransparency = false
-		IsPassable = false
-		LightLevel = "0,0,0"
-		LightFilter = "1,1,1"
 		Aliases = 
 		[
 			"DevBlock",
 		]
+		DefaultTexture = "dev_grid"
+		Icon = null
+		IsTranslucent = false
+		UseTransparency = false
+		IsPassable = false
+		LightLevel = "0,0,0"
+		LightFilter = "1,1,1"
+		AttenuatesSunLight = false
 		DetailModels = 
 		[
 			resource:"models/rust_nature/overgrowth/patch_grass_small.vmdl",
@@ -22,6 +23,6 @@
 			resource:"models/rust_nature/overgrowth/cracks_grass_b.vmdl",
 		]
 		DetailSpawnChance = 0.05
-		Icon = null
+		DetailScale = 0.5
 	}
 }
