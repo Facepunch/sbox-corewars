@@ -12,6 +12,8 @@ namespace Facepunch.CoreWars.Editor
 	{
 		[Net] public string CurrentFileName { get; set; }
 
+		private RealTimeUntil NextBackupSave { get; set; }
+
 		public override void OnEnter()
 		{
 			if ( Host.IsServer )
@@ -28,9 +30,24 @@ namespace Facepunch.CoreWars.Editor
 
 		}
 
+		public override bool CanHearPlayerVoice( Client a, Client b )
+		{
+			return true;
+		}
+
 		public override void OnPlayerJoined( Player player )
 		{
 			player.Respawn();
+		}
+
+		[Event.Tick.Server]
+		protected virtual void ServerTick()
+		{
+			if ( NextBackupSave && !string.IsNullOrEmpty( CurrentFileName ) )
+			{
+				Game.SaveEditorMap( CurrentFileName, true );
+				NextBackupSave = 60f;
+			}
 		}
 	}
 }

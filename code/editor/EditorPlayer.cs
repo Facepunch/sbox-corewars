@@ -250,8 +250,6 @@ namespace Facepunch.CoreWars.Editor
 		{
 			if ( !VoxelWorld.Current.IsValid() ) return;
 
-			var currentMap = VoxelWorld.Current;
-
 			if ( Prediction.FirstTime )
 			{
 				var currentSlotIndex = (int)CurrentHotbarIndex;
