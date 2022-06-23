@@ -1,4 +1,5 @@
-﻿using Facepunch.Voxels;
+﻿using Facepunch.CoreWars.Utility;
+using Facepunch.Voxels;
 using Sandbox;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +24,7 @@ namespace Facepunch.CoreWars.Editor
 		private List<int> EntityIds { get; set; }
 		private bool ShouldCopyEntities { get; set; }
 
-		public void Initialize( IntVector3 sourceMins, IntVector3 sourceMaxs, IntVector3 targetMins, bool copyEntities = false )
+		public void Initialize( IntVector3 sourceMins, IntVector3 sourceMaxs, IntVector3 targetMins, bool copyEntities = false, float rotation = 0f )
 		{
 			var world = VoxelWorld.Current;
 
@@ -32,6 +33,8 @@ namespace Facepunch.CoreWars.Editor
 			TargetMins = targetMins;
 			SourcePositions = world.GetPositionsInBox( SourceMins, SourceMaxs );
 
+			var targetSourceMins = world.ToSourcePositionCenter( TargetMins );
+			var targetSourceMaxs = world.ToSourcePositionCenter( TargetMins + (SourceMaxs - SourceMins) );
 			var totalBlocks = SourcePositions.Count();
 			var currentIndex = 0;
 
@@ -43,15 +46,21 @@ namespace Facepunch.CoreWars.Editor
 			NewBlockIds = new byte[totalBlocks];
 			EntityIds = new();
 
+			var targetSourceCenter = targetSourceMins + (targetSourceMaxs - targetSourceMins) * 0.5f;
+
 			foreach ( var position in SourcePositions )
 			{
 				var localPosition = position - SourceMins;
-				var newPosition = TargetMins + localPosition;
+				var newVoxelPosition = TargetMins + localPosition;
+				var rotatedSourcePosition = world.ToSourcePositionCenter( newVoxelPosition );
 
-				TargetPositions[currentIndex] = newPosition;
+				rotatedSourcePosition = rotatedSourcePosition.RotateAboutPoint( targetSourceCenter, Vector3.Up, rotation );
+				newVoxelPosition = world.ToVoxelPosition( rotatedSourcePosition );
 
-				OldBlockStates[currentIndex] = world.GetState<BlockState>( newPosition );
-				OldBlockIds[currentIndex] = world.GetBlock( newPosition );
+				TargetPositions[currentIndex] = newVoxelPosition;
+
+				OldBlockStates[currentIndex] = world.GetState<BlockState>( newVoxelPosition );
+				OldBlockIds[currentIndex] = world.GetBlock( newVoxelPosition );
 
 				var state = world.GetState<BlockState>( position );
 

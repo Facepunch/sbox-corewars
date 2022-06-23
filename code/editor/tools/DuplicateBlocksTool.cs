@@ -15,6 +15,7 @@ namespace Facepunch.CoreWars.Editor
 		}
 
 		[Net, Change( nameof( OnStageChanged ))] public DuplicateStage Stage { get; set; } = DuplicateStage.Copy;
+		[Net, Predicted] public float PasteRotation { get; set; }
 
 		private EditorAreaGhost AreaGhost { get; set; }
 		private TimeUntil NextBlockPlace { get; set; }
@@ -25,6 +26,15 @@ namespace Facepunch.CoreWars.Editor
 		{
 			var world = VoxelWorld.Current;
 
+			if ( Stage == DuplicateStage.Paste )
+			{
+				if ( Input.Released( InputButton.Reload ) )
+				{
+					PasteRotation = PasteRotation + 90f;
+					PasteRotation = PasteRotation % 360f;
+				}
+			}
+
 			if ( IsClient && world.IsValid() )
 			{
 				var aimVoxelPosition = GetAimVoxelPosition( 6f );
@@ -32,6 +42,8 @@ namespace Facepunch.CoreWars.Editor
 
 				if ( Stage == DuplicateStage.Copy )
 				{
+					AreaGhost.Orientation = 0f;
+
 					if ( StartPosition.HasValue )
 					{
 						AreaGhost.StartBlock = new BBox( StartPosition.Value, StartPosition.Value + new Vector3( VoxelWorld.Current.VoxelSize ) );
@@ -49,6 +61,7 @@ namespace Facepunch.CoreWars.Editor
 				}
 				else
 				{
+					AreaGhost.Orientation = PasteRotation;
 					AreaGhost.MoveStartBlock( new BBox( aimSourcePosition, aimSourcePosition + new Vector3( VoxelWorld.Current.VoxelSize ) ) );
 					AreaGhost.Color = Color.Green;
 				}
@@ -79,6 +92,7 @@ namespace Facepunch.CoreWars.Editor
 
 			StartPosition = null;
 			EndPosition = null;
+			PasteRotation = 0f;
 			Stage = DuplicateStage.Copy;
 		}
 
@@ -112,6 +126,7 @@ namespace Facepunch.CoreWars.Editor
 				DebugOverlay.Text( $"Width: {width}", center + new Vector3( size.x * 0.5f, 0f, 0f ), Color.Red );
 				DebugOverlay.Text( $"Height: {height}", center + new Vector3( 0f, size.y * 0.5f, 0f ), Color.Green );
 				DebugOverlay.Text( $"Depth: {depth}", center + new Vector3( 0f, 0f, size.z * 0.5f ), Color.Cyan );
+				DebugOverlay.Text( $"Rotation: {PasteRotation}", center, Color.Magenta );
 				DebugOverlay.Axis( center, Rotation.Identity, size.Length * 0.25f, 0f, false );
 			}
 		}
@@ -123,6 +138,7 @@ namespace Facepunch.CoreWars.Editor
 
 			if ( stage == DuplicateStage.Paste )
 			{
+				display.AddHotkey( InputButton.Reload, "Rotate" );
 				display.AddHotkey( InputButton.Run, "Copy Entities" );
 			}
 		}
@@ -154,7 +170,7 @@ namespace Facepunch.CoreWars.Editor
 						var endSourceVoxelPosition = VoxelWorld.Current.ToVoxelPosition( EndPosition.Value );
 
 						var action = new DuplicateBlocksAction();
-						action.Initialize( startSourceVoxelPosition, endSourceVoxelPosition, aimVoxelPosition, Input.Down( InputButton.Run ) );
+						action.Initialize( startSourceVoxelPosition, endSourceVoxelPosition, aimVoxelPosition, Input.Down( InputButton.Run ), PasteRotation );
 
 						Player.Perform( action );
 					}
@@ -170,6 +186,7 @@ namespace Facepunch.CoreWars.Editor
 			{
 				NextBlockPlace = 0.1f;
 				StartPosition = null;
+				PasteRotation = 0f;
 				Stage = DuplicateStage.Copy;
 			}
 		}

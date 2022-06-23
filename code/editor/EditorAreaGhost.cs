@@ -12,6 +12,7 @@ namespace Facepunch.CoreWars.Editor
 		public Color Color { get; set; }
 		public BBox LocalBBox { get; set; }
 		public BBox WorldBBox { get; set; }
+		public float Orientation { get; set; }
 
 		public override void DoRender( SceneObject sceneObject )
 		{
@@ -19,10 +20,9 @@ namespace Facepunch.CoreWars.Editor
 				return;
 
 			var vb = Render.GetDynamicVB( true );
-			var center = LocalBBox.Center;
-			var size = LocalBBox.Size;
+			var bbox = LocalBBox;
 
-			DrawBox( vb, center, size );
+			DrawBox( vb, bbox.Center, bbox.Size );
 		}
 
 		public void MoveStartBlock( BBox block )
@@ -38,10 +38,24 @@ namespace Facepunch.CoreWars.Editor
 
 		public void UpdateRenderBounds()
 		{
-			WorldBBox = new BBox( StartBlock.Mins, StartBlock.Maxs );
-			WorldBBox = WorldBBox.AddPoint( EndBlock.Mins );
-			WorldBBox = WorldBBox.AddPoint( EndBlock.Maxs );
+			var world = VoxelWorld.Current;
+			var center = (StartBlock.Mins + (EndBlock.Maxs - StartBlock.Mins) * 0.5f);
+			var startCenter = StartBlock.Center.RotateAboutPoint( center, Vector3.Up, Orientation );
+			var endCenter = EndBlock.Center.RotateAboutPoint( center, Vector3.Up, Orientation );
+			var halfVoxel = Vector3.One * world.VoxelSize * 0.5f;
+			var start = new BBox( startCenter )
+				.AddPoint( startCenter - halfVoxel )
+				.AddPoint( startCenter + halfVoxel );
 
+			var end = new BBox( endCenter )
+				.AddPoint( endCenter - halfVoxel )
+				.AddPoint( endCenter + halfVoxel );
+
+			var worldBBox = new BBox( start.Mins, start.Maxs );
+			worldBBox = worldBBox.AddPoint( end.Mins );
+			worldBBox = worldBBox.AddPoint( end.Maxs );
+
+			WorldBBox = worldBBox;
 			Position = WorldBBox.Mins;
 
 			var localMins = WorldBBox.Mins - Position;
