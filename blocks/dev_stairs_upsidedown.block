@@ -2,7 +2,7 @@
 {
 	data = 
 	{
-		FriendlyName = "Dev Stairs"
+		FriendlyName = "Upside Down Stairs"
 		Description = ""
 		Textures = 
 		{
@@ -17,10 +17,10 @@
 		Aliases = null
 		ModelOverride = 
 		{
-			ModelName = resource:"models/maps/stairs/dev/dev_stairs.vmdl"
+			ModelName = resource:"models/maps/stairs/dev/dev_stairs_2.vmdl"
 			FaceDirection = true
 		}
-		Icon = resource:"models/maps/stairs/dev/dev_stairs.vmdl_c.jpg"
+		Icon = resource:"models/maps/stairs/dev/dev_stairs_2.vmdl_c.jpg"
 		IsTranslucent = false
 		UseTransparency = false
 		IsPassable = true
