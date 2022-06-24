@@ -89,7 +89,7 @@ namespace Facepunch.CoreWars
 
 			if ( caller.Pawn is Player player )
 			{
-				if ( channel == ChatBoxChannel.All )
+				if ( channel == ChatBoxChannel.All || player.Team == Team.None )
 					AddChatEntry( To.Everyone, caller.Name, message, $"avatar:{ConsoleSystem.Caller.PlayerId}", player.Team.GetHudClass() );
 				else
 					AddChatEntry( player.Team.GetTo(), caller.Name, message, $"avatar:{ConsoleSystem.Caller.PlayerId}", player.Team.GetHudClass(), channel );
