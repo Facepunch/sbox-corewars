@@ -76,7 +76,7 @@ namespace Facepunch.CoreWars
 			Current.ShowRandomTip();
 		}
 
-		[ConCmd.Server( "say" )]
+		[ConCmd.Server( "cw_say" )]
 		public static void Say( string message, ChatBoxChannel channel )
 		{
 			var caller = ConsoleSystem.Caller;
