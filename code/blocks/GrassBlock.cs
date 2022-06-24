@@ -8,8 +8,8 @@ namespace Facepunch.CoreWars.Blocks
 	{
 		public override string DefaultTexture => "grass_dirt_01";
 		public override string FriendlyName => "Dirt";
-		public override int MinHueShift => 2;
-		public override int MaxHueShift => 7;
+		public override int MinHueShift => 0;
+		public override int MaxHueShift => 6;
 
 		public override byte GetTextureId( BlockFace face, Chunk chunk, int x, int y, int z )
 		{

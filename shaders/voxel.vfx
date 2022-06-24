@@ -78,11 +78,11 @@ VS
 
 	PixelInput MainVs( INSTANCED_SHADER_PARAMS( VertexInput i ) )
 	{
-		int3 chunkPosition = int3( i.vData.y & 63, (i.vData.y >> 6) & 63, (i.vData.y >> 12) & 63 );
-		float3 position = float3( float( i.vData.x & ( 63 ) ), float( ( i.vData.x >> 6 ) & ( 63 ) ), float( ( i.vData.x >> 12 ) & ( 63 ) ) );
+		int3 chunkPosition = int3( i.vData.y & 0x3F, (i.vData.y >> 6) & 0x3F, (i.vData.y >> 12) & 0x3F );
+		float3 position = float3( float( i.vData.x & ( 0x3F ) ), float( ( i.vData.x >> 6 ) & ( 0x3F ) ), float( ( i.vData.x >> 12 ) & ( 0x3F ) ) );
 		int texindex = int( ( i.vData.x >> 18 ) & ( 0x1ff ) );
 		int normal = int( ( i.vData.x >> 27 ) & ( 0x7 ) );
-		int hueShift = int( ( i.vData.y >> 18 ) & ( 0x10 ) );
+		int hueShift = int( ( i.vData.y >> 18 ) & ( 0x3F ) );
 
 		i.vPositionOs = position * g_flVoxelSize;
 
@@ -302,7 +302,7 @@ PS
 			vColor.rgb = lerp(vColor.rgb, float3(1,0,0), Health);
 			
 			if ( i.iHueShift > 0 )
-				vColor.rgb = hueShift( vColor.rgb, (i.iHueShift * 8.0f) / 255.0f );
+				vColor.rgb = hueShift( vColor.rgb, (3.14f / 128.0f) * i.iHueShift );
 
 			#if S_ALPHA_TEST
 				if(vColor.a < g_flAlphaTestReference) discard;
