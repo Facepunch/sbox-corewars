@@ -65,6 +65,7 @@ struct PixelInput
 	float2 vTexCoord : TEXCOORD9;
 	uint nTextureIndex : TEXCOORD10;
 	int3 vPositionOs : TEXCOORD11;
+	int iHueShift : TEXCOORD14;
 	int iNormal : TEXCOORD15;
 };
 
@@ -80,7 +81,8 @@ VS
 		int3 chunkPosition = int3( i.vData.y & 63, (i.vData.y >> 6) & 63, (i.vData.y >> 12) & 63 );
 		float3 position = float3( float( i.vData.x & ( 63 ) ), float( ( i.vData.x >> 6 ) & ( 63 ) ), float( ( i.vData.x >> 12 ) & ( 63 ) ) );
 		int texindex = int( ( i.vData.x >> 18 ) & ( 0x1ff ) );
-		int normal = int( ( i.vData.x >> 27 ) & ( 7 ) );
+		int normal = int( ( i.vData.x >> 27 ) & ( 0x7 ) );
+		int hueShift = int( ( i.vData.y >> 18 ) & ( 0x10 ) );
 
 		i.vPositionOs = position * g_flVoxelSize;
 
@@ -105,6 +107,7 @@ VS
 		o.vTangentUWs = vBinormalOs;
 		o.vTangentVWs = vTangentOs;
 		o.vTexCoord = vTexCoord.xy;
+		o.iHueShift = hueShift;
 		o.nTextureIndex = texindex;
 		o.iNormal = normal;
 
@@ -241,6 +244,12 @@ PS
 		float LightLevel = max(data.Torch.z, max(data.Torch.x, data.Torch.y)) + data.Sunlight;
 		return min(1.0f, LightLevel);
 	}
+	
+	float3 hueShift(float3 color, float hue) {
+		const float3 k = float3(0.57735, 0.57735, 0.57735);
+		float cosAngle = cos(hue);
+		return float3(color * cosAngle + cross(k, color) * sin(hue) + k * dot(k, color) * (1.0 - cosAngle));
+	}
 
 	PixelOutput MainPs( PixelInput i )
 	{
@@ -291,6 +300,9 @@ PS
 
 			float4 vColor = Tex2DLevelS( g_tAtlasColor, g_sPointSampler, vTexCoordAtlas, 0 );
 			vColor.rgb = lerp(vColor.rgb, float3(1,0,0), Health);
+			
+			if ( i.iHueShift > 0 )
+				vColor.rgb = hueShift( vColor.rgb, (i.iHueShift * 8.0f) / 255.0f );
 
 			#if S_ALPHA_TEST
 				if(vColor.a < g_flAlphaTestReference) discard;
