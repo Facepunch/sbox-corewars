@@ -53,7 +53,7 @@ namespace Facepunch.CoreWars
 
 		private RealTimeUntil NextTipTime { get; set; }
 
-		[ConCmd.Client( "chat_add", CanBeCalledFromServer = true )]
+		[ConCmd.Client( "cw_chat_add", CanBeCalledFromServer = true )]
 		public static void AddChatEntry( string name, string message, string avatar = null, string className = null, ChatBoxChannel channel = ChatBoxChannel.All )
 		{
 			Current?.AddEntry( name, message, avatar, className, channel );
@@ -64,7 +64,7 @@ namespace Facepunch.CoreWars
 			}
 		}
 
-		[ConCmd.Client( "chat_addinfo", CanBeCalledFromServer = true )]
+		[ConCmd.Client( "cw_chat_addinfo", CanBeCalledFromServer = true )]
 		public static void AddInformation( string message, string avatar = null )
 		{
 			Current?.AddEntry( null, message, avatar, "info" );
