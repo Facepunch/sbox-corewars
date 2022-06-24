@@ -147,10 +147,12 @@ PS
 	CreateInputTexture2D( TextureAtlasMetalness,        Linear, 8, "",                 "_metal",  		"Voxel Atlas,10/40", Default( 1.0 ) );
 	CreateInputTexture2D( TextureAtlasAmbientOcclusion, Linear, 8, "",                 "_ao",     		"Voxel Atlas,10/50", Default( 1.0 ) );
 	CreateInputTexture2D( TextureAtlasEmission, 		Linear, 8, "",                 "_emission",     "Voxel Atlas,10/60", Default3( 0.0, 0.0, 0.0 ) );
+	CreateInputTexture2D( TextureAtlasHue, 				Linear, 8, "",                 "_hue",     		"Voxel Atlas,10/70", Default3( 1.0f, 1.0f, 1.0f ) );
 
 	CreateTexture2DWithoutSampler( g_tAtlasNormal )   < Channel( RGBA, None( TextureAtlasNormal ), Linear ); OutputFormat( BC7 ); SrgbRead( false ); >;
 	CreateTexture2DWithoutSampler( g_tAtlasRma )      < Channel( R,    None( TextureAtlasRoughness ), Linear ); Channel( G, None( TextureAtlasMetalness ), Linear ); Channel( B, None( TextureAtlasAmbientOcclusion ), Linear ); OutputFormat( BC7 ); SrgbRead( false ); >;
 	CreateTexture2DWithoutSampler( g_tAtlasEmission ) < Channel( RGB, None( TextureAtlasEmission ), Linear ); OutputFormat( BC7 ); SrgbRead( false ); >;
+	CreateTexture2DWithoutSampler( g_tAtlasHue )  	  < Channel( RGB,  None( TextureAtlasHue ), Linear ); OutputFormat( BC7 ); SrgbRead( false ); Filter( POINT ); AddressU( MIRROR ); AddressV( MIRROR ); >;
 	
 	CreateInputTexture3D( TextureLightmap, Linear, 32, "", "_lightmap", "Voxel Atlas,10/70", Default3( 1.0, 1.0, 1.0 ) );
 	
@@ -254,7 +256,6 @@ PS
 	PixelOutput MainPs( PixelInput i )
 	{
 		float2 vAtlasDims = TextureDimensions2D( g_tAtlasColor, 0 ).xy;
-		
 		float2 vAltasMaxCells = vAtlasDims / g_flTextureAtlasCellSize;
 		float2 vInvMaxCells = 1.0f / vAltasMaxCells;
 
@@ -302,7 +303,12 @@ PS
 			vColor.rgb = lerp(vColor.rgb, float3(1,0,0), Health);
 			
 			if ( i.iHueShift > 0 )
-				vColor.rgb = hueShift( vColor.rgb, (3.14f / 128.0f) * i.iHueShift );
+			{
+				float4 maskColor = Tex2DLevelS( g_tAtlasHue, g_sPointSampler, vTexCoordAtlas, 0 );
+				
+				if ( maskColor.r > 0.1f && maskColor.g >= 0.1f && maskColor.b >= 0.1f )
+					vColor.rgb = hueShift( vColor.rgb, (3.14f / 128.0f) * i.iHueShift );
+			}
 
 			#if S_ALPHA_TEST
 				if(vColor.a < g_flAlphaTestReference) discard;

@@ -49,6 +49,7 @@ Layer0
 	TextureAtlasAmbientOcclusion "textures/blocks/corewars/blocks_ao.png"
 	TextureAtlasColor "textures/blocks/corewars/blocks_color.png"
 	TextureAtlasEmission "[0.000000 0.000000 0.000000 0.000000]"
+	TextureAtlasHue "textures/blocks/corewars/blocks_hue.png"
 	TextureAtlasMetalness "materials/default/default_metal.tga"
 	TextureAtlasNormal "textures/blocks/corewars/blocks_normal.png"
 	TextureAtlasRoughness "textures/blocks/corewars/blocks_rough.png"
