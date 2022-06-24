@@ -15,8 +15,11 @@
 			West = ""
 		}
 		Aliases = null
-		ModelOverride = resource:"models/maps/stairs/dev/dev_stairs.vmdl"
-		ModelFacesDirection = true
+		ModelOverride = 
+		{
+			ModelName = resource:"models/maps/stairs/dev/dev_stairs.vmdl"
+			FaceDirection = true
+		}
 		Icon = null
 		IsTranslucent = false
 		UseTransparency = false
