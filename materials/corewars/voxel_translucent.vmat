@@ -11,7 +11,7 @@ Layer0
 	//---- Translucent ----
 	F_TRANSLUCENT 1
 
-	g_flTextureAtlasCellSize "64.000"
+	g_flTextureAtlasCellSize "32.000"
 	g_flVoxelBrightness "1.000"
 	g_flVoxelSize "48.000"
 
