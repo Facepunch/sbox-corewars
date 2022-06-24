@@ -132,5 +132,11 @@ namespace Facepunch.CoreWars
 			var item = ToastsContainer.AddChild<ToastItem>();
 			item.Update( text, icon );
 		}
+
+		public override void Tick()
+		{
+			ToastsContainer.SetClass( "is-editor", Game.Current.IsEditorMode );
+			base.Tick();
+		}
 	}
 }

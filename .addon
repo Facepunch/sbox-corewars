@@ -9,7 +9,9 @@
   "ResourcePaths": [
     "/textures/*",
     "/shaders/*",
-    "/code/ui/*"
+    "/code/ui/*",
+    "/fonts/*",
+    "/blocks/*"
   ],
   "HasCode": true,
   "CodePath": "code",
@@ -22,6 +24,6 @@
     "LeaderboardType": 0,
     "RankType": 0,
     "GameNetworkType": 0,
-    "MaxPlayers": 0
+    "MaxPlayers": 16
   }
 }

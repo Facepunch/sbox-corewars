@@ -9,9 +9,27 @@ namespace Facepunch.CoreWars
 	{
 		public Panel PopupPanel { get; set; }
 
+		public static void ToastAll( string text, string icon = "" )
+		{
+			Toast( To.Everyone, text, icon );
+		}
+
+		public static void Toast( Player player, string text, string icon = "" )
+		{
+			Toast( To.Single( player ), text, icon );
+		}
+
+		[ClientRpc]
+		public static void Toast( string text, string icon = "" )
+		{
+			ToastList.Instance.AddItem( text, Texture.Load( FileSystem.Mounted, icon ) );
+		}
+
 		public EditorHud()
 		{
 			AddChild<ChatBox>();
+			AddChild<ToastList>();
+			AddChild<VoiceList>();
 		}
 
 		public override Panel FindPopupPanel()

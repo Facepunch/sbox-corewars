@@ -53,7 +53,7 @@ namespace Facepunch.CoreWars
 
 		private RealTimeUntil NextTipTime { get; set; }
 
-		[ConCmd.Client( "chat_add", CanBeCalledFromServer = true )]
+		[ConCmd.Client( "cw_chat_add", CanBeCalledFromServer = true )]
 		public static void AddChatEntry( string name, string message, string avatar = null, string className = null, ChatBoxChannel channel = ChatBoxChannel.All )
 		{
 			Current?.AddEntry( name, message, avatar, className, channel );
@@ -64,7 +64,7 @@ namespace Facepunch.CoreWars
 			}
 		}
 
-		[ConCmd.Client( "chat_addinfo", CanBeCalledFromServer = true )]
+		[ConCmd.Client( "cw_chat_addinfo", CanBeCalledFromServer = true )]
 		public static void AddInformation( string message, string avatar = null )
 		{
 			Current?.AddEntry( null, message, avatar, "info" );
@@ -76,7 +76,7 @@ namespace Facepunch.CoreWars
 			Current.ShowRandomTip();
 		}
 
-		[ConCmd.Server( "say" )]
+		[ConCmd.Server( "cw_say" )]
 		public static void Say( string message, ChatBoxChannel channel )
 		{
 			var caller = ConsoleSystem.Caller;
@@ -89,7 +89,7 @@ namespace Facepunch.CoreWars
 
 			if ( caller.Pawn is Player player )
 			{
-				if ( channel == ChatBoxChannel.All )
+				if ( channel == ChatBoxChannel.All || player.Team == Team.None )
 					AddChatEntry( To.Everyone, caller.Name, message, $"avatar:{ConsoleSystem.Caller.PlayerId}", player.Team.GetHudClass() );
 				else
 					AddChatEntry( player.Team.GetTo(), caller.Name, message, $"avatar:{ConsoleSystem.Caller.PlayerId}", player.Team.GetHudClass(), channel );
@@ -106,7 +106,7 @@ namespace Facepunch.CoreWars
 		{
 			Current = this;
 
-			StyleSheet.Load( "/ui/chat/ChatBox.scss" );
+			StyleSheet.Load( "/ui/chatbox/ChatBox.scss" );
 
 			Canvas = Add.Panel( "chat_canvas" );
 

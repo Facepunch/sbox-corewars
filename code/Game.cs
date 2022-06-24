@@ -103,19 +103,7 @@ namespace Facepunch.CoreWars
 		[ConCmd.Server( "cw_editor_save" )]
 		public static void SaveEditorMapCmd( string fileName )
 		{
-			if ( !fileName.StartsWith( "worlds/" ) )
-				fileName = $"worlds/{fileName}";
-
-			if ( !fileName.EndsWith( ".voxels" ) )
-				fileName += ".voxels";
-
-			FileSystem.Data.CreateDirectory( "worlds" );
-
-			Log.Info( $"Saving voxel world to disk ({fileName})..." );
-			VoxelWorld.Current.SaveToFile( FileSystem.Data, fileName );
-
-			var state = GetStateAs<EditorState>();
-			state.CurrentFileName = fileName;
+			SaveEditorMap( fileName );
 		}
 
 		[ConCmd.Server( "cw_change_team")]
@@ -153,6 +141,41 @@ namespace Facepunch.CoreWars
 		public static void LoadEditorMapCmd( string fileName )
 		{
 			_ = LoadEditorMapTask( fileName );
+		}
+
+		public static void SaveEditorMap( string fileName, bool autosave = false )
+		{
+			if ( autosave )
+			{
+				if ( fileName.EndsWith( ".voxels" ) )
+				{
+					fileName = fileName.Replace( ".voxels", "" );
+				}
+
+				fileName = $"{fileName}_autosave";
+			}
+
+			if ( !fileName.StartsWith( "worlds/" ) )
+				fileName = $"worlds/{fileName}";
+
+			if ( !fileName.EndsWith( ".voxels" ) )
+				fileName += ".voxels";
+
+			FileSystem.Data.CreateDirectory( "worlds" );
+
+			Log.Info( $"Saving voxel world to disk ({fileName})..." );
+			VoxelWorld.Current.SaveToFile( FileSystem.Data, fileName );
+
+			if ( !autosave )
+			{
+				var state = GetStateAs<EditorState>();
+				state.CurrentFileName = fileName;
+				EditorHud.ToastAll( "Saving...", "textures/ui/autosave.png" );
+			}
+			else
+			{
+				EditorHud.ToastAll( "Autosaving (Backup)...", "textures/ui/autosave.png" );
+			}
 		}
 
 		private static async Task LoadEditorMapTask( string fileName )

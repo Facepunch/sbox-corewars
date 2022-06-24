@@ -1,8 +1,20 @@
-﻿EditorHotbar {
+﻿@import "../scss/base.scss";
+
+EditorHotbar {
     position: absolute;
     bottom: 32px;
     display: flex;
     flex-direction: row;
+    justify-content: center;
+
+    .current-block {
+        position: absolute;
+        text-shadow: 0 0px 4px lerp( $editor, rgba( 0 0 0 1 ), 0.3 );
+        font-family: $font;
+        font-size: 32px;
+        color: $editor;
+        top: -64px;
+    }
 
     EditorHotbarSlot {
         margin-right: 16px;

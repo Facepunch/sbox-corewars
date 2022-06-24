@@ -29,6 +29,7 @@ EditorToolDisplay {
             margin-left: 32px;
 
             .name {
+                text-shadow: 0 0px 4px lerp( $editor, rgba( 0 0 0 1 ), 0.3 );
                 font-size: 48px;
                 font-family: $font;
                 font-weight: bold;
