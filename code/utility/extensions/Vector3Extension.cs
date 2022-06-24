@@ -17,5 +17,23 @@ namespace Facepunch.CoreWars.Utility
 		{
 			return pivot + RotateAboutAxis( vector - pivot, axis, degrees );
 		}
+
+		public static Vector3 SnapToGridCeiling( this Vector3 vector, float gridSize )
+		{
+			return new Vector3(
+				MathF.Ceiling( vector.x / gridSize ) * gridSize,
+				MathF.Ceiling( vector.y / gridSize ) * gridSize,
+				MathF.Ceiling( vector.z / gridSize ) * gridSize
+			);
+		}
+
+		public static Vector3 SnapToGridFloor( this Vector3 vector, float gridSize )
+		{
+			return new Vector3(
+				MathF.Floor( vector.x / gridSize ) * gridSize,
+				MathF.Floor( vector.y / gridSize ) * gridSize,
+				MathF.Floor( vector.z / gridSize ) * gridSize
+			);
+		}
 	}
 }

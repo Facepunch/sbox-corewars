@@ -44,12 +44,12 @@ namespace Facepunch.CoreWars.Editor
 			var endCenter = EndBlock.Center.RotateAboutPoint( center, Vector3.Up, Orientation );
 			var halfVoxel = Vector3.One * world.VoxelSize * 0.5f;
 			var start = new BBox( startCenter )
-				.AddPoint( startCenter - halfVoxel )
-				.AddPoint( startCenter + halfVoxel );
+				.AddPoint( (startCenter - halfVoxel) )
+				.AddPoint( (startCenter + halfVoxel) );
 
 			var end = new BBox( endCenter )
-				.AddPoint( endCenter - halfVoxel )
-				.AddPoint( endCenter + halfVoxel );
+				.AddPoint( (endCenter - halfVoxel) )
+				.AddPoint( (endCenter + halfVoxel) );
 
 			var worldBBox = new BBox( start.Mins, start.Maxs );
 			worldBBox = worldBBox.AddPoint( end.Mins );
@@ -58,8 +58,11 @@ namespace Facepunch.CoreWars.Editor
 			WorldBBox = worldBBox;
 			Position = WorldBBox.Mins;
 
-			var localMins = WorldBBox.Mins - Position;
-			var localMaxs = WorldBBox.Maxs - Position;
+			var localMins = (WorldBBox.Mins - Position)
+				.SnapToGridCeiling( world.VoxelSize );
+
+			var localMaxs = (WorldBBox.Maxs - Position)
+				.SnapToGridCeiling( world.VoxelSize );
 
 			LocalBBox = new BBox( localMins, localMaxs );
 			RenderBounds = LocalBBox * 10f;
