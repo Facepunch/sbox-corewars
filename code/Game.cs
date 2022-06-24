@@ -170,11 +170,11 @@ namespace Facepunch.CoreWars
 			{
 				var state = GetStateAs<EditorState>();
 				state.CurrentFileName = fileName;
-				EditorHud.ToastAll( "Saving...", "textures/ui/save.png" );
+				EditorHud.ToastAll( "Saving...", "textures/ui/autosave.png" );
 			}
 			else
 			{
-				EditorHud.ToastAll( "Autosaving (Backup)...", "textures/ui/save.png" );
+				EditorHud.ToastAll( "Autosaving (Backup)...", "textures/ui/autosave.png" );
 			}
 		}
 

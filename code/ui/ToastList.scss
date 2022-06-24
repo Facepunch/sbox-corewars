@@ -93,48 +93,78 @@ ToastList {
 }
 
 .toasts {
-  position: absolute;
-  flex-direction: column-reverse;
-  left: 64px;
-  top: 64px;
+    position: absolute;
 
-  ToastItem {
-    align-self: flex-end;
-    align-items: center;
-    background-color: $box-bg;
-    border: 2px solid $box-border;
-    border-radius: 4px;
-    padding: 4px 8px;
-    margin-bottom: 4px;
-    transition: all 1s ease-out;
-    opacity: 1;
-
-    &:intro {
-      opacity: 0;
-      bottom: -20px;
+    &:not( .is-editor ) {
+        flex-direction: column-reverse;
+        left: 64px;
+        top: 64px;
     }
 
-    &:outro {
-      opacity: 0;
-      bottom: 20px;
-      transition: all 1s ease-out;
+    &.is-editor {
+        flex-direction: column;
+        right: 64px;
+        bottom: 64px;
+
+        ToastItem {
+            padding: 16px 32px;
+            background-color: rgba( lerp( $editor, rgba( 0 0 0 1 ), 0.1 ), 0.4 );
+            box-shadow: 0px 10px 13px -7px rgba( 0 0 0 0.2 ), 0px 0px 27px 3px rgba( lerp( $editor, rgba( 0 0 0 1 ), 0.1 ), 0.3 );
+            border-color: lerp( $editor, rgba( 255 255 255 1 ), 0.3 );
+            margin-bottom: 8px;
+            border-width: 1px;
+
+            .text {
+                color: lerp( $editor, rgba( 0 0 0 1 ), 0.6 );
+                text-shadow: 0 0px 4px lerp( $editor, rgba( 255 255 255 1 ), 0.3 );
+                font-size: 22px;
+                margin-left: 16px;
+            }
+
+            .icon {
+                width: 32px;
+                height: 32px;
+            }
+        }
     }
 
-    .text {
-      color: #fff;
-      font-size: 18px;
-      text-shadow: 0 2px 0 rgba(0, 0, 0, 0.5);
-      margin-left: 8px;
-      margin-right: 6px;
-    }
+    ToastItem {
+        align-self: flex-end;
+        align-items: center;
+        background-color: $box-bg;
+        border: 2px solid $box-border;
+        border-radius: 4px;
+        padding: 4px 8px;
+        margin-bottom: 4px;
+        transition: all 1s ease-out;
+        opacity: 1;
 
-    .icon {
-      width: 32px;
-      height: 32px;
+        &:intro {
+            opacity: 0;
+            bottom: -20px;
+        }
 
-      &.hidden {
-        display: none;
-      }
+        &:outro {
+            opacity: 0;
+            bottom: 20px;
+            transition: all 1s ease-out;
+        }
+
+        .text {
+            color: #fff;
+            font-size: 18px;
+            text-shadow: 0 2px 0 rgba(0, 0, 0, 0.5);
+            margin-left: 8px;
+            margin-right: 6px;
+        }
+
+        .icon {
+            width: 32px;
+            height: 32px;
+
+            &.hidden {
+                display: none;
+            }
+        }
     }
-  }
 }
