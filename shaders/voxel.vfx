@@ -187,6 +187,7 @@ PS
 		float3 Torch;
 		float Sunlight;
 		float Health;
+		bool Opaque;
 	};
 
 	LightmapData UnpackLightmap(Texture3D lightmapTexture, int3 texOffset )
@@ -203,6 +204,7 @@ PS
 		o.Sunlight = float((texData.r >> 12) & 15) / 16.0f;
 		o.Sunlight *= o.Sunlight;
 		o.Health = saturate(float((texData.r >> 16) & 0x7f) / 100.0f);
+		o.Opaque = ((texData.r >> 23) & 0x1) == 1;
 
 		return o;
 	}
@@ -300,7 +302,6 @@ PS
 
 			// Torch flickering
 			float3 torchColor = Torch * (1.0f - (((sin(g_flTime * 8.0f) + 1.0f) * 0.5f) * 0.2f));
-
 			float4 vColor = Tex2DLevelS( g_tAtlasColor, g_sPointSampler, vTexCoordAtlas, 0 );
 			vColor.rgb = lerp(vColor.rgb, float3(1,0,0), Health);
 			
