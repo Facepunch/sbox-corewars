@@ -7,7 +7,7 @@ namespace Facepunch.CoreWars.Blocks
 	public class GrassBlock : BlockType
 	{
 		public override string DefaultTexture => "grass_dirt_01";
-		public override string FriendlyName => "Dirt";
+		public override string FriendlyName => "Grass";
 		public override int MinHueShift => 0;
 		public override int MaxHueShift => 6;
 
