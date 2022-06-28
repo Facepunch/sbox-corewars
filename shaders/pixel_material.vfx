@@ -9,7 +9,7 @@ FEATURES
     #include "common/features.hlsl"
 
 	Feature( F_TRANSLUCENT, 0..1, "Rendering")
-	Feature( F_IS_VOXEL_BLOCK, 0..1, "Is Voxel Block" );
+	Feature( F_IS_VOXEL_BLOCK, 0..1, "Rendering" );
 }
 
 MODES
