@@ -1,15 +1,9 @@
-//=========================================================================================================================
-// Optional
-//=========================================================================================================================
 HEADER
 {
 	CompileTargets = ( IS_SM_50 && ( PC || VULKAN ) );
-	Description = "Template Shader for S&box";
+	Description = "Voxel Model Material";
 }
 
-//=========================================================================================================================
-// Optional
-//=========================================================================================================================
 FEATURES
 {
     #include "common/features.hlsl"
@@ -17,19 +11,15 @@ FEATURES
 	Feature( F_TRANSLUCENT, 0..1, "Rendering")
 }
 
-//=========================================================================================================================
-// Optional
-//=========================================================================================================================
 MODES
 {
-    VrForward();													// Indicates this shader will be used for main rendering
-    Depth( "vr_depth_only.vfx" ); 									// Shader that will be used for shadowing and depth prepass
-    ToolsVis( S_MODE_TOOLS_VIS ); 									// Ability to see in the editor
-    ToolsWireframe( "vr_tools_wireframe.vfx" ); 					// Allows for mat_wireframe to work
-	ToolsShadingComplexity( "vr_tools_shading_complexity.vfx" ); 	// Shows how expensive drawing is in debug view
+    VrForward();
+    Depth( "vr_depth_only.vfx" );
+    ToolsVis( S_MODE_TOOLS_VIS );
+    ToolsWireframe( "vr_tools_wireframe.vfx" );
+	ToolsShadingComplexity( "vr_tools_shading_complexity.vfx" );
 }
 
-//=========================================================================================================================
 COMMON
 {
 	#include "common/shared.hlsl"
@@ -40,52 +30,65 @@ COMMON
 	#define BLEND_MODE_ALREADY_SET
 }
 
-//=========================================================================================================================
-
 struct VertexInput
 {
 	#include "common/vertexinput.hlsl"
 };
-
-//=========================================================================================================================
 
 struct PixelInput
 {
 	#include "common/pixelinput.hlsl"
 };
 
-//=========================================================================================================================
-
 VS
 {
 	#include "common/vertex.hlsl"
-	//
-	// Main
-	//
+	
 	PixelInput MainVs( INSTANCED_SHADER_PARAMS( VS_INPUT i ) )
 	{
 		PixelInput o = ProcessVertex( i );
-		// Add your vertex manipulation functions here
 		return FinalizeVertex( o );
 	}
 }
 
-//=========================================================================================================================
-
 PS
 {
     #include "common/pixel.hlsl"
-	//
-	// Main
-	//
+	
 	StaticCombo( S_TRANSLUCENT, F_TRANSLUCENT, Sys( PC ) );
 
 	RenderState(BlendEnable, S_TRANSLUCENT);
+	
+	float4 g_vVoxelLight< Range4(0.0f, 16.0f, 0.0f, 16.0f, 0.0f, 16.0f, 0.0f, 16.0f); Default4(0.0f, 0.0f, 0.0f, 0.0f); >;
+	float3 g_vTintColor< Range3(0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f); Default3(1.0f, 1.0f, 1.0f); >;
+	int g_iHueShift< Range(0, 64); Default(0); >;
+	
+	float3 hueShift(float3 color, float hue) {
+		const float3 k = float3(0.57735, 0.57735, 0.57735);
+		float cosAngle = cos(hue);
+		return float3(color * cosAngle + cross(k, color) * sin(hue) + k * dot(k, color) * (1.0 - cosAngle));
+	}
 
 	PixelOutput MainPs( PixelInput i )
 	{
-        
 		Material m = GatherMaterial( i );
+		
+		bool hasTintColor = (g_vTintColor.r < 1.0f || g_vTintColor.g < 1.0f || g_vTintColor.b < 1.0f );
+		
+		if ( g_iHueShift > 0 || hasTintColor )
+		{
+			if ( hasTintColor )
+				m.Albedo.rgb *= g_vTintColor.rgb;
+		
+			if ( g_iHueShift > 0 )
+				m.Albedo.rgb = hueShift( m.Albedo.rgb, (3.14f / 128.0f) * g_iHueShift );
+		}
+		
+		float3 torchColor = (g_vVoxelLight.rgb / 16.0f) * (1.0f - (((sin(g_flTime * 8.0f) + 1.0f) * 0.5f) * 0.2f));
+		float sunlight = g_vVoxelLight.w / 16.0f;
+		
+		m.Albedo.rgb *= saturate(0.007f + torchColor + sunlight);
+		
 		return FinalizePixelMaterial( i, m );
 	}
 }
