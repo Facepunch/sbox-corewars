@@ -9,6 +9,7 @@ FEATURES
     #include "common/features.hlsl"
 
 	Feature( F_TRANSLUCENT, 0..1, "Rendering")
+	Feature( F_IS_VOXEL_BLOCK, 0..1, "Is Voxel Block" );
 }
 
 MODES
@@ -56,12 +57,16 @@ PS
     #include "common/pixel.hlsl"
 	
 	StaticCombo( S_TRANSLUCENT, F_TRANSLUCENT, Sys( PC ) );
+	StaticCombo( S_IS_VOXEL_BLOCK, F_IS_VOXEL_BLOCK, Sys( ALL ) );
 
 	RenderState(BlendEnable, S_TRANSLUCENT);
 	
+	#if S_IS_VOXEL_BLOCK
 	float4 g_vVoxelLight< Range4(0.0f, 0.0f, 0.0f, 0.0f, 16.0f, 16.0f, 16.0f, 16.0f); Default4(0.0f, 0.0f, 0.0f, 0.0f); >;
 	float3 g_vTintColor< Range3(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f); Default3(1.0f, 1.0f, 1.0f); >;
 	int g_HueShift< Range(0, 64); Default(0); >;
+	BoolAttribute( IsVoxelBlock, F_IS_VOXEL_BLOCK ? true : false );
+	#endif
 	
 	float3 hueShift(float3 color, float hue) {
 		const float3 k = float3(0.57735, 0.57735, 0.57735);
@@ -73,21 +78,23 @@ PS
 	{
 		Material m = GatherMaterial( i );
 		
-		bool hasTintColor = (g_vTintColor.r < 1.0f || g_vTintColor.g < 1.0f || g_vTintColor.b < 1.0f );
-		
-		if ( g_HueShift > 0 || hasTintColor )
-		{
-			if ( hasTintColor )
-				m.Albedo.rgb *= g_vTintColor.rgb;
-		
-			if ( g_HueShift > 0 )
-				m.Albedo.rgb = hueShift( m.Albedo.rgb, (3.14f / 128.0f) * g_HueShift );
-		}
-		
-		float3 torchColor = (g_vVoxelLight.rgb / 16.0f) * (1.0f - (((sin(g_flTime * 8.0f) + 1.0f) * 0.5f) * 0.2f));
-		float sunlight = g_vVoxelLight.w / 16.0f;
-		
-		m.Albedo.rgb *= saturate(0.007f + torchColor + sunlight);
+		#if S_IS_VOXEL_BLOCK
+			bool hasTintColor = (g_vTintColor.r < 1.0f || g_vTintColor.g < 1.0f || g_vTintColor.b < 1.0f );
+			
+			if ( g_HueShift > 0 || hasTintColor )
+			{
+				if ( hasTintColor )
+					m.Albedo.rgb *= g_vTintColor.rgb;
+			
+				if ( g_HueShift > 0 )
+					m.Albedo.rgb = hueShift( m.Albedo.rgb, (3.14f / 128.0f) * g_HueShift );
+			}
+			
+			float3 torchColor = (g_vVoxelLight.rgb / 16.0f) * (1.0f - (((sin(g_flTime * 8.0f) + 1.0f) * 0.5f) * 0.2f));
+			float sunlight = g_vVoxelLight.w / 16.0f;
+			
+			m.Albedo.rgb *= saturate(0.007f + torchColor + sunlight);
+		#endif
 		
 		ShadingModelValveStandard sm;
 		return FinalizePixelMaterial( i, m, sm );

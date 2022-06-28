@@ -4,6 +4,9 @@ Layer0
 {
 	shader "pixel_material.vfx"
 
+	//---- Is Voxel Block ----
+	F_IS_VOXEL_BLOCK 1
+
 	g_HueShift "0"
 	g_vTintColor "[1.000 1.000 1.000]"
 	g_vVoxelLight "[0.000 0.000 0.000 0.000]"
@@ -14,6 +17,9 @@ Layer0
 
 	//---- Fade ----
 	g_flFadeExponent "1.000"
+
+	//---- Fog ----
+	g_bFogEnabled "1"
 
 	//---- Lighting ----
 	g_flDirectionalLightmapMinZ "0.050"
