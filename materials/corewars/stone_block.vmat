@@ -4,13 +4,6 @@ Layer0
 {
 	shader "pixel_material.vfx"
 
-	//---- Is Voxel Block ----
-	F_IS_VOXEL_BLOCK 1
-
-	g_HueShift "0"
-	g_vTintColor "[1.000 1.000 1.000]"
-	g_vVoxelLight "[0.000 0.000 0.000 0.000]"
-
 	//---- Color ----
 	g_flModelTintAmount "1.000"
 	g_vColorTint "[1.000000 1.000000 1.000000 0.000000]"
@@ -41,11 +34,4 @@ Layer0
 	g_vTexCoordOffset "[0.000 0.000]"
 	g_vTexCoordScale "[1.000 1.000]"
 	g_vTexCoordScrollSpeed "[0.000 0.000]"
-
-	DynamicParams
-	{
-		g_HueShift "HueShift"
-		g_vTintColor "TintColor"
-		g_vVoxelLight "VoxelLight"
-	}
 }

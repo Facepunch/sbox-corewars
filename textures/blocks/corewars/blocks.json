@@ -223,14 +223,22 @@
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
 	"sourceSize": {"w":32,"h":32}
+},
+{
+	"filename": "wood_planks",
+	"frame": {"x":896,"y":0,"w":32,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
+	"sourceSize": {"w":32,"h":32}
 }],
 "meta": {
 	"app": "https://www.codeandweb.com/texturepacker",
 	"version": "1.0",
 	"image": "blocks_color.png",
 	"format": "RGBA8888",
-	"size": {"w":896,"h":32},
+	"size": {"w":928,"h":32},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:2f2fe9a6e253b3eddae34295b3df3151:96b158719b1c337cfe635ca214574a63:56cb1b5db91b40c02ccdfb3e5257b21f$"
+	"smartupdate": "$TexturePacker:SmartUpdate:cb50c11377da666e4266a912d6a047f5:19074c15aea894c3ec24208f91535e21:56cb1b5db91b40c02ccdfb3e5257b21f$"
 }
 }
