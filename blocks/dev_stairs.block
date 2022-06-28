@@ -18,13 +18,17 @@
 		ModelOverride = 
 		{
 			ModelName = resource:"models/maps/stairs/dev/dev_stairs.vmdl"
+			MaterialName = resource:"materials/corewars/stone_block.vmat"
 			FaceDirection = true
 		}
 		Icon = resource:"models/maps/stairs/dev/dev_stairs.vmdl_c.jpg"
+		TintColor = "1,1,1,1"
 		IsTranslucent = false
 		UseTransparency = false
 		IsPassable = true
-		AttenuatesSunLight = false
+		AttenuatesSunLight = true
+		MinHueShift = 0
+		MaxHueShift = 0
 		Sounds = 
 		{
 		}

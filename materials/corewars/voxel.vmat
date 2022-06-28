@@ -7,13 +7,8 @@ Layer0
 	//---- Rendering ----
 	F_NON_DIRECTIONAL_DIFFUSE_LIGHTING 1
 
-	//---- Translucent ----
-	F_ALPHA_TEST 1
-	F_PREPASS_ALPHA_TEST 1
-
 	g_flTextureAtlasCellSize "32.000"
 	g_flVoxelBrightness "1.000"
-	g_flVoxelOpacity "1.000"
 	g_flVoxelSize "48.000"
 
 	//---- Color ----
@@ -32,7 +27,7 @@ Layer0
 
 	//---- Material ----
 	TextureColor "materials/default/default_color.tga"
-	TextureTranslucency "[1.000000 1.000000 1.000000 0.000000]"
+	TextureTintMask "materials/default/default.tga"
 
 	//---- Texture Coordinates ----
 	g_nScaleTexCoordUByModelScaleAxis "0"
@@ -40,10 +35,6 @@ Layer0
 	g_vTexCoordOffset "[0.000 0.000]"
 	g_vTexCoordScale "[1.000 1.000]"
 	g_vTexCoordScrollSpeed "[0.000 0.000]"
-
-	//---- Translucent ----
-	g_flAlphaTestReference "0.500"
-	g_flAntiAliasedEdgeStrength "1.000"
 
 	//---- Voxel Atlas ----
 	TextureAtlasAmbientOcclusion "textures/blocks/corewars/blocks_ao.png"
@@ -64,7 +55,6 @@ Layer0
 	DynamicParams
 	{
 		g_flVoxelBrightness "VoxelBrightness"
-		g_flVoxelOpacity "VoxelOpacity"
 		g_flVoxelSize "VoxelSize"
 		TextureLightmap "Lightmap"
 		TextureLightmapBottom "LightMapBottom"

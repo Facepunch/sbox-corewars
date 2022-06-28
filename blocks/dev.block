@@ -18,11 +18,17 @@
 		[
 			"DevBlock",
 		]
+		ModelOverride = 
+		{
+		}
 		Icon = null
+		TintColor = "1,1,1,1"
 		IsTranslucent = false
 		UseTransparency = false
 		IsPassable = false
 		AttenuatesSunLight = false
+		MinHueShift = 0
+		MaxHueShift = 0
 		Sounds = 
 		{
 		}
