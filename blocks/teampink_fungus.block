@@ -1,0 +1,49 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+{
+	data = 
+	{
+		FriendlyName = "Team Block"
+		Description = ""
+		Textures = 
+		{
+			Default = "fungus"
+			Top = ""
+			Bottom = ""
+			North = ""
+			East = ""
+			South = ""
+			West = ""
+		}
+		Aliases = null
+		ModelOverride = 
+		{
+		}
+		Icon = null
+		TintColor = "0.78039,0.50196,0.9098,1"
+		IsTranslucent = false
+		UseTransparency = false
+		IsPassable = false
+		AttenuatesSunLight = false
+		MinHueShift = 0
+		MaxHueShift = 0
+		Sounds = 
+		{
+		}
+		RedLight = 0
+		GreenLight = 0
+		BlueLight = 0
+		RedFilter = 1
+		GreenFilter = 1
+		BlueFilter = 1
+		DetailModels = null
+		DetailSpawnChance = 0
+		DetailScale = 1
+		FaceToTexture = 
+		{
+		}
+		LightLevel = 
+		{
+		}
+		LightFilter = "1,1,1"
+	}
+}

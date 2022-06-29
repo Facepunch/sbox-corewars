@@ -33,7 +33,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "grass_01",
+	"filename": "fungus",
 	"frame": {"x":128,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -41,7 +41,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "grass_dirt_01",
+	"filename": "grass_01",
 	"frame": {"x":160,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -49,7 +49,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "hardened_metal_01",
+	"filename": "grass_dirt_01",
 	"frame": {"x":192,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -57,7 +57,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "metal_plate",
+	"filename": "hardened_metal_01",
 	"frame": {"x":224,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -65,7 +65,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "planks_01",
+	"filename": "metal_plate",
 	"frame": {"x":256,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -73,7 +73,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "plastic_blue_01",
+	"filename": "planks_01",
 	"frame": {"x":288,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -81,7 +81,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "plastic_cyan_01",
+	"filename": "plastic_blue_01",
 	"frame": {"x":320,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -89,7 +89,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "plastic_green_01",
+	"filename": "plastic_cyan_01",
 	"frame": {"x":352,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -97,7 +97,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "plastic_orange_01",
+	"filename": "plastic_green_01",
 	"frame": {"x":384,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -105,7 +105,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "plastic_pink_01",
+	"filename": "plastic_orange_01",
 	"frame": {"x":416,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -113,7 +113,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "plastic_purple_01",
+	"filename": "plastic_pink_01",
 	"frame": {"x":448,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -121,7 +121,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "plastic_red_01",
+	"filename": "plastic_purple_01",
 	"frame": {"x":480,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -129,7 +129,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "plastic_yellow_01",
+	"filename": "plastic_red_01",
 	"frame": {"x":512,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -137,7 +137,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "sand_01",
+	"filename": "plastic_yellow_01",
 	"frame": {"x":544,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -145,7 +145,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "steel_panel_01",
+	"filename": "sand_01",
 	"frame": {"x":576,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -153,7 +153,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "stone_01",
+	"filename": "steel_panel_01",
 	"frame": {"x":608,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -161,7 +161,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "stone_block",
+	"filename": "stone_01",
 	"frame": {"x":640,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -169,7 +169,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "stone_block_support",
+	"filename": "stone_block",
 	"frame": {"x":672,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -177,7 +177,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "stone_brick",
+	"filename": "stone_block_support",
 	"frame": {"x":704,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -185,7 +185,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "stone_brick_1",
+	"filename": "stone_brick",
 	"frame": {"x":736,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -193,7 +193,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "stone_brick_2",
+	"filename": "stone_brick_1",
 	"frame": {"x":768,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -201,7 +201,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "stone_brick_3",
+	"filename": "stone_brick_2",
 	"frame": {"x":800,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -209,7 +209,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "stone_brick_4",
+	"filename": "stone_brick_3",
 	"frame": {"x":832,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -217,7 +217,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "tree_01",
+	"filename": "stone_brick_4",
 	"frame": {"x":864,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -225,7 +225,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "tree_top_01",
+	"filename": "tree_01",
 	"frame": {"x":896,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -233,7 +233,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "window_01",
+	"filename": "tree_top_01",
 	"frame": {"x":928,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -241,8 +241,16 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "wood_planks",
+	"filename": "window_01",
 	"frame": {"x":960,"y":0,"w":32,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
+	"sourceSize": {"w":32,"h":32}
+},
+{
+	"filename": "wood_planks",
+	"frame": {"x":992,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -253,8 +261,8 @@
 	"version": "1.0",
 	"image": "blocks_color.png",
 	"format": "RGBA8888",
-	"size": {"w":992,"h":32},
+	"size": {"w":1024,"h":32},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:3ccfdbcaeb318af90ce5dddb5f90eef4:0be27140ab2da6876a23b0bc311a3f7b:56cb1b5db91b40c02ccdfb3e5257b21f$"
+	"smartupdate": "$TexturePacker:SmartUpdate:b6b528864281edab64062401212c04a9:fae993e88b4257d505c4b27382d5c1b6:56cb1b5db91b40c02ccdfb3e5257b21f$"
 }
 }
