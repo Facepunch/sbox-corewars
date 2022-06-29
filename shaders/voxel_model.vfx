@@ -1,0 +1,144 @@
+HEADER
+{
+	CompileTargets = ( IS_SM_50 && ( PC || VULKAN ) );
+	Description = "Voxel Model";
+	DebugInfo = false;
+}
+
+FEATURES
+{
+	#include "common/features.hlsl"
+
+	Feature( F_ALPHA_TEST, 0..1, "Translucent" );
+	Feature( F_TRANSLUCENT, 0..1, "Translucent" );
+	FeatureRule( Allow1( F_TRANSLUCENT, F_ALPHA_TEST ), "Translucent and Alpha Test are not compatible" );
+	Feature( F_PREPASS_ALPHA_TEST, 0..1, "Translucent" );
+	Feature( F_NON_DIRECTIONAL_DIFFUSE_LIGHTING, 0..1, "Rendering" );
+}
+
+MODES
+{
+	VrForward();
+	Depth( S_MODE_DEPTH );
+	ToolsVis( S_MODE_TOOLS_VIS );
+	ToolsWireframe( S_MODE_TOOLS_WIREFRAME );
+	ToolsShadingComplexity( "vr_tools_shading_complexity.vfx" );
+}
+
+COMMON
+{
+	#include "system.fxc"
+	#include "sbox_shared.fxc"
+	
+	#define VS_INPUT_HAS_TANGENT_BASIS 1
+	#define PS_INPUT_HAS_TANGENT_BASIS 1
+
+	StaticCombo( S_ALPHA_TEST, F_ALPHA_TEST, Sys( ALL ) );
+	StaticCombo( S_TRANSLUCENT, F_TRANSLUCENT, Sys( ALL ) );
+	StaticCombo( S_NON_DIRECTIONAL_DIFFUSE_LIGHTING, F_NON_DIRECTIONAL_DIFFUSE_LIGHTING, Sys( ALL ) );
+}
+
+struct VertexInput
+{
+	#include "common/vertexinput.hlsl"
+};
+
+struct PixelInput
+{
+	#include "common/pixelinput.hlsl"
+};
+
+VS
+{
+	#include "common/vertex.hlsl"
+	
+	PixelInput MainVs( INSTANCED_SHADER_PARAMS( VS_INPUT i ) )
+	{
+		PixelInput o = ProcessVertex( i );
+		return FinalizeVertex( o );
+	}
+}
+
+PS
+{
+	StaticCombo( S_MODE_DEPTH, 0..1, Sys( ALL ) );
+	StaticCombo( S_MODE_TOOLS_WIREFRAME, 0..1, Sys( ALL ) );
+	StaticCombo( S_DO_NOT_CAST_SHADOWS, F_DO_NOT_CAST_SHADOWS, Sys( ALL ) );
+
+	#if ( S_MODE_TOOLS_WIREFRAME )
+		RenderState( FillMode, WIREFRAME );
+		RenderState( SlopeScaleDepthBias, -0.5 );
+		RenderState( DepthBiasClamp, -0.0005 );
+		RenderState( DepthWriteEnable, false );
+		#define DEPTH_STATE_ALREADY_SET
+	#endif
+	
+	#include "common/pixel.hlsl"
+	
+	CreateInputTexture2D( ModelTextureColor, Srgb, 8, "", "_color", "Voxel Pixel,10/10", Default4( 1.0f, 1.0f, 1.0f, 1.0f ) );
+
+	SamplerState g_sPointSampler < Filter( POINT ); AddressU( MIRROR ); AddressV( MIRROR ); >;
+
+	CreateTexture2DWithoutSampler( g_tModelColor )  < Channel( RGBA,  None( ModelTextureColor ), Srgb ); OutputFormat( BC7 ); SrgbRead( true ); Filter( POINT ); AddressU( MIRROR ); AddressV( MIRROR ); >;
+
+	CreateInputTexture2D( ModelTextureNormal,           Linear, 8, "NormalizeNormals", "_normal", 		"Model Material,10/20", Default3( 0.5, 0.5, 1.0 ) );
+	CreateInputTexture2D( ModelTextureRoughness,        Linear, 8, "",                 "_rough",  		"Model Material,10/30", Default( 0.5 ) );
+	CreateInputTexture2D( ModelTextureMetalness,        Linear, 8, "",                 "_metal",  		"Model Material,10/40", Default( 1.0 ) );
+	CreateInputTexture2D( ModelTextureAmbientOcclusion, Linear, 8, "",                 "_ao",     		"Model Material,10/50", Default( 1.0 ) );
+	CreateInputTexture2D( ModelTextureEmission, 		Linear, 8, "",                 "_emission",     "Model Material,10/60", Default3( 0.0, 0.0, 0.0 ) );
+	CreateInputTexture2D( ModelTextureHue, 				Linear, 8, "",                 "_hue",     		"Model Material,10/70", Default3( 1.0f, 1.0f, 1.0f ) );
+
+	CreateTexture2DWithoutSampler( g_tModelNormal )   < Channel( RGBA, None( ModelTextureNormal ), Linear ); OutputFormat( BC7 ); SrgbRead( false ); >;
+	CreateTexture2DWithoutSampler( g_tModelRma )      < Channel( R,    None( ModelTextureRoughness ), Linear ); Channel( G, None( ModelTextureMetalness ), Linear ); Channel( B, None( ModelTextureAmbientOcclusion ), Linear ); OutputFormat( BC7 ); SrgbRead( false ); >;
+	CreateTexture2DWithoutSampler( g_tModelEmission ) < Channel( RGB, None( ModelTextureEmission ), Linear ); OutputFormat( BC7 ); SrgbRead( false ); >;
+	CreateTexture2DWithoutSampler( g_tModelHue )  	  < Channel( RGB,  None( ModelTextureHue ), Linear ); OutputFormat( BC7 ); SrgbRead( false ); Filter( POINT ); AddressU( MIRROR ); AddressV( MIRROR ); >;
+	
+	float4 g_vVoxelLight< Range4(0.0f, 0.0f, 0.0f, 0.0f, 16.0f, 16.0f, 16.0f, 16.0f); Default4(0.0f, 0.0f, 0.0f, 0.0f); >;
+	float3 g_vTintColor< Range3(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f); Default3(1.0f, 1.0f, 1.0f); >;
+	int g_HueShift< Range(0, 64); Default(0); >;
+	
+	BoolAttribute( DoNotCastShadows, F_DO_NOT_CAST_SHADOWS ? true : false );
+	
+	float3 hueShift(float3 color, float hue) {
+		const float3 k = float3(0.57735, 0.57735, 0.57735);
+		float cosAngle = cos(hue);
+		return float3(color * cosAngle + cross(k, color) * sin(hue) + k * dot(k, color) * (1.0 - cosAngle));
+	}
+
+	PixelOutput MainPs( PixelInput i )
+	{
+		float4 vColor = Tex2DLevelS( g_tColor, g_sPointSampler, i.vTextureCoords.xy, 0 );
+		Material m = GatherMaterial( i );
+		
+		bool hasTintColor = (g_vTintColor.r < 1.0f || g_vTintColor.g < 1.0f || g_vTintColor.b < 1.0f );
+		
+		if ( g_HueShift > 0 || hasTintColor )
+		{
+			if ( hasTintColor )
+				vColor.rgb *= g_vTintColor.rgb;
+		
+			if ( g_HueShift > 0 )
+				vColor.rgb = hueShift( vColor.rgb, (3.14f / 128.0f) * g_HueShift );
+		}
+		
+		float3 vRma = Tex2DLevelS( g_tModelRma, g_sPointSampler, i.vTextureCoords.xy, 0 ).rgb;
+		float3 vEmission = Tex2DLevelS( g_tModelEmission, g_sPointSampler, i.vTextureCoords.xy, 0 ).rgb;
+		
+		float3 torchColor = (g_vVoxelLight.rgb / 16.0f) * (1.0f - (((sin(g_flTime * 8.0f) + 1.0f) * 0.5f) * 0.2f));
+		float sunlight = g_vVoxelLight.w / 16.0f;
+		sunlight *= sunlight;
+		
+		m.TintMask = 1.0f;
+		m.Opacity = 1.0f;
+		m.Albedo.rgb = vColor.rgb * saturate(0.007f + torchColor + sunlight);
+		m.Normal = Tex2DLevelS( g_tModelNormal, g_sPointSampler, i.vTextureCoords.xy, 0 ).rgb;
+		m.Roughness = vRma.r;
+		m.Metalness = vRma.g;
+		m.AmbientOcclusion = vRma.b;
+		m.AmbientOcclusion = vRma.b;
+		m.Emission.rgb = vEmission;
+		
+		ShadingModelValveStandard sm;
+		return FinalizePixelMaterial( i, m, sm );
+	}
+}
