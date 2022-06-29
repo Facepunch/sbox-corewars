@@ -127,10 +127,11 @@ PS
 		float3 torchColor = (g_vVoxelLight.rgb / 16.0f) * (1.0f - (((sin(g_flTime * 8.0f) + 1.0f) * 0.5f) * 0.2f));
 		float sunlight = g_vVoxelLight.w / 16.0f;
 		sunlight *= sunlight;
+		float brightness = 0.8f;
 		
 		m.TintMask = 1.0f;
 		m.Opacity = 1.0f;
-		m.Albedo.rgb = vColor.rgb * saturate(0.007f + torchColor + sunlight);
+		m.Albedo.rgb = vColor.rgb * saturate(0.007f + torchColor + sunlight * brightness);
 		m.Normal = Tex2DLevelS( g_tModelNormal, g_sPointSampler, i.vTextureCoords.xy, 0 ).rgb;
 		m.Roughness = vRma.r;
 		m.Metalness = vRma.g;

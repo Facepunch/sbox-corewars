@@ -5,13 +5,13 @@ using System.IO;
 
 namespace Facepunch.CoreWars
 {
-	[EditorEntity( Title = "Airdrop Spawnpoint", EditorModel = "models/rust_props/wooden_crates/wooden_crate_d.vmdl" )]
+	[EditorEntity( Title = "Airdrop Spawnpoint", EditorModel = "models/gameplay/temp/shrine_test/air_drop_shrine.vmdl" )]
 	[Category( "Gameplay" )]
 	public partial class AirdropSpawnpoint : ModelEntity, ISourceEntity
 	{
 		public override void Spawn()
 		{
-			SetModel( "models/rust_props/wooden_crates/wooden_crate_d.vmdl" );
+			SetModel( "models/gameplay/temp/shrine_test/air_drop_shrine.vmdl" );
 
 			var isEditorMode = Game.Current.IsEditorMode;
 

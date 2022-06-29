@@ -117,9 +117,25 @@ namespace Facepunch.CoreWars
 			base.ClientSpawn();
 		}
 
+		public override void OnNewModel( Model model )
+		{
+			if ( IsClient )
+			{
+				VoxelWorld.RegisterVoxelModel( this );
+			}
+
+			base.OnNewModel( model );
+		}
+
 		protected override void OnDestroy()
 		{
+			if ( IsClient )
+			{
+				VoxelWorld.UnregisterVoxelModel( this );
+			}
+
 			Effect?.Destroy();
+
 			base.OnDestroy();
 		}
 
