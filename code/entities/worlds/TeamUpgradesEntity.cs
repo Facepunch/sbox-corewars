@@ -37,6 +37,7 @@ namespace Facepunch.CoreWars
 
 		public override void ClientSpawn()
 		{
+			VoxelWorld.RegisterVoxelModel( this );
 			Nameplate = new Nameplate( this );
 			AddAllUpgrades();
 			base.ClientSpawn();
@@ -67,6 +68,17 @@ namespace Facepunch.CoreWars
 		public void OnUsed( Player player )
 		{
 			OpenForClient( To.Single( player ) );
+		}
+
+		protected override void OnDestroy()
+		{
+			if ( IsClient )
+			{
+				VoxelWorld.UnregisterVoxelModel( this );
+				Nameplate?.Delete();
+			}
+
+			base.OnDestroy();
 		}
 
 		private void AddAllUpgrades()

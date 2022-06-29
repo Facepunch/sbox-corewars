@@ -4,7 +4,6 @@ using Facepunch.Voxels;
 using Sandbox;
 using System;
 using System.IO;
-using System.ComponentModel;
 
 namespace Facepunch.CoreWars
 {
