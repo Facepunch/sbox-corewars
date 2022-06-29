@@ -17,7 +17,6 @@ namespace Facepunch.CoreWars.Editor
 		public ActionHistory<EditorAction> UndoStack { get; private set; }
 		public ActionHistory<EditorAction> RedoStack { get; private set; }
 
-
 		public Dictionary<int,EditorTool> Tools { get; private set; }
 
 		private EditorBounds EditorBounds { get; set; }
