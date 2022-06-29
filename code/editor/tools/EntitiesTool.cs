@@ -1,6 +1,7 @@
 ﻿using Facepunch.Voxels;
 using Sandbox;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Facepunch.CoreWars.Editor
@@ -312,8 +313,15 @@ namespace Facepunch.CoreWars.Editor
 							aimSourcePosition.z = topSourcePosition.z - model.Bounds.Size.z;
 						}
 
+						Dictionary<string, object> properties = null;
+
+						if ( Player.LastPlacedEntity.IsSameType( CurrentTypeDescription ) )
+						{
+							properties = Player.LastPlacedEntity.Properties;
+						}
+
 						var action = new PlaceEntityAction();
-						action.Initialize( CurrentTypeDescription, aimSourcePosition, CurrentRotation );
+						action.Initialize( CurrentTypeDescription, aimSourcePosition, CurrentRotation, properties );
 						Player.Perform( action );
 					}
 
@@ -464,6 +472,19 @@ namespace Facepunch.CoreWars.Editor
 			{
 				GhostEntity = new ModelEntity( CurrentAttribute.EditorModel );
 				GhostEntity.RenderColor = Color.White.WithAlpha( 0.5f );
+
+				if ( Local.Pawn is not EditorPlayer player )
+					return;
+
+				if ( player.LastPlacedEntity.IsSameType( CurrentTypeDescription ) )
+				{
+					var model = player.LastPlacedEntity.GetEditorData<string>( "model" );
+
+					if ( !string.IsNullOrEmpty( model ) )
+					{
+						GhostEntity.SetModel( model );
+					}
+				}
 			}
 		}
 	}

@@ -34,23 +34,40 @@ namespace Facepunch.CoreWars.Editor
 		[ConCmd.Server]
 		public static void SaveEntityKeyValue( int entityId, string key, string value )
 		{
+			if ( ConsoleSystem.Caller.Pawn is not EditorPlayer player )
+				return;
+
 			var entity = Sandbox.Entity.FindByIndex( entityId );
 			if ( !entity.IsValid() ) return;
 
+			if ( !player.LastPlacedEntity.IsSameType( entity ) )
+			{
+				player.LastPlacedEntity.SetEntity( entity );
+			}
+
 			var properties = TypeLibrary.GetProperties( entity );
+			var callbacks = (entity as IEditorCallbacks);
 
 			foreach ( var property in properties )
 			{
-				if ( property.Name != key ) continue;
-				if ( property.GetCustomAttribute<EditorPropertyAttribute>() == null ) continue;
+				if ( property.GetCustomAttribute<EditorPropertyAttribute>() == null )
+				{
+					continue;
+				}
+
+				if ( property.Name != key )
+				{
+					player.LastPlacedEntity.StoreProperty( property.Name, property.GetValue( entity ) );
+					continue;
+				}
 
 				property.SetValue( entity, ConvertPropertyValue( property, value ) );
+				callbacks?.OnPropertyChanged( key );
 
-				if ( entity is IEditorCallbacks callbacks )
-				{
-					callbacks.OnPropertyChanged( key );
-				}
+				player.LastPlacedEntity.StoreProperty( property.Name, property.GetValue( entity ) );
 			}
+
+			callbacks?.OnPlayerSavedData( player );
 		}
 
 		[ConCmd.Server( "cw_open_entity_data" )]
@@ -120,7 +137,8 @@ namespace Facepunch.CoreWars.Editor
 			Current = new EditorEntityData( entity );
 			Current.PopulateItems();
 
-			Game.Hud.FindPopupPanel().AddChild( Current );
+			var popup = Game.Hud.FindPopupPanel();
+			popup?.AddChild( Current );
 		}
 
 		public EditorEntityData( ISourceEntity entity )

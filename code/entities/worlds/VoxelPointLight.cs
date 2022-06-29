@@ -44,6 +44,11 @@ namespace Facepunch.CoreWars
 			UpdateLightSettings();
 		}
 
+		public virtual void OnPlayerSavedData( EditorPlayer player )
+		{
+
+		}
+
 		public override void Spawn()
 		{
 			var isEditorMode = Game.Current.IsEditorMode;

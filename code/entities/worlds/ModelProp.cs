@@ -29,6 +29,12 @@ namespace Facepunch.CoreWars
 			UpdateModelFromPath();
 		}
 
+		public virtual void OnPlayerSavedData( EditorPlayer player )
+		{
+			player.LastPlacedEntity.SetEditorData( "model", ModelPath );
+			Log.Info( "Saved: " + ModelPath );
+		}
+
 		public override void Spawn()
 		{
 			Transmit = TransmitType.Always;

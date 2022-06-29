@@ -1,16 +1,13 @@
-﻿using Facepunch.CoreWars.Blocks;
-using Facepunch.Voxels;
+﻿using Facepunch.Voxels;
 using Sandbox;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json;
 
 namespace Facepunch.CoreWars.Editor
 {
 	public partial class EditorPlayer : Sandbox.Player, INameplate
 	{
 		[Net, Predicted] public int CurrentHotbarIndex { get; private set; }
+		[Net] public EditorLastEntityData LastPlacedEntity { get; set; } = new();
 		[Net] public IList<byte> HotbarBlockIds { get; set; }
 		[Net, Change( nameof( OnToolChanged ) )] public EditorTool Tool { get; private set; }
 
@@ -19,6 +16,7 @@ namespace Facepunch.CoreWars.Editor
 
 		public ActionHistory<EditorAction> UndoStack { get; private set; }
 		public ActionHistory<EditorAction> RedoStack { get; private set; }
+
 
 		public Dictionary<int,EditorTool> Tools { get; private set; }
 
