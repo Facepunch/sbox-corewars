@@ -37,10 +37,19 @@ namespace Facepunch.CoreWars
 
 		public override void ClientSpawn()
 		{
-			VoxelWorld.RegisterVoxelModel( this );
 			Nameplate = new Nameplate( this );
 			AddAllItems();
 			base.ClientSpawn();
+		}
+
+		public override void OnNewModel( Model model )
+		{
+			if ( IsClient )
+			{
+				VoxelWorld.RegisterVoxelModel( this );
+			}
+
+			base.OnNewModel( model );
 		}
 
 		public virtual void Serialize( BinaryWriter writer )
