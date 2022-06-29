@@ -61,6 +61,8 @@ PS
 
 	RenderState(BlendEnable, S_TRANSLUCENT);
 	
+	SamplerState g_sPointSampler < Filter( POINT ); AddressU( MIRROR ); AddressV( MIRROR ); >;
+	
 	#if S_IS_VOXEL_BLOCK
 	float4 g_vVoxelLight< Range4(0.0f, 0.0f, 0.0f, 0.0f, 16.0f, 16.0f, 16.0f, 16.0f); Default4(0.0f, 0.0f, 0.0f, 0.0f); >;
 	float3 g_vTintColor< Range3(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f); Default3(1.0f, 1.0f, 1.0f); >;
@@ -76,6 +78,8 @@ PS
 
 	PixelOutput MainPs( PixelInput i )
 	{
+		float4 vColor = Tex2DLevelS( g_tColor, g_sPointSampler, i.vTextureCoords.xy, 0 );
+	
 		Material m = GatherMaterial( i );
 		
 		#if S_IS_VOXEL_BLOCK
@@ -84,16 +88,16 @@ PS
 			if ( g_HueShift > 0 || hasTintColor )
 			{
 				if ( hasTintColor )
-					m.Albedo.rgb *= g_vTintColor.rgb;
+					vColor.rgb *= g_vTintColor.rgb;
 			
 				if ( g_HueShift > 0 )
-					m.Albedo.rgb = hueShift( m.Albedo.rgb, (3.14f / 128.0f) * g_HueShift );
+					vColor.rgb = hueShift( vColor.rgb, (3.14f / 128.0f) * g_HueShift );
 			}
 			
 			float3 torchColor = (g_vVoxelLight.rgb / 16.0f) * (1.0f - (((sin(g_flTime * 8.0f) + 1.0f) * 0.5f) * 0.2f));
 			float sunlight = g_vVoxelLight.w / 16.0f;
-			
-			m.Albedo.rgb *= saturate(0.007f + torchColor + sunlight);
+			sunlight *= sunlight;
+			m.Albedo.rgb = vColor * saturate(0.007f + torchColor + sunlight);
 		#endif
 		
 		ShadingModelValveStandard sm;
