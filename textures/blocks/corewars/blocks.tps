@@ -4,7 +4,7 @@
         <key>fileFormatVersion</key>
         <int>5</int>
         <key>texturePackerVersion</key>
-        <string>6.0.0</string>
+        <string>6.0.2</string>
         <key>autoSDSettings</key>
         <array>
             <struct type="AutoSDSettings">
@@ -43,22 +43,12 @@
         <uint>2</uint>
         <key>basisUniversalQualityLevel</key>
         <uint>2</uint>
-        <key>atfCompressData</key>
-        <false/>
-        <key>mipMapMinSize</key>
-        <uint>32768</uint>
         <key>etc1QualityLevel</key>
         <uint>70</uint>
         <key>etc2QualityLevel</key>
         <uint>70</uint>
         <key>dxtCompressionMode</key>
         <enum type="SettingsBase::DxtCompressionMode">DXT_PERCEPTUAL</enum>
-        <key>jxrColorFormat</key>
-        <enum type="SettingsBase::JpegXrColorMode">JXR_YUV444</enum>
-        <key>jxrTrimFlexBits</key>
-        <uint>0</uint>
-        <key>jxrCompressionLevel</key>
-        <uint>0</uint>
         <key>ditherType</key>
         <enum type="SettingsBase::DitherType">PngQuantLow</enum>
         <key>backgroundColor</key>
@@ -82,8 +72,6 @@
         <key>webpQualityLevel</key>
         <uint>101</uint>
         <key>textureSubPath</key>
-        <string></string>
-        <key>atfFormats</key>
         <string></string>
         <key>textureFormat</key>
         <enum type="SettingsBase::TextureFormat">png</enum>
@@ -217,6 +205,30 @@
                 <rect>16,16,32,32</rect>
                 <key>scale9Paddings</key>
                 <rect>16,16,32,32</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">color/crystal.png</key>
+            <key type="filename">color/metal_plate.png</key>
+            <key type="filename">color/stone_block.png</key>
+            <key type="filename">color/stone_block_support.png</key>
+            <key type="filename">color/stone_brick.png</key>
+            <key type="filename">color/stone_brick_1.png</key>
+            <key type="filename">color/stone_brick_2.png</key>
+            <key type="filename">color/stone_brick_3.png</key>
+            <key type="filename">color/stone_brick_4.png</key>
+            <key type="filename">color/wood_planks.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>spriteScale</key>
+                <double>1</double>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>8,8,16,16</rect>
+                <key>scale9Paddings</key>
+                <rect>8,8,16,16</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>

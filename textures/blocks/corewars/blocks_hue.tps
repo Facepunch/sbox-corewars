@@ -4,7 +4,7 @@
         <key>fileFormatVersion</key>
         <int>5</int>
         <key>texturePackerVersion</key>
-        <string>6.0.0</string>
+        <string>6.0.2</string>
         <key>autoSDSettings</key>
         <array>
             <struct type="AutoSDSettings">
@@ -43,22 +43,12 @@
         <uint>2</uint>
         <key>basisUniversalQualityLevel</key>
         <uint>2</uint>
-        <key>atfCompressData</key>
-        <false/>
-        <key>mipMapMinSize</key>
-        <uint>32768</uint>
         <key>etc1QualityLevel</key>
         <uint>70</uint>
         <key>etc2QualityLevel</key>
         <uint>70</uint>
         <key>dxtCompressionMode</key>
         <enum type="SettingsBase::DxtCompressionMode">DXT_PERCEPTUAL</enum>
-        <key>jxrColorFormat</key>
-        <enum type="SettingsBase::JpegXrColorMode">JXR_YUV444</enum>
-        <key>jxrTrimFlexBits</key>
-        <uint>0</uint>
-        <key>jxrCompressionLevel</key>
-        <uint>0</uint>
         <key>ditherType</key>
         <enum type="SettingsBase::DitherType">NearestNeighbour</enum>
         <key>backgroundColor</key>
@@ -82,8 +72,6 @@
         <key>webpQualityLevel</key>
         <uint>101</uint>
         <key>textureSubPath</key>
-        <string></string>
-        <key>atfFormats</key>
         <string></string>
         <key>textureFormat</key>
         <enum type="SettingsBase::TextureFormat">png</enum>
@@ -180,11 +168,13 @@
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
             <key type="filename">hue/concrete_01_hue.png</key>
+            <key type="filename">hue/crystal_hue.png</key>
             <key type="filename">hue/dev_grid_hue.png</key>
             <key type="filename">hue/dirt_02_hue.png</key>
             <key type="filename">hue/grass_01_hue.png</key>
             <key type="filename">hue/grass_dirt_01_hue.png</key>
             <key type="filename">hue/hardened_metal_01_hue.png</key>
+            <key type="filename">hue/metal_plate_hue.png</key>
             <key type="filename">hue/planks_01_hue.png</key>
             <key type="filename">hue/plastic_blue_01_hue.png</key>
             <key type="filename">hue/plastic_cyan_01_hue.png</key>
@@ -197,9 +187,17 @@
             <key type="filename">hue/sand_01_hue.png</key>
             <key type="filename">hue/steel_panel_01_hue.png</key>
             <key type="filename">hue/stone_01_hue.png</key>
+            <key type="filename">hue/stone_block_hue.png</key>
+            <key type="filename">hue/stone_block_support_hue.png</key>
+            <key type="filename">hue/stone_brick_1_hue.png</key>
+            <key type="filename">hue/stone_brick_2_hue.png</key>
+            <key type="filename">hue/stone_brick_3_hue.png</key>
+            <key type="filename">hue/stone_brick_4_hue.png</key>
+            <key type="filename">hue/stone_brick_hue.png</key>
             <key type="filename">hue/tree_01_hue.png</key>
             <key type="filename">hue/tree_top_01_hue.png</key>
             <key type="filename">hue/window_01_hue.png</key>
+            <key type="filename">hue/wood_planks_hue.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
