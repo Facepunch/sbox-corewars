@@ -161,7 +161,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "stone_brick",
+	"filename": "stone_block_support",
 	"frame": {"x":640,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -169,7 +169,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "stone_brick_1",
+	"filename": "stone_brick",
 	"frame": {"x":672,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -177,7 +177,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "stone_brick_2",
+	"filename": "stone_brick_1",
 	"frame": {"x":704,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -185,7 +185,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "stone_brick_3",
+	"filename": "stone_brick_2",
 	"frame": {"x":736,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -193,7 +193,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "stone_brick_4",
+	"filename": "stone_brick_3",
 	"frame": {"x":768,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -201,7 +201,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "tree_01",
+	"filename": "stone_brick_4",
 	"frame": {"x":800,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -209,7 +209,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "tree_top_01",
+	"filename": "tree_01",
 	"frame": {"x":832,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -217,7 +217,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "window_01",
+	"filename": "tree_top_01",
 	"frame": {"x":864,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -225,8 +225,16 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "wood_planks",
+	"filename": "window_01",
 	"frame": {"x":896,"y":0,"w":32,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
+	"sourceSize": {"w":32,"h":32}
+},
+{
+	"filename": "wood_planks",
+	"frame": {"x":928,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -237,8 +245,8 @@
 	"version": "1.0",
 	"image": "blocks_color.png",
 	"format": "RGBA8888",
-	"size": {"w":928,"h":32},
+	"size": {"w":960,"h":32},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:b4a7e2408b9d2cff501977daebaf5bc3:523c4ebdc03d86d2b39414079dc88e75:56cb1b5db91b40c02ccdfb3e5257b21f$"
+	"smartupdate": "$TexturePacker:SmartUpdate:22f9837d5c25d625e982cda0f12f4a82:2e30d7bc71245e4a6d5754b2dd78387a:56cb1b5db91b40c02ccdfb3e5257b21f$"
 }
 }
