@@ -7,6 +7,9 @@ Layer0
 	//---- Translucent ----
 	F_ALPHA_TEST 1
 
+	g_flDiffuseBoost "0.045"
+	g_flLightDirectionBias "1.000"
+	g_flSpecularBoost "1.000"
 	g_flTextureAtlasCellSize "32.000"
 	g_flVoxelBrightness "1.000"
 	g_flVoxelOpacity "1.000"
@@ -20,14 +23,14 @@ Layer0
 	g_flFadeExponent "1.000"
 
 	//---- Fog ----
-	g_bFogEnabled "0"
+	g_bFogEnabled "1"
 
 	//---- Lighting ----
 	g_flDirectionalLightmapMinZ "0.050"
 	g_flDirectionalLightmapStrength "1.000"
 
 	//---- Material ----
-	TextureColor "[1.000000 1.000000 1.000000 0.000000]"
+	TextureColor "materials/default/default_color.tga"
 	TextureTranslucency "materials/default/default_trans.tga"
 
 	//---- Texture Coordinates ----
