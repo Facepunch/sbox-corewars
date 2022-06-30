@@ -11,3 +11,5 @@ release.zip
 *.los
 .vs
 *.generated.*
+*.vmdl_c
+*.vmat_c
