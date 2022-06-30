@@ -37,10 +37,13 @@ MODES
 //=========================================================================================================================
 COMMON
 {
-	#include "system.fxc" // This should always be the first include in COMMON
-	#include "sbox_shared.fxc"
+	#define S_SPECULAR 1
+	#define S_SPECULAR_CUBE_MAP 1
 	#define VS_INPUT_HAS_TANGENT_BASIS 1
 	#define PS_INPUT_HAS_TANGENT_BASIS 1
+	
+	#include "system.fxc" // This should always be the first include in COMMON
+	#include "sbox_shared.fxc"
 	float g_flVoxelSize < Default( 32.0 ); >;
 
 	StaticCombo( S_ALPHA_TEST, F_ALPHA_TEST, Sys( ALL ) );
@@ -151,7 +154,7 @@ PS
 	CreateInputTexture2D( TextureAtlasEmission, 		Linear, 8, "",                 "_emission",     "Voxel Atlas,10/60", Default3( 0.0, 0.0, 0.0 ) );
 	CreateInputTexture2D( TextureAtlasHue, 				Linear, 8, "",                 "_hue",     		"Voxel Atlas,10/70", Default3( 1.0f, 1.0f, 1.0f ) );
 
-	CreateTexture2DWithoutSampler( g_tAtlasNormal )   < Channel( RGBA, None( TextureAtlasNormal ), Linear ); OutputFormat( BC7 ); SrgbRead( false ); >;
+	CreateTexture2DWithoutSampler( g_tAtlasNormal )   < Channel( RGBA, HemiOctNormal( TextureAtlasNormal ), Linear ); OutputFormat( BC7 ); SrgbRead( false ); >;
 	CreateTexture2DWithoutSampler( g_tAtlasRma )      < Channel( R,    None( TextureAtlasRoughness ), Linear ); Channel( G, None( TextureAtlasMetalness ), Linear ); Channel( B, None( TextureAtlasAmbientOcclusion ), Linear ); OutputFormat( BC7 ); SrgbRead( false ); >;
 	CreateTexture2DWithoutSampler( g_tAtlasEmission ) < Channel( RGB, None( TextureAtlasEmission ), Linear ); OutputFormat( BC7 ); SrgbRead( false ); >;
 	CreateTexture2DWithoutSampler( g_tAtlasHue )  	  < Channel( RGB,  None( TextureAtlasHue ), Linear ); OutputFormat( BC7 ); SrgbRead( false ); Filter( POINT ); AddressU( MIRROR ); AddressV( MIRROR ); >;
@@ -181,6 +184,100 @@ PS
 	float g_flVoxelBrightness< Range(0.0f, 1.0f); Default(1.0f); >;
 
 	BoolAttribute( DoNotCastShadows, F_DO_NOT_CAST_SHADOWS ? true : false );
+
+
+	class ShadingModelValveWithDiffuse : ShadingModel
+	{
+		CombinerInput Input;
+		ShadeParams shadeParams;
+
+		CombinerInput MaterialToCombinerInput( PixelInput i, Material m )
+		{
+			CombinerInput o;
+
+			o = PS_CommonProcessing( i );
+			
+			#if ( S_ALPHA_TEST )
+			{
+				// Clip first to try to kill the wave if we're in an area of all zero
+				o.flOpacity = m.Opacity * o.flOpacity;
+				clip( o.flOpacity - .001 );
+
+				o.flOpacity = AdjustOpacityForAlphaToCoverage( o.flOpacity, g_flAlphaTestReference, g_flAntiAliasedEdgeStrength, i.vTextureCoords.xy );
+				clip( o.flOpacity - 0.001 );
+			}
+			#elif ( S_TRANSLUCENT )
+			{
+				o.flOpacity *= m.Opacity * g_flOpacityScale;
+			}
+			#endif
+
+			o = CalculateDiffuseAndSpecularFromAlbedoAndMetalness( o, m.Albedo.rgb, m.Metalness );
+
+			PS_CommonTransformNormal( i, o, DecodeHemiOctahedronNormal( m.Normal.rg ) );
+			o.vRoughness = m.Roughness;
+			o.flRetroReflectivity = 1.0f;
+			o.vEmissive = m.Emission;
+			o.flAmbientOcclusion = m.AmbientOcclusion.x;
+			o.vTransmissiveMask = m.Transmission;
+
+			return o;
+		}
+
+		void Init( const PixelInput pixelInput, const Material material )
+		{
+			Input = MaterialToCombinerInput( pixelInput, material );
+			shadeParams = ShadeParams::ProcessMaterial( pixelInput, material );
+		}
+
+		float3 DiffuseLobe( const LightData light )
+		{
+			const float3 h = normalize(shadeParams.inputs.ViewRayWs + light.LightDir);
+
+			const float NoV = shadeParams.inputs.NoV;
+			const float NoL = saturate(light.NdotL);
+			const float NoH = saturate(dot(shadeParams.inputs.NormalWs, h));
+			const float LoH = saturate(dot(light.LightDir, h));
+
+			float3 diffuse = diffuseLobe( shadeParams, NoV, NoL, LoH);
+			
+			// TODO: attenuate the diffuse lobe to avoid energy gain
+
+			// The energy compensation term is used to counteract the darkening effect
+			// at high roughness
+			float fEnergyCompensation = 1.0f;
+
+			float3 color = diffuse * fEnergyCompensation;
+
+			return (color * light.Color.rgb) *
+					( light.Attenuation * NoL * light.Visibility );
+		}
+		
+		LightShade Direct( const LightData light )
+		{
+			LightShade o;
+			#if S_NON_DIRECTIONAL_DIFFUSE_LIGHTING
+				o.Diffuse = 0;
+				o.Specular = 0;
+			#else
+				o.Diffuse = DiffuseLobe(light);
+				o.Specular = 0;
+			#endif
+			return o;
+		}
+		
+		LightShade Indirect()
+		{
+			LightShade o;
+			
+			float3 vColor = PS_FinalCombiner( Input ).vColor.rgb;
+
+			o.Diffuse = vColor;
+			o.Specular = 0;
+			return o;
+		}
+	};
+
 
 	struct LightmapData
 	{
@@ -328,6 +425,15 @@ PS
 			float3 vRma = Tex2DLevelS( g_tAtlasRma, g_sPointSampler, vTexCoordAtlas, 0 ).rgb;
 			float3 vEmission = Tex2DLevelS( g_tAtlasEmission, g_sPointSampler, vTexCoordAtlas, 0 ).rgb;
 			float brightness = 1.0f;
+
+			float3 vTangentUWs = i.vTangentUWs.xyz;
+			float3 vTangentVWs = i.vTangentVWs.xyz;
+
+			float3 vNormalTs = DecodeHemiOctahedronNormal( Tex2DLevelS( g_tAtlasNormal, g_sPointSampler, vTexCoordAtlas, 0 ).ag );
+			vNormalTs.z = 1.0;
+			vNormalTs.xyz = normalize( vNormalTs.xyz );
+			float3 vAtlasNormalWs = Vec3TsToWsNormalized( vNormalTs.xyz, i.vNormalWs, i.vTangentUWs.xyz, i.vTangentVWs.xyz );
+
 			
 			if ( i.iNormal == 1 )
 				brightness = 0.6f;
@@ -335,10 +441,10 @@ PS
 				brightness = 0.7f;
 			else if ( i.iNormal == 4 || i.iNormal == 5 )
 				brightness = 0.8f;
-				
+			
 			Material m = GatherMaterial( i );
 			m.Albedo.rgb = vColor.rgb * saturate(0.007f + torchColor + Sunlight * brightness * g_flVoxelBrightness);
-			m.Normal = normalize(2.0f * Tex2DLevelS( g_tAtlasNormal, g_sPointSampler, vTexCoordAtlas, 0 ).rgb - 1.0f);
+			m.Normal = Tex2DLevelS( g_tAtlasNormal, g_sPointSampler, vTexCoordAtlas, 0 ).rgb;//normalize(2.0f * Tex2DLevelS( g_tAtlasNormal, g_sPointSampler, vTexCoordAtlas, 0 ).rgb - 1.0f);
 			m.Roughness = vRma.r;
 			m.Metalness = vRma.g;
 			m.AmbientOcclusion = vRma.b;
@@ -347,9 +453,9 @@ PS
 			#if (S_ALPHA_TEST || S_TRANSLUCENT)
 				m.Opacity = vColor.a * g_flVoxelOpacity;
 			#endif
-			m.Emission.rgb = vEmission;
+			m.Emission.rgb = m.Albedo.rgb * vEmission;
 			
-			ShadingModelValveStandard sm;
+			ShadingModelValveWithDiffuse sm;
 			return FinalizePixelMaterial( i, m, sm );
 
 		}
