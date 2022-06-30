@@ -33,11 +33,13 @@ namespace Facepunch.CoreWars
 				damage *= SecondaryMaterialMultiplier;
 			}
 
+			var sourcePosition = world.ToSourcePositionCenter( voxel.Position );
+
 			if ( !string.IsNullOrEmpty( block.HitSound ) )
 			{
 				using ( Prediction.Off() )
 				{
-					PlaySound( block.HitSound );
+					Sound.FromWorld( block.HitSound, sourcePosition );
 				}
 			}
 
@@ -55,7 +57,6 @@ namespace Facepunch.CoreWars
 				return;
 			}
 
-			var sourcePosition = world.ToSourcePositionCenter( voxel.Position );
 			var newHealth = (state.Health - damage).FloorToInt().Clamp( 0, 100 );
 
 			state.LastDamageTime = 0f;
@@ -74,7 +75,7 @@ namespace Facepunch.CoreWars
 
 					if ( !string.IsNullOrEmpty( block.DestroySound ) )
 					{
-						PlaySound( block.DestroySound );
+						Sound.FromWorld( block.DestroySound, sourcePosition );
 					}
 				}
 

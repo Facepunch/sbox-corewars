@@ -10,9 +10,9 @@
 		Decibels = 60
 		Sounds = 
 		[
-			resource:"sound/break.plastic.vsnd",
+			resource:"sound/break.fungus.vsnd",
 		]
-		SelectionMode = 3
+		SelectionMode = "Random"
 		MaximumDistance = 848.93066
 		MinimumDistance = 42.446533
 	}

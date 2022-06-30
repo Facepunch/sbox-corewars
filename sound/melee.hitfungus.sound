@@ -10,9 +10,9 @@
 		Decibels = 35
 		Sounds = 
 		[
-			resource:"sound/melee.hitplastic.vsnd",
+			resource:"sound/melee.hitfungus.vsnd",
 		]
-		SelectionMode = 3
+		SelectionMode = "Random"
 		MaximumDistance = 309.98337
 		MinimumDistance = 15.499168
 	}
