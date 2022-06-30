@@ -8,7 +8,7 @@ using System.ComponentModel;
 
 namespace Facepunch.CoreWars
 {
-	[EditorEntity( Title = "Point Light", EditorModel = "models/rust_props/light_fixtures/airfieldsirenlight.vmdl" )]
+	[EditorEntity( Title = "Point Light", EditorModel = "models/editor/omni.vmdl" )]
 	[Category( "Lighting" )]
 	public partial class VoxelPointLight : ModelEntity, ISourceEntity, IEditorCallbacks
 	{
@@ -53,7 +53,7 @@ namespace Facepunch.CoreWars
 		{
 			var isEditorMode = Game.Current.IsEditorMode;
 
-			SetModel( "models/rust_props/light_fixtures/airfieldsirenlight.vmdl" );
+			SetModel( "models/editor/omni.vmdl" );
 			Transmit = isEditorMode ? TransmitType.Always : TransmitType.Never;
 			Light = new PointLightEntity();
 
@@ -75,6 +75,8 @@ namespace Facepunch.CoreWars
 			Light.Range = Range;
 			Light.Color = new Color( Red, Green, Blue );
 			Light.Brightness = Brightness;
+
+			RenderColor = Light.Color;
 
 			var isEditorMode = Game.Current.IsEditorMode;
 
