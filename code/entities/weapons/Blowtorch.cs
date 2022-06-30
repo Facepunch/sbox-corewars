@@ -23,7 +23,7 @@ namespace Facepunch.CoreWars
 		public override float SecondaryRate => 1f;
 		public override int ClipSize => 0;
 		public override bool IsMelee => true;
-		public override BuildingMaterialType PrimaryMaterialType => BuildingMaterialType.Plastic;
+		public override BuildingMaterialType PrimaryMaterialType => BuildingMaterialType.Fungus;
 		public override float SecondaryMaterialMultiplier => 0f;
 
 		private RealTimeUntil DestroyEffectTime { get; set; }

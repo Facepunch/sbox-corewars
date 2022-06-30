@@ -8,7 +8,7 @@ namespace Facepunch.CoreWars.Blocks
 		Unbreakable,
 		Wooden,
 		Metal,
-		Plastic,
+		Fungus,
 		Blastproof,
 		Explosives
 	}

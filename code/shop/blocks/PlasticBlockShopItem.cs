@@ -9,7 +9,7 @@ using Facepunch.Voxels;
 namespace Facepunch.CoreWars
 {
 	[Library]
-	public class PlasticBlockShopItem : BaseBlockShopItem
+	public class FungusBlockShopItem : BaseBlockShopItem
 	{
 		public override Dictionary<Type, int> Costs => new()
 		{
@@ -19,7 +19,7 @@ namespace Facepunch.CoreWars
 
 		public override BlockType GetBlockType( Player player )
 		{
-			return player.Team.GetPlasticBlock();
+			return player.Team.GetFungusBlock();
 		}
 	}
 }

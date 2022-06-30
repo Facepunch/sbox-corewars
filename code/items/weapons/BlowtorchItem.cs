@@ -8,7 +8,7 @@ namespace Facepunch.CoreWars
 	public class BlowtorchItem : WeaponItem
 	{
 		public override string WeaponName => "weapon_blowtorch";
-		public override string Description => "A simple tool for quickly melting plastic.";
+		public override string Description => "A simple tool for quickly melting fungus.";
 		public override string Group => "blowtorch";
 		public override Color Color => ColorPalette.Tools;
 		public override int Tier => 1;

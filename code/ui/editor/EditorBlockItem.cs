@@ -41,6 +41,7 @@ namespace Facepunch.CoreWars.Editor
 					Icon.Style.SetBackgroundImage( icon );
 					Icon.Style.BackgroundSizeX = Length.Cover;
 					Icon.Style.BackgroundSizeY = Length.Cover;
+					Icon.Style.BackgroundTint = BlockType.TintColor;
 				}
 			}
 			else

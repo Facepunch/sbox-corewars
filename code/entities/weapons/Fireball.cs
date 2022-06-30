@@ -65,7 +65,7 @@ namespace Facepunch.CoreWars
 
 				if ( block is BaseBuildingBlock buildingBlock )
 				{
-					if ( buildingBlock.MaterialType == BuildingMaterialType.Plastic )
+					if ( buildingBlock.MaterialType == BuildingMaterialType.Fungus )
 					{
 						using ( Prediction.Off() )
 						{

@@ -6,7 +6,7 @@ namespace Facepunch.CoreWars
 {
 	public abstract class BlockDamageWeapon : Weapon
 	{
-		public virtual BuildingMaterialType PrimaryMaterialType => BuildingMaterialType.Plastic;
+		public virtual BuildingMaterialType PrimaryMaterialType => BuildingMaterialType.Fungus;
 		public virtual float SecondaryMaterialMultiplier => 0.3f;
 
 		protected virtual void DamageVoxel( Voxel voxel, float damage, bool showEffects = true )

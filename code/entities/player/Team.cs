@@ -37,21 +37,21 @@ namespace Facepunch.CoreWars
 
 		private static Dictionary<Team, TeamCore> Cores = new();
 
-		public static BlockType GetPlasticBlock( this Team team )
+		public static BlockType GetFungusBlock( this Team team )
 		{
 			var world = VoxelWorld.Current;
 			if ( !world.IsValid() ) return null;
 
 			var blockId = team switch
 			{
-				Team.Blue => world.FindBlockId<BluePlasticBlock>(),
-				Team.Red => world.FindBlockId<RedPlasticBlock>(),
-				Team.Orange => world.FindBlockId<OrangePlasticBlock>(),
-				Team.Green => world.FindBlockId<GreenPlasticBlock>(),
-				Team.Purple => world.FindBlockId<PurplePlasticBlock>(),
-				Team.Pink => world.FindBlockId<PinkPlasticBlock>(),
-				Team.Cyan => world.FindBlockId<CyanPlasticBlock>(),
-				Team.Yellow => world.FindBlockId<YellowPlasticBlock>(),
+				Team.Blue => world.FindBlockId<BlueFungusBlock>(),
+				Team.Red => world.FindBlockId<RedFungusBlock>(),
+				Team.Orange => world.FindBlockId<OrangeFungusBlock>(),
+				Team.Green => world.FindBlockId<GreenFungusBlock>(),
+				Team.Purple => world.FindBlockId<PurpleFungusBlock>(),
+				Team.Pink => world.FindBlockId<PinkFungusBlock>(),
+				Team.Cyan => world.FindBlockId<CyanFungusBlock>(),
+				Team.Yellow => world.FindBlockId<YellowFungusBlock>(),
 				_ => throw new System.NotImplementedException()
 			};
 
@@ -113,9 +113,9 @@ namespace Facepunch.CoreWars
 			return default;
 		}
 
-		public static BlockItem CreatePlasticBlockItem( this Team team )
+		public static BlockItem CreateFungusBlockItem( this Team team )
 		{
-			var block = team.GetPlasticBlock();
+			var block = team.GetFungusBlock();
 			if ( block == null ) return null;
 
 			var item = InventorySystem.CreateItem<BlockItem>();
