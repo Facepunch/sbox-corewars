@@ -338,7 +338,7 @@ PS
 				
 			Material m = GatherMaterial( i );
 			m.Albedo.rgb = vColor.rgb * saturate(0.007f + torchColor + Sunlight * brightness * g_flVoxelBrightness);
-			m.Normal = Tex2DLevelS( g_tAtlasNormal, g_sPointSampler, vTexCoordAtlas, 0 ).rgb;
+			m.Normal = normalize(2.0f * Tex2DLevelS( g_tAtlasNormal, g_sPointSampler, vTexCoordAtlas, 0 ).rgb - 1.0f);
 			m.Roughness = vRma.r;
 			m.Metalness = vRma.g;
 			m.AmbientOcclusion = vRma.b;

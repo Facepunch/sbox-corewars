@@ -132,7 +132,7 @@ PS
 		m.TintMask = 1.0f;
 		m.Opacity = 1.0f;
 		m.Albedo.rgb = vColor.rgb * saturate(0.007f + torchColor + sunlight * brightness);
-		m.Normal = Tex2DLevelS( g_tModelNormal, g_sPointSampler, i.vTextureCoords.xy, 0 ).rgb;
+		m.Normal = normalize( 2.0f * Tex2DLevelS( g_tModelNormal, g_sPointSampler, i.vTextureCoords.xy, 0 ).rgb - 1.0f );
 		m.Roughness = vRma.r;
 		m.Metalness = vRma.g;
 		m.AmbientOcclusion = vRma.b;
