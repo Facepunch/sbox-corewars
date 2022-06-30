@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Sandbox;
 
 namespace Facepunch.CoreWars
 {
@@ -18,6 +14,7 @@ namespace Facepunch.CoreWars
 
 		public bool CanAfford( Player player );
 		public string GetIcon( Player player );
+		public Color GetIconTintColor( Player player );
 		public bool IsLocked( Player player );
 		public bool CanPurchase( Player player );
 		public void OnPurchased( Player player );

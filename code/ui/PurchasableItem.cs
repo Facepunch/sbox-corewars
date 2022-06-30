@@ -59,11 +59,17 @@ namespace Facepunch.CoreWars
 					Tags = item.Tags;
 
 					var icon = item.GetIcon( player );
+					var color = item.GetIconTintColor( player );
 
 					if ( !string.IsNullOrEmpty( icon ) )
+					{
 						Icon.Style.SetBackgroundImage( icon );
+						Icon.Style.BackgroundTint = color;
+					}
 					else
+					{
 						Icon.Style.BackgroundImage = null;
+					}
 				}
 
 				SetClass( "is-block", item is BaseBlockShopItem );

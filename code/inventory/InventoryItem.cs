@@ -20,6 +20,7 @@ namespace Facepunch.CoreWars.Inventory
 		public virtual bool CanBeDropped => true;
 		public virtual Color Color => Color.White;
 		public virtual string Name => string.Empty;
+		public virtual Color IconTintColor => Color.White;
 		public virtual string Icon => string.Empty;
 
 		private ItemTag[] InternalTags;

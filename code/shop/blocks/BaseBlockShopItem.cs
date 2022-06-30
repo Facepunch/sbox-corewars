@@ -28,6 +28,12 @@ namespace Facepunch.CoreWars
 			return $"textures/blocks/corewars/color/{block.DefaultTexture}.png";
 		}
 
+		public override Color GetIconTintColor( Player player )
+		{
+			var block = GetBlockType( player );
+			return block.TintColor;
+		}
+
 		public override void OnPurchased( Player player )
 		{
 			var item = InventorySystem.CreateItem<BlockItem>();

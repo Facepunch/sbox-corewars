@@ -61,9 +61,14 @@ namespace Facepunch.CoreWars
 			var icon = item.Icon;
 
 			if ( !string.IsNullOrEmpty( icon ) )
+			{
 				Icon.Style.SetBackgroundImage( icon );
+				Icon.Style.BackgroundTint = item.IconTintColor;
+			}
 			else
+			{
 				Icon.Style.BackgroundImage = null;
+			}
 
 			SlotPanel.SetClass( "hidden", DisplaySlot <= 0 );
 			SlotLabel.Text = DisplaySlot.ToString();

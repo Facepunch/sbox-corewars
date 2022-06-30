@@ -50,6 +50,11 @@ namespace Facepunch.CoreWars
 			return string.Empty;
 		}
 
+		public virtual Color GetIconTintColor( Player player )
+		{
+			return Color.White;
+		}
+
 		public virtual bool CanPurchase( Player player )
 		{
 			var core = player.Team.GetCore();
