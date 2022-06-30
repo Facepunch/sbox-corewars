@@ -4,9 +4,6 @@ Layer0
 {
 	shader "voxel.vfx"
 
-	//---- Rendering ----
-	F_NON_DIRECTIONAL_DIFFUSE_LIGHTING 1
-
 	//---- Translucent ----
 	F_ALPHA_TEST 1
 
@@ -30,7 +27,7 @@ Layer0
 	g_flDirectionalLightmapStrength "1.000"
 
 	//---- Material ----
-	TextureColor "materials/default/default_color.tga"
+	TextureColor "[1.000000 1.000000 1.000000 0.000000]"
 	TextureTranslucency "materials/default/default_trans.tga"
 
 	//---- Texture Coordinates ----

@@ -185,7 +185,6 @@ PS
 
 	BoolAttribute( DoNotCastShadows, F_DO_NOT_CAST_SHADOWS ? true : false );
 
-
 	class ShadingModelValveWithDiffuse : ShadingModel
 	{
 		CombinerInput Input;
@@ -433,14 +432,13 @@ PS
 			vNormalTs.z = 1.0;
 			vNormalTs.xyz = normalize( vNormalTs.xyz );
 			float3 vAtlasNormalWs = Vec3TsToWsNormalized( vNormalTs.xyz, i.vNormalWs, i.vTangentUWs.xyz, i.vTangentVWs.xyz );
-
 			
 			if ( i.iNormal == 1 )
-				brightness = 0.6f;
+				brightness = 0.85f;
 			else if ( i.iNormal == 2 || i.iNormal == 3 )
-				brightness = 0.7f;
+				brightness = 0.9f;
 			else if ( i.iNormal == 4 || i.iNormal == 5 )
-				brightness = 0.8f;
+				brightness = 0.95f;
 			
 			Material m = GatherMaterial( i );
 			m.Albedo.rgb = vColor.rgb * saturate(0.007f + torchColor + Sunlight * brightness * g_flVoxelBrightness);
