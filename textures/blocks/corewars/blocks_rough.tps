@@ -4,7 +4,7 @@
         <key>fileFormatVersion</key>
         <int>5</int>
         <key>texturePackerVersion</key>
-        <string>6.0.2</string>
+        <string>6.0.0</string>
         <key>autoSDSettings</key>
         <array>
             <struct type="AutoSDSettings">
@@ -43,12 +43,22 @@
         <uint>2</uint>
         <key>basisUniversalQualityLevel</key>
         <uint>2</uint>
+        <key>atfCompressData</key>
+        <false/>
+        <key>mipMapMinSize</key>
+        <uint>32768</uint>
         <key>etc1QualityLevel</key>
         <uint>70</uint>
         <key>etc2QualityLevel</key>
         <uint>70</uint>
         <key>dxtCompressionMode</key>
         <enum type="SettingsBase::DxtCompressionMode">DXT_PERCEPTUAL</enum>
+        <key>jxrColorFormat</key>
+        <enum type="SettingsBase::JpegXrColorMode">JXR_YUV444</enum>
+        <key>jxrTrimFlexBits</key>
+        <uint>0</uint>
+        <key>jxrCompressionLevel</key>
+        <uint>0</uint>
         <key>ditherType</key>
         <enum type="SettingsBase::DitherType">NearestNeighbour</enum>
         <key>backgroundColor</key>
@@ -72,6 +82,8 @@
         <key>webpQualityLevel</key>
         <uint>101</uint>
         <key>textureSubPath</key>
+        <string></string>
+        <key>atfFormats</key>
         <string></string>
         <key>textureFormat</key>
         <enum type="SettingsBase::TextureFormat">png</enum>
@@ -203,6 +215,7 @@
                 <false/>
             </struct>
             <key type="filename">rough/crystal_rough.png</key>
+            <key type="filename">rough/fungus_rough.png</key>
             <key type="filename">rough/metal_plate_rough.png</key>
             <key type="filename">rough/stone_block_rough.png</key>
             <key type="filename">rough/stone_block_support_rough.png</key>
@@ -210,7 +223,7 @@
             <key type="filename">rough/stone_brick_2_rough.png</key>
             <key type="filename">rough/stone_brick_3_rough.png</key>
             <key type="filename">rough/stone_brick_4_rough.png</key>
-            <key type="filename">rough/stone_brick_rough.png</key>
+            <key type="filename">rough/stone_brick_5_rough.png</key>
             <key type="filename">rough/wood_planks_rough.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
