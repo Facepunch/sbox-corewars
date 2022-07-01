@@ -10,6 +10,9 @@ Layer0
 	//---- Translucent ----
 	F_TRANSLUCENT 1
 
+	g_flDiffuseBoost "0.000"
+	g_flLightDirectionBias "0.000"
+	g_flSpecularBoost "1.000"
 	g_flTextureAtlasCellSize "32.000"
 	g_flVoxelBrightness "1.000"
 	g_flVoxelSize "48.000"
