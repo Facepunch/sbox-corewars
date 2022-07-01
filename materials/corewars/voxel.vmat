@@ -8,7 +8,7 @@ Layer0
 	F_ALPHA_TEST 1
 
 	g_flDiffuseBoost "0.045"
-	g_flLightDirectionBias "0.000"
+	g_flLightDirectionBias "1.000"
 	g_flSpecularBoost "1.000"
 	g_flTextureAtlasCellSize "32.000"
 	g_flVoxelBrightness "1.000"
