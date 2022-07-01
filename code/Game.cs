@@ -306,7 +306,7 @@ namespace Facepunch.CoreWars
 			world.SetChunkSize( 32, 32, 32 );
 			world.SetSeaLevel( 48 );
 			world.SetMaxSize( 256, 256, 128 );
-			world.LoadBlockAtlas( "textures/blocks/corewars/blocks_color.atlas" );
+			world.LoadBlockAtlas( "textures/blocks/corewars/blocks_color.json" );
 			world.AddAllBlockTypes();
 
 			if ( !IsEditorMode )
