@@ -36,7 +36,7 @@ namespace Facepunch.CoreWars.Editor
 
 			if ( !string.IsNullOrEmpty( icon ) )
 			{
-				if ( FileSystem.Mounted.FileExists( icon ) )
+				if ( Util.FileExistsCached( icon ) )
 				{
 					Icon.Style.SetBackgroundImage( icon );
 					Icon.Style.BackgroundSizeX = Length.Cover;
