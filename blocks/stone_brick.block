@@ -2,7 +2,7 @@
 {
 	data = 
 	{
-		FriendlyName = "Stone Brick "
+		FriendlyName = "Stone Brick"
 		Description = ""
 		Textures = 
 		{
@@ -19,6 +19,7 @@
 		{
 		}
 		Icon = null
+		TintColor = "1,1,1,1"
 		IsTranslucent = false
 		UseTransparency = false
 		IsPassable = false

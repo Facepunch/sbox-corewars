@@ -2,11 +2,11 @@
 {
 	data = 
 	{
-		FriendlyName = "Stone Support 1"
+		FriendlyName = "Stone Support 2"
 		Description = ""
 		Textures = 
 		{
-			Default = "stone_wall_block_1"
+			Default = "stone_wall_block_4"
 			Top = "stone_wall_block"
 			Bottom = "stone_wall_block"
 			North = ""
