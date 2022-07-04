@@ -6,7 +6,7 @@
 		Description = ""
 		Textures = 
 		{
-			Default = "stone_wall_block"
+			Default = "stone_wall_block_1"
 			Top = ""
 			Bottom = ""
 			North = ""
