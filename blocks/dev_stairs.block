@@ -17,8 +17,8 @@
 		Aliases = null
 		ModelOverride = 
 		{
-			ModelName = resource:"models/maps/stairs/dev/dev_stairs.vmdl"
-			MaterialName = resource:"materials/corewars/stone_block.vmat"
+			ModelName = resource:"models/maps/stairs/stone_block/step_stone_block.vmdl"
+			MaterialName = resource:"models/maps/stairs/stone_block/textures/step_stone_block.vmat"
 			FaceDirection = true
 		}
 		Icon = resource:"models/maps/stairs/dev/dev_stairs.vmdl_c.jpg"
