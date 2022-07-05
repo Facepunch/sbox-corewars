@@ -261,7 +261,7 @@ PS
 				vColor.rgb = ApplySphericalVignette( vColor.rgb, vPositionWs.xyz );
 			}
 
-			o.Diffuse = vColor;
+			o.Diffuse = vColor * VoxelBrightness;
 			o.Specular = 0;
 			return o;
 		}
