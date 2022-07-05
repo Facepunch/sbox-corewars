@@ -2,11 +2,11 @@
 {
 	data = 
 	{
-		FriendlyName = "Stone Block"
+		FriendlyName = "stone Floor Tile"
 		Description = ""
 		Textures = 
 		{
-			Default = "stone_wall_block_1"
+			Default = "stone_floor_tile_1"
 			Top = ""
 			Bottom = ""
 			North = ""

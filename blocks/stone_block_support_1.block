@@ -6,9 +6,9 @@
 		Description = ""
 		Textures = 
 		{
-			Default = "stone_wall_block_1"
-			Top = "stone_wall_block"
-			Bottom = "stone_wall_block"
+			Default = "stone_wall_block_2"
+			Top = "stone_wall_block_1"
+			Bottom = "stone_wall_block_1"
 			North = ""
 			East = ""
 			South = ""
@@ -40,6 +40,8 @@
 		DetailScale = 1
 		FaceToTexture = 
 		{
+			Top = "stone_wall_block"
+			Bottom = "stone_wall_block"
 		}
 		LightLevel = 
 		{
