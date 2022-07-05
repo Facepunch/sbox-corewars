@@ -64,6 +64,12 @@ namespace Facepunch.CoreWars
 
 		public override void TakeDamage( DamageInfo info ) { }
 
+		protected override void OnDestroy()
+		{
+			Light?.Delete();
+			base.OnDestroy();
+		}
+
 		[Event.Tick.Server]
 		private void ServerTick()
 		{
