@@ -347,7 +347,7 @@ PS
 				vColor.rgb = ApplySphericalVignette( vColor.rgb, vPositionWs.xyz );
 			}
 
-			o.Diffuse = vColor;
+			o.Diffuse = vColor * VoxelBrightness;
 			o.Specular = 0;
 			return o;
 		}
@@ -468,14 +468,13 @@ PS
 		#else
 		{
 			LightmapData LightData = FetchBestLightmap( i.vPositionOs );
-			float3 Torch = LightData.Torch;
-			float Sunlight = LightData.Sunlight;
-			float Health = FetchBestLightmap( i.vPositionOs - i.vNormalWs ).Health;
+			float3 torch = LightData.Torch;
+			float sunlight = LightData.Sunlight;
+			float health = FetchBestLightmap( i.vPositionOs - i.vNormalWs ).Health;
 
-			// Torch flickering
-			float3 torchColor = Torch * (1.0f - (((sin(g_flTime * 8.0f) + 1.0f) * 0.5f) * 0.2f));
+			float3 torchColor = torch * (1.0f - (((sin(g_flTime * 8.0f) + 1.0f) * 0.5f) * 0.2f));
 			float4 vColor = Tex2DLevelS( g_tAtlasColor, g_sPointSampler, vTexCoordAtlas, 0 );
-			vColor.rgb = lerp(vColor.rgb, float3(1,0,0), Health);
+			vColor.rgb = lerp(vColor.rgb, float3(1,0,0), health);
 			
 			bool hasTintColor = (i.vTintColor.r < 1.0f || i.vTintColor.g < 1.0f || i.vTintColor.b < 1.0f );
 			
@@ -508,7 +507,7 @@ PS
 			else if ( i.iNormal == 4 || i.iNormal == 5 )
 				brightness = 0.95f;
 			
-			float flCurrentBrightness = saturate((max(max(torchColor.x, torchColor.y), torchColor.z) + Sunlight) * brightness * g_flVoxelBrightness);
+			float flCurrentBrightness = saturate((max(max(torchColor.x, torchColor.y), torchColor.z) + sunlight) * brightness * g_flVoxelBrightness);
 
 			#if S_LIGHTMAP_VIEWER
 				PixelOutput o;
@@ -516,7 +515,7 @@ PS
 				return o;
 			#else
 				Material m = GatherMaterial( i );
-				m.Albedo.rgb = vColor.rgb * saturate(0.007f + torchColor + Sunlight * brightness * g_flVoxelBrightness);
+				m.Albedo.rgb = vColor.rgb * saturate(0.007f + torchColor + sunlight * brightness * g_flVoxelBrightness);
 				m.Normal = Tex2DLevelS( g_tAtlasNormal, g_sPointSampler, vTexCoordAtlas, 0 ).rgb;//normalize(2.0f * Tex2DLevelS( g_tAtlasNormal, g_sPointSampler, vTexCoordAtlas, 0 ).rgb - 1.0f);
 				m.Roughness = vRma.r;
 				m.Metalness = vRma.g;
