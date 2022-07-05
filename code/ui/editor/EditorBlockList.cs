@@ -1,6 +1,7 @@
 ﻿using Facepunch.Voxels;
 using Sandbox;
 using Sandbox.UI;
+using System;
 
 namespace Facepunch.CoreWars.Editor
 {
@@ -8,6 +9,14 @@ namespace Facepunch.CoreWars.Editor
 	public partial class EditorBlockList : Panel
 	{
 		public static EditorBlockList Current { get; private set; }
+
+		[ConVar.Client( "cw_show_all_blocks" ), Change( nameof( OnShowAllBlocksChanged ) )]
+		public static bool ShowAllBlocks { get; set; }
+
+		private static void OnShowAllBlocksChanged()
+		{
+			Current?.PopulateItems();
+		}
 
 		public Panel Items { get; set; }
 
@@ -34,7 +43,7 @@ namespace Facepunch.CoreWars.Editor
 
 			foreach ( var block in blocks )
 			{
-				if ( block.ShowInEditor )
+				if ( block.ShowInEditor || ShowAllBlocks )
 				{
 					var item = Items.AddChild<EditorBlockItem>();
 					item.SetBlockId( block.BlockId );
