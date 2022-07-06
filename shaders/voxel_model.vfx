@@ -13,7 +13,6 @@ FEATURES
 	Feature( F_TRANSLUCENT, 0..1, "Translucent" );
 	FeatureRule( Allow1( F_TRANSLUCENT, F_ALPHA_TEST ), "Translucent and Alpha Test are not compatible" );
 	Feature( F_PREPASS_ALPHA_TEST, 0..1, "Translucent" );
-	Feature( F_NON_DIRECTIONAL_DIFFUSE_LIGHTING, 0..1, "Rendering" );
 }
 
 MODES
@@ -220,7 +219,7 @@ PS
 				float flShadowScalar = ComputeSunShadowScalar( f.vPositionWs.xyz );
 				float3 vDiffuseTerm, vSpecularTerm;
 				ComputeDiffuseAndSpecularTermsForVoxel( vDiffuseTerm, vSpecularTerm,  true, f, g_vSunLightDir.xyz, vPositionToCameraDirWs.xyz, vDiffuseExponent.xy );
-				float3 vLightMask = g_vSunLightColor.rgb * max( flShadowScalar, 0.7f * VoxelBrightness );
+				float3 vLightMask = g_vSunLightColor.rgb * max( flShadowScalar, 0.9f * VoxelBrightness );
 				o.vDiffuse.rgb += vDiffuseTerm.rgb * vLightMask;
 				o.vSpecular.rgb += vSpecularTerm.rgb * vLightMask;
 			}
@@ -295,7 +294,7 @@ PS
 		float3 torchColor = (g_vVoxelLight.rgb / 16.0f) * (1.0f - (((sin(g_flTime * 8.0f) + 1.0f) * 0.5f) * 0.2f));
 		float sunlight = g_vVoxelLight.w / 16.0f;
 		sunlight *= sunlight;
-		float brightness = 0.8f;
+		float brightness = 1.0f;
 
 		float flCurrentBrightness = saturate((max(max(torchColor.x, torchColor.y), torchColor.z) + sunlight) * brightness);
 		
@@ -305,7 +304,6 @@ PS
 		m.Normal = Tex2DLevelS( g_tModelNormal, g_sPointSampler, i.vTextureCoords.xy, 0 ).rgb;
 		m.Roughness = vRma.r;
 		m.Metalness = vRma.g;
-		m.AmbientOcclusion = vRma.b;
 		m.AmbientOcclusion = vRma.b;
 		m.Emission.rgb = m.Albedo.rgb * vEmission;
 		

@@ -7,9 +7,9 @@ Layer0
 	//---- Translucent ----
 	F_ALPHA_TEST 1
 
-	g_flDiffuseBoost "0.045"
+	g_flDiffuseBoost "0.050"
 	g_flLightDirectionBias "1.000"
-	g_flSpecularBoost "1.000"
+	g_flSpecularBoost "0.100"
 	g_flTextureAtlasCellSize "32.000"
 	g_flVoxelBrightness "1.000"
 	g_flVoxelOpacity "1.000"

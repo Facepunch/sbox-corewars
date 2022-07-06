@@ -4,8 +4,8 @@ Layer0
 {
 	shader "voxel_model.vfx"
 
-	g_flDiffuseBoost "0.000"
-	g_flLightDirectionBias "0.000"
+	g_flDiffuseBoost "0.045"
+	g_flLightDirectionBias "1.000"
 	g_flSpecularBoost "1.000"
 	g_HueShift "0"
 	g_vTintColor "[1.000 1.000 1.000]"

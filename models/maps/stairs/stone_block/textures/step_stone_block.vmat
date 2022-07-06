@@ -4,9 +4,12 @@ Layer0
 {
 	shader "voxel_model.vfx"
 
-	g_flDiffuseBoost "0.500"
-	g_flLightDirectionBias "0.000"
-	g_flSpecularBoost "1.000"
+	//---- Translucent ----
+	F_ALPHA_TEST 1
+
+	g_flDiffuseBoost "0.050"
+	g_flLightDirectionBias "1.000"
+	g_flSpecularBoost "0.100"
 	g_HueShift "0"
 	g_vTintColor "[1.000 1.000 1.000]"
 	g_vVoxelLight "[0.000 0.000 0.000 0.000]"
@@ -27,11 +30,11 @@ Layer0
 
 	//---- Material ----
 	TextureColor "models/maps/stairs/stone_block/textures/step_stone_block_color.png"
-	TextureTintMask "materials/default/default.tga"
+	TextureTranslucency "materials/default/default_trans.tga"
 
 	//---- Model Material ----
 	ModelTextureAmbientOcclusion "materials/default/default_ao.tga"
-	ModelTextureEmission "materials/default/default.tga"
+	ModelTextureEmission "[0.000000 0.000000 0.000000 0.000000]"
 	ModelTextureMetalness "materials/default/default_metal.tga"
 	ModelTextureNormal "models/maps/stairs/stone_block/textures/step_stone_block_normal.png"
 	ModelTextureRoughness "models/maps/stairs/stone_block/textures/step_stone_block_rough.png"
@@ -42,6 +45,10 @@ Layer0
 	g_vTexCoordOffset "[0.000 0.000]"
 	g_vTexCoordScale "[1.000 1.000]"
 	g_vTexCoordScrollSpeed "[0.000 0.000]"
+
+	//---- Translucent ----
+	g_flAlphaTestReference "0.500"
+	g_flAntiAliasedEdgeStrength "1.000"
 
 	DynamicParams
 	{
