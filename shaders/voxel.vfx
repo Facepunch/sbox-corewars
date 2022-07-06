@@ -191,7 +191,6 @@ PS
 	{
 		CombinerInput Input;
 		ShadeParams shadeParams;
-		float VoxelBrightness;
 
 		CombinerInput MaterialToCombinerInput( PixelInput i, Material m )
 		{
@@ -215,7 +214,7 @@ PS
 
 			o = CalculateDiffuseAndSpecularFromAlbedoAndMetalness( o, m.Albedo.rgb, m.Metalness );
 
-			PS_CommonTransformNormal( i, o, DecodeHemiOctahedronNormal( m.Normal.rg ) );
+			PS_CommonTransformNormal( i, o, DecodeHemiOctahedronNormal( m.Normal.rgb ) );
 			o.vRoughness = m.Roughness;
 			o.flRetroReflectivity = 1.0f;
 			o.vEmissive = m.Emission;
@@ -306,7 +305,7 @@ PS
 				float flShadowScalar = ComputeSunShadowScalar( f.vPositionWs.xyz );
 				float3 vDiffuseTerm, vSpecularTerm;
 				ComputeDiffuseAndSpecularTermsForVoxel( vDiffuseTerm, vSpecularTerm,  true, f, g_vSunLightDir.xyz, vPositionToCameraDirWs.xyz, vDiffuseExponent.xy );
-				float3 vLightMask = g_vSunLightColor.rgb * max( flShadowScalar, 0.7f * VoxelBrightness );
+				float3 vLightMask = g_vSunLightColor.rgb * flShadowScalar;
 				o.vDiffuse.rgb += vDiffuseTerm.rgb * vLightMask;
 				o.vSpecular.rgb += vSpecularTerm.rgb * vLightMask;
 			}
@@ -347,7 +346,7 @@ PS
 				vColor.rgb = ApplySphericalVignette( vColor.rgb, vPositionWs.xyz );
 			}
 
-			o.Diffuse = vColor * VoxelBrightness;
+			o.Diffuse = vColor;
 			o.Specular = 0;
 			return o;
 		}
@@ -515,7 +514,7 @@ PS
 				return o;
 			#else
 				Material m = GatherMaterial( i );
-				m.Albedo.rgb = vColor.rgb * saturate(0.007f + torchColor + sunlight * brightness * g_flVoxelBrightness);
+				m.Albedo.rgb = vColor.rgb;
 				m.Normal = Tex2DLevelS( g_tAtlasNormal, g_sPointSampler, vTexCoordAtlas, 0 ).rgb;//normalize(2.0f * Tex2DLevelS( g_tAtlasNormal, g_sPointSampler, vTexCoordAtlas, 0 ).rgb - 1.0f);
 				m.Roughness = vRma.r;
 				m.Metalness = vRma.g;
@@ -528,8 +527,9 @@ PS
 				m.Emission.rgb = m.Albedo.rgb * vEmission;
 				
 				ShadingModelValveWithDiffuse sm;
-				sm.VoxelBrightness = flCurrentBrightness;
-				return FinalizePixelMaterial( i, m, sm );
+				PixelOutput o = FinalizePixelMaterial( i, m, sm );
+				o.vColor.rgb *= saturate(0.007f + torchColor + sunlight * brightness * g_flVoxelBrightness);
+				return o;
 			#endif
 
 		}
