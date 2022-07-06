@@ -4,6 +4,9 @@ Layer0
 {
 	shader "voxel_model.vfx"
 
+	//---- Rendering ----
+	F_NON_DIRECTIONAL_DIFFUSE_LIGHTING 1
+
 	g_flDiffuseBoost "0.500"
 	g_flLightDirectionBias "0.000"
 	g_flSpecularBoost "1.000"

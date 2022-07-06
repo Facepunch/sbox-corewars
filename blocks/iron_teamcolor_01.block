@@ -7,12 +7,12 @@
 		Textures = 
 		{
 			Default = "iron_teamcolor_01"
-			Top = ""
-			Bottom = ""
-			North = ""
-			East = ""
-			South = ""
-			West = ""
+			Top = "iron_teamcolor_01"
+			Bottom = "iron_teamcolor_01"
+			North = "iron_teamcolor_01"
+			East = "iron_teamcolor_01"
+			South = "iron_teamcolor_01"
+			West = "iron_teamcolor_01"
 		}
 		Aliases = null
 		ModelOverride = 
