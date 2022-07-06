@@ -2,17 +2,17 @@
 {
 	data = 
 	{
-		FriendlyName = "Iron Team Color 01"
+		FriendlyName = "stone Floor Tile West"
 		Description = ""
 		Textures = 
 		{
-			Default = "iron_teamcolor_01"
-			Top = "iron_teamcolor_01"
-			Bottom = "iron_teamcolor_01"
-			North = "iron_teamcolor_01"
-			East = "iron_teamcolor_01"
-			South = "iron_teamcolor_01"
-			West = "iron_teamcolor_01"
+			Default = "stone_floor_tile_5"
+			Top = ""
+			Bottom = ""
+			North = ""
+			East = ""
+			South = ""
+			West = "stone_floor_tile_6"
 		}
 		Aliases = null
 		ModelOverride = 
@@ -40,6 +40,7 @@
 		DetailScale = 1
 		FaceToTexture = 
 		{
+			West = "stone_floor_tile_6"
 		}
 		LightLevel = 
 		{
