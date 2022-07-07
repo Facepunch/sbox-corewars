@@ -134,14 +134,14 @@
 						{
 							x = 0.0
 							y = 20.0
-							m_flSlopeIncoming = -9.495999
-							m_flSlopeOutgoing = -9.495999
+							m_flSlopeIncoming = -8.632727
+							m_flSlopeOutgoing = -8.632727
 						},
 						{
-							x = 1.0
+							x = 1.1
 							y = 10.504001
-							m_flSlopeIncoming = -9.495999
-							m_flSlopeOutgoing = -9.495999
+							m_flSlopeIncoming = -8.632727
+							m_flSlopeOutgoing = -8.632727
 						},
 					]
 					m_tangents = 
@@ -156,7 +156,7 @@
 						},
 					]
 					m_vDomainMins = [ 0.0, 0.0 ]
-					m_vDomainMaxs = [ 1.0, 20.0 ]
+					m_vDomainMaxs = [ 1.1, 20.0 ]
 				}
 			}
 			m_flInitialRadius = 
@@ -203,14 +203,14 @@
 						{
 							x = 0.0
 							y = 0.0
-							m_flSlopeIncoming = 12.0
-							m_flSlopeOutgoing = 12.0
+							m_flSlopeIncoming = 10.909091
+							m_flSlopeOutgoing = 10.909091
 						},
 						{
-							x = 1.0
+							x = 1.1
 							y = 12.0
-							m_flSlopeIncoming = 12.0
-							m_flSlopeOutgoing = 12.0
+							m_flSlopeIncoming = 10.909091
+							m_flSlopeOutgoing = 10.909091
 						},
 					]
 					m_tangents = 
@@ -225,7 +225,7 @@
 						},
 					]
 					m_vDomainMins = [ 0.0, 0.0 ]
-					m_vDomainMaxs = [ 1.0, 12.0 ]
+					m_vDomainMaxs = [ 1.1, 12.0 ]
 				}
 			}
 			m_flRoll = 
