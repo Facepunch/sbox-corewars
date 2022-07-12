@@ -12,7 +12,6 @@ Layer0
 	g_flSpecularBoost "0.100"
 	g_HueShift "0"
 	g_vTintColor "[1.000 1.000 1.000]"
-	g_vVoxelLight "[0.000 0.000 0.000 0.000]"
 
 	//---- Color ----
 	g_flModelTintAmount "1.000"
@@ -54,6 +53,5 @@ Layer0
 	{
 		g_HueShift "HueShift"
 		g_vTintColor "TintColor"
-		g_vVoxelLight "VoxelLight"
 	}
 }
