@@ -19,8 +19,6 @@ FEATURES
 	Feature( F_TRANSLUCENT, 0..1, "Translucent" );
 	FeatureRule( Allow1( F_TRANSLUCENT, F_ALPHA_TEST ), "Translucent and Alpha Test are not compatible" );
 	Feature( F_PREPASS_ALPHA_TEST, 0..1, "Translucent" );
-	Feature( F_LIGHTMAP_VIEWER, 0..1, "Voxel Lighting");
-	Feature( F_USE_LIGHTMAP, 0..1, "Voxel Lighting");
 }
 
 //=========================================================================================================================
@@ -84,7 +82,7 @@ VS
 		float3 position = float3( float( i.vData.x & ( 0x3F ) ), float( ( i.vData.x >> 6 ) & ( 0x3F ) ), float( ( i.vData.x >> 12 ) & ( 0x3F ) ) );
 		int texindex = int( ( i.vData.x >> 18 ) & ( 0x1ff ) );
 		int normal = int( ( i.vData.x >> 27 ) & ( 0x7 ) );
-		int hueShift = int( ( i.vData.y >> 18 ) & ( 0x3F ) );
+		int HueShift = int( ( i.vData.y >> 18 ) & ( 0x3F ) );
 
 		i.vPositionOs = position * g_flVoxelSize;
 
@@ -110,7 +108,7 @@ VS
 		o.vTangentUWs = vBinormalOs;
 		o.vTangentVWs = vTangentOs;
 		o.vTexCoord = vTexCoord.xy;
-		o.iHueShift = hueShift;
+		o.iHueShift = HueShift;
 		o.nTextureIndex = texindex;
 		o.iNormal = normal;
 
@@ -129,8 +127,6 @@ PS
 	StaticCombo( S_MODE_DEPTH, 0..1, Sys( ALL ) );
 	StaticCombo( S_MODE_TOOLS_WIREFRAME, 0..1, Sys( ALL ) );
 	StaticCombo( S_DO_NOT_CAST_SHADOWS, F_DO_NOT_CAST_SHADOWS, Sys( ALL ) );
-	StaticCombo( S_LIGHTMAP_VIEWER, F_LIGHTMAP_VIEWER, Sys( ALL ) );
-	StaticCombo( S_USE_LIGHTMAP, F_USE_LIGHTMAP, Sys( ALL ) );
 
 	#if ( S_MODE_TOOLS_WIREFRAME )
 		RenderState( FillMode, WIREFRAME );
@@ -160,26 +156,9 @@ PS
 	CreateTexture2DWithoutSampler( g_tAtlasEmission ) < Channel( RGB, None( TextureAtlasEmission ), Linear ); OutputFormat( BC7 ); SrgbRead( false ); >;
 	CreateTexture2DWithoutSampler( g_tAtlasHue )  	  < Channel( RGB,  None( TextureAtlasHue ), Linear ); OutputFormat( BC7 ); SrgbRead( false ); Filter( POINT ); AddressU( MIRROR ); AddressV( MIRROR ); >;
 	
-	CreateInputTexture3D( TextureLightmap, Linear, 32, "", "_lightmap", "Voxel Atlas,10/70", Default3( 1.0, 1.0, 1.0 ) );
-	
-	// Move all this to C#
-	CreateInputTexture3D( TextureLightmapWest, Linear, 32, "", "_lightmap", "Voxel Atlas,10/80", Default3( 1.0, 1.0, 1.0 ) );
-	CreateInputTexture3D( TextureLightmapSouth, Linear, 32, "", "_lightmap", "Voxel Atlas,10/90", Default3( 1.0, 1.0, 1.0 ) );
-	CreateInputTexture3D( TextureLightmapEast, Linear, 32, "", "_lightmap", "Voxel Atlas,10/100", Default3( 1.0, 1.0, 1.0 ) );
-	CreateInputTexture3D( TextureLightmapNorth, Linear, 32, "", "_lightmap", "Voxel Atlas,10/110", Default3( 1.0, 1.0, 1.0 ) );
-	CreateInputTexture3D( TextureLightmapTop, Linear, 32, "", "_lightmap", "Voxel Atlas,10/120", Default3( 1.0, 1.0, 1.0 ) );
-	CreateInputTexture3D( TextureLightmapBottom, Linear, 32, "", "_lightmap", "Voxel Atlas,10/130", Default3( 1.0, 1.0, 1.0 ) );
+	CreateInputTexture3D( TextureDataMap, Linear, 32, "", "_datamap", "Voxel Atlas,10/70", Default3( 1.0, 1.0, 1.0 ) );
 
-	CreateTexture3DWithoutSampler( g_tLightmap ) < Channel( R, None( TextureLightmap ), Linear ); SrgbRead( false ); Filter( POINT ); OutputFormat( R32F ); AddressU( CLAMP ); AddressV( CLAMP ); AddressW( CLAMP ); > ;
-	
-	// We can't do this because the inputs are dynamic :(
-	//CreateTexture3DWithoutSampler( g_tLightmapAdjacent ) < Channel( R, None( TextureLightmapWest ), Linear ); Channel( G, None( TextureLightmapSouth ), Linear ); Channel( B, None( TextureLightmapEast ), Linear ); Channel( A, None( TextureLightmapNorth ), Linear ); OutputFormat( RGBA8888 ); SrgbRead( false ); Filter( POINT ); AddressU( MIRROR ); AddressV( MIRROR ); AddressW( MIRROR ); > ;
-	CreateTexture3DWithoutSampler( g_tLightmapAdjacent0 ) < Channel( R, None( TextureLightmapWest ), Linear ); OutputFormat( R32F ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
-	CreateTexture3DWithoutSampler( g_tLightmapAdjacent1 ) < Channel( R, None( TextureLightmapSouth ), Linear ); OutputFormat( R32F ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
-	CreateTexture3DWithoutSampler( g_tLightmapAdjacent2 ) < Channel( R, None( TextureLightmapEast ), Linear ); OutputFormat( R32F ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
-	CreateTexture3DWithoutSampler( g_tLightmapAdjacent3 ) < Channel( R, None( TextureLightmapNorth ), Linear ); OutputFormat( R32F ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
-	CreateTexture3DWithoutSampler( g_tLightmapAdjacent4 ) < Channel( R, None( TextureLightmapTop ), Linear ); OutputFormat( R32F ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
-	CreateTexture3DWithoutSampler( g_tLightmapAdjacent5 ) < Channel( R, None( TextureLightmapBottom ), Linear ); OutputFormat( R32F ); SrgbRead( false ); Filter( POINT ); AddressU( WRAP ); AddressV(WRAP ); AddressW( WRAP ); > ;
+	CreateTexture3DWithoutSampler( g_tDataMap ) < Channel( R, None( TextureDataMap ), Linear ); SrgbRead( false ); Filter( POINT ); OutputFormat( R32F ); AddressU( CLAMP ); AddressV( CLAMP ); AddressW( CLAMP ); > ;
 
 	float g_flVoxelOpacity< Range(0.0f, 1.0f); Default(1.0f); >;
 	float g_flVoxelBrightness< Range(0.0f, 1.0f); Default(1.0f); >;
@@ -356,76 +335,27 @@ PS
 	};
 
 
-	struct LightmapData
+	struct DataMap
 	{
-		float3 Torch;
-		float Sunlight;
 		float Health;
-		bool Opaque;
 	};
 
-	LightmapData UnpackLightmap(Texture3D lightmapTexture, int3 texOffset )
+	DataMap UnpackDataMap(Texture3D texture, int3 offset )
 	{
-		float texDataFl = Tex3DLoad(lightmapTexture, int4( texOffset, 0 ) ).r;
-		uint texData = asuint(texDataFl) & 0xbfffffff; // Skip bit we're using for denormalization
+		float texDataFl = Tex3DLoad(texture, int4( offset, 0 ) ).r;
+		uint texData = asuint(texDataFl) & 0xbfffffff;
 
-		LightmapData o;
-		o.Torch = float3(
-			float(texData.r & 15) / 16.0f,
-			float((texData.r >> 4) & 15) / 16.0f,
-			float((texData.r >> 8) & 15) / 16.0f
-		);
-		o.Sunlight = float((texData.r >> 12) & 15) / 16.0f;
-		o.Sunlight *= o.Sunlight;
+		DataMap o;
 		o.Health = saturate(float((texData.r >> 16) & 0x7f) / 100.0f);
-		o.Opaque = ((texData.r >> 23) & 0x1) == 1;
-
 		return o;
 	}
-
-	LightmapData FetchBestLightmap( int3 vPositionOs )
+	
+	DataMap FetchDataMap( int3 vPositionOs )
 	{
-		int3 vLightmapDim = TextureDimensions3D( g_tLightmap, 0 );
-		if( vPositionOs.x < 0 )
-		{
-			// x - 1
-			return UnpackLightmap( g_tLightmapAdjacent0, int3(vLightmapDim.x - 1, vPositionOs.yz) );
-		}
-		else if( vPositionOs.y < 0 )
-		{
-			// y - 1
-			return UnpackLightmap( g_tLightmapAdjacent1, int3(vPositionOs.x, vLightmapDim.y - 1, vPositionOs.z) );
-		}
-		else if( vPositionOs.z < 0 )
-		{
-			return UnpackLightmap( g_tLightmapAdjacent5, int3(vPositionOs.xy, vLightmapDim.z - 1) );
-		}
-		else if( vPositionOs.x >= vLightmapDim.x )
-		{
-			return UnpackLightmap( g_tLightmapAdjacent2, int3(0, vPositionOs.yz) );
-		}
-		else if( vPositionOs.y >= vLightmapDim.y )
-		{
-			return UnpackLightmap( g_tLightmapAdjacent3, int3(vPositionOs.x, 0, vPositionOs.z) );
-		}
-		else if( vPositionOs.z >= vLightmapDim.z )
-		{
-			return UnpackLightmap( g_tLightmapAdjacent4, int3(vPositionOs.xy, 0) );
-		}
-		else
-		{
-			return UnpackLightmap( g_tLightmap, vPositionOs.xyz );
-		}
-	}
-
-	float TapLightmap( int3 vPositionOs )
-	{
-		LightmapData data = FetchBestLightmap(vPositionOs);
-		float LightLevel = max(data.Torch.z, max(data.Torch.x, data.Torch.y)) + data.Sunlight;
-		return min(1.0f, LightLevel);
+		return UnpackDataMap( g_tDataMap, vPositionOs );
 	}
 	
-	float3 hueShift(float3 color, float hue) {
+	float3 HueShift( float3 color, float hue ) {
 		const float3 k = float3(0.57735, 0.57735, 0.57735);
 		float cosAngle = cos(hue);
 		return float3(color * cosAngle + cross(k, color) * sin(hue) + k * dot(k, color) * (1.0 - cosAngle));
@@ -469,12 +399,9 @@ PS
 		}
 		#else
 		{
-			LightmapData LightData = FetchBestLightmap( i.vPositionOs );
-			float3 torch = LightData.Torch;
-			float sunlight = LightData.Sunlight;
-			float health = FetchBestLightmap( i.vPositionOs - i.vNormalWs ).Health;
-
-			float3 torchColor = torch * (1.0f - (((sin(g_flTime * 8.0f) + 1.0f) * 0.5f) * 0.2f));
+			DataMap data = FetchDataMap( i.vPositionOs - i.vNormalWs );
+			float health = data.Health;
+			
 			float4 vColor = Tex2DLevelS( g_tAtlasColor, g_sPointSampler, vTexCoordAtlas, 0 );
 			vColor.rgb = lerp(vColor.rgb, float3(1,0,0), health);
 			
@@ -490,7 +417,7 @@ PS
 						vColor.rgb *= i.vTintColor.rgb;
 				
 					if ( i.iHueShift > 0 )
-						vColor.rgb = hueShift( vColor.rgb, (3.14f / 128.0f) * i.iHueShift );
+						vColor.rgb = HueShift( vColor.rgb, (3.14f / 128.0f) * i.iHueShift );
 				}
 			}
 
@@ -501,42 +428,25 @@ PS
 			float3 vRma = Tex2DLevelS( g_tAtlasRma, g_sPointSampler, vTexCoordAtlas, 0 ).rgb;
 			float3 vEmission = Tex2DLevelS( g_tAtlasEmission, g_sPointSampler, vTexCoordAtlas, 0 ).rgb;
 			float brightness = 1.0f;
-			
-			float flCurrentBrightness = 1.0f;
-			
-			#if S_USE_LIGHTMAP
-			saturate((max(max(torchColor.x, torchColor.y), torchColor.z) + sunlight) * brightness * g_flVoxelBrightness);
-			#endif
 
-			#if S_LIGHTMAP_VIEWER
-				PixelOutput o;
-				o.vColor.rgba = float4(flCurrentBrightness.xxx, 1.0f);
-				return o;
-			#else
-				Material m = GatherMaterial( i );
-				m.Albedo.rgb = vColor.rgb;
-				m.Normal = Tex2DLevelS( g_tAtlasNormal, g_sPointSampler, vTexCoordAtlas, 0 ).rgb;
-				m.Roughness = vRma.r;
-				m.Metalness = vRma.g;
-				m.AmbientOcclusion = vRma.b;
-				m.Opacity = g_flVoxelOpacity;
-				m.TintMask = 1.0f;
-				#if (S_ALPHA_TEST || S_TRANSLUCENT)
-					m.Opacity = vColor.a * g_flVoxelOpacity;
-				#endif
-				m.Emission.rgb = m.Albedo.rgb * vEmission;
-				
-				ShadingModelValveWithDiffuse sm;
-				sm.VoxelBrightness = flCurrentBrightness;
-				PixelOutput o = FinalizePixelMaterial( i, m, sm );
-				
-				#if S_USE_LIGHTMAP
-				o.vColor.rgb *= saturate(0.007f + torchColor + sunlight * brightness * g_flVoxelBrightness);
-				#endif
-				
-				return o;
+			Material m = GatherMaterial( i );
+			m.Albedo.rgb = vColor.rgb;
+			m.Normal = Tex2DLevelS( g_tAtlasNormal, g_sPointSampler, vTexCoordAtlas, 0 ).rgb;
+			m.Roughness = vRma.r;
+			m.Metalness = vRma.g;
+			m.AmbientOcclusion = vRma.b;
+			m.Opacity = g_flVoxelOpacity;
+			m.TintMask = 1.0f;
+			#if (S_ALPHA_TEST || S_TRANSLUCENT)
+				m.Opacity = vColor.a * g_flVoxelOpacity;
 			#endif
-
+			m.Emission.rgb = m.Albedo.rgb * vEmission;
+			
+			ShadingModelValveWithDiffuse sm;
+			sm.VoxelBrightness = 1.0f;
+			PixelOutput o = FinalizePixelMaterial( i, m, sm );
+			
+			return o;
 		}
 		#endif
 	}

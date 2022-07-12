@@ -16,9 +16,6 @@ namespace Facepunch.CoreWars.Utility
 			if ( self.IsPassable )
 				tags.Add( new ItemTag( "Passable", Color.Green ) );
 
-			if ( self.LightLevel.Length > 0 )
-				tags.Add( new ItemTag( "Emits Light", Color.Yellow ) );
-
 			return tags.ToArray();
 		}
 	}

@@ -13,7 +13,6 @@ FEATURES
 	Feature( F_TRANSLUCENT, 0..1, "Translucent" );
 	FeatureRule( Allow1( F_TRANSLUCENT, F_ALPHA_TEST ), "Translucent and Alpha Test are not compatible" );
 	Feature( F_PREPASS_ALPHA_TEST, 0..1, "Translucent" );
-	Feature( F_USE_LIGHTMAP, 0..1, "Voxel Lighting");
 }
 
 MODES
@@ -63,7 +62,6 @@ PS
 	StaticCombo( S_MODE_DEPTH, 0..1, Sys( ALL ) );
 	StaticCombo( S_MODE_TOOLS_WIREFRAME, 0..1, Sys( ALL ) );
 	StaticCombo( S_DO_NOT_CAST_SHADOWS, F_DO_NOT_CAST_SHADOWS, Sys( ALL ) );
-	StaticCombo( S_USE_LIGHTMAP, F_USE_LIGHTMAP, Sys( ALL ) );
 
 	#if ( S_MODE_TOOLS_WIREFRAME )
 		RenderState( FillMode, WIREFRAME );
@@ -93,7 +91,6 @@ PS
 	CreateTexture2DWithoutSampler( g_tModelEmission ) < Channel( RGB, None( ModelTextureEmission ), Linear ); OutputFormat( BC7 ); SrgbRead( false ); >;
 	CreateTexture2DWithoutSampler( g_tModelHue )  	  < Channel( RGB,  None( ModelTextureHue ), Linear ); OutputFormat( BC7 ); SrgbRead( false ); Filter( POINT ); AddressU( MIRROR ); AddressV( MIRROR ); >;
 	
-	float4 g_vVoxelLight< Range4(0.0f, 0.0f, 0.0f, 0.0f, 16.0f, 16.0f, 16.0f, 16.0f); Default4(0.0f, 0.0f, 0.0f, 0.0f); >;
 	float3 g_vTintColor< Range3(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f); Default3(1.0f, 1.0f, 1.0f); >;
 	float g_flDiffuseBoost< Range(0.0f, 1.0f); Default(0.0f); >;
 	float g_flSpecularBoost< Range(0.1f, 32.0f); Default(1.0f); >;
@@ -268,7 +265,8 @@ PS
 		}
 	};
 
-	float3 hueShift(float3 color, float hue) {
+	float3 HueShift( float3 color, float hue )
+	{
 		const float3 k = float3(0.57735, 0.57735, 0.57735);
 		float cosAngle = cos(hue);
 		return float3(color * cosAngle + cross(k, color) * sin(hue) + k * dot(k, color) * (1.0 - cosAngle));
@@ -287,22 +285,11 @@ PS
 				vColor.rgb *= g_vTintColor.rgb;
 		
 			if ( g_HueShift > 0 )
-				vColor.rgb = hueShift( vColor.rgb, (3.14f / 128.0f) * g_HueShift );
+				vColor.rgb = HueShift( vColor.rgb, (3.14f / 128.0f) * g_HueShift );
 		}
 		
 		float3 vRma = Tex2DLevelS( g_tModelRma, g_sPointSampler, i.vTextureCoords.xy, 0 ).rgb;
 		float3 vEmission = Tex2DLevelS( g_tModelEmission, g_sPointSampler, i.vTextureCoords.xy, 0 ).rgb;
-		
-		float3 torchColor = (g_vVoxelLight.rgb / 16.0f) * (1.0f - (((sin(g_flTime * 8.0f) + 1.0f) * 0.5f) * 0.2f));
-		float sunlight = g_vVoxelLight.w / 16.0f;
-		sunlight *= sunlight;
-		
-		float brightness = 1.0f;
-		float flCurrentBrightness = 1.0f;
-		
-		#if S_USE_LIGHTMAP
-		flCurrentBrightness = saturate((max(max(torchColor.x, torchColor.y), torchColor.z) + sunlight) * brightness);
-		#endif
 		
 		m.TintMask = 1.0f;
 		m.Opacity = 1.0f;
@@ -314,12 +301,8 @@ PS
 		m.Emission.rgb = m.Albedo.rgb * vEmission;
 		
 		ShadingModelValveWithDiffuse sm;
-		sm.VoxelBrightness = flCurrentBrightness;
+		sm.VoxelBrightness = 1.0f;
 		PixelOutput o = FinalizePixelMaterial( i, m, sm );
-		
-		#if S_USE_LIGHTMAP
-		o.vColor.rgb *= saturate(0.007f + torchColor + sunlight * brightness);
-		#endif
 		
 		return o;
 	}
