@@ -51,23 +51,11 @@ Layer0
 	TextureAtlasMetalness "materials/default/default_metal.tga"
 	TextureAtlasNormal "textures/blocks/corewars/blocks_normal.png"
 	TextureAtlasRoughness "textures/blocks/corewars/blocks_rough.png"
-	TextureLightmap "materials/default/default_lightmap.tga"
-	TextureLightmapBottom "materials/default/default_lightmap.tga"
-	TextureLightmapEast "materials/default/default_lightmap.tga"
-	TextureLightmapNorth "materials/default/default_lightmap.tga"
-	TextureLightmapSouth "materials/default/default_lightmap.tga"
-	TextureLightmapTop "materials/default/default_lightmap.tga"
-	TextureLightmapWest "materials/default/default_lightmap.tga"
+	TextureDataMap "materials/default/default.tga"
 
 	DynamicParams
 	{
 		g_flVoxelSize "VoxelSize"
-		TextureLightmap "Lightmap"
-		TextureLightmapBottom "LightMapBottom"
-		TextureLightmapEast "LightMapEast"
-		TextureLightmapNorth "LightMapNorth"
-		TextureLightmapSouth "LightMapSouth"
-		TextureLightmapTop "LightMapTop"
-		TextureLightmapWest "LightMapWest"
+		TextureDataMap "DataMap"
 	}
 }

@@ -172,7 +172,6 @@ PS
 	{
 		CombinerInput Input;
 		ShadeParams shadeParams;
-		float VoxelBrightness;
 
 		CombinerInput MaterialToCombinerInput( PixelInput i, Material m )
 		{
@@ -287,7 +286,7 @@ PS
 				float flShadowScalar = ComputeSunShadowScalar( f.vPositionWs.xyz );
 				float3 vDiffuseTerm, vSpecularTerm;
 				ComputeDiffuseAndSpecularTermsForVoxel( vDiffuseTerm, vSpecularTerm,  true, f, g_vSunLightDir.xyz, vPositionToCameraDirWs.xyz, vDiffuseExponent.xy );
-				float3 vLightMask = g_vSunLightColor.rgb * max( flShadowScalar, 0.9f * VoxelBrightness );
+				float3 vLightMask = g_vSunLightColor.rgb * flShadowScalar;
 				o.vDiffuse.rgb += vDiffuseTerm.rgb * vLightMask;
 				o.vSpecular.rgb += vSpecularTerm.rgb * vLightMask;
 			}
@@ -427,7 +426,6 @@ PS
 
 			float3 vRma = Tex2DLevelS( g_tAtlasRma, g_sPointSampler, vTexCoordAtlas, 0 ).rgb;
 			float3 vEmission = Tex2DLevelS( g_tAtlasEmission, g_sPointSampler, vTexCoordAtlas, 0 ).rgb;
-			float brightness = 1.0f;
 
 			Material m = GatherMaterial( i );
 			m.Albedo.rgb = vColor.rgb;
@@ -443,7 +441,6 @@ PS
 			m.Emission.rgb = m.Albedo.rgb * vEmission;
 			
 			ShadingModelValveWithDiffuse sm;
-			sm.VoxelBrightness = 1.0f;
 			PixelOutput o = FinalizePixelMaterial( i, m, sm );
 			
 			return o;
