@@ -145,7 +145,7 @@ namespace Facepunch.CoreWars
 
 		public static void SaveEditorMap( string fileName, bool autosave = false )
 		{
-			if ( autosave )
+			if ( autosave && !fileName.Contains( "_autosave" ) )
 			{
 				if ( fileName.EndsWith( ".voxels" ) )
 				{

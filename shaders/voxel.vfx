@@ -19,7 +19,8 @@ FEATURES
 	Feature( F_TRANSLUCENT, 0..1, "Translucent" );
 	FeatureRule( Allow1( F_TRANSLUCENT, F_ALPHA_TEST ), "Translucent and Alpha Test are not compatible" );
 	Feature( F_PREPASS_ALPHA_TEST, 0..1, "Translucent" );
-	Feature( F_LIGHTMAP_VIEWER, 0..1, "Debug");
+	Feature( F_LIGHTMAP_VIEWER, 0..1, "Voxel Lighting");
+	Feature( F_USE_LIGHTMAP, 0..1, "Voxel Lighting");
 }
 
 //=========================================================================================================================
@@ -129,6 +130,7 @@ PS
 	StaticCombo( S_MODE_TOOLS_WIREFRAME, 0..1, Sys( ALL ) );
 	StaticCombo( S_DO_NOT_CAST_SHADOWS, F_DO_NOT_CAST_SHADOWS, Sys( ALL ) );
 	StaticCombo( S_LIGHTMAP_VIEWER, F_LIGHTMAP_VIEWER, Sys( ALL ) );
+	StaticCombo( S_USE_LIGHTMAP, F_USE_LIGHTMAP, Sys( ALL ) );
 
 	#if ( S_MODE_TOOLS_WIREFRAME )
 		RenderState( FillMode, WIREFRAME );
@@ -500,7 +502,11 @@ PS
 			float3 vEmission = Tex2DLevelS( g_tAtlasEmission, g_sPointSampler, vTexCoordAtlas, 0 ).rgb;
 			float brightness = 1.0f;
 			
-			float flCurrentBrightness = saturate((max(max(torchColor.x, torchColor.y), torchColor.z) + sunlight) * brightness * g_flVoxelBrightness);
+			float flCurrentBrightness = 1.0f;
+			
+			#if S_USE_LIGHTMAP
+			saturate((max(max(torchColor.x, torchColor.y), torchColor.z) + sunlight) * brightness * g_flVoxelBrightness);
+			#endif
 
 			#if S_LIGHTMAP_VIEWER
 				PixelOutput o;
@@ -523,7 +529,11 @@ PS
 				ShadingModelValveWithDiffuse sm;
 				sm.VoxelBrightness = flCurrentBrightness;
 				PixelOutput o = FinalizePixelMaterial( i, m, sm );
+				
+				#if S_USE_LIGHTMAP
 				o.vColor.rgb *= saturate(0.007f + torchColor + sunlight * brightness * g_flVoxelBrightness);
+				#endif
+				
 				return o;
 			#endif
 
