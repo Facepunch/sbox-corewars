@@ -11,9 +11,9 @@
 				[
 					{
 						_class = "RenderMeshFile"
-						filename = "models\\gameplay\\team_chest\\dmx\\mesh\\team_chest.dmx"
+						filename = "models/gameplay/personal_chest/mesh/chest.fbx"
 						import_translation = [ 0.0, 0.0, 0.0 ]
-						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 270.0, 0.0 ]
 						import_scale = 1.0
 						align_origin_x_type = "None"
 						align_origin_y_type = "None"
@@ -22,7 +22,10 @@
 						import_filter = 
 						{
 							exclude_by_default = false
-							exception_list = [  ]
+							exception_list = 
+							[
+								"hammermesh_8",
+							]
 						}
 					},
 				]
@@ -35,13 +38,28 @@
 						_class = "PhysicsShapeBox"
 						parent_bone = ""
 						surface_prop = "default"
-						collision_group = ""
-						collision_interact_as = ""
-						collision_interact_with = ""
-						collision_interact_exclude = ""
+						collision_tags = "solid"
 						origin = [ -0.010056, 0.00143, 24.055288 ]
 						angles = [ 0.0, 0.0, 0.0 ]
 						dimensions = [ 48.175072, 48.109833, 48.118305 ]
+					},
+				]
+			},
+			{
+				_class = "MaterialGroupList"
+				children = 
+				[
+					{
+						_class = "DefaultMaterialGroup"
+						remaps = 
+						[
+							{
+								from = "personalchest.001.vmat"
+								to = "models/gameplay/team_chest/textures/team_chest.vmat"
+							},
+						]
+						use_global_default = false
+						global_default_material = ""
 					},
 				]
 			},
