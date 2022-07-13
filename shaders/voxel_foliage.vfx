@@ -1,17 +1,11 @@
-//=========================================================================================================================
-// Optional
-//=========================================================================================================================
 HEADER
 {
 	CompileTargets = ( IS_SM_50 && ( PC || VULKAN ) );
-	Description = "Pixel Foliage shader for s&box";
+	Description = "Voxel Foliage";
     DevShader = true;
     DebugInfo = false;
 }
 
-//=========================================================================================================================
-// Optional
-//=========================================================================================================================
 FEATURES
 {
     #include "common/features.minimal.hlsl"
@@ -27,9 +21,7 @@ FEATURES
     FeatureRule( Requires1( F_TRANSMISSIVE_BACKFACE_NDOTL, F_TRANSMISSIVE ), "Requires transmissive" );
 }
 
-//=========================================================================================================================
-// Optional
-//=========================================================================================================================
+
 MODES
 {
     VrForward();													// Indicates this shader will be used for main rendering
@@ -39,7 +31,6 @@ MODES
 	ToolsShadingComplexity( "vr_tools_shading_complexity.vfx" ); 	// Shows how expensive drawing is in debug view
 }
 
-//=========================================================================================================================
 COMMON
 {
     #include "common/shared.hlsl"
@@ -66,14 +57,10 @@ COMMON
     #endif
 }
 
-//=========================================================================================================================
-
 struct VertexInput
 {
 	#include "common/vertexinput.hlsl"
 };
-
-//=========================================================================================================================
 
 struct PixelInput
 {
@@ -85,14 +72,10 @@ struct GS_INPUT
 	#include "common/pixelinput.hlsl"
 };
 
-//=========================================================================================================================
-
 VS
 {
 	#include "common/vertex.hlsl"
-	//
-	// Main
-	//
+	
 	PixelInput MainVs( INSTANCED_SHADER_PARAMS( VS_INPUT i ) )
 	{
 		PixelInput o = ProcessVertex( i );
@@ -100,8 +83,6 @@ VS
 		return FinalizeVertex( o );
 	}
 }
-
-//=========================================================================================================================
 
 GS
 {
@@ -230,8 +211,6 @@ GS
 #endif
 }
 
-//=========================================================================================================================
-
 PS
 {
     #include "common/pixel.hlsl"
@@ -253,9 +232,6 @@ PS
 
     RenderState( CullMode, F_RENDER_BACKFACES ? NONE : DEFAULT );
 
-	//
-	// Main
-	//
 	PixelOutput MainPs( PixelInput i )
 	{
         const float flAlphaTestReference = 0.01;

@@ -2,15 +2,18 @@
 {
 	data = 
 	{
-		sounds = 
-		[
-			"sound/weapons/barage.explode.vsnd",
-		]
 		UI = false
-		Volume = 1.0
-		VolumeRandom = 0.0
-		Pitch = 1.0
-		PitchRandom = 0.0
-		DistanceMax = 3000.0
+		Volume = 1
+		VolumeRandom = 0
+		Pitch = 1
+		PitchRandom = 0
+		Decibels = 170
+		Sounds = 
+		[
+			resource:"sound/weapons/barage.explode.vsnd",
+		]
+		SelectionMode = "Random"
+		MaximumDistance = 6590.138
+		MinimumDistance = 329.50693
 	}
 }
