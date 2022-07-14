@@ -1,7 +1,7 @@
 HEADER
 {
 	CompileTargets = ( IS_SM_50 && ( PC || VULKAN ) );
-	Description = "Voxel Model Material";
+	Description = "Pixel Material";
 }
 
 FEATURES
