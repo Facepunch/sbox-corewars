@@ -1,0 +1,70 @@
+﻿@import "./scss/base.scss";
+
+WinSummary {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    pointer-events: none;
+    backdrop-filter-blur: 24px;
+    flex-direction: column;
+    background-color: rgba(0, 0, 0, 0.9);
+
+    .modal {
+        padding: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        pointer-events: all;
+
+        .header {
+            .title {
+                color: $grey;
+                font-family: $font;
+                font-size: 36px;
+            }
+
+            .winner {
+                color: $red;
+                font-family: $font;
+                font-size: 48px;
+            }
+        }
+
+        .stats {
+            .container {
+
+            }
+        }
+
+        .next-round {
+            .title {
+                font-family: $font;
+                font-size: 20px;
+                color: $grey;
+            }
+
+            .countdown {
+                background-color: $box-bg;
+                border: 2px solid $box-border;
+
+                .value {
+                    font-family: $font;
+                    font-size: 18px;
+                    color: white;
+                }
+            }
+        }
+    }
+
+    &.hidden {
+        display: none;
+
+        .modal {
+            pointer-events: none;
+        }
+    }
+}
