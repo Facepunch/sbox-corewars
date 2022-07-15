@@ -36,7 +36,43 @@ WinSummary {
 
         .stats {
             .container {
+                .left {
+                    .title {
+                        color: white;
+                        font-family: $font;
+                    }
 
+                    .icon {
+                        background-size: cover;
+                        width: 64px;
+                        height: 64px;
+                    }
+                }
+
+                .right {
+                    .players {
+                        display: flex;
+                        flex-direction: column;
+
+                        .player {
+                            .avatar {
+                                background-size: cover;
+                                width: 40px;
+                                height: 40px;
+                            }
+
+                            .name {
+                                font-family: $font;
+                                font-size: 18px;
+                            }
+
+                            .score {
+                                color: white;
+                                font-size: 18px;
+                            }
+                        }
+                    }
+                }
             }
         }
 

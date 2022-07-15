@@ -7,12 +7,34 @@
             <label class="winner">WINNING TEAM</label>
         </div>
         <div class="stats">
+            <div class="container">
+                <div class="left">
+                    <div class="icon"></div>
+                    <div class="title">MOST KILLS</div>
+                </div>
+                <div class="right">
+                    <div @ref="MostKillsList" class="players">
 
+                    </div>
+                </div>
+            </div>
+
+            <div class="container">
+                <div class="left">
+                    <div class="icon"></div>
+                    <div class="title">CORES DESTROYED</div>
+                </div>
+                <div class="right">
+                    <div @ref="CoresDestroyedList" class="players">
+
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="next-round">
             <label class="title">NEXT ROUND</label>
             <div class="countdown">
-                <label class="value">0</label>
+                <label @text="NextRoundTime" class="value">0</label>
             </div>
         </div>
     </div>
