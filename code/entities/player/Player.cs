@@ -957,7 +957,21 @@ namespace Facepunch.CoreWars
 			if ( IsClient )
 			{
 				SimulateBlockGhost( client );
+
+				if ( Prediction.FirstTime && Input.Released( InputButton.Drop ) )
+				{
+					if ( WinSummary.Current.IsOpen )
+					{
+						WinSummary.Current.Close();
+					}
+					else
+					{
+						WinSummary.Current.Open();
+						WinSummary.Current.Populate();
+					}
+				}
 			}
+
 
 			if ( IsServer )
 			{
@@ -988,6 +1002,7 @@ namespace Facepunch.CoreWars
 
 				if ( Input.Released( InputButton.Use ) )
 				{
+
 					if ( CameraMode is ThirdPersonCamera )
 						CameraMode = new FirstPersonCamera();
 					else
