@@ -21,31 +21,67 @@ WinSummary {
         pointer-events: all;
 
         .header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
             .title {
                 color: $grey;
                 font-family: $font;
-                font-size: 36px;
+                font-size: 32px;
             }
 
             .winner {
                 color: $red;
                 font-family: $font;
-                font-size: 48px;
+                font-size: 64px;
+                margin-top: -24px;
             }
         }
 
         .stats {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            margin-top: 150px;
+
             .container {
+                background-color: $box-bg;
+                border: 2px solid $box-border;
+                border-radius: $border-radius-default;
+                margin-right: 32px;
+                display: flex;
+                flex-direction: row;
+                padding-top: 32px;
+                padding-bottom: 32px;
+                width: 30%;
+
+                &:last-child {
+                    margin-right: 0px;
+                }
+
                 .left {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    margin-right: 32px;
+                    padding: 16px;
+                    border-right: 1px solid #444;
+                    width: 200px;
+                    flex-shrink: 0;
+                    justify-content: center;
+
                     .title {
                         color: white;
                         font-family: $font;
+                        font-size: 24px;
                     }
 
                     .icon {
+                        background-image: url(textures/ui/logo_spinner.png);
                         background-size: cover;
-                        width: 64px;
-                        height: 64px;
+                        width: 72px;
+                        height: 72px;
                     }
                 }
 
@@ -53,22 +89,36 @@ WinSummary {
                     .players {
                         display: flex;
                         flex-direction: column;
+                        width: 90%;
 
                         .player {
-                            .avatar {
-                                background-size: cover;
-                                width: 40px;
-                                height: 40px;
+                            display: flex;
+                            flex-direction: row;
+                            align-items: center;
+
+                            .username {
+                                font-family: $font;
+                                font-size: 20px;
+                                color: white;
                             }
 
-                            .name {
-                                font-family: $font;
-                                font-size: 18px;
+                            .avatar {
+                                background-image: url(textures/ui/logo_spinner.png);
+                                background-size: cover;
+                                width: 48px;
+                                height: 48px;
+                                margin-right: 16px;
                             }
 
                             .score {
                                 color: white;
-                                font-size: 18px;
+                                font-size: 20px;
+                                position: absolute;
+                                right: 16px;
+                            }
+
+                            &:nth-child(even) {
+                                background-color: #272727;
                             }
                         }
                     }
@@ -77,19 +127,30 @@ WinSummary {
         }
 
         .next-round {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 150px;
+
             .title {
                 font-family: $font;
-                font-size: 20px;
+                font-size: 26px;
                 color: $grey;
             }
 
             .countdown {
                 background-color: $box-bg;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-direction: row;
                 border: 2px solid $box-border;
+                border-radius: $border-radius-default;
+                width: 180px;
 
                 .value {
                     font-family: $font;
-                    font-size: 18px;
+                    font-size: 24px;
                     color: white;
                 }
             }
