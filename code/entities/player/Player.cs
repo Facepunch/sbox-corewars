@@ -522,6 +522,7 @@ namespace Facepunch.CoreWars
 
 		public virtual void Reset()
 		{
+			Client.SetInt( "cores", 0 );
 			Client.SetInt( "kills", 0 );
 			ClearInventories();
 			ClearBuffs();
@@ -967,7 +968,7 @@ namespace Facepunch.CoreWars
 					else
 					{
 						WinSummary.Current.Open();
-						WinSummary.Current.Populate();
+						WinSummary.Current.Populate( 5f );
 					}
 				}
 			}
