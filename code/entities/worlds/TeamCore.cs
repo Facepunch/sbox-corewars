@@ -158,6 +158,11 @@ namespace Facepunch.CoreWars
 
 		public override void OnKilled()
 		{
+			if ( LastAttacker is Player player )
+			{
+				player.Client.AddInt( "cores", 1 );
+			}
+			
 			Explode();
 		}
 
