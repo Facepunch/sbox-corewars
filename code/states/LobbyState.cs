@@ -14,6 +14,7 @@ namespace Facepunch.CoreWars
 			{
 				foreach ( var player in Entity.All.OfType<Player>() )
 				{
+					player.SetTeam( Team.None );
 					player.RespawnWhenAvailable();
 				}
 
