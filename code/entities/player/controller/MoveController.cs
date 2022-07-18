@@ -454,8 +454,7 @@ namespace Facepunch.CoreWars
 
 			var pm = Trace.Ray( start, end )
 				.Size( Mins, Maxs )
-				.HitLayer( CollisionLayer.All, false )
-				.HitLayer( CollisionLayer.LADDER, true )
+				.WithTag( "ladder" )
 				.Ignore( Pawn )
 				.Run();
 

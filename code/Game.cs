@@ -76,6 +76,12 @@ namespace Facepunch.CoreWars
 			base.ClientSpawn();
 		}
 
+		[ConCmd.Server( "cw_end_game" )]
+		public static void EndGameCmd()
+		{
+			Current.StateSystem.Set( new SummaryState() );
+		}
+
 		[ConCmd.Server( "cw_core_revive" )]
 		public static void ReviveCoreCmd()
 		{

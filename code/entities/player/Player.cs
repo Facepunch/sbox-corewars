@@ -742,10 +742,10 @@ namespace Facepunch.CoreWars
 
 				CreateHull();
 
-				if ( !isLobbyState )
-				{
+				if ( isLobbyState )
+					ClearInventories();
+				else
 					GiveInitialItems();
-				}
 			}
 
 			ClearBuffs();
@@ -958,21 +958,7 @@ namespace Facepunch.CoreWars
 			if ( IsClient )
 			{
 				SimulateBlockGhost( client );
-
-				if ( Prediction.FirstTime && Input.Released( InputButton.Drop ) )
-				{
-					if ( WinSummary.Current.IsOpen )
-					{
-						WinSummary.Current.Close();
-					}
-					else
-					{
-						WinSummary.Current.Open();
-						WinSummary.Current.Populate( 5f );
-					}
-				}
 			}
-
 
 			if ( IsServer )
 			{
