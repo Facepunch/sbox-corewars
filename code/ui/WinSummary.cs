@@ -1,11 +1,8 @@
 ﻿using Sandbox;
-using Sandbox.Internal;
 using Sandbox.UI;
 using Sandbox.UI.Construct;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace Facepunch.CoreWars
 {
@@ -16,7 +13,8 @@ namespace Facepunch.CoreWars
 
 		public Panel CoresDestroyedList { get; private set; }
 		public Panel MostKillsList { get; private set; }
-		public string NextRoundTime => Math.Max( TimeUntilNextRound.Relative, 0 ).ToString();
+		public string NextRoundTime => Math.Max( TimeUntilNextRound.Relative.CeilToInt(), 0 ).ToString();
+		public Label WinningTeam { get; private set; }
 		public bool IsOpen { get; set; }
 
 		private RealTimeUntil TimeUntilNextRound { get; set; }
@@ -41,11 +39,14 @@ namespace Facepunch.CoreWars
 			IsOpen = false;
 		}
 
-		public void Populate( RealTimeUntil nextRoundTime )
+		public void Populate( RealTimeUntil nextRoundTime, Team winningTeam )
 		{
 			TimeUntilNextRound = nextRoundTime;
 			CoresDestroyedList.DeleteChildren( true );
 			MostKillsList.DeleteChildren( true );
+
+			WinningTeam.Text = $"{winningTeam.ToString().ToUpper()} TEAM WINS";
+			WinningTeam.Style.FontColor = winningTeam.GetColor();
 
 			var allValidClients = Client.All.Where( c => c.Pawn is Player player && player.Team != Team.None );
 			var clientsByKills = allValidClients.ToList();
