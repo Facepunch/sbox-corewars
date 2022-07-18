@@ -17,10 +17,6 @@ namespace Facepunch.CoreWars
 		{
 			MoveType = MoveType.Physics;
 			UsePhysicsCollision = true;
-
-			SetInteractsAs( CollisionLayer.Debris );
-			SetInteractsWith( CollisionLayer.WORLD_GEOMETRY );
-			SetInteractsExclude( CollisionLayer.Player | CollisionLayer.Debris );
 		}
 
 		public void CopyFrom( Player player )
@@ -61,6 +57,12 @@ namespace Facepunch.CoreWars
 				else
 					PhysicsGroup.AddVelocity( force );
 			}
+		}
+
+		public override void Spawn()
+		{
+			Tags.Add( "corpse" );
+			base.Spawn();
 		}
 
 		[Event.Tick.Client]
