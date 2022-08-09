@@ -326,7 +326,15 @@ namespace Facepunch.CoreWars
 					world.SetChunkGenerator<EmptyChunkGenerator>();
 					world.AddBiome<EmptyBiome>();
 
-					var result = await world.LoadFromFile( FileSystem.Mounted, worldLoader.FileName );
+					var fileName = worldLoader.FileName;
+					var fs = FileSystem.Mounted;
+
+					if ( !fs.FileExists( fileName ) && !fileName.EndsWith( ".json" ) )
+					{
+						fileName = $"{fileName}.json";
+					}
+
+					var result = await world.LoadFromFile( fs, worldLoader.FileName );
 
 					if ( !result )
 					{
