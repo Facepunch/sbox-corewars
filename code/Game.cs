@@ -338,7 +338,7 @@ namespace Facepunch.CoreWars
 
 					if ( !result )
 					{
-						throw new Exception( $"Unable to load the voxel world '{worldLoader.FileName}', file does not exist!" );
+						throw new Exception( $"Unable to load the voxel world '{fileName}', file does not exist!" );
 					}
 				}
 				else

@@ -24,7 +24,7 @@
     "LeaderboardType": "None",
     "RankType": "None",
     "GameNetworkType": "Multiplayer",
-    "MaxPlayers": 16,
+    "MaxPlayers": 32,
     "Collision": {
       "Defaults": {
         "solid": "Collide",
@@ -66,6 +66,28 @@
           "r": "Ignore"
         }
       ]
+    },
+    "GameCategory": "None",
+    "LobbySettings": {
+      "cw_friendly_fire": {
+        "Type": "Boolean",
+        "ConVar": "cw_friendly_fire",
+        "FriendlyName": "Friendly Fire",
+        "Default": "false"
+      },
+      "testconvar": {
+        "ConVar": "testconvar",
+        "FriendlyName": "Test String",
+        "Default": ""
+      },
+      "testfloat": {
+        "Type": "Number",
+        "ConVar": "testfloat",
+        "FriendlyName": "Test Float",
+        "Default": "4",
+        "Min": 4,
+        "Max": 12
+      }
     }
   }
 }
