@@ -334,7 +334,7 @@ namespace Facepunch.CoreWars
 						fileName = $"{fileName}.json";
 					}
 
-					var result = await world.LoadFromFile( fs, worldLoader.FileName );
+					var result = await world.LoadFromFile( fs, fileName );
 
 					if ( !result )
 					{
