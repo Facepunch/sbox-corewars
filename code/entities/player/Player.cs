@@ -952,7 +952,7 @@ namespace Facepunch.CoreWars
 		{
 			if ( Stamina <= 10f )
 				IsOutOfBreath = true;
-			else if ( IsOutOfBreath && Stamina >= 40f )
+			else if ( IsOutOfBreath && Stamina >= 25f )
 				IsOutOfBreath = false;
 
 			if ( IsClient )
