@@ -24,7 +24,7 @@ namespace Facepunch.CoreWars
 		{
 			player.Health += 30f;
 			player.Health = Math.Min( player.Health, 100f );
-			player.ReduceStamina( 100f );
+			player.ReduceStamina( 50f );
 
 			base.OnActivated( player );
 		}

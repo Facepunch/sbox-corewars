@@ -394,7 +394,7 @@ namespace Facepunch.CoreWars
 
 				if ( Client.Pawn is Player player )
 				{
-					player.ReduceStamina( 10f );
+					player.ReduceStamina( 2f );
 				}
 			}
 		}

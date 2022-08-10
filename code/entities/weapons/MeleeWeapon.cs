@@ -1,12 +1,14 @@
-﻿using Facepunch.CoreWars.Blocks;
-using Sandbox;
+﻿using Sandbox;
+using System;
 
 namespace Facepunch.CoreWars
 {
 	public abstract partial class MeleeWeapon : BlockDamageWeapon
 	{
+		public virtual float DamageStaminaThreshold => 40f;
+		public virtual bool ScaleDamageWithStamina => true;
 		public virtual float ScaleNonBlockDamage => 1f;
-		public virtual float StaminaLossPerSwing => 5f;
+		public virtual float StaminaLossPerSwing => 4f;
 		public virtual bool DoesBlockDamage => false;
 		public virtual bool UseTierBodyGroups => false;
 		public virtual string HitPlayerSound => "melee.hitflesh";
@@ -24,12 +26,16 @@ namespace Facepunch.CoreWars
 			if ( Owner is not Player player )
 				return;
 
-			if ( player.IsOutOfBreath )
-				return;
+			var damageScale = ScaleNonBlockDamage;
+
+			if ( ScaleDamageWithStamina )
+			{
+				damageScale *= Math.Max( (player.Stamina / DamageStaminaThreshold ), 1f );
+			}
 
 			PlayAttackAnimation();
 			ShootEffects();
-			MeleeStrike( Config.Damage * ScaleNonBlockDamage, 1.5f );
+			MeleeStrike( Config.Damage * damageScale, 1.5f );
 			PlaySound( SwingSound );
 
 			if ( IsServer && WeaponItem.IsValid() && DoesBlockDamage )
