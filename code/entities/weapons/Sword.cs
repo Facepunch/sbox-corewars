@@ -22,6 +22,7 @@ namespace Facepunch.CoreWars
 		public override DamageFlags DamageType => DamageFlags.Blunt;
 		public override float MeleeRange => 80f;
 		public override float PrimaryRate => 1.5f;
+		public override float Force => 3f * WeaponItem.Tier;
 
 		public override void Spawn()
 		{

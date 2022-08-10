@@ -296,7 +296,7 @@ namespace Facepunch.CoreWars
 			var forward = Owner.EyeRotation.Forward;
 			forward = forward.Normal;
 
-			foreach ( var trace in TraceBullet( Owner.EyePosition, Owner.EyePosition + forward * MeleeRange, 10f ) )
+			foreach ( var trace in TraceBullet( Owner.EyePosition, Owner.EyePosition + forward * MeleeRange, 16f ) )
 			{
 				if ( !trace.Entity.IsValid() || trace.Entity.IsWorld )
 				{
@@ -457,13 +457,11 @@ namespace Facepunch.CoreWars
 			return AvailableAmmo() > 0;
 		}
 
-		public override IEnumerable<TraceResult> TraceBullet( Vector3 start, Vector3 end, float radius = 2.0f )
+		public override IEnumerable<TraceResult> TraceBullet( Vector3 start, Vector3 end, float radius = 2f )
 		{
-			bool inWater = Map.Physics.IsPointWater( start );
-
 			yield return Trace.Ray( start, end )
 				.UseHitboxes()
-				.HitLayer( CollisionLayer.Water, !inWater )
+				.WithAnyTags( "solid", "player" )
 				.Ignore( Owner )
 				.Ignore( this )
 				.Size( radius )

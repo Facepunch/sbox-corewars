@@ -14,6 +14,7 @@ namespace Facepunch.CoreWars
 		public virtual string HitPlayerSound => "melee.hitflesh";
 		public virtual string HitObjectSound => "sword.hit";
 		public virtual string SwingSound => "melee.swing";
+		public virtual float Force => 1.5f;
 
 		public override float MeleeRange => 80f;
 		public override float PrimaryRate => 2f;
@@ -35,7 +36,7 @@ namespace Facepunch.CoreWars
 
 			PlayAttackAnimation();
 			ShootEffects();
-			MeleeStrike( Config.Damage * damageScale, 1.5f );
+			MeleeStrike( Config.Damage * damageScale, Force );
 			PlaySound( SwingSound );
 
 			if ( IsServer && WeaponItem.IsValid() && DoesBlockDamage )

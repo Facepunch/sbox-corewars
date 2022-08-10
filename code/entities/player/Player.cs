@@ -869,6 +869,11 @@ namespace Facepunch.CoreWars
 
 				FloatingDamage.Show( this, info.Damage, info.Position );
 				RemoveBuff<StealthBuff>();
+
+				if ( info.Flags.HasFlag( DamageFlags.Blunt ) )
+				{
+					ApplyAbsoluteImpulse( info.Force );
+				}
 			}
 
 			LastDamageTaken = info;
