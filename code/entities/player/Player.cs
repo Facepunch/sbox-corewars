@@ -1062,7 +1062,7 @@ namespace Facepunch.CoreWars
 			else
 				ActiveChild = null;
 
-			if ( IsClient )
+			if ( IsClient && Prediction.FirstTime )
 			{
 				if ( Input.Released( InputButton.Use ) )
 				{
