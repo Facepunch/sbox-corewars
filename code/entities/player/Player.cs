@@ -1152,6 +1152,8 @@ namespace Facepunch.CoreWars
 		{
 			base.Touch( other );
 
+			if ( IsClient ) return;
+
 			if ( LifeState == LifeState.Dead )
 				return;
 
