@@ -34,7 +34,7 @@ namespace Facepunch.CoreWars
 
 			if ( IsServer && WeaponItem.IsValid() && DoesBlockDamage )
 			{
-				DamageVoxelInDirection( MeleeRange, Config.Damage * WeaponItem.Tier );
+				DamageVoxelInDirection( MeleeRange, Config.Damage + ( Config.Damage * ( WeaponItem.Tier - 1 ) * 0.75f ) );
 			}
 
 			TimeSincePrimaryAttack = 0;

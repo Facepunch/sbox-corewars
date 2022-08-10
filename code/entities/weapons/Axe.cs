@@ -10,7 +10,7 @@ namespace Facepunch.CoreWars
 		public override AmmoType AmmoType => AmmoType.None;
 		public override WeaponType Type => WeaponType.Melee;
 		public override int Ammo => 0;
-		public override int Damage => 10;
+		public override int Damage => 30;
 	}
 
 	[Library( "weapon_axe" )]
@@ -24,6 +24,7 @@ namespace Facepunch.CoreWars
 		public override float MeleeRange => 80f;
 		public override float PrimaryRate => 2f;
 		public override BuildingMaterialType PrimaryMaterialType => BuildingMaterialType.Wooden;
+		public override float SecondaryMaterialMultiplier => 0.5f;
 
 		public override void Spawn()
 		{

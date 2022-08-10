@@ -11,7 +11,7 @@ namespace Facepunch.CoreWars
 		public override AmmoType AmmoType => AmmoType.None;
 		public override WeaponType Type => WeaponType.Melee;
 		public override int Ammo => 0;
-		public override int Damage => 20;
+		public override int Damage => 30;
 	}
 
 	[Library( "weapon_pickaxe" )]
@@ -25,6 +25,7 @@ namespace Facepunch.CoreWars
 		public override float MeleeRange => 80f;
 		public override float PrimaryRate => 2f;
 		public override BuildingMaterialType PrimaryMaterialType => BuildingMaterialType.Metal;
+		public override float SecondaryMaterialMultiplier => 0.75f;
 
 		public override void Spawn()
 		{
