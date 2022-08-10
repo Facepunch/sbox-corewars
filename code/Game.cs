@@ -71,8 +71,8 @@ namespace Facepunch.CoreWars
 
 		public override void ClientSpawn()
 		{
-			Hud = IsEditorMode ? new EditorHud() : new Hud();
-
+			// Only create the hud if we don't have one. This fixes full updates duplicating the hud.
+			Hud ??= IsEditorMode ? new EditorHud() : new Hud();
 			base.ClientSpawn();
 		}
 
