@@ -16,14 +16,20 @@ namespace Facepunch.CoreWars
 		public float EndDotDistance { get; set; } = 1250f;
 		public INameplate Entity { get; private set; }
 
+		private Team LastTeam { get; set; }
+
 		public Nameplate( INameplate entity )
 		{
 			StyleSheet.Load( "/ui/Nameplate.scss" );
+
 			Container = Add.Panel( "container" );
 			Dot = Add.Panel( "dot" );
 			NameLabel = Container.Add.Label( "", "name" );
+
 			PanelBounds = new Rect( -1000, -1000, 2000, 2000 );
 			Entity = entity;
+
+			CheckDirtyTeam( true );
 		}
 
 		public override void Tick()
@@ -44,6 +50,8 @@ namespace Facepunch.CoreWars
 				SetClass( "hidden", true );
 				return;
 			}
+
+			CheckDirtyTeam();
 
 			var transform = Transform;
 
@@ -85,6 +93,37 @@ namespace Facepunch.CoreWars
 			SetClass( "hidden", Dot.Style.Opacity == 0f && Container.Style.Opacity == 0f );
 
 			base.Tick();
+		}
+
+		private void CheckDirtyTeam( bool forceUpdate = false )
+		{
+			if ( !forceUpdate && LastTeam == Entity.Team )
+				return;
+
+			var teamColor = Entity.Team.GetColor();
+
+			var textShadow = new Shadow()
+			{
+				Blur = 6f,
+				Color = teamColor.Lighten( 0.1f )
+			};
+
+			var boxShadow = new Shadow()
+			{
+				Blur = 32f,
+				Color = teamColor.Lighten( 0.1f ).WithAlpha( 0.2f )
+			};
+
+			Dot.Style.BoxShadow.Clear();
+			Dot.Style.BoxShadow.Add( boxShadow );
+			Dot.Style.BackgroundColor = teamColor;
+			Dot.Style.BorderColor = teamColor.Darken( 0.2f );
+
+			NameLabel.Style.TextShadow.Clear();
+			NameLabel.Style.TextShadow.Add( textShadow );
+			NameLabel.Style.FontColor = teamColor;
+
+			LastTeam = Entity.Team;
 		}
 
 		private bool IsEntityVisible()
