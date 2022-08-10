@@ -987,15 +987,6 @@ namespace Facepunch.CoreWars
 					NextActionTime = 0.1f;
 				}
 
-				if ( Input.Released( InputButton.Use ) )
-				{
-
-					if ( CameraMode is ThirdPersonCamera )
-						CameraMode = new FirstPersonCamera();
-					else
-						CameraMode = new ThirdPersonCamera();
-				}
-
 				if ( Input.Released( InputButton.Drop ) )
 				{
 					var container = HotbarInventory.Instance;
