@@ -25,10 +25,17 @@ namespace Facepunch.CoreWars
 			Transmit = TransmitType.Always;
 			SetupPhysicsFromModel( PhysicsMotionType.Static );
 
+			base.Spawn();
+		}
+
+		public override void ClientSpawn()
+		{
+			Effect?.Destroy( true );
+
 			Effect = Particles.Create( "particles/gameplay/resource_pool/resource_pool_gold.vpcf", this );
 			Effect.SetEntity( 0, this );
 
-			base.Spawn();
+			base.ClientSpawn();
 		}
 
 		public override void TakeDamage( DamageInfo info ) { }
