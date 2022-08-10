@@ -40,8 +40,7 @@ namespace Facepunch.CoreWars.Inventory
 			Item = new NetInventoryItem( item );
 			item.SetWorldEntity( this );
 
-			CollisionGroup = CollisionGroup.Weapon;
-			SetInteractsAs( CollisionLayer.Debris );
+			Tags.Add( "item" );
 		}
 
 		public InventoryItem Take()
