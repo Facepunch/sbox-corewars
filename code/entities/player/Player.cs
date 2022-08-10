@@ -1003,7 +1003,7 @@ namespace Facepunch.CoreWars
 					PlaySound( "item.dropped" );
 				}
 			}
-			else
+			else if ( Prediction.FirstTime )
 			{
 				if ( Input.Pressed( InputButton.Score ) )
 				{
