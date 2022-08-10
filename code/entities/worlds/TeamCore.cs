@@ -17,12 +17,17 @@ namespace Facepunch.CoreWars
 		[EditorProperty, Net] public Team Team { get; set; }
 		[Net] public float MaxHealth { get; private set; } = 200f;
 
-		[Net, Change( nameof( OnUpgradeTypesChanged ) )] protected List<int> UpgradeTypes { get; set; } = new();
+		[Net, Change( nameof( OnUpgradeTypesChanged ) )] protected IList<int> UpgradeTypes { get; set; }
 		protected List<BaseTeamUpgrade> InternalUpgrades { get; set; } = new();
 		public IReadOnlyList<BaseTeamUpgrade> Upgrades => InternalUpgrades;
 
 		private TimeUntil NextAutoHeal { get; set; }
 		private Particles Effect { get; set; }
+
+		public TeamCore()
+		{
+			UpgradeTypes = new List<int>();
+		}
 
 		public T FindUpgrade<T>() where T : BaseTeamUpgrade
 		{
@@ -166,7 +171,7 @@ namespace Facepunch.CoreWars
 			Explode();
 		}
 
-		public virtual void OnUpgradeTypesChanged( List<int> oldTypes, List<int> newTypes )
+		public virtual void OnUpgradeTypesChanged( IList<int> oldTypes, IList<int> newTypes )
 		{
 			InternalUpgrades.Clear();
 

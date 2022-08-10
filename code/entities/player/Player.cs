@@ -10,7 +10,7 @@ namespace Facepunch.CoreWars
 	public partial class Player : Sandbox.Player, IResettable, INameplate
 	{
 		[Net, Change( nameof( OnTeamChanged ) )] public Team Team { get; private set; }
-		[Net] public Dictionary<StatModifier, float> Modifiers { get; private set; }
+		[Net] public IDictionary<StatModifier, float> Modifiers { get; private set; }
 		[Net, Predicted] public ushort CurrentHotbarIndex { get; private set; }
 		[Net, Predicted] public bool IsOutOfBreath { get; set; }
 		[Net, Predicted] public float Stamina { get; set; }
@@ -20,7 +20,7 @@ namespace Facepunch.CoreWars
 		[Net] public NetInventoryContainer EquipmentInventory { get; private set; }
 		[Net] public TeamCore Core { get; private set; }
 		[Net, Change] public IList<BaseBuff> Buffs { get; private set; }
-		[Net] public Dictionary<string,int> Resources { get; private set; }
+		[Net] public IDictionary<string,int> Resources { get; private set; }
 
 		public RealTimeSince TimeSinceLastHit { get; private set; }
 		public Dictionary<ArmorSlot,List<BaseClothing>> Armor { get; private set; }

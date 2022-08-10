@@ -7,11 +7,16 @@ namespace Facepunch.CoreWars.Editor
 {
 	public partial class EditorLastEntityData : BaseNetworkable
 	{
-		[Net] public Dictionary<string, object> EditorData { get; set; } = new();
+		[Net] public IDictionary<string, object> EditorData { get; set; }
 		[Net, Change] public string TypeName { get; set; }
 
 		public Dictionary<string, object> Properties { get; set; } = new();
 		public Type Type { get; set; }
+
+		public EditorLastEntityData()
+		{
+			EditorData = new Dictionary<string, object>();
+		}
 
 		public bool IsSameType( TypeDescription description )
 		{
