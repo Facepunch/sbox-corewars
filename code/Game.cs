@@ -231,7 +231,15 @@ namespace Facepunch.CoreWars
 		{
 			if ( client.Pawn is Player player )
 			{
-				player.TakeDamage( DamageInfo.Generic( 200f ) );
+				var damage = new DamageInfo()
+					.WithFlag( DamageFlags.Generic )
+					.WithAttacker( player )
+					.WithWeapon( player.ActiveChild )
+					.WithPosition( player.Position );
+
+				damage.Damage = 200f;
+
+				player.TakeDamage( damage );
 			}
 		}
 

@@ -1,0 +1,73 @@
+﻿@import "../scss/base.scss";
+
+RespawnKillerInfo {
+    .respawn-box {
+        &.weapon {
+            display: none;
+        }
+    }
+
+    &.has-weapon {
+        display: flex;
+
+        .respawn-box {
+            &.weapon {
+                display: flex;
+            }
+        }
+    }
+
+    &.team_blue {
+        .respawn-box .respawn-body {
+            background-color: $blue;
+        }
+    }
+
+    &.team_red {
+        .respawn-box .respawn-body {
+            background-color: $red;
+        }
+    }
+
+    &.team_pink {
+        .respawn-box .respawn-body {
+            background-color: $pink;
+        }
+    }
+
+    &.team_purple {
+        .respawn-box .respawn-body {
+            background-color: $purple;
+        }
+    }
+
+    &.team_cyan {
+        .respawn-box .respawn-body {
+            background-color: $cyan;
+        }
+    }
+
+    &.team_orange {
+        .respawn-box .respawn-body {
+            background-color: $orange;
+        }
+    }
+
+    &.team_yellow {
+        .respawn-box .respawn-body {
+            background-color: $yellow;
+        }
+    }
+
+    &.team_green {
+        .respawn-box .respawn-body {
+            background-color: $green;
+        }
+    }
+
+    &.team_none {
+        .respawn-box .respawn-body {
+            background-color: white;
+        }
+    }
+}

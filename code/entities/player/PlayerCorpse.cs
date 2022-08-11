@@ -1,9 +1,4 @@
 ﻿using Sandbox;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Facepunch.CoreWars
 {
@@ -15,7 +10,6 @@ namespace Facepunch.CoreWars
 
 		public PlayerCorpse()
 		{
-			MoveType = MoveType.Physics;
 			UsePhysicsCollision = true;
 		}
 

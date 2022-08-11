@@ -12,6 +12,7 @@ namespace Facepunch.CoreWars
 		public virtual string[] KillFeedReasons => new[] { "killed" };
 		public virtual string KillFeedIcon => WeaponItem?.Icon ?? string.Empty;
 		public virtual string KillFeedName => WeaponItem?.Name ?? string.Empty;
+		public virtual Team KillFeedTeam => (Owner as Player)?.Team ?? Team.None;
 		public virtual string MuzzleAttachment => "muzzle";
 		public virtual string MuzzleFlashEffect => "particles/pistol_muzzleflash.vpcf";
 		public virtual string CrosshairClass => "automatic";

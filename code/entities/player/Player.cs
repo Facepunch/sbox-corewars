@@ -25,6 +25,7 @@ namespace Facepunch.CoreWars
 		public RealTimeSince TimeSinceLastHit { get; private set; }
 		public Dictionary<ArmorSlot,List<BaseClothing>> Armor { get; private set; }
 		public ProjectileSimulator Projectiles { get; private set; }
+		public RealTimeUntil TimeUntilRespawn { get; private set; }
 		public DamageInfo LastDamageTaken { get; private set; }
 		public TimeUntil NextActionTime { get; private set; }
 		public TimeSince LastPickupTime { get; private set; }
@@ -468,9 +469,10 @@ namespace Facepunch.CoreWars
 			return world.GetBlockType( world.ToVoxelPosition( Position ) + Chunk.BlockDirections[1] );
 		}
 
-		public void RespawnWhenAvailable()
+		public void RespawnWhenAvailable( float timeToRespawn = 0f )
 		{
 			IsWaitingToRespawn = true;
+			TimeUntilRespawn = timeToRespawn;
 		}
 
 		public void RemoveBuff<T>() where T : BaseBuff
@@ -655,8 +657,11 @@ namespace Facepunch.CoreWars
 
 			EnableAllCollisions = false;
 			EnableDrawing = false;
+			Controller = null;
 
-			RespawnWhenAvailable();
+			RespawnScreen.Show( To.Single( this ), 5f, LastDamageTaken.Attacker, LastDamageTaken.Weapon );
+
+			RespawnWhenAvailable( 5f );
 			ClearBuffs();
 
 			var itemsToDrop = FindItems<InventoryItem>().Where( i => i.DropOnDeath );
@@ -708,6 +713,8 @@ namespace Facepunch.CoreWars
 		public override void Respawn()
 		{
 			var isLobbyState = Game.IsState<LobbyState>();
+
+			RespawnScreen.Hide( To.Single( this ) );
 
 			if ( !isLobbyState && !IsCoreValid() )
 			{
@@ -823,7 +830,7 @@ namespace Facepunch.CoreWars
 		{
 			if ( info.Attacker is Player attacker )
 			{
-				if ( attacker == this && info.Flags.HasFlag( DamageFlags.Fall ) )
+				if ( attacker == this && ( info.Flags.HasFlag( DamageFlags.Fall ) || info.Flags.HasFlag( DamageFlags.Generic ) ) )
 				{
 					RemoveBuff<StealthBuff>();
 					LastDamageTaken = info;
@@ -1193,7 +1200,7 @@ namespace Facepunch.CoreWars
 		[Event.Tick.Server]
 		protected virtual void ServerTick()
 		{
-			if ( IsWaitingToRespawn )
+			if ( IsWaitingToRespawn && TimeUntilRespawn )
 			{
 				var spawnpoint = GetSpawnpoint();
 				if ( !spawnpoint.HasValue ) return;

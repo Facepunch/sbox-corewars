@@ -9,5 +9,6 @@ namespace Facepunch.CoreWars
 		public string[] KillFeedReasons { get; }
 		public string KillFeedIcon { get; }
 		public string KillFeedName { get; }
+		public Team KillFeedTeam { get; }
 	}
 }
