@@ -8,6 +8,8 @@ namespace Facepunch.CoreWars
 		[Net] public RealTimeUntil NextStageTime { get; private set; }
 		[Net] public Team WinningTeam { get; private set; } = Team.None;
 
+		private VoteMapEntity VoteMap { get; set; }
+
 		public override void OnEnter()
 		{
 			if ( IsServer )
@@ -37,7 +39,7 @@ namespace Facepunch.CoreWars
 		{
 			if ( NextStageTime )
 			{
-				System.Set( new LobbyState() );
+				System.Set( new VoteMapState() );
 			}
 		}
 

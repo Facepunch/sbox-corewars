@@ -1,0 +1,80 @@
+﻿@import "../scss/base.scss";
+
+MapIcon {
+    background-color: red;
+    margin: 10px;
+    background-position: center;
+    background-size: cover;
+    transition: all 0.5s ease-in-out;
+    border-radius: 8px;
+    aspect-ratio: 1;
+    width: 400px;
+    cursor: pointer;
+    opacity: 1;
+
+    &:hover {
+        transition: all 0.1s ease-in-out;
+        transform: scale( 1.03 );
+        box-shadow: 0px 0px 64px mix( $yellow, rgba( 0 0 0 0 ), 0.6 );
+        opacity: 1;
+    }
+
+    .votes {
+        position: absolute;
+        background-color: rgb( 32 32 32 0.5 );
+        border-radius: 4px;
+        justify-content: center;
+        border: 1px solid $yellow;
+        align-items: center;
+        min-width: 76px;
+        max-height: 76px;
+        min-height: 76px;
+        padding: 16px;
+        bottom: 10px;
+        right: 10px;
+
+        text {
+            font-weight: bold;
+            font-size: 32px;
+            color: $yellow;
+        }
+    }
+
+    .orgavatar {
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        width: 50px;
+        height: 50px;
+        border-radius: 4px;
+        background-color: black;
+        background-position: center;
+        background-size: cover;
+        mix-blend-mode: lighten;
+    }
+
+    .info {
+        position: absolute;
+        border-radius: 4px;
+        background-color: rgb( 32 32 32 0.5 );
+        flex-direction: column;
+        bottom: 10px;
+        padding: 6px 12px;
+        left: 10px;
+
+        .title {
+            font-weight: bolder;
+            font-size: 20px;
+            mix-blend-mode: lighten;
+            color: $yellow;
+        }
+
+        .orgname {
+            font-weight: bolder;
+            font-size: 14px;
+            opacity: 1;
+            mix-blend-mode: lighten;
+            color: white;
+        }
+    }
+}
