@@ -28,7 +28,7 @@ namespace Facepunch.CoreWars
 			{
 				Type = Package.Type.Map,
 				Order = Package.Order.User,
-				Take = 16,
+				Take = 16
 			};
 
 			query.Tags.Add( "game:facepunch.corewars" );
@@ -56,11 +56,6 @@ namespace Facepunch.CoreWars
 
 			MapIcons.Add( icon );
 			return icon;
-		}
-
-		public override void Tick()
-		{
-			base.Tick();
 		}
 
 		internal void UpdateFromVotes( IDictionary<Client, string> votes )

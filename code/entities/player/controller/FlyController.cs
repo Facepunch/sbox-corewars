@@ -2,12 +2,13 @@
 
 namespace Facepunch.CoreWars
 {
-	public class FlyController : BasePlayerController
+	public partial class FlyController : BasePlayerController
 	{
-		public float EyeHeight { get; set; } = 72f;
-		public float BodyGirth { get; set; } = 32f;
-		public float BodyHeight { get; set; } = 72f;
-		public bool EnableCollisions { get; set; } = true;
+		[Net] public bool EnableCollisions { get; set; } = true;
+
+		protected float EyeHeight { get; set; } = 72f;
+		protected float BodyGirth { get; set; } = 32f;
+		protected float BodyHeight { get; set; } = 72f;
 
 		protected Vector3 Mins { get; set; }
 		protected Vector3 Maxs { get; set; }
