@@ -39,16 +39,7 @@ namespace Facepunch.CoreWars
 
 			foreach ( var package in randomPicks )
 			{
-				if ( randomPicks.Count() == 1 )
-				{
-					AddMap( package.FullIdent );
-					AddMap( package.FullIdent );
-					AddMap( package.FullIdent );
-				}
-				else
-				{
-					AddMap( package.FullIdent );
-				}
+				AddMap( package.FullIdent );
 			}
 		}
 
