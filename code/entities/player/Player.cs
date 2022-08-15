@@ -681,6 +681,13 @@ namespace Facepunch.CoreWars
 				item.Remove();
 			}
 
+			var weapons = Children.OfType<Weapon>().ToArray();
+
+			foreach ( var weapon in weapons )
+			{
+				weapon.Delete();
+			}
+
 			base.OnKilled();
 		}
 
@@ -764,6 +771,7 @@ namespace Facepunch.CoreWars
 				Transform = spawnpoint.Value;
 			}
 
+			InitializeHotbarWeapons();
 			ResetInterpolation();
 		}
 
@@ -1402,20 +1410,7 @@ namespace Facepunch.CoreWars
 		{
 			if ( instance is WeaponItem weapon )
 			{
-				if ( !weapon.Weapon.IsValid() )
-				{
-					try
-					{
-						weapon.Weapon = TypeLibrary.Create<Weapon>( weapon.WeaponName );
-						weapon.Weapon.SetWeaponItem( weapon );
-						weapon.Weapon.OnCarryStart( this );
-						weapon.IsDirty = true;
-					}
-					catch ( Exception e )
-					{
-						Log.Error( e );
-					}
-				}
+				InitializeWeaponItem( weapon );
 			}
 		}
 
@@ -1428,6 +1423,35 @@ namespace Facepunch.CoreWars
 					weapon.Weapon.Delete();
 					weapon.Weapon = null;
 					weapon.IsDirty = true;
+				}
+			}
+		}
+
+		private void InitializeHotbarWeapons()
+		{
+			foreach ( var item in HotbarInventory.Instance.ItemList )
+			{
+				if ( item is WeaponItem weapon )
+				{
+					InitializeWeaponItem( weapon );
+				}
+			}
+		}
+
+		private void InitializeWeaponItem( WeaponItem item )
+		{
+			if ( !item.Weapon.IsValid() )
+			{
+				try
+				{
+					item.Weapon = TypeLibrary.Create<Weapon>( item.WeaponName );
+					item.Weapon.SetWeaponItem( item );
+					item.Weapon.OnCarryStart( this );
+					item.IsDirty = true;
+				}
+				catch ( Exception e )
+				{
+					Log.Error( e );
 				}
 			}
 		}
