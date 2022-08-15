@@ -1,0 +1,32 @@
+﻿@import "./scss/base.scss";
+
+TeamCoreList {
+    position: absolute;
+    bottom: 32px;
+    right: 32px;
+    display: flex;
+
+    .container {
+        flex-direction: row;
+
+        .core {
+            background-image: url( /textures/ui/core.png );
+            background-size: cover;
+            margin-right: 8px;
+            width: 48px;
+            height: 48px;
+
+            &:last-child {
+                margin-right: 0px;
+            }
+
+            &.destroyed {
+                opacity: 0.1;
+            }
+        }
+    }
+
+    &.hidden {
+        display: none;
+    }
+}
