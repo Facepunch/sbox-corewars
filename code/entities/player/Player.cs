@@ -658,6 +658,7 @@ namespace Facepunch.CoreWars
 			EnableAllCollisions = false;
 			EnableDrawing = false;
 			Controller = null;
+			CameraMode = new SpectateCamera();
 
 			RespawnScreen.Show( To.Single( this ), 5f, LastDamageTaken.Attacker, LastDamageTaken.Weapon );
 
@@ -761,6 +762,8 @@ namespace Facepunch.CoreWars
 				else
 					GiveInitialItems();
 			}
+
+			CameraMode = new FirstPersonCamera();
 
 			ClearBuffs();
 
