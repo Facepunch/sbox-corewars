@@ -11,6 +11,8 @@ namespace Facepunch.CoreWars
 		public PlayerCorpse()
 		{
 			UsePhysicsCollision = true;
+			TimeSinceSpawned = 0f;
+			PhysicsEnabled = true;
 		}
 
 		public void CopyFrom( Player player )
@@ -56,6 +58,7 @@ namespace Facepunch.CoreWars
 		public override void Spawn()
 		{
 			Tags.Add( "corpse" );
+
 			base.Spawn();
 		}
 
