@@ -46,17 +46,17 @@ namespace Facepunch.CoreWars
 	[UseTemplate]
 	public partial class TeamItem : Panel
 	{
-		public Panel Header { get; set; }
-		public Panel Players { get; set; }
-		public Panel Core { get; set; }
-		public Team Team { get; set; }
+		private Panel Header { get; set; }
+		private Panel Players { get; set; }
+		private Panel Core { get; set; }
+		private TeamCore Entity { get; set; }
 
-		public void Update( Team team )
+		public void Update( TeamCore core )
 		{
-			Team = team;
-			Header.Style.BackgroundColor = team.GetColor();
+			Entity = core;
+			Header.Style.BackgroundColor = core.Team.GetColor();
 
-			var players = team.GetPlayers();
+			var players = core.Team.GetPlayers();
 			Players.DeleteChildren( true );
 
 			foreach ( var player in players )
@@ -67,6 +67,22 @@ namespace Facepunch.CoreWars
 					item.Update( player );
 				}
 			}
+
+			SetClass( "hidden", IsHidden() );
+			SetClass( "destroyed", IsDestroyed() );
+
+			BindClass( "hidden", IsHidden );
+			BindClass( "destroyed", IsDestroyed );
+		}
+
+		private bool IsHidden()
+		{
+			return Entity.Team.GetPlayers().Count() == 0;
+		}
+
+		private bool IsDestroyed()
+		{
+			return Entity.LifeState == LifeState.Dead;
 		}
 	}
 }

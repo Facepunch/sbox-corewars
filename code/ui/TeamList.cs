@@ -36,16 +36,10 @@ namespace Facepunch.CoreWars
 
 			Current.Container.DeleteChildren( true );
 
-			var teams = Entity.All.OfType<Player>()
-				.Where( p => p.LifeState == LifeState.Alive )
-				.Where( p => p.Team != Team.None )
-				.Select( p => p.Team )
-				.Distinct();
-
-			foreach ( var team in teams )
+			foreach ( var core in Entity.All.OfType<TeamCore>() )
 			{
 				var item = Current.Container.AddChild<TeamItem>();
-				item.Update( team );
+				item.Update( core );
 			}
 		}
 

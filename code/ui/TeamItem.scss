@@ -33,12 +33,6 @@
             width: 32px;
             height: 32px;
         }
-
-        &.no-core {
-            .core {
-                background-image: url( /textures/ui/no_core.png );
-            }
-        }
     }
 
     .players {
@@ -83,5 +77,19 @@
         :last-child {
             margin-bottom: 0px;
         }
+    }
+
+    &.destroyed {
+        opacity: 0.5;
+
+        .header {
+            .core {
+                background-image: url( /textures/ui/no_core.png );
+            }
+        }
+    }
+
+    &.hidden {
+        display: none;
     }
 }
