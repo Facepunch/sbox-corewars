@@ -94,6 +94,7 @@
         "Min": 4,
         "Max": 12
       }
-    }
+    },
+    "GameSettings": {}
   }
 }

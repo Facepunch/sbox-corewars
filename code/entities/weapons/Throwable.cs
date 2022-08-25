@@ -22,7 +22,7 @@ namespace Facepunch.CoreWars
 		public override float ProjectileLifeTime => 4f;
 		public virtual string ThrowSound => null;
 
-		[Net, Predicted] public bool HasBeenThrown { get; private set; }
+		[Net, Predicted] public bool HasBeenThrown { get; protected set; }
 
 		public override void Spawn()
 		{
