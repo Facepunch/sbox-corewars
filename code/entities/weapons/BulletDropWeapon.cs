@@ -65,6 +65,7 @@ namespace Facepunch.CoreWars
 			direction = direction.Normal;
 
 			var velocity = (direction * Speed) + (player.Velocity * InheritVelocity);
+			velocity = AdjustProjectileVelocity( velocity );
 			projectile.Initialize( position, velocity, ProjectileRadius, ( p, t ) => OnProjectileHit( (T)p, t ) );
 
 			OnProjectileFired( projectile );
@@ -73,6 +74,11 @@ namespace Facepunch.CoreWars
 		protected virtual void OnProjectileFired( T projectile )
 		{
 
+		}
+
+		protected virtual Vector3 AdjustProjectileVelocity( Vector3 velocity )
+		{
+			return velocity;
 		}
 
 		protected virtual float ModifyDamage( Entity victim, float damage )

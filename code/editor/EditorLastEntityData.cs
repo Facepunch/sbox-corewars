@@ -58,7 +58,7 @@ namespace Facepunch.CoreWars.Editor
 		{
 			if ( !IsSameType( entity ) ) return false;
 
-			var properties = TypeLibrary.GetProperties( entity );
+			var properties = TypeLibrary.GetPropertyDescriptions( entity );
 
 			foreach ( var property in properties )
 			{
@@ -91,7 +91,7 @@ namespace Facepunch.CoreWars.Editor
 
 		protected void OnTypeNameChanged( string typeName )
 		{
-			Type = TypeLibrary.GetTypeByName( typeName );
+			Type = TypeLibrary.GetDescription( typeName ).TargetType;
 		}
 	}
 }

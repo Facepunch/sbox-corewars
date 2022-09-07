@@ -84,7 +84,7 @@ namespace Facepunch.CoreWars
 			var innerBox = outerBox.Shrink( 2f, 2f, 2f, 2f );
 			var fraction = (1f / TimeToLiveFor) * TimeUntilDestroy;
 
-			innerBox.width *= fraction;
+			innerBox.Width *= fraction;
 
 			var innerColor = Color.Lerp( Color.Red, Color.Green, fraction );
 
@@ -186,14 +186,13 @@ namespace Facepunch.CoreWars
 
 		private void AddAllItems()
 		{
-			var types = TypeLibrary.GetTypes<BaseShopItem>();
+			var types = TypeLibrary.GetDescriptions<BaseShopItem>();
 
 			foreach ( var type in types )
 			{
 				if ( type.IsAbstract || type.IsGenericType ) continue;
-				var description = TypeLibrary.GetDescription( type );
-				if ( !description.HasTag( "airdrop" ) ) continue;
-				var item = TypeLibrary.Create<BaseShopItem>( type );
+				if ( !type.HasTag( "airdrop" ) ) continue;
+				var item = type.Create<BaseShopItem>();
 				Items.Add( item );
 			}
 		}

@@ -38,7 +38,7 @@ namespace Facepunch.CoreWars
 			SetModel( "models/gameplay/team_chest/team_chest.vmdl" );
 
 			Transmit = TransmitType.Always;
-			SetupPhysicsFromModel( PhysicsMotionType.Static );
+			SetupPhysicsFromModel( PhysicsMotionType.Keyframed );
 
 			var inventory = new InventoryContainer( this );
 			inventory.SetSlotLimit( 24 );

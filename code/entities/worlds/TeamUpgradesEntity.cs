@@ -92,12 +92,12 @@ namespace Facepunch.CoreWars
 
 		private void AddAllUpgrades()
 		{
-			var types = TypeLibrary.GetTypes<BaseTeamUpgrade>();
+			var types = TypeLibrary.GetDescriptions<BaseTeamUpgrade>();
 
 			foreach ( var type in types )
 			{
 				if ( type.IsAbstract || type.IsGenericType ) continue;
-				var upgrade = TypeLibrary.Create<BaseTeamUpgrade>( type );
+				var upgrade = type.Create<BaseTeamUpgrade>();
 				Upgrades.Add( upgrade );
 			}
 		}

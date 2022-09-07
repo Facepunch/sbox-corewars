@@ -122,8 +122,6 @@ namespace Facepunch.CoreWars
 			TextEntry.Input.AllowEmojiReplace = true;
 			TextEntry.Input.OnTabPressed += OnTabPressed;
 			TextEntry.SetChannel( Channel );
-
-			Chat.OnOpenChat += Open;
 		}
 
 		public void Open()
@@ -165,6 +163,11 @@ namespace Facepunch.CoreWars
 			{
 				ShowRandomTip();
 				NextTipTime = Rand.Float( 45f, 60f );
+			}
+
+			if ( Sandbox.Input.Pressed( InputButton.Chat ) )
+			{
+				Open();
 			}
 
 			base.Tick();

@@ -25,7 +25,7 @@ namespace Facepunch.CoreWars.Editor
 			control.Parent = value;
 		}
 
-		public void AddRowWithCallback( PropertyInfo member, object target, Panel control, Action<object> callback )
+		public void AddRowWithCallback( PropertyDescription member, object target, Panel control, Action<object> callback )
 		{
 			var entryTitle = member.Name;
 			var row = (currentGroup ?? this).AddChild<Field>();
@@ -36,14 +36,14 @@ namespace Facepunch.CoreWars.Editor
 			var value = row.AddChild<FieldControl>();
 			control.Parent = value;
 			control.SetPropertyObject( "value", member.GetValue( target ) );
-			control.SetClass( "disabled", IsReadOnly( member ) );
+			control.SetClass( "disabled", !member.CanWrite );
 			control.AddEventListener( "value.changed", ( e ) =>
 			{
 				callback?.Invoke( e.Value );
 			} );
 		}
 
-		public Panel CreateControlFor( PropertyInfo property )
+		public Panel CreateControlFor( PropertyDescription property )
 		{
 			if ( property.PropertyType.IsEnum )
 			{

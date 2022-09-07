@@ -13,7 +13,7 @@ namespace Facepunch.CoreWars.Editor
 	[UseTemplate]
 	public partial class EditorBlockData : Panel
 	{
-		private static object ConvertPropertyValue( PropertyInfo property, string value )
+		private static object ConvertPropertyValue( PropertyDescription property, string value )
 		{
 			object convertedValue;
 
@@ -39,7 +39,7 @@ namespace Facepunch.CoreWars.Editor
 
 			var voxel = world.GetVoxel( x, y, z );
 			var state = world.GetOrCreateState<BlockState>( voxel.Position );
-			var properties = TypeLibrary.GetProperties( state );
+			var properties = TypeLibrary.GetPropertyDescriptions( state );
 
 			foreach ( var property in properties )
 			{
@@ -64,7 +64,7 @@ namespace Facepunch.CoreWars.Editor
 			{
 				using ( var writer = new BinaryWriter( stream ) )
 				{
-					var properties = TypeLibrary.GetProperties( state )
+					var properties = TypeLibrary.GetPropertyDescriptions( state )
 						.Where( property => property.GetCustomAttribute<EditorPropertyAttribute>() != null );
 
 					writer.Write( properties.Count() );
@@ -95,7 +95,7 @@ namespace Facepunch.CoreWars.Editor
 				using ( var reader = new BinaryReader( stream ) )
 				{
 					var propertyCount = reader.ReadInt32();
-					var properties = TypeLibrary.GetProperties( state );
+					var properties = TypeLibrary.GetPropertyDescriptions( state );
 
 					for ( var i = 0; i < propertyCount; i++ )
 					{
@@ -141,7 +141,7 @@ namespace Facepunch.CoreWars.Editor
 
 			ChangedValues.Clear();
 
-			var properties = TypeLibrary.GetProperties( State );
+			var properties = TypeLibrary.GetPropertyDescriptions( State );
 
 			for ( int i = 0; i < properties.Length; i++ )
 			{

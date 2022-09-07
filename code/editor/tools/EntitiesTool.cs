@@ -27,8 +27,7 @@ namespace Facepunch.CoreWars.Editor
 			if ( player.Tool is not EntitiesTool tool )
 				return;
 
-			var type = TypeLibrary.GetTypeByName( typeName );
-			tool.SetTypeDescription( TypeLibrary.GetDescription( type ) );
+			tool.SetTypeDescription( TypeLibrary.GetDescription( typeName ) );
 		}
 
 		[ConCmd.Server]
@@ -173,9 +172,8 @@ namespace Facepunch.CoreWars.Editor
 
 		protected virtual void OnTypeChanged( string typeName )
 		{
-			var type = TypeLibrary.GetTypeByName( typeName );
-			CurrentAttribute = TypeLibrary.GetAttribute<EditorEntityAttribute>( type );
-			CurrentTypeDescription = TypeLibrary.GetDescription( type );
+			CurrentTypeDescription = TypeLibrary.GetDescription( typeName );
+			CurrentAttribute = TypeLibrary.GetAttribute<EditorEntityAttribute>( CurrentTypeDescription.TargetType );
 			OnTypeDescriptionChanged( CurrentTypeDescription );
 		}
 

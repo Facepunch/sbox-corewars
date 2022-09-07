@@ -26,8 +26,8 @@ namespace Facepunch.CoreWars.Editor
 		{
 			base.OnLayout( ref layoutRect );
 
-			var halfWidth = layoutRect.width / 2f;
-			var halfHeight = layoutRect.height / 2f;
+			var halfWidth = layoutRect.Width / 2f;
+			var halfHeight = layoutRect.Height / 2f;
 
 			layoutRect.left -= halfWidth;
 			layoutRect.top -= halfHeight;

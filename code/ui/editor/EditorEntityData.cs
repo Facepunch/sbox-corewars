@@ -13,7 +13,7 @@ namespace Facepunch.CoreWars.Editor
 	[UseTemplate]
 	public partial class EditorEntityData : Panel
 	{
-		private static object ConvertPropertyValue( PropertyInfo property, string value )
+		private static object ConvertPropertyValue( PropertyDescription property, string value )
 		{
 			object convertedValue;
 
@@ -45,7 +45,7 @@ namespace Facepunch.CoreWars.Editor
 				player.LastPlacedEntity.SetEntity( entity );
 			}
 
-			var properties = TypeLibrary.GetProperties( entity );
+			var properties = TypeLibrary.GetPropertyDescriptions( entity );
 			var callbacks = (entity as IEditorCallbacks);
 
 			foreach ( var property in properties )
@@ -62,6 +62,7 @@ namespace Facepunch.CoreWars.Editor
 				}
 
 				property.SetValue( entity, ConvertPropertyValue( property, value ) );
+
 				callbacks?.OnPropertyChanged( key );
 
 				player.LastPlacedEntity.StoreProperty( property.Name, property.GetValue( entity ) );
@@ -80,7 +81,7 @@ namespace Facepunch.CoreWars.Editor
 			{
 				using ( var writer = new BinaryWriter( stream ) )
 				{
-					var properties = TypeLibrary.GetProperties( entity )
+					var properties = TypeLibrary.GetPropertyDescriptions( entity )
 						.Where( property => property.GetCustomAttribute<EditorPropertyAttribute>() != null );
 
 					writer.Write( properties.Count() );
@@ -108,7 +109,7 @@ namespace Facepunch.CoreWars.Editor
 				using ( var reader = new BinaryReader( stream ) )
 				{
 					var propertyCount = reader.ReadInt32();
-					var properties = TypeLibrary.GetProperties( entity );
+					var properties = TypeLibrary.GetPropertyDescriptions( entity );
 
 					for ( var i = 0; i < propertyCount; i++ )
 					{
@@ -153,7 +154,7 @@ namespace Facepunch.CoreWars.Editor
 
 			ChangedValues.Clear();
 
-			var properties = TypeLibrary.GetProperties( Entity );
+			var properties = TypeLibrary.GetPropertyDescriptions( Entity );
 
 			for ( int i = 0; i < properties.Length; i++ )
 			{

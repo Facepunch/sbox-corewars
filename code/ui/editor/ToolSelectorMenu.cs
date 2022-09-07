@@ -16,7 +16,7 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void Populate()
 		{
-			var available = TypeLibrary.GetTypes<EditorTool>().ToList();
+			var available = TypeLibrary.GetDescriptions<EditorTool>().ToList();
 
 			available.Sort( ( a, b ) => a.Name.CompareTo( b.Name ) );
 
@@ -24,7 +24,7 @@ namespace Facepunch.CoreWars.Editor
 			{
 				if ( !type.IsAbstract )
 				{
-					AddTool( TypeLibrary.GetDescription( type ) );
+					AddTool( type );
 				}
 			}
 

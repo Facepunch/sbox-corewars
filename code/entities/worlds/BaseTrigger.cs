@@ -58,7 +58,7 @@ namespace Facepunch.CoreWars
 
 			if ( !isEditorMode )
 			{
-				CollisionGroup = CollisionGroup.Trigger;
+				Tags.Add( "trigger" );
 			}
 
 			Tags.Add( "volume" );

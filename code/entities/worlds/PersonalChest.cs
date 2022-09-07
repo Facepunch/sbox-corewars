@@ -23,7 +23,7 @@ namespace Facepunch.CoreWars
 			SetModel( "models/gameplay/personal_chest/personal_chest.vmdl" );
 
 			Transmit = TransmitType.Always;
-			SetupPhysicsFromModel( PhysicsMotionType.Static );
+			SetupPhysicsFromModel( PhysicsMotionType.Keyframed );
 
 			base.Spawn();
 		}

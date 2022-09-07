@@ -63,7 +63,7 @@ namespace Facepunch.CoreWars
 			var innerBox = outerBox.Shrink( 2f, 2f, 2f, 2f );
 			var fraction = (1f / NextGenerateDuration) * NextGenerateTime;
 
-			innerBox.width *= fraction;
+			innerBox.Width *= fraction;
 
 			var innerColor = Color.Lerp( Color.Green, Color.Red, fraction );
 

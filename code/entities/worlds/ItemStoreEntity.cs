@@ -92,12 +92,12 @@ namespace Facepunch.CoreWars
 
 		private void AddAllItems()
 		{
-			var types = TypeLibrary.GetTypes<BaseShopItem>();
+			var types = TypeLibrary.GetDescriptions<BaseShopItem>();
 
 			foreach ( var type in types )
 			{
 				if ( type.IsAbstract || type.IsGenericType ) continue;
-				var item = TypeLibrary.Create<BaseShopItem>( type );
+				var item = type.Create<BaseShopItem>();
 				Items.Add( item );
 			}
 		}

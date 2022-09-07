@@ -23,7 +23,7 @@ namespace Facepunch.CoreWars
 			SetModel( "models/gameplay/resource_pool/resource_pool_crystal.vmdl" );
 
 			Transmit = TransmitType.Always;
-			SetupPhysicsFromModel( PhysicsMotionType.Static );
+			SetupPhysicsFromModel( PhysicsMotionType.Keyframed );
 
 			base.Spawn();
 		}

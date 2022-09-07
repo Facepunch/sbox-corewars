@@ -58,7 +58,7 @@ namespace Facepunch.CoreWars.Editor
 
 		private void UpdateProperties( ISourceEntity entity )
 		{
-			var properties = TypeLibrary.GetProperties( entity );
+			var properties = TypeLibrary.GetPropertyDescriptions( entity );
 
 			foreach ( var property in properties )
 			{
