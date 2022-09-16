@@ -95,6 +95,15 @@
         "Max": 12
       }
     },
-    "GameSettings": {}
+    "GameSettings": {
+      "cw_friendly_fire": {
+        "DisplayType": "Boolean",
+        "Choices": [],
+        "ConVarName": "cw_friendly_fire",
+        "DisplayName": "Friendly Fire",
+        "DefaultValue": "false",
+        "Description": "Whether or not players on the same team can hurt eachother."
+      }
+    }
   }
 }
