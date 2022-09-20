@@ -65,178 +65,191 @@ ChatBox {
 }
 
 chatentry {
-  margin-bottom: 0px;
-  color: white;
-  transition: all 0.1s ease-out;
-  opacity: 1;
-  max-height: 200px;
-  min-height: 42px;
-  flex-shrink: 0;
-  flex-grow: 0;
-  padding: 0 8px 0 0;
-  max-width: 100%;
-  transform: scale(1);
-  //backdrop-filter: $blur-medium;
-  font-family: $font;
-  margin-bottom: 2px;
-  flex-direction: row;
-
-  &:intro {
-    max-height: 0px;
-    padding-top: 0;
-    padding-bottom: 0;
-    margin-bottom: 0;
-    opacity: 0;
-    transform: scale(0);
-  }
-
-  &:outro {
-    opacity: 0;
-    transition: all 2s ease-out;
-  }
-
-  image {
-    width: 42px;
-    height: 42px;
-    border-radius: 8px;
-    margin: 0;
-    padding: 0;
-    max-height: 42px;
-    max-width: 42px;
-    flex-shrink: 0;
-  }
-
-  .channel {
-    color: #fff;
-    align-self: flex-start;
-    min-height: 42px;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-    margin-left: 8px;
-    font-family: $font;
-    font-size: 16px;
-    color: #fff;
-    flex-shrink: 0;
-    padding: 0 8px;
-    min-width: 40px;
-    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
-
-    &.hidden {
-      display: none;
-    }
-  }
-
-  .name {
-    padding: 5px 0;
-    font-weight: 600;
-    font-size: 18px;
-    color: #fff;
-    flex-shrink: 0;
-    font-family: $font;
-    margin-left: 8px;
-    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.5);
-  }
-
-  .message {
+    margin-bottom: 0px;
     color: white;
+    transition: all 0.1s ease-out;
+    opacity: 1;
+    max-height: 200px;
+    min-height: 42px;
+    flex-shrink: 0;
+    flex-grow: 0;
+    padding: 0 8px 0 0;
+    max-width: 100%;
+    transform: scale(1);
+    //backdrop-filter: $blur-medium;
     font-family: $font;
-    font-size: 18px;
-    flex-grow: 1;
-    margin-left: 8px;
-    padding-top: 5px;
-    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
-  }
+    margin-bottom: 2px;
+    flex-direction: row;
 
-  &.noname .name {
-    display: none;
-  }
+    &:intro {
+        max-height: 0px;
+        padding-top: 0;
+        padding-bottom: 0;
+        margin-bottom: 0;
+        opacity: 0;
+        transform: scale(0);
+    }
 
-  &.noavatar image {
-    display: none;
-  }
+    &:outro {
+        opacity: 0;
+        transition: all 2s ease-out;
+    }
 
-  &.tip {
-    background-color: $blue;
-  }
+    image {
+        width: 42px;
+        height: 42px;
+        border-radius: 8px;
+        margin: 0;
+        padding: 0;
+        max-height: 42px;
+        max-width: 42px;
+        flex-shrink: 0;
+    }
 
-  &.noavatar {
-    padding-left: 12px;
-  }
-
-  &.team_orange {
     .channel {
-      background-color: $orange;
+        color: #fff;
+        align-self: flex-start;
+        min-height: 42px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        margin-left: 8px;
+        font-family: $font;
+        font-size: 16px;
+        color: #fff;
+        flex-shrink: 0;
+        padding: 0 8px;
+        min-width: 40px;
+        text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+
+        &.hidden {
+            display: none;
+        }
     }
 
     .name {
-      color: $orange;
-    }
-  }
-
-  &.team_green {
-    .channel {
-      background-color: $green;
-    }
-
-    .name {
-      color: $green;
-    }
-  }
-  &.team_purple {
-    .channel {
-      background-color: $purple;
+        padding: 5px 0;
+        font-weight: 600;
+        font-size: 18px;
+        color: #fff;
+        flex-shrink: 0;
+        font-family: $font;
+        margin-left: 8px;
+        text-shadow: 0 2px 0 rgba(0, 0, 0, 0.5);
     }
 
-    .name {
-      color: $purple;
-    }
-  }
-  &.team_pink {
-    .channel {
-      background-color: $pink;
-    }
-
-    .name {
-      color: $pink;
-    }
-  }
-  &.team_cyan {
-    .channel {
-      background-color: $cyan;
+    .message {
+        color: white;
+        font-family: $font;
+        font-size: 18px;
+        flex-grow: 1;
+        margin-left: 8px;
+        padding-top: 5px;
+        text-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
     }
 
-    .name {
-      color: $cyan;
-    }
-  }
-  &.team_yellow {
-    .channel {
-      background-color: $yellow;
+    &.noname .name {
+        display: none;
     }
 
-    .name {
-      color: $yellow;
-    }
-  }
-
-  &.team_red {
-    .channel {
-      background-color: $pink;
+    &.noavatar image {
+        display: none;
     }
 
-    .name {
-      color: $pink;
-    }
-  }
+    &.tip {
+        background-color: rgba( $green, 0.3 );
+        backdrop-filter-blur: 24px;
+        border-radius: 8px;
+        margin-bottom: 4px;
+        margin-top: 4px;
 
-  &.team_blue {
-    .channel {
-      background-color: $blue;
+        .channel {
+            color: saturate( $green, 0.3 );
+            text-shadow: 0px 0px 4px darken( $green, 0.5 );
+        }
     }
 
-    .name {
-      color: $blue;
+    &.noavatar {
+        padding-left: 12px;
     }
-  }
+
+    &.team_orange {
+        .channel {
+            background-color: $orange;
+        }
+
+        .name {
+            color: $orange;
+        }
+    }
+
+    &.team_green {
+        .channel {
+            background-color: $green;
+        }
+
+        .name {
+            color: $green;
+        }
+    }
+
+    &.team_purple {
+        .channel {
+            background-color: $purple;
+        }
+
+        .name {
+            color: $purple;
+        }
+    }
+
+    &.team_pink {
+        .channel {
+            background-color: $pink;
+        }
+
+        .name {
+            color: $pink;
+        }
+    }
+
+    &.team_cyan {
+        .channel {
+            background-color: $cyan;
+        }
+
+        .name {
+            color: $cyan;
+        }
+    }
+
+    &.team_yellow {
+        .channel {
+            background-color: $yellow;
+        }
+
+        .name {
+            color: $yellow;
+        }
+    }
+
+    &.team_red {
+        .channel {
+            background-color: $pink;
+        }
+
+        .name {
+            color: $pink;
+        }
+    }
+
+    &.team_blue {
+        .channel {
+            background-color: $blue;
+        }
+
+        .name {
+            color: $blue;
+        }
+    }
 }
