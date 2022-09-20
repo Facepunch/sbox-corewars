@@ -1017,9 +1017,18 @@ namespace Facepunch.CoreWars
 
 					if ( item.IsValid() && item.CanBeDropped )
 					{
+						var itemToDrop = item;
+
+						if ( item.StackSize > 1 )
+						{
+							itemToDrop = InventorySystem.CreateDuplicateItem( item );
+							itemToDrop.StackSize = 1;
+							item.StackSize--;
+						}
+
 						var entity = new ItemEntity();
 						entity.Position = Input.Position + Input.Rotation.Forward * 32f;
-						entity.SetItem( item );
+						entity.SetItem( itemToDrop );
 						entity.ApplyLocalImpulse( Input.Rotation.Forward * 100f + Vector3.Up * 50f );
 					}
 
