@@ -453,9 +453,9 @@ namespace Facepunch.CoreWars
 		}
 
 		[ClientRpc]
-		public void ShowHitMarker( int hitboxGroup )
+		public void ShowHitMarker( bool isHeadshot )
 		{
-			if ( hitboxGroup == 1 )
+			if ( isHeadshot )
 				Sound.FromScreen( "hitmarker.headshot" );
 			else
 				Sound.FromScreen( "hitmarker.hit" );
@@ -854,6 +854,11 @@ namespace Facepunch.CoreWars
 
 				info.Damage *= attacker.GetModifier( StatModifier.Damage );
 
+				if ( info.Hitbox.HasTag( "head" ) )
+				{
+					info.Damage *= 2f;
+				}
+
 				if ( attacker.Core.IsValid() )
 				{
 					var damageTier = attacker.Core.GetUpgradeTier( "damage" );
@@ -882,8 +887,7 @@ namespace Facepunch.CoreWars
 					particles.SetForward( 0, info.Force.Normal );
 				}
 
-				var hitboxGroup = GetHitboxGroup( info.HitboxIndex );
-				attacker.ShowHitMarker( To.Single( attacker ), hitboxGroup );
+				attacker.ShowHitMarker( To.Single( attacker ), info.Hitbox.HasTag( "head" ) );
 
 				FloatingDamage.Show( this, info.Damage, info.Position );
 				RemoveBuff<StealthBuff>();
