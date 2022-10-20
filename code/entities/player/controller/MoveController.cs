@@ -86,11 +86,14 @@ namespace Facepunch.CoreWars
 
 		public override void Simulate()
 		{
+			if ( Pawn is not Sandbox.Player basePlayer )
+				return;
+
 			EyeLocalPosition = Vector3.Up * Scale( EyeHeight );
 			UpdateBBox();
 
 			EyeLocalPosition += TraceOffset;
-			EyeRotation = Input.Rotation;
+			EyeRotation = basePlayer.ViewAngles.ToRotation();
 
 			if ( Unstuck.TestAndFix() )
 			{
@@ -131,9 +134,9 @@ namespace Facepunch.CoreWars
 				ApplyFriction( GroundFriction * SurfaceFriction );
 			}
 
-			WishVelocity = new Vector3( Input.Forward, Input.Left, 0 );
+			WishVelocity = new Vector3( basePlayer.InputDirection.x, basePlayer.InputDirection.y, 0 );
 			var inSpeed = WishVelocity.Length.Clamp( 0, 1 );
-			WishVelocity *= Input.Rotation;
+			WishVelocity *= EyeRotation;
 
 			if ( !Swimming && !IsTouchingLadder )
 			{

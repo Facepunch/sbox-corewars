@@ -14,7 +14,9 @@ namespace Facepunch.CoreWars.Editor
 			if ( !EnableDrawing || !VoxelWorld.Current.IsValid() )
 				return;
 
-			var vb = Render.GetDynamicVB( true );
+			var vb = new VertexBuffer();
+			vb.Init( true );
+
 			var center = VoxelWorld.Current.MaxSize * VoxelWorld.Current.VoxelSize * 0.5f;
 			var size = VoxelWorld.Current.MaxSize * (float)VoxelWorld.Current.VoxelSize;
 
@@ -26,10 +28,12 @@ namespace Facepunch.CoreWars.Editor
 			vb.AddCube( center, size, Rotation.Identity, default, size / VoxelWorld.Current.VoxelSize, true );
 			vb.AddCube( center, size, Rotation.Identity, default, size / VoxelWorld.Current.VoxelSize );
 
-			Render.Attributes.Set( "Opacity", 0.5f );
-			Render.Attributes.Set( "Color", Color );
+			var attributes = new RenderAttributes();
 
-			vb.Draw( BoxMaterial );
+			attributes.Set( "Opacity", 0.5f );
+			attributes.Set( "Color", Color );
+
+			vb.Draw( BoxMaterial, attributes );
 		}
 	}
 }

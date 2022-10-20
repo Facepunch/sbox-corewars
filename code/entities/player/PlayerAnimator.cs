@@ -12,9 +12,12 @@ namespace Facepunch.CoreWars
 		{
 			base.Simulate();
 
+			if ( Pawn is not Player player )
+				return;
+
 			if ( Velocity.Length > 90f )
 			{
-				if (  Input.Forward == 0f && Input.Left == 0f )
+				if ( player.InputDirection.x == 0f && player.InputDirection.y == 0f )
 					Skid = Skid.LerpTo( 1f, Time.Delta * 5f );
 				else
 					Skid = Skid.LerpTo( 0f, Time.Delta * 5f );

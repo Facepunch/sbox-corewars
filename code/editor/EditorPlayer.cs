@@ -233,11 +233,6 @@ namespace Facepunch.CoreWars.Editor
 			ResetInterpolation();
 		}
 
-		public override void BuildInput( InputBuilder input )
-		{
-			base.BuildInput( input );
-		}
-
 		public override void FrameSimulate( Client client )
 		{
 			base.FrameSimulate( client );

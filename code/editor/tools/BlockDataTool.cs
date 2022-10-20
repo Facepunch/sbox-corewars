@@ -74,7 +74,8 @@ namespace Facepunch.CoreWars.Editor
 
 		private IntVector3? GetTargetBlockPosition()
 		{
-			var face = VoxelWorld.Current.Trace( Input.Position * (1.0f / VoxelWorld.Current.VoxelSize), Input.Rotation.Forward, 1000f, out var endPosition, out _ );
+			var player = Prediction.CurrentHost.Pawn;
+			var face = VoxelWorld.Current.Trace( player.EyePosition * (1.0f / VoxelWorld.Current.VoxelSize), player.EyeRotation.Forward, 1000f, out var endPosition, out _ );
 
 			if ( face != BlockFace.Invalid && VoxelWorld.Current.GetBlock( endPosition ) != 0 )
 			{

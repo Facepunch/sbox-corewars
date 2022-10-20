@@ -778,15 +778,15 @@ namespace Facepunch.CoreWars
 			ResetInterpolation();
 		}
 
-		public override void BuildInput( InputBuilder input )
+		public override void BuildInput()
 		{
 			if ( ShouldResetEyeRotation )
 			{
-				input.ViewAngles = Angles.Zero;
+				ViewAngles = Angles.Zero;
 				ShouldResetEyeRotation = false;
 			}
 
-			base.BuildInput( input );
+			base.BuildInput();
 		}
 
 		public override void FrameSimulate( Client client )
@@ -910,7 +910,7 @@ namespace Facepunch.CoreWars
 
 			if ( blockItem.IsValid() )
 			{
-				var position = GetBlockPosition( Input.Position, Input.Rotation.Forward );
+				var position = GetBlockPosition( EyePosition, EyeRotation.Forward );
 				var ghost = GetOrCreateBlockGhost();
 
 				if ( position.HasValue )
@@ -940,7 +940,7 @@ namespace Facepunch.CoreWars
 
 		protected virtual void TryPlaceBlockItem( Client client, BlockItem item, Vector3 eyePosition, Vector3 direction )
 		{
-			var position = GetBlockPosition( Input.Position, Input.Rotation.Forward );
+			var position = GetBlockPosition( EyePosition, EyeRotation.Forward );
 			if ( !position.HasValue ) return;
 
 			var world = VoxelWorld.Current;
@@ -1003,7 +1003,7 @@ namespace Facepunch.CoreWars
 					{
 						if ( item is BlockItem blockItem )
 						{
-							TryPlaceBlockItem( client, blockItem, Input.Position, Input.Rotation.Forward );
+							TryPlaceBlockItem( client, blockItem, EyePosition, EyeRotation.Forward );
 						}
 						else if ( item is IConsumableItem consumable )
 						{
@@ -1031,9 +1031,9 @@ namespace Facepunch.CoreWars
 						}
 
 						var entity = new ItemEntity();
-						entity.Position = Input.Position + Input.Rotation.Forward * 32f;
+						entity.Position = EyePosition + EyeRotation.Forward * 32f;
 						entity.SetItem( itemToDrop );
-						entity.ApplyLocalImpulse( Input.Rotation.Forward * 100f + Vector3.Up * 50f );
+						entity.ApplyLocalImpulse( EyeRotation.Forward * 100f + Vector3.Up * 50f );
 					}
 
 					PlaySound( "item.dropped" );
@@ -1104,7 +1104,7 @@ namespace Facepunch.CoreWars
 				{
 					if ( !IDialog.IsActive() )
 					{
-						var trace = Trace.Ray( Input.Position, Input.Position + Input.Rotation.Forward * 10000f )
+						var trace = Trace.Ray( EyePosition, EyePosition + EyeRotation.Forward * 10000f )
 							.EntitiesOnly()
 							.Ignore( this )
 							.Ignore( ActiveChild )
