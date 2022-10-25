@@ -37,6 +37,10 @@ namespace Facepunch.CoreWars
 				NextStageTime = 300f * StageTimeMultiplier;
 				Stage = RoundStage.Start;
 			}
+			else
+			{
+				TeamCoreList.Current?.Update();
+			}
 		}
 
 		public override bool CanHearPlayerVoice( Client a, Client b )
