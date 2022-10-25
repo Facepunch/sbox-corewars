@@ -6,6 +6,9 @@
     justify-content: center;
     pointer-events: none;
     display: flex;
+    backdrop-filter-blur: 24px;
+    background-color: rgba(0, 0, 0, 0.9);
+    z-index: 20;
 
     .container {
         background-color: rgba( 50 50 50 0.4 );
