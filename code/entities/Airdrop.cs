@@ -59,7 +59,7 @@ namespace Facepunch.CoreWars
 		{
 			if ( !HasLanded ) return;
 
-			var draw = Render.Draw2D;
+			var draw = Util.Draw.Reset();
 			var position = (WorldSpaceBounds.Center + Vector3.Up * 96f).ToScreen();
 			var iconSize = 64f;
 			var iconAlpha = 1f;

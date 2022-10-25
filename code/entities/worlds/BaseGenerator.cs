@@ -38,7 +38,7 @@ namespace Facepunch.CoreWars
 			if ( !ShowHudIcon || string.IsNullOrEmpty( HudIconPath ) )
 				return;
 
-			var draw = Render.Draw2D;
+			var draw = Util.Draw.Reset();
 			var position = (WorldSpaceBounds.Center + Vector3.Up * 96f).ToScreen();
 			var iconSize = 32f;
 			var iconAlpha = 1f;

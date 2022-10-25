@@ -101,7 +101,7 @@ namespace Facepunch.CoreWars
 			if ( Local.Pawn is not Player player || player.Team != Team )
 				return;
 
-			var draw = Render.Draw2D;
+			var draw = Util.Draw.Reset();
 			var position = (WorldSpaceBounds.Center + Vector3.Up * 96f).ToScreen();
 			var iconSize = 64f;
 			var iconAlpha = 1f;

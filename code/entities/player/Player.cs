@@ -507,7 +507,7 @@ namespace Facepunch.CoreWars
 			}
 			else
 			{
-				var draw = Render.Draw2D;
+				var draw = Util.Draw.Reset();
 				draw.BlendMode = BlendMode.Lighten;
 				draw.Color = Color.Yellow.WithAlpha( 0.6f );
 				draw.Circle( screenSize * 0.5f, 6f );
