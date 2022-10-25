@@ -15,7 +15,7 @@ namespace Facepunch.CoreWars
 	public partial class TeamCore : ModelEntity, ISourceEntity, IResettable, IHudRenderer
 	{
 		[EditorProperty, Net] public Team Team { get; set; }
-		[Net] public float MaxHealth { get; private set; } = 200f;
+		[Net] public float MaxHealth { get; private set; } = 400f;
 
 		[Net, Change( nameof( OnUpgradeTypesChanged ) )] protected IList<int> UpgradeTypes { get; set; }
 		protected List<BaseTeamUpgrade> InternalUpgrades { get; set; } = new();
