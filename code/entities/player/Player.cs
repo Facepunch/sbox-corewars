@@ -921,6 +921,7 @@ namespace Facepunch.CoreWars
 					{
 						ghost.EnableDrawing = true;
 						ghost.Position = world.ToSourcePosition( position.Value );
+						ghost.Color = Team.GetColor();
 					}
 					else
 					{

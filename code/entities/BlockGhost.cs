@@ -29,7 +29,7 @@ namespace Facepunch.CoreWars
 			var attributes = new RenderAttributes();
 
 			attributes.Set( "TintColor", Color );
-			attributes.Set( "Opacity", 0.8f );
+			attributes.Set( "Opacity", 0.3f );
 
 			vb.Draw( BoxMaterial, attributes );
 		}
