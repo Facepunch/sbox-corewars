@@ -95,7 +95,7 @@ namespace Facepunch.CoreWars
 
 		public override void Tick()
 		{
-			if ( Provider == null || !Provider.IsVisible )
+			if ( Provider == null || !Provider.IsVisible || !Provider.HasHovered )
 			{
 				if ( !IsDeleting )
 				{
