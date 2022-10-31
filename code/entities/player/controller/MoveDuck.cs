@@ -17,7 +17,7 @@ namespace Sandbox
 
 		public virtual void PreTick() 
 		{
-			var doesWantToDuck = Input.Down( InputButton.Run );
+			var doesWantToDuck = Input.Down( InputButton.Duck );
 
 			if ( doesWantToDuck != IsActive ) 
 			{
