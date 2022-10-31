@@ -71,10 +71,10 @@ namespace Facepunch.CoreWars
 
 			var distanceToPawn = Local.Pawn.Position.Distance( Position );
 
-			if ( distanceToPawn <= 800f )
-			{
-				iconAlpha = distanceToPawn.Remap( 512f, 1024, 0f, 1f );
-			}
+			if ( distanceToPawn <= 1024f )
+				iconAlpha = distanceToPawn.Remap( 512f, 1024f, 0f, 1f );
+			else if ( distanceToPawn > 3072f )
+				iconAlpha = distanceToPawn.Remap( 3072f, 4096f, 1f, 0f );
 
 			draw.Color = Color.White.WithAlpha( iconAlpha );
 			draw.BlendMode = BlendMode.Normal;

@@ -53,13 +53,13 @@ namespace Facepunch.CoreWars
 			if ( distanceToPawn <= 1024f )
 				iconAlpha = distanceToPawn.Remap( 512f, 1024f, 0f, 1f );
 			else if ( distanceToPawn > 2048f )
-				iconAlpha = distanceToPawn.Remap( 2048f, 3096f, 1f, 0f );
+				iconAlpha = distanceToPawn.Remap( 2048f, 3072f, 1f, 0f );
 
 			draw.Color = Color.White.WithAlpha( iconAlpha );
 			draw.BlendMode = BlendMode.Normal;
 			draw.Image( HudIconPath, new Rect( position.x, position.y, iconSize, iconSize ) );
 
-			var outerBox = new Rect( position.x, position.y + iconSize + 8f, iconSize, 8f );
+			var outerBox = new Rect( position.x, position.y + iconSize + 8f, iconSize, 6f );
 			var innerBox = outerBox.Shrink( 2f, 2f, 2f, 2f );
 			var fraction = (1f / NextGenerateDuration) * NextGenerateTime;
 
