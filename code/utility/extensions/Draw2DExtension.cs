@@ -10,7 +10,7 @@ namespace Facepunch.CoreWars.Utility
 		public static void Image( this Draw2D self, string texture, Rect rect )
 		{
 			self.Texture = Texture.Load( FileSystem.Mounted, texture );
-			self.Quad( rect, Color.White );
+			self.Quad( rect, self.Color );
 			self.Texture = Texture.White;
 		}
 	}
