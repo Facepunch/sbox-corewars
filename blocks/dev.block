@@ -40,18 +40,14 @@
 		BlueFilter = 1
 		DetailModels = 
 		[
-			resource:"models/rust_nature/overgrowth/patch_grass_small.vmdl",
-			resource:"models/rust_nature/overgrowth/patch_grass_tall.vmdl",
-			resource:"models/rust_nature/overgrowth/cracks_grass_b.vmdl",
+			resource:"models/maps/grass_clumps/grass_clump_a.vmdl",
+			resource:"models/maps/grass_clumps/grass_clump_b.vmdl",
+			resource:"models/maps/grass_clumps/grass_clump_c.vmdl",
 		]
 		DetailSpawnChance = 0.05
 		DetailScale = 0.5
 		FaceToTexture = 
 		{
 		}
-		LightLevel = 
-		{
-		}
-		LightFilter = "1,1,1"
 	}
 }
