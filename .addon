@@ -3,7 +3,7 @@
   "Type": "game",
   "Org": "facepunch",
   "Ident": "corewars",
-  "Tags": null,
+  "Tags": "",
   "Schema": 1,
   "HasAssets": true,
   "AssetsPath": "",
@@ -110,6 +110,7 @@
         "DefaultValue": "false",
         "Description": "Whether or not players on the same team can hurt eachother."
       }
-    }
+    },
+    "ParentPackage": ""
   }
 }
