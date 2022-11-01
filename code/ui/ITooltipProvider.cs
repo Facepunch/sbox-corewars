@@ -11,5 +11,6 @@ namespace Facepunch.CoreWars
 		public ItemTag[] Tags { get; }
 		public bool IsVisible { get; }
 		public Color Color { get; }
+		public bool HasHovered { get;  }
 	}
 }

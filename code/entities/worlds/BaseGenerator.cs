@@ -38,7 +38,7 @@ namespace Facepunch.CoreWars
 			if ( !ShowHudIcon || string.IsNullOrEmpty( HudIconPath ) )
 				return;
 
-			var draw = Render.Draw2D;
+			var draw = Util.Draw.Reset();
 			var position = (WorldSpaceBounds.Center + Vector3.Up * 96f).ToScreen();
 			var iconSize = 32f;
 			var iconAlpha = 1f;
@@ -51,15 +51,15 @@ namespace Facepunch.CoreWars
 			var distanceToPawn = Local.Pawn.Position.Distance( Position );
 
 			if ( distanceToPawn <= 1024f )
-			{
-				iconAlpha = distanceToPawn.Remap( 512f, 1024, 0f, 1f );
-			}
+				iconAlpha = distanceToPawn.Remap( 512f, 1024f, 0f, 1f );
+			else if ( distanceToPawn > 2048f )
+				iconAlpha = distanceToPawn.Remap( 2048f, 3072f, 1f, 0f );
 
 			draw.Color = Color.White.WithAlpha( iconAlpha );
 			draw.BlendMode = BlendMode.Normal;
 			draw.Image( HudIconPath, new Rect( position.x, position.y, iconSize, iconSize ) );
 
-			var outerBox = new Rect( position.x, position.y + iconSize + 8f, iconSize, 8f );
+			var outerBox = new Rect( position.x, position.y + iconSize + 8f, iconSize, 6f );
 			var innerBox = outerBox.Shrink( 2f, 2f, 2f, 2f );
 			var fraction = (1f / NextGenerateDuration) * NextGenerateTime;
 

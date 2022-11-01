@@ -15,7 +15,6 @@ namespace Facepunch.CoreWars
 		public virtual Team KillFeedTeam => (Owner as Player)?.Team ?? Team.None;
 		public virtual string MuzzleAttachment => "muzzle";
 		public virtual string MuzzleFlashEffect => "particles/pistol_muzzleflash.vpcf";
-		public virtual string CrosshairClass => "automatic";
 		public virtual string ImpactEffect => null;
 		public virtual bool ShouldRenderCrosshair => true;
 		public virtual int ClipSize => 16;
@@ -340,7 +339,7 @@ namespace Facepunch.CoreWars
 
 		public virtual void RenderCrosshair( Player player, Vector2 center )
 		{
-			var draw = Render.Draw2D;
+			var draw = Util.Draw.Reset();
 			var lastHitTime = player.TimeSinceLastHit.Relative;
 			var lastAttackTime = TimeSincePrimaryAttack.Relative;
 			var shootEase = Easing.EaseIn( lastAttackTime.LerpInverse( 0.2f, 0.0f ) );

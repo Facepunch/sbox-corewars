@@ -21,7 +21,7 @@ namespace Facepunch.CoreWars
 			{
 				var world = VoxelWorld.Current;
 				var block = world.GetBlockType<T>();
-				var success = world.SetBlockInDirection( Input.Position, Input.Rotation.Forward, block.BlockId, out var blockPosition, true, 5f, ( position ) =>
+				var success = world.SetBlockInDirection( player.EyePosition, player.EyeRotation.Forward, block.BlockId, out var blockPosition, true, 5f, ( position ) =>
 				{
 					var sourcePosition = world.ToSourcePosition( position );
 					return player.CanBuildAt( sourcePosition );

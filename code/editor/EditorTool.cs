@@ -52,20 +52,22 @@ namespace Facepunch.CoreWars.Editor
 
 		protected BlockFace GetTargetBlockFace( float range )
 		{
+			var player = Prediction.CurrentHost.Pawn;
 			var distance = VoxelWorld.Current.VoxelSize * range;
-			return VoxelWorld.Current.Trace( Input.Position * (1.0f / VoxelWorld.Current.VoxelSize), Input.Rotation.Forward, distance, out var _, out _ );
+			return VoxelWorld.Current.Trace( player.EyePosition * (1.0f / VoxelWorld.Current.VoxelSize), player.EyeRotation.Forward, distance, out var _, out _ );
 		}
 
 		protected IntVector3 GetAimVoxelPosition( float range )
 		{
 			if ( Input.Down( InputButton.Flashlight ) ) range *= 2f;
 
+			var player = Prediction.CurrentHost.Pawn;
 			var distance = VoxelWorld.Current.VoxelSize * range;
-			var aimVoxelPosition = VoxelWorld.Current.ToVoxelPosition( Input.Position + Input.Rotation.Forward * distance );
+			var aimVoxelPosition = VoxelWorld.Current.ToVoxelPosition( player.EyePosition + player.EyeRotation.Forward * distance );
 
 			if ( Input.Down( InputButton.Use ) )
 			{
-				var face = VoxelWorld.Current.Trace( Input.Position * (1.0f / VoxelWorld.Current.VoxelSize), Input.Rotation.Forward, distance, out var endPosition, out _ );
+				var face = VoxelWorld.Current.Trace( player.EyePosition * (1.0f / VoxelWorld.Current.VoxelSize), player.EyeRotation.Forward, distance, out var endPosition, out _ );
 
 				if ( face != BlockFace.Invalid && VoxelWorld.Current.GetBlock( endPosition ) != 0 )
 				{

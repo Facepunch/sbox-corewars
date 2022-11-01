@@ -11,7 +11,7 @@ Vitals {
 
     .player-buffs {
         flex-direction: row;
-        justify-items: center;
+        justify-content: center;
 
         .buff {
             transition: all 0.1s ease-in;
@@ -113,19 +113,19 @@ Vitals {
                 height: 100%;
                 border-radius: 32px;
                 min-width: 20px;
+            }
 
-                .value {
-                    color: #fff;
-                    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.5);
-                    font-size: 26px;
-                    text-align: center;
-                    position: absolute;
-                    left: 0;
-                    right: 0;
-                    top: -18px;
-                    min-width: 80px;
-                    z-index: 5;
-                }
+            .value {
+                color: #fff;
+                text-shadow: 0 2px 0 rgba(0, 0, 0, 0.5);
+                font-size: 26px;
+                text-align: center;
+                position: absolute;
+                left: 0;
+                right: 0;
+                top: -18px;
+                min-width: 80px;
+                z-index: 5;
             }
         }
     }

@@ -7,11 +7,9 @@ Layer0
 	//---- Translucent ----
 	F_TRANSLUCENT 1
 
-	//---- Unlit ----
-	F_DISABLE_TONE_MAPPING 1
-	F_UNLIT 1
-
 	//---- Ambient Occlusion ----
+	g_flAmbientOcclusionDirectDiffuse "0.000"
+	g_flAmbientOcclusionDirectSpecular "0.000"
 	TextureAmbientOcclusion "materials/default/default_ao.tga"
 
 	//---- Color ----
@@ -24,6 +22,10 @@ Layer0
 
 	//---- Fog ----
 	g_bFogEnabled "0"
+
+	//---- Lighting ----
+	g_flDirectionalLightmapMinZ "0.050"
+	g_flDirectionalLightmapStrength "1.000"
 
 	//---- Metalness ----
 	g_flMetalness "0.000"

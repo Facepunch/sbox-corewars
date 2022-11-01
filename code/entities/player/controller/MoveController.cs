@@ -32,7 +32,7 @@ namespace Facepunch.CoreWars
 		protected Unstuck Unstuck { get; private set; }
 
 		protected float SurfaceFriction { get; set; }
-		protected bool IsSneakingOnBlock { get; set; }
+		//protected bool IsSneakingOnBlock { get; set; }
 		protected Vector3 PreVelocity { get; set; }
 		protected Vector3 Mins { get; set; }
 		protected Vector3 Maxs { get; set; }
@@ -86,11 +86,14 @@ namespace Facepunch.CoreWars
 
 		public override void Simulate()
 		{
+			if ( Pawn is not Sandbox.Player basePlayer )
+				return;
+
 			EyeLocalPosition = Vector3.Up * Scale( EyeHeight );
 			UpdateBBox();
 
 			EyeLocalPosition += TraceOffset;
-			EyeRotation = Input.Rotation;
+			EyeRotation = basePlayer.ViewAngles.ToRotation();
 
 			if ( Unstuck.TestAndFix() )
 			{
@@ -131,9 +134,9 @@ namespace Facepunch.CoreWars
 				ApplyFriction( GroundFriction * SurfaceFriction );
 			}
 
-			WishVelocity = new Vector3( Input.Forward, Input.Left, 0 );
+			WishVelocity = new Vector3( basePlayer.InputDirection.x, basePlayer.InputDirection.y, 0 );
 			var inSpeed = WishVelocity.Length.Clamp( 0, 1 );
-			WishVelocity *= Input.Rotation;
+			WishVelocity *= EyeRotation;
 
 			if ( !Swimming && !IsTouchingLadder )
 			{
@@ -150,7 +153,7 @@ namespace Facepunch.CoreWars
 				var modifier = player.GetModifier( StatModifier.Speed );
 				WishVelocity *= modifier;
 
-				if ( Input.Down( InputButton.Duck ) && !Input.Down( InputButton.Run ) && WishVelocity.Length > 1f )
+				if ( Input.Down( InputButton.Run ) && !Input.Down( InputButton.Duck ) && WishVelocity.Length > 1f )
 					player.ReduceStamina( 10f * Time.Delta );
 				else
 					player.GainStamina( 15f * Time.Delta );
@@ -161,6 +164,7 @@ namespace Facepunch.CoreWars
 			if ( currentBlockBelow.IsValid && !currentBlockBelow.GetBlockType().IsPassable )
 				BlockPosition = currentBlockBelow.Position;
 
+			/*
 			var lastValidBlockBelow = VoxelWorld.Current.GetVoxel( BlockPosition );
 			IsSneakingOnBlock = false;
 
@@ -181,6 +185,7 @@ namespace Facepunch.CoreWars
 
 				IsSneakingOnBlock = lastValidBlockBelow.IsValid;
 			}
+			*/
 
 			var stayOnGround = false;
 
@@ -210,6 +215,7 @@ namespace Facepunch.CoreWars
 				Velocity -= new Vector3( 0, 0, Gravity * 0.5f ) * Time.Delta;
 			}
 
+			/*
 			if ( IsSneakingOnBlock )
 			{
 				var blockSourceBoundsMin = currentMap.ToSourcePosition( lastValidBlockBelow.Position );
@@ -223,6 +229,7 @@ namespace Facepunch.CoreWars
 				position.y = Math.Clamp( position.y, blockSourceBoundsMin.y, blockSourceBoundsMax.y );
 				Position = position;
 			}
+			*/
 
 			if ( GroundEntity != null )
 			{
@@ -235,7 +242,7 @@ namespace Facepunch.CoreWars
 			var wishSpeed = Duck.GetWishSpeed();
 			if ( wishSpeed >= 0f ) return wishSpeed;
 
-			var isSprinting = Input.Down( InputButton.Duck );
+			var isSprinting = Input.Down( InputButton.Run );
 
 			if ( Client.Pawn is Player player )
 			{

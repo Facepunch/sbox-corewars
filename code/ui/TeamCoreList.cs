@@ -1,7 +1,6 @@
 ﻿using Facepunch.CoreWars.Inventory;
 using Sandbox;
 using Sandbox.UI;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Facepunch.CoreWars
@@ -28,16 +27,23 @@ namespace Facepunch.CoreWars
 
 			public override void Tick()
 			{
-				SetClass( "destroyed", !Core.IsValid() || Core.LifeState == LifeState.Dead );
+				var playerCount = Core.Team.GetPlayers().Count();
+				SetClass( "destroyed", !Core.IsValid() || Core.LifeState == LifeState.Dead || playerCount == 0 );
 				base.Tick();
 			}
 		}
 
+		public TeamCoreList()
+		{
+			Current = this;
+		}
+
 		private Panel Container { get; set; }
 
-		protected override void PostTemplateApplied()
+		[Event.Entity.PostSpawn]
+		public void Update()
 		{
-			BindClass( "hidden", IsHidden );
+			Container.DeleteChildren( true );
 
 			foreach ( var core in Entity.All.OfType<TeamCore>() )
 			{
@@ -45,6 +51,12 @@ namespace Facepunch.CoreWars
 				icon.SetCoreEntity( core );
 				Container.AddChild( icon );
 			}
+		}
+
+		protected override void PostTemplateApplied()
+		{
+			BindClass( "hidden", IsHidden );
+			Update();
 
 			base.PostTemplateApplied();
 		}

@@ -101,8 +101,9 @@ namespace Facepunch.CoreWars
 		protected virtual void DamageVoxelInDirection( float range, float damage, bool showEffects = true )
 		{
 			var world = VoxelWorld.Current;
+			var player = Prediction.CurrentHost.Pawn;
 
-			if ( !world.GetBlockInDirection( Input.Position, Input.Rotation.Forward, out var position, range / world.VoxelSize ) )
+			if ( !world.GetBlockInDirection( player.EyePosition, player.EyeRotation.Forward, out var position, range / world.VoxelSize ) )
 			{
 				return;
 			}

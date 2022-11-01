@@ -24,12 +24,12 @@ namespace Facepunch.CoreWars.Editor
 			base.Populate();
 		}
 
-		protected override bool ShouldOpen( InputBuilder builder )
+		protected override bool ShouldOpen()
 		{
 			if ( Local.Pawn is not EditorPlayer player )
 				return false;
 
-			if ( builder.Down( InputButton.Duck ) )
+			if ( Input.Down( InputButton.Duck ) )
 				return false;
 
 			return player.Tool is EntitiesTool;

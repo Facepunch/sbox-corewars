@@ -394,7 +394,8 @@ namespace Facepunch.CoreWars.Editor
 
 		private bool TryGetTargetEntity( out ISourceEntity target, out TraceResult trace )
 		{
-			var request = Trace.Ray( Input.Position, Input.Position + Input.Rotation.Forward * 5000f )
+			var player = Prediction.CurrentHost.Pawn;
+			var request = Trace.Ray( player.EyePosition, player.EyePosition + player.EyeRotation.Forward * 5000f )
 				.EntitiesOnly();
 
 			if ( Input.Down( InputButton.Run ) )

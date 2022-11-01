@@ -15,7 +15,7 @@ namespace Facepunch.CoreWars
 	public partial class TeamCore : ModelEntity, ISourceEntity, IResettable, IHudRenderer
 	{
 		[EditorProperty, Net] public Team Team { get; set; }
-		[Net] public float MaxHealth { get; private set; } = 200f;
+		[Net] public float MaxHealth { get; private set; } = 400f;
 
 		[Net, Change( nameof( OnUpgradeTypesChanged ) )] protected IList<int> UpgradeTypes { get; set; }
 		protected List<BaseTeamUpgrade> InternalUpgrades { get; set; } = new();
@@ -101,7 +101,7 @@ namespace Facepunch.CoreWars
 			if ( Local.Pawn is not Player player || player.Team != Team )
 				return;
 
-			var draw = Render.Draw2D;
+			var draw = Util.Draw.Reset();
 			var position = (WorldSpaceBounds.Center + Vector3.Up * 96f).ToScreen();
 			var iconSize = 64f;
 			var iconAlpha = 1f;
