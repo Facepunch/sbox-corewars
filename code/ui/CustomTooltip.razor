@@ -21,13 +21,13 @@
 
 @code
 {
-    private static Tooltip Current { get; set; }
+    private static CustomTooltip Current { get; set; }
 
-    public static Tooltip Show( ITooltipProvider provider )
+    public static CustomTooltip Show( ITooltipProvider provider )
     {
         if ( Current == null || Current.Provider != provider )
         {
-            var tooltip = new Tooltip();
+            var tooltip = new CustomTooltip();
             tooltip.SetProvider( provider );
             Game.Hud.AddChild( tooltip );
             return tooltip;
@@ -58,7 +58,7 @@
         Provider = provider;
     }
 
-    public Tooltip()
+    public CustomTooltip()
     {
         TimeSinceShown = 0f;
 
@@ -109,7 +109,7 @@
 
     protected override void FinalLayoutChildren( Vector2 offset )
     {
-		Container.SetClass( "active", true );
+		Container?.SetClass( "active", true );
 
         base.FinalLayoutChildren( offset );
 	}

@@ -54,7 +54,7 @@ namespace Facepunch.CoreWars.Editor
 		{
 			if ( BlockType.IsValid() )
 			{
-				Tooltip.Show( this );
+				CustomTooltip.Show( this );
 			}
 
 			base.OnMouseOver( e );
@@ -62,7 +62,7 @@ namespace Facepunch.CoreWars.Editor
 
 		protected override void OnMouseOut( MousePanelEvent e )
 		{
-			Tooltip.Hide( this );
+			CustomTooltip.Hide( this );
 			base.OnMouseOut( e );
 		}
 

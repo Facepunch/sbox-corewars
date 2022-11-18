@@ -159,7 +159,7 @@ namespace Facepunch.CoreWars
 		{
 			if ( Item.IsValid() )
 			{
-				Tooltip.Show( this );
+				CustomTooltip.Show( this );
 			}
 			
 			base.OnMouseOver( e );
@@ -167,7 +167,7 @@ namespace Facepunch.CoreWars
 
 		protected override void OnMouseOut( MousePanelEvent e )
 		{
-			Tooltip.Hide( this );
+			CustomTooltip.Hide( this );
 			base.OnMouseOut( e );
 		}
 

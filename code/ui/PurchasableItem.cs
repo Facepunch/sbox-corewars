@@ -118,7 +118,7 @@ namespace Facepunch.CoreWars
 
 			if ( Item != null )
 			{
-				var tooltip = Tooltip.Show( this );
+				var tooltip = CustomTooltip.Show( this );
 				tooltip.Style.FontColor = Item.Color;
 
 				if ( Item.IsLocked( player ) )
@@ -138,16 +138,16 @@ namespace Facepunch.CoreWars
 
 		protected override void OnMouseOut( MousePanelEvent e )
 		{
-			Tooltip.Hide( this );
+			CustomTooltip.Hide( this );
 			base.OnMouseOut( e );
 		}
 
-		private void AddRequirementToTooltip( Tooltip tooltip )
+		private void AddRequirementToTooltip( CustomTooltip tooltip )
 		{
 			tooltip.Container.Add.Label( $"Team Upgrade Required", "requirement" );
 		}
 
-		private void AddCostsToTooltip( Tooltip tooltip )
+		private void AddCostsToTooltip( CustomTooltip tooltip )
 		{
 			if ( Local.Pawn is not Player player )
 				return;
