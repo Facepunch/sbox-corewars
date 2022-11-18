@@ -23,16 +23,16 @@ namespace Facepunch.CoreWars
 
 		public override void Simulate()
 		{
-			if ( Pawn is not Sandbox.Player basePlayer )
+			if ( Pawn is not Sandbox.Player pawn )
 				return;
 
 			EyeLocalPosition = Vector3.Up * Scale( EyeHeight );
 			UpdateBBox();
 
 			EyeLocalPosition += TraceOffset;
-			EyeRotation = basePlayer.ViewAngles.ToRotation();
+			EyeRotation = pawn.ViewAngles.ToRotation();
 
-			var vel = (EyeRotation.Forward * basePlayer.InputDirection.x) + (EyeRotation.Left * basePlayer.InputDirection.y);
+			var vel = (EyeRotation.Forward * pawn.InputDirection.x) + (EyeRotation.Left * pawn.InputDirection.y);
 
 			vel = vel.Normal * 2000;
 

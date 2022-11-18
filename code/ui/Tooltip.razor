@@ -107,11 +107,11 @@
         base.OnAfterTreeRender( firstTime );
     }
 
-    protected override void FinalLayoutChildren()
+    protected override void FinalLayoutChildren( Vector2 offset )
     {
 		Container.SetClass( "active", true );
 
-		base.FinalLayoutChildren();
+        base.FinalLayoutChildren( offset );
 	}
 
 	public override void Tick()

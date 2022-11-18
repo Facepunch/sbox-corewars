@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace Facepunch.CoreWars.Inventory
 {
@@ -302,13 +301,11 @@ namespace Facepunch.CoreWars.Inventory
 
 			if ( fromInventory == null )
 			{
-				Log.Error( "Unable to locate inventory by Id #" + fromId );
 				return;
 			}
 
 			if ( toInventory == null )
 			{
-				Log.Error( "Unable to locate inventory by Id #" + toId );
 				return;
 			}
 
@@ -342,13 +339,11 @@ namespace Facepunch.CoreWars.Inventory
 
 			if ( fromInventory == null )
 			{
-				Log.Error( "Unable to locate inventory by Id #" + fromId );
 				return;
 			}
 
 			if ( toInventory == null )
 			{
-				Log.Error( "Unable to locate inventory by Id #" + toId );
 				return;
 			}
 
@@ -369,18 +364,18 @@ namespace Facepunch.CoreWars.Inventory
 
 			if ( fromInventory == null )
 			{
-				Log.Error( "Unable to locate inventory by Id #" + fromId );
 				return;
 			}
 
 			if ( toInventory == null )
 			{
-				Log.Error( "Unable to locate inventory by Id #" + toId );
 				return;
 			}
 
 			if ( IsServer )
+			{
 				fromInventory.Move( toInventory, fromSlot, toSlot );
+			}
 		}
 
 		private static void ProcessSendDirtyItemsEvent( BinaryReader reader )
@@ -486,11 +481,6 @@ namespace Facepunch.CoreWars.Inventory
 				var itemId = OrphanedItems.Dequeue();
 				Items.Remove( itemId );
 				totalOrphanedItems++;
-			}
-
-			if ( totalOrphanedItems > 0 )
-			{
-				Log.Info( $"Removed {totalOrphanedItems} orphaned items..." );
 			}
 		}
 	}

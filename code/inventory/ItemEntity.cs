@@ -1,8 +1,5 @@
 ﻿using Sandbox;
 using System;
-using System.IO;
-using System.Linq;
-using Facepunch.CoreWars.Utility;
 
 namespace Facepunch.CoreWars.Inventory
 {

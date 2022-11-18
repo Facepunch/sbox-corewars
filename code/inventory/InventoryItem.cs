@@ -84,8 +84,6 @@ namespace Facepunch.CoreWars.Inventory
 		public bool IsClient => Host.IsClient;
 		public bool IsInstance => ItemId > 0;
 
-		public LibraryAttribute Attribute { get; set; }
-
 		public bool IsDirty
 		{
 			get => InternalIsDirty;

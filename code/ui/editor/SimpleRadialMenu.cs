@@ -161,7 +161,7 @@ namespace Facepunch.CoreWars.Editor
 			return true;
 		}
 
-		protected override void FinalLayoutChildren()
+		protected override void FinalLayoutChildren( Vector2 offset )
 		{
 			var radius = Box.Rect.Size.x * 0.5f;
 			var center = Box.Rect.WithoutPosition.Center;
@@ -177,7 +177,7 @@ namespace Facepunch.CoreWars.Editor
 				item.Style.Top = Length.Pixels( (center.y + y) * ScaleFromScreen );
 			}
 
-			base.FinalLayoutChildren();
+			base.FinalLayoutChildren( offset );
 		}
 
 		private bool IsHidden() => !IsOpen;
