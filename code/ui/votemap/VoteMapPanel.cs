@@ -24,18 +24,9 @@ namespace Facepunch.CoreWars
 
 		public async Task PopulateMaps()
 		{
-			var query = new Package.Query
-			{
-				Type = Package.Type.Map,
-				Order = Package.Order.User,
-				Take = 16
-			};
-
-			query.Tags.Add( "game:facepunch.corewars" );
-
-			var packages = await query.RunAsync( default );
+			var result = await Package.FindAsync( "game:facepunch.corewars type:map order:user", 16 );
 			var random = new Random();
-			var randomPicks = packages.OrderBy( x => random.Next() ).Take( 3 );
+			var randomPicks = result.Packages.OrderBy( x => random.Next() ).Take( 3 );
 
 			foreach ( var package in randomPicks )
 			{

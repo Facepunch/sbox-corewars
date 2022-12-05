@@ -111,6 +111,10 @@
         "Description": "Whether or not players on the same team can hurt eachother."
       }
     },
-    "ParentPackage": ""
+    "ParentPackage": "",
+    "DefaultLeaderboards": null,
+    "Summary": "A voxel-based PvP game where teams fight to build to and destroy their enemy\u0027s Core. ",
+    "Description": "",
+    "Public": true
   }
 }

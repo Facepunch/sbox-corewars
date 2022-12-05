@@ -191,7 +191,7 @@ namespace Facepunch.CoreWars
 			if ( ReloadAnimation )
 				PlayReloadAnimation();
 
-			if ( !String.IsNullOrEmpty( ReloadSoundName ) )
+			if ( !string.IsNullOrEmpty( ReloadSoundName ) )
 				ReloadSound = PlaySound( ReloadSoundName );
 
 			DoClientReload();
@@ -240,44 +240,6 @@ namespace Facepunch.CoreWars
 				return false;
 
 			return base.CanSecondaryAttack();
-		}
-
-		public virtual void StartChargeAttack()
-		{
-			ChargeAttackEndTime = Time.Now + ChargeAttackDuration;
-		}
-
-		public virtual void OnChargeAttackFinish() { }
-
-		public virtual void OnReloadFinish()
-		{
-			IsReloading = false;
-
-			if ( Owner is Player player )
-			{
-				if ( !UnlimitedAmmo )
-				{
-					var ammo = player.TakeAmmo( Config.AmmoType, (ushort)(ClipSize - AmmoClip) );
-
-					if ( ammo == 0 )
-						return;
-
-					AmmoClip += ammo;
-				}
-				else
-				{
-					AmmoClip = ClipSize;
-				}
-			}
-		}
-
-		[ClientRpc]
-		public virtual void DoClientReload()
-		{
-			if ( ReloadAnimation )
-			{
-				ViewModelEntity?.SetAnimParameter( "reload", true );
-			}
 		}
 
 		public override void AttackPrimary()
@@ -466,6 +428,44 @@ namespace Facepunch.CoreWars
 				.Ignore( this )
 				.Size( radius )
 				.Run();
+		}
+
+		[ClientRpc]
+		protected virtual void DoClientReload()
+		{
+			if ( ReloadAnimation )
+			{
+				ViewModelEntity?.SetAnimParameter( "reload", true );
+			}
+		}
+
+		protected virtual void StartChargeAttack()
+		{
+			ChargeAttackEndTime = Time.Now + ChargeAttackDuration;
+		}
+
+		protected virtual void OnChargeAttackFinish() { }
+
+		protected virtual void OnReloadFinish()
+		{
+			IsReloading = false;
+
+			if ( Owner is Player player )
+			{
+				if ( !UnlimitedAmmo )
+				{
+					var ammo = player.TakeAmmo( Config.AmmoType, (ushort)(ClipSize - AmmoClip) );
+
+					if ( ammo == 0 )
+						return;
+
+					AmmoClip += ammo;
+				}
+				else
+				{
+					AmmoClip = ClipSize;
+				}
+			}
 		}
 
 		protected virtual void OnMeleeAttackMissed( TraceResult trace ) { }
