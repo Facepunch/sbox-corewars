@@ -60,8 +60,6 @@ namespace Facepunch.CoreWars
 			if ( Owner is not Player player || player.Controller is not MoveController )
 				return;
 
-			Rotation = player.EyeRotation;
-
 			if ( IsAiming )
 			{
 				PositionOffset = PositionOffset.LerpTo( AimConfig.Position, Time.Delta * AimConfig.Speed );
