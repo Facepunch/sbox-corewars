@@ -71,13 +71,15 @@ namespace Facepunch.CoreWars.Editor
 		{
 			if ( IsServer && NextBlockPlace )
 			{
-				if ( VoxelWorld.Current.GetBlockInDirection( client.Pawn.EyePosition, client.Pawn.EyeRotation.Forward, out var blockPosition ) )
+				var pawn = client.Pawn as Player;
+
+				if ( VoxelWorld.Current.GetBlockInDirection( pawn.EyePosition, pawn.EyeRotation.Forward, out var blockPosition ) )
 				{
 					var voxel = VoxelWorld.Current.GetVoxel( blockPosition );
 
 					if ( voxel.IsValid )
 					{
-						VoxelWorld.Current.SetBlockInDirection( client.Pawn.EyePosition, client.Pawn.EyeRotation.Forward, 0 );
+						VoxelWorld.Current.SetBlockInDirection( pawn.EyePosition, pawn.EyeRotation.Forward, 0 );
 					}
 				}
 

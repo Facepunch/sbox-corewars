@@ -59,16 +59,9 @@ namespace Facepunch.CoreWars
 			TimeSinceSecondaryAttack = 0;
 		}
 
-		public override void SimulateAnimator( PawnAnimator anim )
+		public override void SimulateAnimator( CitizenAnimationHelper anim )
 		{
-			anim.SetAnimParameter( "holdtype", 2 );
-			anim.SetAnimParameter( "aim_body_weight", 1.0f );
-
-			if ( Owner.IsValid() )
-			{
-				ViewModelEntity?.SetAnimParameter( "b_grounded", Owner.GroundEntity.IsValid() );
-				ViewModelEntity?.SetAnimParameter( "aim_pitch", Owner.EyeRotation.Pitch() );
-			}
+			anim.HoldType = CitizenAnimationHelper.HoldTypes.Rifle;
 		}
 
 		[Event.Tick]

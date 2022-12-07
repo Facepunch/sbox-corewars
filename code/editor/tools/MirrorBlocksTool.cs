@@ -136,7 +136,7 @@ namespace Facepunch.CoreWars.Editor
 					Color = Color.Orange
 				};
 
-				Player.Camera.ZoomOut = 1f;
+				Player.EditorCamera.ZoomOut = 1f;
 			}
 
 			StartPosition = null;
@@ -150,7 +150,7 @@ namespace Facepunch.CoreWars.Editor
 
 			if ( IsClient )
 			{
-				Player.Camera.ZoomOut = 0f;
+				Player.EditorCamera.ZoomOut = 0f;
 				VoxelWorld.Current.GlobalOpacity = 1f;
 				AreaGhost?.Delete();
 			}

@@ -50,9 +50,9 @@ namespace Facepunch.CoreWars
 			ViewModelEntity?.SetAnimParameter( "deploy", true );
 		}
 
-		public override void SimulateAnimator( PawnAnimator anim )
+		public override void SimulateAnimator( CitizenAnimationHelper anim )
 		{
-			anim.SetAnimParameter( "holdtype", 5 );
+			anim.HoldType = CitizenAnimationHelper.HoldTypes.Punch;
 		}
 
 		protected virtual void OnBlockPlaced( IntVector3 position )

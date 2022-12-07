@@ -93,8 +93,8 @@ namespace Facepunch.CoreWars
 			Position += Velocity * Time.Delta;
 			Velocity -= Velocity * Time.Delta;
 
-			Rotation = Rotation.LookAt( CurrentView.Position - Position );
-			WorldScale = Position.Distance( CurrentView.Position ).Remap( 0f, 1000f, 2f, 4f );
+			Rotation = Rotation.LookAt( Camera.Position - Position );
+			WorldScale = Position.Distance( Camera.Position ).Remap( 0f, 1000f, 2f, 4f );
 
 			base.Tick();
 		}

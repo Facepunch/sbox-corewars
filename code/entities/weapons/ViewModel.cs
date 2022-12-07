@@ -45,19 +45,13 @@ namespace Facepunch.CoreWars
 			IsAiming = isAiming;
 		}
 
-		public override void PostCameraSetup( ref CameraSetup camSetup )
+		[Event.Client.PostCamera]
+		private void AddCameraEffects()
 		{
-			base.PostCameraSetup( ref camSetup );
-
-			AddCameraEffects( ref camSetup );
-		}
-
-		private void AddCameraEffects( ref CameraSetup camSetup )
-		{
-			if ( Owner is not Player player || player.Controller is not MoveController controller )
+			if ( Owner is not Player player || player.Controller is not MoveController )
 				return;
 
-			Rotation = Local.Pawn.EyeRotation;
+			Rotation = player.EyeRotation;
 
 			if ( IsAiming )
 			{

@@ -12,7 +12,6 @@ namespace Facepunch.CoreWars.Editor
 		[Net, Change( nameof( OnToolChanged ) )] public EditorTool Tool { get; private set; }
 
 		public byte SelectedBlockId => HotbarBlockIds[CurrentHotbarIndex];
-		public EditorCamera Camera => CameraMode as EditorCamera;
 
 		public ActionHistory<EditorAction> UndoStack { get; private set; }
 		public ActionHistory<EditorAction> RedoStack { get; private set; }
@@ -25,6 +24,8 @@ namespace Facepunch.CoreWars.Editor
 		public string DisplayName => Client.Name;
 		public bool IsFriendly => true;
 		public Team Team => Team.Orange;
+
+		public EditorCamera EditorCamera { get; private set; } = new();
 
 		public EditorPlayer() : base()
 		{
@@ -159,9 +160,6 @@ namespace Facepunch.CoreWars.Editor
 			EnableAllCollisions = false;
 			EnableDrawing = true;
 
-			CameraMode = new EditorCamera();
-			Animator = new PlayerAnimator();
-
 			EnterFlyMode();
 
 			SetModel( "models/citizen/citizen.vmdl" );
@@ -235,11 +233,13 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void FrameSimulate( Client client )
 		{
-			base.FrameSimulate( client );
+			EditorCamera?.Update();
 		}
 
 		public override void Simulate( Client client )
 		{
+			SimulateAnimation();
+
 			if ( !VoxelWorld.Current.IsValid() ) return;
 
 			if ( Prediction.FirstTime )
@@ -302,14 +302,9 @@ namespace Facepunch.CoreWars.Editor
 			if ( viewer.IsInWorld() && !viewer.IsCurrentChunkReady ) return;
 
 			var controller = GetActiveController();
-			controller?.Simulate( client, this, GetActiveAnimator() );
+			controller?.Simulate( client, this );
 
 			Tool?.Simulate( client );
-		}
-
-		public override void PostCameraSetup( ref CameraSetup setup )
-		{
-			base.PostCameraSetup( ref setup );
 		}
 
 		protected override void OnDestroy()

@@ -57,7 +57,7 @@ namespace Facepunch.CoreWars
 
 			transform.Position = Entity.WorldSpaceBounds.Center + Vector3.Up * 56f;
 
-			var targetRotation = Rotation.LookAt( CurrentView.Position - Position );
+			var targetRotation = Rotation.LookAt( Camera.Position - Position );
 			transform.Rotation = targetRotation;
 
 			var distanceToCamera = player.Position.Distance( Entity.Position );

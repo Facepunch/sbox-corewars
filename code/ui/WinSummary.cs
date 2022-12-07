@@ -88,7 +88,7 @@ namespace Facepunch.CoreWars
 		{
 			var row = parent.AddChild<Panel>( "player" );
 			var avatar = row.AddChild<Panel>( "avatar" );
-			avatar.Style.SetBackgroundImage( $"avatar:{client.PlayerId}" );
+			avatar.Style.SetBackgroundImage( $"avatar:{client.SteamId}" );
 			row.Add.Label( client.Name, "username" );
 			row.Add.Label( score.ToString(), "score" );
 		}

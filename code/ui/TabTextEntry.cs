@@ -1,8 +1,6 @@
 ﻿
 using Sandbox;
-using Sandbox.Hooks;
 using Sandbox.UI;
-using Sandbox.UI.Construct;
 using System;
 
 namespace Facepunch.CoreWars

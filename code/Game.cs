@@ -11,8 +11,7 @@ using System.Threading.Tasks;
 
 namespace Facepunch.CoreWars
 {
-	[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-	public partial class Game : Sandbox.Game
+	public partial class Game : GameManager
 	{
 		[Net] public StateSystem StateSystem { get; private set; }
 		[Net] public bool IsEditorMode { get; private set; }
@@ -226,22 +225,6 @@ namespace Facepunch.CoreWars
 		}
 
 		public override void DoPlayerNoclip( Client client ) { }
-
-		public override void DoPlayerSuicide( Client client )
-		{
-			if ( client.Pawn is Player player )
-			{
-				var damage = new DamageInfo()
-					.WithFlag( DamageFlags.Generic )
-					.WithAttacker( player )
-					.WithWeapon( player.ActiveChild )
-					.WithPosition( player.Position );
-
-				damage.Damage = 200f;
-
-				player.TakeDamage( damage );
-			}
-		}
 
 		public override void ClientDisconnect( Client client, NetworkDisconnectionReason reason )
 		{

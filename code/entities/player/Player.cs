@@ -48,9 +48,11 @@ namespace Facepunch.CoreWars
 		private TimeSince TimeSinceBackpackOpen { get; set; }
 		private bool IsBackpackToggleMode { get; set; }
 		private bool IsWaitingToRespawn { get; set; }
-		private bool ShouldResetEyeRotation { get; set; }
 		private BlockGhost BlockGhost { get; set; }
 		private Nameplate Nameplate { get; set; }
+
+		private FirstPersonCamera FirstPersonCamera { get; set; } = new();
+		private SpectateCamera SpectateCamera { get; set; } = new();
 
 		public Player() : base()
 		{
@@ -575,9 +577,6 @@ namespace Facepunch.CoreWars
 		{
 			EnableHideInFirstPerson = true;
 			EnableAllCollisions = true;
-
-			CameraMode = new FirstPersonCamera();
-			Animator = new PlayerAnimator();
 		}
 
 		public override void Spawn()
@@ -658,7 +657,6 @@ namespace Facepunch.CoreWars
 			EnableAllCollisions = false;
 			EnableDrawing = false;
 			Controller = null;
-			CameraMode = new SpectateCamera();
 
 			RespawnScreen.Show( To.Single( this ), 5f, LastDamageTaken.Attacker, LastDamageTaken.Weapon );
 
@@ -763,8 +761,6 @@ namespace Facepunch.CoreWars
 					GiveInitialItems();
 			}
 
-			CameraMode = new FirstPersonCamera();
-
 			ClearBuffs();
 
 			var spawnpoint = GetSpawnpoint();
@@ -778,20 +774,12 @@ namespace Facepunch.CoreWars
 			ResetInterpolation();
 		}
 
-		public override void BuildInput()
-		{
-			if ( ShouldResetEyeRotation )
-			{
-				ViewAngles = Angles.Zero;
-				ShouldResetEyeRotation = false;
-			}
-
-			base.BuildInput();
-		}
-
 		public override void FrameSimulate( Client client )
 		{
-			base.FrameSimulate( client );
+			if ( LifeState == LifeState.Alive )
+				FirstPersonCamera?.Update();
+			else
+				SpectateCamera?.Update();
 		}
 
 		public override void Simulate( Client client )
@@ -829,12 +817,9 @@ namespace Facepunch.CoreWars
 			}
 
 			var controller = GetActiveController();
-			controller?.Simulate( client, this, GetActiveAnimator() );
-		}
+			controller?.Simulate( client, this );
 
-		public override void PostCameraSetup( ref CameraSetup setup )
-		{
-			base.PostCameraSetup( ref setup );
+			SimulateAnimation();
 		}
 
 		public override void TakeDamage( DamageInfo info )
@@ -1219,7 +1204,7 @@ namespace Facepunch.CoreWars
 		[ClientRpc]
 		protected void ResetEyeRotation()
 		{
-			ShouldResetEyeRotation = true;
+			ViewAngles = Angles.Zero;
 		}
 
 		[Event.Tick.Server]

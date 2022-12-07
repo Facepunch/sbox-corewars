@@ -53,7 +53,7 @@ namespace Facepunch.CoreWars
 			}
 
 			var transform = Transform;
-			var direction = (CurrentView.Position - Entity.IconPosition).Normal;
+			var direction = (Camera.Position - Entity.IconPosition).Normal;
 			var targetRotation = Rotation.LookAt( direction );
 
 			transform.Position = Entity.IconPosition;

@@ -188,7 +188,7 @@ namespace Facepunch.CoreWars.Editor
 			}
 		}
 
-		[Event.Frame]
+		[Event.Client.Frame]
 		protected virtual void OnFrame()
 		{
 			if ( TryGetTargetEntity( out var target, out var trace ) )
@@ -394,7 +394,7 @@ namespace Facepunch.CoreWars.Editor
 
 		private bool TryGetTargetEntity( out ISourceEntity target, out TraceResult trace )
 		{
-			var player = Prediction.CurrentHost.Pawn;
+			var player = GetSimulatingPlayer();
 			var request = Trace.Ray( player.EyePosition, player.EyePosition + player.EyeRotation.Forward * 5000f )
 				.EntitiesOnly();
 

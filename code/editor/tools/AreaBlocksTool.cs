@@ -55,7 +55,7 @@ namespace Facepunch.CoreWars.Editor
 					Color = Color.Green
 				};
 
-				Player.Camera.ZoomOut = 1f;
+				Player.EditorCamera.ZoomOut = 1f;
 			}
 
 			Event.Register( this );
@@ -68,14 +68,14 @@ namespace Facepunch.CoreWars.Editor
 			if ( IsClient )
 			{
 				VoxelWorld.Current.GlobalOpacity = 1f;
-				Player.Camera.ZoomOut = 0f;
+				Player.EditorCamera.ZoomOut = 0f;
 				AreaGhost?.Delete();
 			}
 
 			Event.Unregister( this );
 		}
 
-		[Event.Frame]
+		[Event.Client.Frame]
 		protected virtual void OnFrame()
 		{
 			var world = VoxelWorld.Current;

@@ -36,13 +36,13 @@ namespace Facepunch.CoreWars.Utility
 		/// </summary>
 		public static void AddQuad( this VertexBuffer self, Ray origin, Vector3 width, Vector3 height, Vector2 uvScale )
 		{
-			self.Default.Normal = origin.Direction;
+			self.Default.Normal = origin.Forward;
 			self.Default.Tangent = new Vector4( width.Normal, 1 );
 
-			AddQuad( self, origin.Origin - width - height,
-				origin.Origin + width - height,
-				origin.Origin + width + height,
-				origin.Origin - width + height,
+			AddQuad( self, origin.Position - width - height,
+				origin.Position + width - height,
+				origin.Position + width + height,
+				origin.Position - width + height,
 				uvScale );
 		}
 

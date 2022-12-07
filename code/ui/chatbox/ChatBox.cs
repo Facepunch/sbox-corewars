@@ -1,10 +1,7 @@
-﻿
-using Facepunch.CoreWars.Editor;
+﻿using Facepunch.CoreWars.Editor;
 using Sandbox;
-using Sandbox.Hooks;
 using Sandbox.UI;
 using Sandbox.UI.Construct;
-using System;
 using System.Text.RegularExpressions;
 
 namespace Facepunch.CoreWars
@@ -90,13 +87,13 @@ namespace Facepunch.CoreWars
 			if ( caller.Pawn is Player player )
 			{
 				if ( channel == ChatBoxChannel.All || player.Team == Team.None )
-					AddChatEntry( To.Everyone, caller.Name, message, $"avatar:{ConsoleSystem.Caller.PlayerId}", player.Team.GetHudClass() );
+					AddChatEntry( To.Everyone, caller.Name, message, $"avatar:{ConsoleSystem.Caller.SteamId}", player.Team.GetHudClass() );
 				else
-					AddChatEntry( player.Team.GetTo(), caller.Name, message, $"avatar:{ConsoleSystem.Caller.PlayerId}", player.Team.GetHudClass(), channel );
+					AddChatEntry( player.Team.GetTo(), caller.Name, message, $"avatar:{ConsoleSystem.Caller.SteamId}", player.Team.GetHudClass(), channel );
 			}	
 			else if ( caller.Pawn is EditorPlayer )
 			{
-				AddChatEntry( To.Everyone, caller.Name, message, $"avatar:{ConsoleSystem.Caller.PlayerId}", Team.Orange.GetHudClass() );
+				AddChatEntry( To.Everyone, caller.Name, message, $"avatar:{ConsoleSystem.Caller.SteamId}", Team.Orange.GetHudClass() );
 			}
 		}
 
@@ -165,7 +162,7 @@ namespace Facepunch.CoreWars
 				NextTipTime = Rand.Float( 45f, 60f );
 			}
 
-			if ( Sandbox.Input.Pressed( InputButton.Chat ) )
+			if ( Input.Pressed( InputButton.Chat ) )
 			{
 				Open();
 			}

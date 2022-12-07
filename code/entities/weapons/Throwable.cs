@@ -53,17 +53,9 @@ namespace Facepunch.CoreWars
 			ViewModelEntity?.SetAnimParameter( "deploy", true );
 		}
 
-		public override void SimulateAnimator( PawnAnimator anim )
+		public override void SimulateAnimator( CitizenAnimationHelper anim )
 		{
-			anim.SetAnimParameter( "holdtype", 5 );
-			anim.SetAnimParameter( "aim_body_weight", 1 );
-
-			ViewModelEntity?.SetAnimParameter( "b_grounded", false );
-
-			if ( Owner.IsValid() )
-			{
-				ViewModelEntity?.SetAnimParameter( "aim_pitch", Owner.EyeRotation.Pitch() );
-			}
+			anim.HoldType = CitizenAnimationHelper.HoldTypes.Punch;
 		}
 
 		public override void ActiveEnd( Entity entity, bool dropped )
@@ -76,7 +68,7 @@ namespace Facepunch.CoreWars
 			base.ActiveEnd( entity, dropped );
 		}
 
-		[Event.Frame]
+		[Event.Client.Frame]
 		protected virtual void UpdateBodyGroup()
 		{
 			ViewModelEntity?.SetBodyGroup( "throw", HasBeenThrown ? 1 : 0 );

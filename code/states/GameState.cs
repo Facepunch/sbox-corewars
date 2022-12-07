@@ -29,7 +29,7 @@ namespace Facepunch.CoreWars
 					player.AssignRandomTeam( true );
 					player.RespawnWhenAvailable();
 
-					var playerId = player.Client.PlayerId;
+					var playerId = player.Client.SteamId;
 					PlayerToTeam[playerId] = player.Team;
 				}
 
@@ -61,7 +61,7 @@ namespace Facepunch.CoreWars
 
 		public override void OnPlayerJoined( Player player )
 		{
-			var playerId = player.Client.PlayerId;
+			var playerId = player.Client.SteamId;
 
 			if ( !PlayerToTeam.ContainsKey( playerId ) )
 				player.AssignRandomTeam( true );

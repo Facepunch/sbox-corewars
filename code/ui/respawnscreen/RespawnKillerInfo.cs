@@ -20,7 +20,7 @@ namespace Facepunch.CoreWars
 
 		public void Update( Player player )
 		{
-			KillerAvatar.SetTexture( $"avatar:{player.Client.PlayerId}" );
+			KillerAvatar.SetTexture( $"avatar:{player.Client.SteamId}" );
 			KillerName.Style.FontColor = player.Team.GetColor().Darken( 0.4f );
 			KillerName.Text = player.Client.Name;
 			SetTeam( player.Team );

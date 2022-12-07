@@ -50,9 +50,14 @@ namespace Facepunch.CoreWars.Editor
 			}
 		}
 
+		protected EditorPlayer GetSimulatingPlayer()
+		{
+			return Prediction.CurrentHost.Pawn as EditorPlayer;
+		}
+
 		protected BlockFace GetTargetBlockFace( float range )
 		{
-			var player = Prediction.CurrentHost.Pawn;
+			var player = GetSimulatingPlayer();
 			var distance = VoxelWorld.Current.VoxelSize * range;
 			return VoxelWorld.Current.Trace( player.EyePosition * (1.0f / VoxelWorld.Current.VoxelSize), player.EyeRotation.Forward, distance, out var _, out _ );
 		}
@@ -61,7 +66,7 @@ namespace Facepunch.CoreWars.Editor
 		{
 			if ( Input.Down( InputButton.Flashlight ) ) range *= 2f;
 
-			var player = Prediction.CurrentHost.Pawn;
+			var player = GetSimulatingPlayer();
 			var distance = VoxelWorld.Current.VoxelSize * range;
 			var aimVoxelPosition = VoxelWorld.Current.ToVoxelPosition( player.EyePosition + player.EyeRotation.Forward * distance );
 
