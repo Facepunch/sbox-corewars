@@ -45,6 +45,15 @@ namespace Facepunch.CoreWars
 			IsAiming = isAiming;
 		}
 
+		public override void PlaceViewmodel()
+		{
+			if ( Global.IsRunningInVR )
+				return;
+
+			Position = Camera.Position + Camera.Rotation.Forward * 15f;
+			Rotation = Camera.Rotation;
+		}
+
 		[Event.Client.PostCamera]
 		private void AddCameraEffects()
 		{
