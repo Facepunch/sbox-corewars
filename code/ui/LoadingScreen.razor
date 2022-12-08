@@ -1,0 +1,48 @@
+﻿@using System;
+@using Sandbox;
+@using Sandbox.UI;
+@using Facepunch.CoreWars;
+@using Sandbox.UI.Construct;
+@using Facepunch.Voxels;
+
+@namespace Facepunch.CoreWars.UI
+@attribute [StyleSheet( "/ui/LoadingScreen.scss" )]
+@inherits Panel
+
+<root>
+    <div class="container">
+        <div class="logo"></div>
+        <div @ref="Spinner" class="spinner"></div>
+    </div>
+</root>
+
+
+@code
+{
+	public Panel Spinner { get; set; }
+
+	public override void Tick()
+	{
+		SetClass( "hidden", HasWorldLoaded() );
+
+		var transform = new PanelTransform();
+		transform.AddRotation( 0f, 0f, MathF.Sin( Time.Now ) * 180f );
+		Spinner.Style.Transform = transform;
+
+		base.Tick();
+	}
+
+	private bool HasWorldLoaded()
+	{
+		var viewer = Local.Client.GetChunkViewer();
+		if ( !viewer.IsValid() ) return false;
+
+		if ( VoxelWorld.Current == null || !VoxelWorld.Current.Initialized )
+			return false;
+
+		if ( viewer.TimeSinceLastReset < 1f )
+			return false;
+
+		return viewer.HasLoadedMinimumChunks() && viewer.IsCurrentChunkReady;
+	}
+}

@@ -1,0 +1,69 @@
+﻿@using System;
+@using Sandbox;
+@using Sandbox.UI;
+@using Facepunch.CoreWars;
+@using Sandbox.UI.Construct;
+@using System.Linq;
+
+@namespace Facepunch.CoreWars.UI
+@attribute [StyleSheet( "/ui/TeamList.scss" )]
+@inherits Panel
+
+<root>
+    <div @ref="Container" class="container">
+        @foreach ( var core in Entity.All.OfType<TeamCore>() )
+        {
+            <TeamItem Entity=@core></TeamItem>
+        }
+    </div>
+</root>
+
+@code
+{
+    public static TeamList Current { get; private set; }
+    public Panel Container { get; set; }
+    public bool IsOpen { get; private set; }
+
+    public TeamList()
+    {
+        Current = this;
+    }
+
+    public static void Open()
+    {
+        Current?.SetOpen( true );
+    }
+
+    public static void Close()
+    {
+        Current?.SetOpen( false );
+    }
+
+    public void SetOpen( bool isOpen )
+    {
+        IsOpen = isOpen;
+    }
+
+    protected override void OnAfterTreeRender( bool firstTime )
+    {
+        base.OnAfterTreeRender( firstTime );
+        BindClass( "hidden", IsHidden );
+    }
+
+    protected override int BuildHash()
+    {
+        var count = Entity.All.OfType<TeamCore>();
+        return HashCode.Combine( count );
+    }
+
+    private bool IsHidden()
+    {
+		if ( Local.Pawn.LifeState == LifeState.Dead )
+			return true;
+
+		if ( IDialog.IsActive() || !Game.IsState<GameState>() )
+			return true;
+
+		return !IsOpen;
+	}
+}

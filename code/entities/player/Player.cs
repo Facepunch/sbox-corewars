@@ -663,8 +663,6 @@ namespace Facepunch.CoreWars
 		{
 			Nameplate = new UI.Nameplate( this );
 
-			UI.TeamList.Refresh();
-
 			base.ClientSpawn();
 		}
 
@@ -1073,10 +1071,7 @@ namespace Facepunch.CoreWars
 
 		protected virtual void OnTeamChanged( Team team )
 		{
-			if ( IsClient )
-			{
-				UI.TeamList.Refresh();
-			}
+
 		}
 
 		protected virtual void GiveInitialItems()

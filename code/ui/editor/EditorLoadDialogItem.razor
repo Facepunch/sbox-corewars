@@ -1,0 +1,27 @@
+﻿@using System;
+@using Sandbox;
+@using Sandbox.UI;
+@using Facepunch.CoreWars;
+@using Sandbox.UI.Construct;
+
+@namespace Facepunch.CoreWars.Editor
+@attribute [StyleSheet( "/ui/editor/EditorLoadDialogItem.scss" )]
+@inherits Panel
+
+<root>
+    <label @text="FileName" class="fileName"></label>
+</root>
+
+
+@code
+{
+	public string FileName { get; set; }
+	public Action OnSelect { get; set; }
+
+	protected override void OnClick( MousePanelEvent e )
+	{
+		OnSelect?.Invoke();
+
+		base.OnClick( e );
+	}
+}

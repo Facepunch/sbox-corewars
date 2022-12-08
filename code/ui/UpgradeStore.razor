@@ -21,6 +21,13 @@
             <label @text="CrystalAmount">0</label>
         </div>
         <div @ref="ItemContainer" class="container">
+            @if ( Entity.IsValid() )
+            {
+                foreach ( var item in Entity.Upgrades )
+                {
+                    <PurchasableItem class="item" Item=@item OnPurchaseClicked=@OnItemPurchased></PurchasableItem>          
+                }
+            }
         </div>
     </div>
 </root>
@@ -59,15 +66,6 @@
 	public void SetEntity( TeamUpgradesEntity entity )
 	{
 		Entity = entity;
-
-		ItemContainer.DeleteChildren( true );
-
-		foreach ( var item in entity.Upgrades )
-		{
-			var panel = ItemContainer.AddChild<PurchasableItem>( "item" );
-			panel.OnPurchaseClicked += OnItemPurchased;
-			panel.SetItem( item );
-		}
 	}
 
 	public override void Tick()
@@ -105,14 +103,9 @@
 		Util.Play( "item.purchase" );
 	}
 
-	protected override void PostTemplateApplied()
-	{
-		base.PostTemplateApplied();
-
-		if ( Entity.IsValid() )
-		{
-			SetEntity( Entity );
-		}
+    protected override void OnAfterTreeRender( bool firstTime )
+    {
+        base.OnAfterTreeRender( firstTime );
 
 		BindClass( "hidden", () => !IsOpen );
 	}

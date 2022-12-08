@@ -1,0 +1,52 @@
+﻿@using System;
+@using Sandbox;
+@using Sandbox.UI;
+@using Facepunch.CoreWars;
+@using Sandbox.UI.Construct;
+@using System.Threading.Tasks;
+
+@namespace Facepunch.CoreWars.UI
+@attribute [StyleSheet( "/ui/votemap/MapIcon.scss" )]
+@inherits Panel
+
+<root>
+    <div class="orgavatar" @ref="OrgAvatar"></div>
+
+    <div class="info">
+        <text class="title" @text="Title"></text>
+        <text class="orgname" @text="Org"></text>
+    </div>
+
+    <div class="votes">
+        <text @text="VoteCount"></text>
+    </div>
+</root>
+
+@code
+{
+	public string VoteCount { get; set; } = "0";
+	public string Title { get; set; } = "...";
+	public string Org { get; set; } = "...";
+	public string Ident { get; internal set; }
+	public Panel OrgAvatar { get; set; }
+
+	public MapIcon( string fullIdent )
+	{
+		Ident = fullIdent;
+
+		_ = FetchMapInformation();
+	}
+
+	private async Task FetchMapInformation()
+	{
+		var package = await Package.Fetch( Ident, true );
+		if ( package == null ) return;
+		if ( package.PackageType != Package.Type.Map ) return;
+
+		Title = package.Title;
+		Org = package.Org.Title;
+
+		await Style.SetBackgroundImageAsync( package.Thumb );
+		await OrgAvatar.Style.SetBackgroundImageAsync( package.Org.Thumb );
+	}
+}

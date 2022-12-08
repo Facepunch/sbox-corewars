@@ -1,0 +1,25 @@
+﻿@using System;
+@using Sandbox;
+@using Sandbox.UI;
+@using Facepunch.CoreWars;
+@using Sandbox.UI.Construct;
+
+@namespace Facepunch.CoreWars.Editor
+@attribute [StyleSheet( "/ui/editor/AutoCompleteList.scss" )]
+@inherits Panel
+@implements IAutoCompleteList
+
+@code
+{
+	public void ClearOptions()
+	{
+		DeleteChildren();
+	}
+
+	public void AddOption( string option, Action callback )
+	{
+		var item = AddChild<Button>( "option" );
+		item.AddEventListener( "onclick", callback );
+		item.SetText( option );
+	}
+}

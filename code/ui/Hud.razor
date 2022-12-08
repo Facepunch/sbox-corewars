@@ -1,0 +1,80 @@
+﻿@using System;
+@using Sandbox;
+@using Sandbox.UI;
+@using Facepunch.CoreWars;
+@using Sandbox.UI.Construct;
+
+@namespace Facepunch.CoreWars.UI
+@attribute [StyleSheet( "/ui/Hud.scss" )]
+@inherits RootPanel
+
+<div>
+    <Storage></Storage>
+    <Backpack></Backpack>
+    <ItemStore></ItemStore>
+    <AirdropStore></AirdropStore>
+    <UpgradeStore></UpgradeStore>
+    <RespawnScreen></RespawnScreen>
+    <Announcements></Announcements>
+    <StageInfo></StageInfo>
+    <TeamList></TeamList>
+    <WinSummary></WinSummary>
+    <LoadingScreen></LoadingScreen>
+
+    <div class="bottom">
+        <Vitals></Vitals>
+        <Hotbar></Hotbar>
+        <TeamCoreList></TeamCoreList>
+    </div>
+</div>
+
+
+@code
+{
+	public static Hud Current { get; private set; }
+	public Panel Crosshair { get; set; }
+
+	private Team Team { get; set; }
+
+	public static void SetTeam( Team team )
+	{
+		if ( Current == null || Current.Team == team )
+			return;
+
+		Current.RemoveClass( Current.Team.GetHudClass() );
+		Current.AddClass( team.GetHudClass() );
+
+		Current.Team = team;
+	}
+
+	public static void ToastAll( string text, string icon = "" )
+	{
+		Toast( To.Everyone, text, icon );
+	}
+
+	public static void Toast( CoreWars.Player player, string text, string icon = "" )
+	{
+		Toast( To.Single( player ), text, icon );
+	}
+
+	public Hud()
+	{
+		AddChild<ChatBox>();
+		AddChild<ToastList>();
+		AddChild<VoiceList>();
+
+		AddClass( Team.None.GetHudClass() );
+
+		Current = this;
+	}
+
+	public override void Tick()
+	{
+		if ( Local.Pawn is CoreWars.Player player )
+		{
+			SetTeam( player.Team );
+		}
+
+		base.Tick();
+	}
+}

@@ -7,6 +7,7 @@ using Sandbox;
 
 namespace Facepunch.CoreWars.UI
 {
+	[StyleSheet( "/ui/ItemWorldIcon.scss" )]
 	public class ItemWorldIcon : WorldPanel
 	{
 		public Panel Container { get; private set; }
@@ -16,7 +17,6 @@ namespace Facepunch.CoreWars.UI
 
 		public ItemWorldIcon( ItemEntity entity )
 		{
-			StyleSheet.Load( "/ui/ItemWorldIcon.scss" );
 			Container = Add.Panel( "container" );
 			Glow = Container.Add.Panel( "glow" );
 			Entity = entity;

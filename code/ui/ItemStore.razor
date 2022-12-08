@@ -1,19 +1,18 @@
 ﻿@using System;
+@using System.Linq;
 @using Sandbox;
 @using Sandbox.UI;
 @using Facepunch.CoreWars;
 @using Sandbox.UI.Construct;
-@using System.Collections.Generic;
-@using System.Linq;
 
 @namespace Facepunch.CoreWars.UI
-@attribute [StyleSheet( "/ui/AirdropStore.scss" )]
+@attribute [StyleSheet( "/ui/ItemStore.scss" )]
 @inherits Panel
 @implements IDialog
 
 <root>
     <div class="modal">
-        <label class="title">Airdrop Store</label>
+        <label class="title">Item Store</label>
         <div class="currency">
             <div class="iron"></div>
             <label @text="IronAmount">0</label>
@@ -23,31 +22,32 @@
             <label @text="CrystalAmount">0</label>
         </div>
         <div @ref="ItemContainer" class="container">
-            @if ( Airdrop.IsValid() )
+            @if ( Entity.IsValid() )
             {
-                Airdrop.Items.OrderByDescending( a => a.SortOrder ).ThenBy( a => a.Name );
+                Entity.Items.OrderByDescending( a => a.SortOrder ).ThenBy( a => a.Name );
 
-                foreach ( var item in Airdrop.Items )
+                foreach ( var item in Entity.Items )
                 {
-                    <PurchasableItem class="item" Item=@item OnPurchaseClicked=@OnItemPurchased></PurchasableItem>
+                    <PurchasableItem class="item" Item=@item OnPurchaseClicked=@OnItemPurchased></PurchasableItem>          
                 }
             }
         </div>
     </div>
 </root>
 
+
 @code
 {
-    public static AirdropStore Current { get; private set; }
+    public static ItemStore Current { get; private set; }
 
     public string IronAmount => GetResourceCount<IronItem>().ToString();
     public string GoldAmount => GetResourceCount<GoldItem>().ToString();
     public string CrystalAmount => GetResourceCount<CrystalItem>().ToString();
     public Panel ItemContainer { get; set; }
-    public Airdrop Airdrop { get; set; }
+    public ItemStoreEntity Entity { get; set; }
     public bool IsOpen { get; set; }
 
-    public AirdropStore()
+    public ItemStore()
     {
         Current = this;
     }
@@ -67,24 +67,18 @@
         IsOpen = false;
     }
 
-    public void SetAirdrop( Airdrop airdrop )
+    public void SetEntity( ItemStoreEntity entity )
     {
-        Airdrop = airdrop;
-    }
-
-    public void SetItems( List<BaseShopItem> items )
-    {
-
+        Entity = entity;
     }
 
     public override void Tick()
     {
-        if ( Local.Pawn is not CoreWars.Player player )
-            return;
+        if ( Local.Pawn is not CoreWars.Player player ) return;
 
-        if ( Airdrop.IsValid() )
+        if ( Entity.IsValid() )
         {
-            var distance = Airdrop.Position.Distance( player.Position );
+            var distance = Entity.Position.Distance( player.Position );
 
             if ( distance >= 300f )
             {
@@ -108,8 +102,13 @@
 
     protected virtual void OnItemPurchased( IPurchasableItem item )
     {
-        CoreWars.Player.BuyItemCmd( Airdrop.NetworkIdent, item.GetType().Name );
+        CoreWars.Player.BuyItemCmd( Entity.NetworkIdent, item.GetType().Name );
         Util.Play( "item.purchase" );
+    }
+
+    protected override int BuildHash()
+    {
+        return HashCode.Combine( Entity );
     }
 
     protected override void OnAfterTreeRender( bool firstTime )

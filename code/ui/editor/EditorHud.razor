@@ -1,0 +1,63 @@
+﻿@using System;
+@using Sandbox;
+@using Sandbox.UI;
+@using Facepunch.CoreWars;
+@using Facepunch.CoreWars.UI;
+@using Sandbox.UI.Construct;
+
+@namespace Facepunch.CoreWars.Editor
+@attribute [StyleSheet( "/ui/EditorHud.scss" )]
+@inherits RootPanel
+
+<root>
+    <div class="crosshair"></div>
+
+    <EditorToolDisplay></EditorToolDisplay>
+    <LoadingScreen></LoadingScreen>
+
+    <div class="center">
+        <ToolSelectorMenu></ToolSelectorMenu>
+        <EntityToolMenu></EntityToolMenu>
+    </div>
+
+    <div class="bottom">
+        <EditorHotbar></EditorHotbar>
+    </div>
+
+    <div @ref="PopupPanel" class="popup-container"></div>
+</root>
+
+
+@code
+{
+	public Panel PopupPanel { get; set; }
+
+	public static void ToastAll( string text, string icon = "" )
+	{
+		Toast( To.Everyone, text, icon );
+	}
+
+    public static void Toast( CoreWars.Player player, string text, string icon = "" )
+	{
+		Toast( To.Single( player ), text, icon );
+	}
+
+	public EditorHud()
+	{
+		AddChild<UI.ChatBox>();
+		AddChild<UI.ToastList>();
+		AddChild<VoiceList>();
+	}
+
+	public override Panel FindPopupPanel()
+	{
+		return PopupPanel;
+	}
+
+    protected override void OnAfterTreeRender( bool firstTime )
+    {
+        base.OnAfterTreeRender( firstTime );
+
+		PopupPanel.BindClass( "open", () => PopupPanel.ChildrenCount > 0 );
+	}
+}

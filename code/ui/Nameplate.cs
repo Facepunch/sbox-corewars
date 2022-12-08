@@ -5,6 +5,7 @@ using Sandbox;
 
 namespace Facepunch.CoreWars.UI
 {
+	[StyleSheet( "/ui/Nameplate.scss" )]
 	public class Nameplate : WorldPanel
 	{
 		public Panel Container { get; private set; }
@@ -20,8 +21,6 @@ namespace Facepunch.CoreWars.UI
 
 		public Nameplate( INameplate entity )
 		{
-			StyleSheet.Load( "/ui/Nameplate.scss" );
-
 			Container = Add.Panel( "container" );
 			Dot = Add.Panel( "dot" );
 			NameLabel = Container.Add.Label( "", "name" );

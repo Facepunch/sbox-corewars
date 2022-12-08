@@ -40,9 +40,9 @@ public partial class EditorPlayer
 		if ( Controller.HasEvent( "jump" ) ) animHelper.TriggerJump();
 		if ( ActiveChild != LastActiveChild ) animHelper.TriggerDeploy();
 
-		if ( ActiveChild is BaseCarriable carry )
+		if ( ActiveChild is Weapon weapon )
 		{
-			carry.SimulateAnimator( animHelper );
+			weapon.SimulateAnimator( animHelper );
 		}
 		else
 		{

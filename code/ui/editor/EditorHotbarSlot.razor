@@ -1,0 +1,105 @@
+﻿@using System;
+@using Sandbox;
+@using Sandbox.UI;
+@using Facepunch.CoreWars;
+@using Sandbox.UI.Construct;
+@using Facepunch.Voxels;
+@using Facepunch.CoreWars.UI;
+@using Facepunch.CoreWars.Utility;
+@using System.Collections.Generic;
+
+@namespace Facepunch.CoreWars.Editor
+@attribute [StyleSheet( "/ui/editor/EditorHotbarSlot.scss" )]
+@inherits Panel
+@implements ITooltipProvider
+@implements IDroppable
+
+<root>
+    <div @ref="SlotPanel" class="key-number">
+        <label @ref="SlotLabel">1</label>
+    </div>
+</root>
+
+@code
+{
+	public ushort Slot { get; set; }
+	public byte BlockId { get; set; }
+	public bool IsSelected { get; set; }
+	public BlockType BlockType { get; set; }
+	public Panel SlotPanel { get; set; }
+	public Label SlotLabel { get; set; }
+
+	public string Description => BlockType.Description;
+	public IReadOnlySet<string> Tags { get; set; }
+	public string Name => BlockType.FriendlyName;
+	public Color Color => Color.White;
+
+	public EditorHotbarSlot() { }
+
+	public void SetBlockId( byte blockId )
+	{
+		BlockType = VoxelWorld.Current.GetBlockType( blockId );
+		BlockId = blockId;
+		Tags = BlockType.GetItemTags();
+
+		var displaySlot = Slot + 1;
+		SlotPanel.SetClass( "hidden", displaySlot <= 0 );
+		SlotLabel.Text = displaySlot.ToString();
+
+		var icon = $"textures/blocks/corewars/color/{BlockType.DefaultTexture}.png";
+
+		if ( !string.IsNullOrEmpty( BlockType.Icon ) )
+			icon = BlockType.Icon;
+
+		if ( !string.IsNullOrEmpty( icon ) )
+		{
+			if ( CoreWars.Util.FileExistsCached( icon ) )
+			{
+				Style.SetBackgroundImage( icon );
+				Style.BackgroundSizeX = Length.Cover;
+				Style.BackgroundSizeY = Length.Cover;
+				Style.BackgroundTint = BlockType.TintColor;
+			}
+		}
+		else
+		{
+			Style.BackgroundImage = null;
+		}
+	}
+
+    protected override void OnAfterTreeRender( bool firstTime )
+    {
+        base.OnAfterTreeRender( firstTime );
+
+		BindClass( "selected", () => IsSelected );
+	}
+
+	public bool CanDrop( IDraggable draggable, DraggableMode mode )
+	{
+		return draggable is EditorBlockItem;
+	}
+
+	public void OnDrop( IDraggable draggable, DraggableMode mode )
+	{
+		if ( draggable is EditorBlockItem item )
+		{
+			EditorPlayer.SetHotbarBlockId( Slot, (int)item.BlockId );
+		}
+	}
+
+	protected override void OnMouseOver( MousePanelEvent e )
+	{
+		if ( BlockType.IsValid() )
+		{
+			CustomTooltip.Show( this );
+		}
+
+		base.OnMouseOver( e );
+	}
+
+	protected override void OnMouseOut( MousePanelEvent e )
+	{
+		CustomTooltip.Hide( this );
+		base.OnMouseOut( e );
+	}
+}

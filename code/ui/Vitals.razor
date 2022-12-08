@@ -107,14 +107,11 @@
 		base.Tick();
 	}
 
-	protected override void PostTemplateApplied()
-	{
-        if ( Local.Pawn is not CoreWars.Player player )
-			return;
+    protected override void OnAfterTreeRender( bool firstTime )
+    {
+        base.OnAfterTreeRender( firstTime );
 
 		BindClass( "hidden", IsHidden );
-
-		base.PostTemplateApplied();
 	}
 
 	private void InternalAddBuff( BaseBuff buff )

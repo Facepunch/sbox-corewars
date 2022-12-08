@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 namespace Facepunch.CoreWars.UI
 {
+	[StyleSheet( "/ui/Announcements.scss" )]
 	public partial class Announcements : Panel
 	{
 		public static Announcements Instance { get; private set; }
@@ -23,7 +24,6 @@ namespace Facepunch.CoreWars.UI
 
 		public Announcements()
 		{
-			StyleSheet.Load( "/ui/Announcements.scss" );
 			Container = Add.Panel( "container" );
 			Instance = this;
 			Queue = new();

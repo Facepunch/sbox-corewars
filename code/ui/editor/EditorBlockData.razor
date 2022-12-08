@@ -1,0 +1,107 @@
+﻿@using System;
+@using Sandbox;
+@using Sandbox.UI;
+@using Facepunch.CoreWars;
+@using Sandbox.UI.Construct;
+@using Facepunch.Voxels;
+@using System.Collections.Generic;
+
+@namespace Facepunch.CoreWars.Editor
+@attribute [StyleSheet( "/ui/editor/EditorBlockData.scss" )]
+@inherits Panel
+
+<root>
+    <div class="modal">
+        <label @text="Title"class="title">Entity</label>
+
+        <SimpleForm @ref="PropertyForm">
+
+        </SimpleForm>
+    </div>
+</root>
+
+@code
+{
+	private static object ConvertPropertyValue( PropertyDescription property, string value )
+	{
+		object convertedValue;
+
+		if ( property.PropertyType.IsEnum )
+			convertedValue = Enum.Parse( property.PropertyType, value );
+		else if ( property.PropertyType == typeof( float ) )
+			convertedValue = Convert.ToSingle( value );
+		else if ( property.PropertyType == typeof( int ) )
+			convertedValue = Convert.ToInt32( value );
+		else if ( property.PropertyType == typeof( bool ) )
+			convertedValue = Convert.ToBoolean( value );
+		else
+			convertedValue = value;
+
+		return convertedValue;
+	}
+
+	public static EditorBlockData Current { get; private set; }
+
+	public SimpleForm PropertyForm { get; set; }
+	public string Title => Voxel.GetBlockType().FriendlyName;
+	public BlockState State { get; private set; }
+	public Voxel Voxel { get; private set; }
+
+	private Dictionary<string, object> ChangedValues { get; set; } = new();
+
+	public static void Open( Voxel voxel, BlockState state )
+	{
+		Current?.Delete();
+		Current = new EditorBlockData( voxel, state );
+		Current.PopulateItems();
+
+		Local.Hud.FindPopupPanel().AddChild( Current );
+	}
+
+	public EditorBlockData( Voxel voxel, BlockState state )
+	{
+		Voxel = voxel;
+		State = state;
+	}
+
+	public void PopulateItems()
+	{
+		PropertyForm.Clear();
+		PropertyForm.StartGroup();
+
+		ChangedValues.Clear();
+
+		var properties = TypeLibrary.GetPropertyDescriptions( State );
+
+		for ( int i = 0; i < properties.Length; i++ )
+		{
+			var property = properties[i];
+
+			if ( property.GetCustomAttribute<EditorPropertyAttribute>() == null )
+				continue;
+
+			PropertyForm.AddRowWithCallback( property, State, PropertyForm.CreateControlFor( property ), ( value ) =>
+			{
+				ChangedValues[property.Name] = value;
+			} );
+		}
+
+		PropertyForm.EndGroup();
+
+		var button = PropertyForm.Add.Button( "Save" );
+		button.AddClass( "editor-button" );
+		button.AddEventListener( "onclick", () => Save() );
+	}
+
+	protected virtual void Save()
+	{
+		foreach ( var kv in ChangedValues )
+		{
+			SaveBlockDataValue( Voxel.Position.x, Voxel.Position.y, Voxel.Position.z, kv.Key, kv.Value.ToString() );
+		}
+
+		ChangedValues.Clear();
+
+		Delete();
+	}
+}

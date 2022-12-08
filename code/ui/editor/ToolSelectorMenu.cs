@@ -1,5 +1,4 @@
 ﻿using Facepunch.CoreWars.Editor;
-
 using Facepunch.Voxels;
 using Sandbox;
 using Sandbox.UI;
@@ -9,8 +8,8 @@ using System.Linq;
 
 namespace Facepunch.CoreWars.Editor
 {
-	[UseTemplate]
-	public partial class ToolSelectorMenu : SimpleRadialMenu
+	[StyleSheet( "/ui/editor/ToolSelectorMenu.scss" )]
+	public partial class ToolSelectorMenu : RadialMenu
 	{
 		public override InputButton Button => InputButton.Score;
 
@@ -28,15 +27,20 @@ namespace Facepunch.CoreWars.Editor
 				}
 			}
 
-			AddAction( "Block List", "View available blocks", "textures/ui/blocklist.png", () => EditorBlockList.Open() );
+			AddItem( "Block List", "View available blocks", "textures/ui/blocklist.png", () => EditorBlockList.Open() );
 
 			if ( Local.Client.IsListenServerHost )
 			{
-				AddAction( "Save World", "Save world to disk", "textures/ui/save.png", () => EditorSaveDialog.Open() );
-				AddAction( "Load World", "Load world from disk", "textures/ui/load.png", () => EditorLoadDialog.Open() );
+				AddItem( "Save World", "Save world to disk", "textures/ui/save.png", () => EditorSaveDialog.Open() );
+				AddItem( "Load World", "Load world from disk", "textures/ui/load.png", () => EditorLoadDialog.Open() );
 			}
 
 			base.Populate();
+		}
+
+		public void AddTool( TypeDescription type )
+		{
+			AddItem( type.Title, type.Description, type.Icon, () => EditorPlayer.ChangeToolTo( type.Identity ) );
 		}
 	}
 }

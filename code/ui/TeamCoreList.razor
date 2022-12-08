@@ -1,0 +1,76 @@
+﻿@using System;
+@using Sandbox;
+@using Sandbox.UI;
+@using Facepunch.CoreWars;
+@using Sandbox.UI.Construct;
+@using System.Linq;
+
+@namespace Facepunch.CoreWars.UI
+@attribute [StyleSheet( "/ui/TeamCoreList.scss" )]
+@inherits Panel
+
+<root>
+    <div class="container">
+        @foreach ( var core in Entity.All.OfType<TeamCore>() )
+        {
+            <TeamCoreIcon Entity=@core></TeamCoreIcon>
+        }
+    </div>
+</root>
+
+@code
+{
+    public static TeamCoreList Current { get; private set; }
+
+    private class TeamCoreIcon : Panel
+    {
+        public TeamCore Entity { get; set; }
+
+        public TeamCoreIcon()
+        {
+            AddClass( "core" );
+        }
+
+        protected override void OnParametersSet()
+        {
+            Style.BackgroundTint = Entity.Team.GetColor();
+
+            base.OnParametersSet();
+        }
+
+        public override void Tick()
+        {
+			var playerCount = Entity.Team.GetPlayers().Count();
+            SetClass( "destroyed", !Entity.IsValid() || Entity.LifeState == LifeState.Dead || playerCount == 0 );
+			base.Tick();
+		}
+	}
+
+	public TeamCoreList()
+	{
+		Current = this;
+	}
+
+    protected override void OnAfterTreeRender( bool firstTime )
+    {
+        base.OnAfterTreeRender( firstTime );
+		BindClass( "hidden", IsHidden );
+	}
+
+    protected override int BuildHash()
+    {
+        var count = Entity.All.OfType<TeamCore>();
+        return HashCode.Combine( count );
+    }
+
+	private bool IsHidden()
+	{
+		if ( Local.Pawn.LifeState == LifeState.Dead )
+			return true;
+
+		if ( IDialog.IsActive() || !Game.IsState<GameState>() )
+			return true;
+
+		return false;
+	}
+}

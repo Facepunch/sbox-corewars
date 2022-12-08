@@ -40,13 +40,11 @@ namespace Facepunch.CoreWars
 		public static void AddValidTeam( Team team )
 		{
 			ValidTeamSet.Add( team );
-			UI.TeamList.Refresh();
 		}
 
 		public static void RemoveValidTeam( Team team )
 		{
 			ValidTeamSet.Remove( team );
-			UI.TeamList.Refresh();
 		}
 
 		public static IReadOnlySet<Team> GetValidTeams()

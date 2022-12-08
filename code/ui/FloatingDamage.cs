@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 namespace Facepunch.CoreWars.UI
 {
+	[StyleSheet( "/ui/FloatingDamage.scss" )]
 	public partial class FloatingDamage : WorldPanel
 	{
 		private static Queue<FloatingDamage> Pool { get; set; } = new();
@@ -58,7 +59,6 @@ namespace Facepunch.CoreWars.UI
 
 		public FloatingDamage()
 		{
-			StyleSheet.Load( "/ui/FloatingDamage.scss" );
 			DamageLabel = Add.Label( "0", "damage" );
 			PanelBounds = new Rect( -1000f, -1000f, 2000f, 2000f );
 		}

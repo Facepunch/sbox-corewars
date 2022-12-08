@@ -1,0 +1,74 @@
+﻿@using System;
+@using Sandbox;
+@using Sandbox.UI;
+@using Facepunch.CoreWars;
+@using Sandbox.UI.Construct;
+@using Facepunch.Voxels;
+@using Facepunch.CoreWars.UI;
+@using System.Collections.Generic;
+
+@namespace Facepunch.CoreWars.Editor
+@attribute [StyleSheet( "/ui/editor/EditorBlockList.scss" )]
+@inherits Panel
+
+<root>
+    <div class="modal">
+        <label class="title">Blocks</label>
+        <div @ref="Items" class="items">
+        </div>
+    </div>
+</root>
+
+@code
+{
+	public static EditorBlockList Current { get; private set; }
+
+	public Panel Items { get; set; }
+
+	public static void Open()
+	{
+		Current?.Delete();
+		Current = new EditorBlockList();
+		Current.PopulateItems();
+		Local.Hud.AddChild( Current );
+	}
+
+	public EditorBlockList()
+	{
+		AcceptsFocus = true;
+		Focus();
+	}
+
+	public void PopulateItems()
+	{
+		Items.DeleteChildren();
+
+		var world = VoxelWorld.Current;
+		var blocks = world.BlockData.Values;
+
+		foreach ( var block in blocks )
+		{
+			if ( block.ShowInEditor || ShowAllBlocks )
+			{
+				var item = Items.AddChild<EditorBlockItem>();
+				item.SetBlockId( block.BlockId );
+			}
+		}
+	}
+
+	protected override void OnBlur( PanelEvent e )
+	{
+		Delete();
+		base.OnBlur( e );
+	}
+
+	public override void OnButtonTyped( string button, KeyModifiers km )
+	{
+		if ( button == "escape" )
+		{
+			Blur();
+		}
+
+		base.OnButtonTyped( button, km );
+	}
+}
