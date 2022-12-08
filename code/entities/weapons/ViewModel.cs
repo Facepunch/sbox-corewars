@@ -50,7 +50,9 @@ namespace Facepunch.CoreWars
 			if ( Global.IsRunningInVR )
 				return;
 
-			Position = Camera.Position + Camera.Rotation.Forward * 15f;
+			Camera.Main.SetViewModelCamera( 90f, 0.1f, 200f );
+
+			Position = Camera.Position;
 			Rotation = Camera.Rotation;
 		}
 
