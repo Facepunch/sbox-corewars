@@ -1,104 +1,103 @@
 ﻿using Sandbox;
-using System;
+using System.IO;
+using Facepunch.CoreWars.UI;
 
-namespace Facepunch.CoreWars.Inventory
+namespace Facepunch.CoreWars;
+
+public partial class ItemEntity : ModelEntity, IResettable
 {
-	public partial class ItemEntity : ModelEntity, IResettable
+	[Net] private NetInventoryItem InternalItem { get; set; }
+	public InventoryItem Item => InternalItem.Value;
+
+	public TimeUntil TimeUntilCanPickup { get; set; }
+	public Vector3 IconPosition { get; set; }
+
+	private PickupTrigger PickupTrigger { get; set; }
+	private ItemWorldIcon Icon { get; set; }
+	private Particles Effect { get; set; }
+
+	public void Serialize( BinaryWriter writer )
 	{
-		[Net] public NetInventoryItem Item { get; private set; }
+		writer.Write( Transform );
 
-		public TimeUntil TimeUntilCanPickup { get; set; }
-		public Vector3 IconPosition { get; set; }
-
-		private PickupTrigger PickupTrigger { get; set; }
-		private ItemWorldIcon Icon { get; set; }
-		private Particles Effect { get; set; }
-
-		public void SetItem( InventoryItem item )
+		if ( Item.IsValid() )
 		{
-			if ( !string.IsNullOrEmpty( item.WorldModel ) )
-			{
-				SetModel( item.WorldModel );
-				SetupPhysicsFromModel( PhysicsMotionType.Dynamic );
-			}
-			else
-			{
-				SetupPhysicsFromSphere( PhysicsMotionType.Dynamic, Vector3.Zero, 8f );
-				PhysicsBody.LinearDamping = 4f;
-				PhysicsBody.LinearDamping = 4f;
-			}
-
-			PickupTrigger = new PickupTrigger
-			{
-				Parent = this,
-				Position = Position
-			};
-
-			Item = new NetInventoryItem( item );
-			item.SetWorldEntity( this );
-
-			Tags.Add( "item" );
+			writer.Write( true );
+			writer.Write( Item );
 		}
-
-		public InventoryItem Take()
+		else
 		{
-			if ( IsValid )
-			{
-				var item = Item.Instance;
-
-				item.ClearWorldEntity();
-				Item = null;
-				Delete();
-
-				return item;
-			}
-
-			return null;
+			writer.Write( false );
 		}
+	}
 
-		public virtual void Reset()
+	public void Deserialize( BinaryReader reader )
+	{
+		Transform = reader.ReadTransform();
+
+		var isValid = reader.ReadBoolean();
+
+		
+		if ( isValid )
+		{
+			var item = reader.ReadInventoryItem();
+			SetItem( item );
+		}
+		else
 		{
 			Delete();
 		}
+	}
 
-		public override void Spawn()
+	public void SetItem( InventoryItem item )
+	{
+		var worldModel = !string.IsNullOrEmpty( item.WorldModel ) ? item.WorldModel : "models/sbox_props/burger_box/burger_box.vmdl";
+
+		if ( !string.IsNullOrEmpty( item.WorldModel ) )
 		{
-			TimeUntilCanPickup = 1f;
-			base.Spawn();
+			SetModel( item.WorldModel );
+			SetupPhysicsFromModel( PhysicsMotionType.Dynamic );
+		}
+		else
+		{
+			SetupPhysicsFromSphere( PhysicsMotionType.Dynamic, Vector3.Zero, 8f );
+			PhysicsBody.LinearDamping = 4f;
+			PhysicsBody.LinearDamping = 4f;
 		}
 
-		public override void ClientSpawn()
+		InternalItem = new NetInventoryItem( item );
+		item.SetWorldEntity( this );
+	}
+
+	public InventoryItem Take()
+	{
+		if ( IsValid && Item.IsValid() )
 		{
-			Effect = Particles.Create( "particles/gameplay/items/item_on_ground/generic/items_on_ground.vpcf" );
-			Effect.SetPosition( 0, WorldSpaceBounds.Center );
+			var item = Item;
 
-			Icon = new ItemWorldIcon( this );
+			item.ClearWorldEntity();
+			InternalItem = null;
+			Delete();
 
-			if ( Item.Instance.IsValid() )
-			{
-				Effect.SetPosition( 6, Item.Instance.Color.Saturate( 1.5f ) * 255f );
-			}
-
-			base.ClientSpawn();
+			return item;
 		}
 
-		[Event.Tick.Client]
-		protected virtual void ClientTick()
-		{
-			IconPosition = WorldSpaceBounds.Center + Vector3.Up * (8f + MathF.Sin( Time.Now ) * 8f);
-			Effect?.SetPosition( 0, IconPosition );
-			Effect?.SetForward( 0, Vector3.Forward );
-		}
+		return null;
+	}
 
-		protected override void OnDestroy()
-		{
-			Effect?.Destroy( true );
+	public virtual void Reset()
+	{
+		Delete();
+	}
 
-			Icon?.Delete();
-			Icon = null;
+	public override void Spawn()
+	{
+		TimeUntilCanPickup = 1f;
+		Transmit = TransmitType.Always;
 
-			base.OnDestroy();
-		}
+		Tags.Add( "item", "solid", "passplayers" );
+
+		base.Spawn();
 	}
 }
 

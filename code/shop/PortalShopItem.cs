@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Facepunch.CoreWars.Inventory;
 using Sandbox;
 
 namespace Facepunch.CoreWars

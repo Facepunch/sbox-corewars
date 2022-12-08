@@ -1,22 +1,30 @@
-﻿using System;
-using Sandbox;
-using Sandbox.UI;
+﻿using System.Collections.Generic;
 
-namespace Facepunch.CoreWars
+namespace Facepunch.CoreWars;
+
+public struct ItemTag
 {
-	public struct ItemTag
+	private static Dictionary<string, ItemTag> Tags { get; set; } = new();
+
+	public static void Register( string id, string name, Color color )
 	{
-		public static ItemTag CanDrop { get; private set; } = new ItemTag( "Droppable", Color.Yellow );
-		public static ItemTag Soulbound { get; private set; } = new ItemTag( "Soulbound", Color.Green );
-		public static ItemTag UsesStamina { get; private set; } = new ItemTag( "Uses Stamina", Color.Cyan );
-
-		public string Name { get; set; }
-		public Color Color { get; set; }
-
-		public ItemTag( string name, Color color )
+		if ( !Tags.ContainsKey( id ) )
 		{
-			Name = name;
-			Color = color;
+			Tags.Add( id, new ItemTag( name, color ) );
 		}
+	}
+
+	public static bool TryGetTag( string id, out ItemTag tag )
+	{
+		return Tags.TryGetValue( id, out tag );
+	}
+
+	public string Name { get; set; }
+	public Color Color { get; set; }
+
+	public ItemTag( string name, Color color )
+	{
+		Name = name;
+		Color = color;
 	}
 }

@@ -4,7 +4,7 @@ namespace Facepunch.CoreWars;
 
 public partial class Player
 {
-	private Entity LastActiveChild { get; set; }
+	private Entity LastWeaponEntity { get; set; }
 
 	protected void SimulateAnimation()
 	{
@@ -26,7 +26,7 @@ public partial class Player
 		var animHelper = new CitizenAnimationHelper( this );
 
 		animHelper.WithWishVelocity( Controller.WishVelocity );
-		animHelper.WithVelocity( Controller.Velocity );
+		animHelper.WithVelocity( Velocity );
 		animHelper.WithLookAt( EyePosition + EyeRotation.Forward * 100.0f, 1.0f, 1.0f, 0.5f );
 		animHelper.AimAngle = rotation;
 		animHelper.FootShuffle = shuffle;
@@ -40,11 +40,11 @@ public partial class Player
 		animHelper.IsWeaponLowered = false;
 
 		if ( Controller.HasEvent( "jump" ) ) animHelper.TriggerJump();
-		if ( ActiveChild != LastActiveChild ) animHelper.TriggerDeploy();
+		if ( ActiveChild != LastWeaponEntity ) animHelper.TriggerDeploy();
 
-		if ( ActiveChild is BaseCarriable carry )
+		if ( ActiveChild is Weapon weapon )
 		{
-			carry.SimulateAnimator( animHelper );
+			weapon.SimulateAnimator( animHelper );
 		}
 		else
 		{
@@ -52,6 +52,6 @@ public partial class Player
 			animHelper.AimBodyWeight = 0.5f;
 		}
 
-		LastActiveChild = ActiveChild;
+		LastWeaponEntity = ActiveChild;
 	}
 }

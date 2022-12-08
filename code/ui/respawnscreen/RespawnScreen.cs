@@ -2,7 +2,7 @@
 using Sandbox.UI;
 using System;
 
-namespace Facepunch.CoreWars
+namespace Facepunch.CoreWars.UI
 {
 	[UseTemplate] 
 	public partial class RespawnScreen : Panel

@@ -1,5 +1,4 @@
-﻿using Facepunch.CoreWars.Inventory;
-using Facepunch.Voxels;
+﻿using Facepunch.Voxels;
 using Sandbox;
 using System;
 using System.Collections.Generic;
@@ -7,17 +6,27 @@ using System.Linq;
 
 namespace Facepunch.CoreWars
 {
-	public partial class Player : Sandbox.Player, IResettable, INameplate
+	public partial class Player : BasePlayer, IResettable, INameplate
 	{
+		public static Player Me => Local.Pawn as Player;
+
 		[Net, Change( nameof( OnTeamChanged ) )] public Team Team { get; private set; }
 		[Net] public IDictionary<StatModifier, float> Modifiers { get; private set; }
-		[Net, Predicted] public ushort CurrentHotbarIndex { get; private set; }
+		[Net, Predicted] public ushort HotbarIndex { get; private set; }
 		[Net, Predicted] public bool IsOutOfBreath { get; set; }
 		[Net, Predicted] public float Stamina { get; set; }
-		[Net] public NetInventoryContainer BackpackInventory { get; private set; }
-		[Net] public NetInventoryContainer HotbarInventory { get; private set; }
+
+		[Net] private NetInventoryContainer InternalBackpack { get; set; }
+		public InventoryContainer Backpack => InternalBackpack.Value;
+
+		[Net] private NetInventoryContainer InternalHotbar { get; set; }
+		public InventoryContainer Hotbar => InternalHotbar.Value;
+
+		[Net] private NetInventoryContainer InternalEquipment { get; set; }
+		public InventoryContainer Equipment => InternalEquipment.Value;
+
 		[Net] public NetInventoryContainer ChestInventory { get; private set; }
-		[Net] public NetInventoryContainer EquipmentInventory { get; private set; }
+
 		[Net] public TeamCore Core { get; private set; }
 		[Net, Change] public IList<BaseBuff> Buffs { get; private set; }
 		[Net] public IDictionary<string,int> Resources { get; private set; }
@@ -44,12 +53,11 @@ namespace Facepunch.CoreWars
 			}
 		}
 
-		private TimeSince TimeSinceLastFootstep { get; set; }
 		private TimeSince TimeSinceBackpackOpen { get; set; }
 		private bool IsBackpackToggleMode { get; set; }
 		private bool IsWaitingToRespawn { get; set; }
 		private BlockGhost BlockGhost { get; set; }
-		private Nameplate Nameplate { get; set; }
+		private UI.Nameplate Nameplate { get; set; }
 
 		private FirstPersonCamera FirstPersonCamera { get; set; } = new();
 		private SpectateCamera SpectateCamera { get; set; } = new();
@@ -136,7 +144,7 @@ namespace Facepunch.CoreWars
 
 		public Player( Client client ) : this()
 		{
-			CurrentHotbarIndex = 0;
+			HotbarIndex = 0;
 			client.Pawn = this;
 			CreateInventories();
 			Modifiers = new Dictionary<StatModifier, float>();
@@ -164,10 +172,10 @@ namespace Facepunch.CoreWars
 		{
 			var item = InventorySystem.CreateItem<T>();
 			
-			if ( HotbarInventory.Instance.Give( item ) )
+			if ( Hotbar.Give( item ) )
 				return true;
 
-			return BackpackInventory.Instance.Give( item );
+			return Backpack.Give( item );
 		}
 
 		public void TryGiveAmmo( AmmoType type, ushort amount )
@@ -176,11 +184,11 @@ namespace Facepunch.CoreWars
 			item.AmmoType = type;
 			item.StackSize = amount;
 
-			var remaining = HotbarInventory.Instance.Stack( item );
+			var remaining = Hotbar.Stack( item );
 
 			if ( remaining > 0 )
 			{
-				BackpackInventory.Instance.Stack( item );
+				Backpack.Stack( item );
 			}
 		}
 
@@ -205,11 +213,11 @@ namespace Facepunch.CoreWars
 			item.BlockId = blockId;
 			item.StackSize = amount;
 
-			var remaining = HotbarInventory.Instance.Stack( item );
+			var remaining = Hotbar.Stack( item );
 
 			if ( remaining > 0 )
 			{
-				BackpackInventory.Instance.Stack( item );
+				Backpack.Stack( item );
 			}
 		}
 
@@ -245,16 +253,16 @@ namespace Facepunch.CoreWars
 		public bool TryGiveArmor( ArmorItem item )
 		{
 			var slotToIndex = (int)item.ArmorSlot - 1;
-			return EquipmentInventory.Instance.Give( item, (ushort)slotToIndex );
+			return Equipment.Give( item, (ushort)slotToIndex );
 		}
 
 		public ushort TryGiveItem( InventoryItem item )
 		{
-			var remaining = HotbarInventory.Instance.Stack( item );
+			var remaining = Hotbar.Stack( item );
 
 			if ( remaining > 0 )
 			{
-				remaining = BackpackInventory.Instance.Stack( item );
+				remaining = Backpack.Stack( item );
 			}
 
 			return remaining;
@@ -288,18 +296,18 @@ namespace Facepunch.CoreWars
 		public List<T> FindItems<T>() where T : InventoryItem
 		{
 			var items = new List<T>();
-			items.AddRange( HotbarInventory.Instance.FindItems<T>() );
-			items.AddRange( BackpackInventory.Instance.FindItems<T>() );
-			items.AddRange( EquipmentInventory.Instance.FindItems<T>() );
+			items.AddRange( Hotbar.FindItems<T>() );
+			items.AddRange( Backpack.FindItems<T>() );
+			items.AddRange( Equipment.FindItems<T>() );
 			return items;
 		}
 
 		public List<InventoryItem> FindItems( Type type )
 		{
 			var items = new List<InventoryItem>();
-			items.AddRange( HotbarInventory.Instance.FindItems( type ) );
-			items.AddRange( BackpackInventory.Instance.FindItems( type ) );
-			items.AddRange( EquipmentInventory.Instance.FindItems( type ) );
+			items.AddRange( Hotbar.FindItems( type ) );
+			items.AddRange( Backpack.FindItems( type ) );
+			items.AddRange( Equipment.FindItems( type ) );
 			return items;
 		}
 
@@ -307,8 +315,8 @@ namespace Facepunch.CoreWars
 		{
 			var items = new List<ResourceItem>();
 
-			items.AddRange( HotbarInventory.Instance.FindItems<ResourceItem>() );
-			items.AddRange( BackpackInventory.Instance.FindItems<ResourceItem>() );
+			items.AddRange( Hotbar.FindItems<ResourceItem>() );
+			items.AddRange( Backpack.FindItems<ResourceItem>() );
 
 			var amountLeftToTake = count;
 			var totalAmountTaken = 0;
@@ -345,8 +353,8 @@ namespace Facepunch.CoreWars
 		{
 			var items = new List<AmmoItem>();
 
-			items.AddRange( HotbarInventory.Instance.FindItems<AmmoItem>() );
-			items.AddRange( BackpackInventory.Instance.FindItems<AmmoItem>() );
+			items.AddRange( Hotbar.FindItems<AmmoItem>() );
+			items.AddRange( Backpack.FindItems<AmmoItem>() );
 
 			var amountLeftToTake = count;
 			ushort totalAmountTaken = 0;
@@ -389,8 +397,8 @@ namespace Facepunch.CoreWars
 		{
 			var items = new List<AmmoItem>();
 
-			items.AddRange( HotbarInventory.Instance.FindItems<AmmoItem>() );
-			items.AddRange( BackpackInventory.Instance.FindItems<AmmoItem>() );
+			items.AddRange( Hotbar.FindItems<AmmoItem>() );
+			items.AddRange( Backpack.FindItems<AmmoItem>() );
 
 			var output = 0;
 
@@ -518,10 +526,10 @@ namespace Facepunch.CoreWars
 
 		public virtual void ClearInventories()
 		{
-			EquipmentInventory.Instance.RemoveAll();
-			BackpackInventory.Instance.RemoveAll();
-			HotbarInventory.Instance.RemoveAll();
-			ChestInventory.Instance.RemoveAll();
+			Equipment.RemoveAll();
+			Backpack.RemoveAll();
+			Hotbar.RemoveAll();
+			ChestInventory.Value.RemoveAll();
 		}
 
 		public virtual void Reset()
@@ -589,67 +597,28 @@ namespace Facepunch.CoreWars
 			AttachClothing( "models/citizen_clothes/shoes/slippers/models/slippers.vmdl" );
 			SetMaterialGroup( Rand.Int( MaterialGroupCount - 1 ) );
 
+			Tags.Add( "player" );
+
 			base.Spawn();
-		}
-
-		public override void OnAnimEventFootstep( Vector3 position, int foot, float volume )
-		{
-			if ( LifeState == LifeState.Dead || !IsClient )
-				return;
-
-			if ( TimeSinceLastFootstep < 0.2f )
-				return;
-
-			var block = GetBlockBelow();
-
-			if ( block is not AirBlock )
-			{
-				var sound = foot == 0 ? block.FootLeftSound : block.FootRightSound;
-
-				if ( !string.IsNullOrEmpty( sound ) )
-				{
-					Sound.FromWorld( sound, position ).SetVolume( volume );
-					return;
-				}
-			}
-
-			volume *= FootstepVolume();
-
-			TimeSinceLastFootstep = 0f;
-
-			var trace = Trace.Ray( position, position + Vector3.Down * 20f )
-				.Radius( 1 )
-				.Ignore( this )
-				.Run();
-
-			if ( !trace.Hit ) return;
-
-			trace.Surface.DoFootstep( this, trace, foot, volume );
-		}
-
-		public override float FootstepVolume()
-		{
-			return Velocity.WithZ( 0f ).Length.LerpInverse( 0f, 200f ) * 0.3f;
 		}
 
 		public override void OnKilled()
 		{
 			if ( LastDamageTaken.Attacker is Player attacker )
 			{
-				var resources = HotbarInventory.Instance.FindItems<ResourceItem>();
-				resources.AddRange( BackpackInventory.Instance.FindItems<ResourceItem>() );
+				var resources = FindItems<ResourceItem>();
 
 				foreach ( var resource in resources )
 				{
-					resource.Container.Remove( resource );
+					resource.Parent.Remove( resource );
 					attacker.TryGiveItem( resource );
 				}
 
-				Hud.AddKillFeed( To.Everyone, attacker, this, LastDamageTaken.Weapon, LastDamageTaken.Flags );
+				UI.Hud.AddKillFeed( To.Everyone, attacker, this, LastDamageTaken.Weapon, LastDamageTaken.Flags );
 			}
 			else
 			{
-				Hud.AddKillFeed( To.Everyone, this, LastDamageTaken.Flags );
+				UI.Hud.AddKillFeed( To.Everyone, this, LastDamageTaken.Flags );
 			}
 
 			BecomeRagdollOnClient( LastDamageTaken.Force, LastDamageTaken.BoneIndex );
@@ -658,7 +627,7 @@ namespace Facepunch.CoreWars
 			EnableDrawing = false;
 			Controller = null;
 
-			RespawnScreen.Show( To.Single( this ), 5f, LastDamageTaken.Attacker, LastDamageTaken.Weapon );
+			UI.RespawnScreen.Show( To.Single( this ), 5f, LastDamageTaken.Attacker, LastDamageTaken.Weapon );
 
 			RespawnWhenAvailable( 5f );
 			ClearBuffs();
@@ -692,26 +661,9 @@ namespace Facepunch.CoreWars
 
 		public override void ClientSpawn()
 		{
-			if ( IsLocalPawn )
-			{
-				var backpack = BackpackInventory.Instance;
-				var equipment = EquipmentInventory.Instance;
-				var hotbar = HotbarInventory.Instance;
+			Nameplate = new UI.Nameplate( this );
 
-				backpack.SetTransferTargetHandler( GetBackpackTransferTarget );
-				equipment.SetTransferTargetHandler( GetEquipmentTransferTarget );
-				hotbar.SetTransferTargetHandler( GetHotbarTransferTarget );
-
-				Backpack.Current?.SetBackpack( backpack );
-				Backpack.Current?.SetEquipment( equipment );
-				Backpack.Current?.SetHotbar( hotbar );
-
-				Hotbar.Current?.SetContainer( hotbar );
-			}
-
-			Nameplate = new Nameplate( this );
-
-			TeamList.Refresh();
+			UI.TeamList.Refresh();
 
 			base.ClientSpawn();
 		}
@@ -720,7 +672,7 @@ namespace Facepunch.CoreWars
 		{
 			var isLobbyState = Game.IsState<LobbyState>();
 
-			RespawnScreen.Hide( To.Single( this ) );
+			UI.RespawnScreen.Hide( To.Single( this ) );
 
 			if ( !isLobbyState && !IsCoreValid() )
 			{
@@ -780,6 +732,9 @@ namespace Facepunch.CoreWars
 				FirstPersonCamera?.Update();
 			else
 				SpectateCamera?.Update();
+
+			Controller?.SetActivePlayer( this );
+			Controller?.FrameSimulate();
 		}
 
 		public override void Simulate( Client client )
@@ -816,8 +771,8 @@ namespace Facepunch.CoreWars
 				}
 			}
 
-			var controller = GetActiveController();
-			controller?.Simulate( client, this );
+			Controller?.SetActivePlayer( this );
+			Controller?.Simulate();
 
 			SimulateAnimation();
 		}
@@ -874,7 +829,7 @@ namespace Facepunch.CoreWars
 
 				attacker.ShowHitMarker( To.Single( attacker ), info.Hitbox.HasTag( "head" ) );
 
-				FloatingDamage.Show( this, info.Damage, info.Position );
+				UI.FloatingDamage.Show( this, info.Damage, info.Position );
 				RemoveBuff<StealthBuff>();
 
 				if ( info.Flags.HasFlag( DamageFlags.Blunt ) )
@@ -890,8 +845,8 @@ namespace Facepunch.CoreWars
 		protected virtual void SimulateBlockGhost( Client client )
 		{
 			var world = VoxelWorld.Current;
-			var container = HotbarInventory.Instance;
-			var blockItem = container.GetFromSlot( CurrentHotbarIndex ) as BlockItem;
+			var container = Hotbar;
+			var blockItem = container.GetFromSlot( HotbarIndex ) as BlockItem;
 
 			if ( blockItem.IsValid() )
 			{
@@ -963,6 +918,13 @@ namespace Facepunch.CoreWars
 
 		protected virtual void SimulateGameState( Client client )
 		{
+			Projectiles.Simulate();
+
+			SimulateActiveChild( ActiveChild );
+
+			if ( ActiveChildInput.IsValid() && ActiveChildInput.Owner == this )
+				ActiveChild = ActiveChildInput;
+
 			if ( Stamina <= 10f )
 				IsOutOfBreath = true;
 			else if ( IsOutOfBreath && Stamina >= 25f )
@@ -982,8 +944,8 @@ namespace Facepunch.CoreWars
 
 				if ( Input.Released( InputButton.PrimaryAttack ) && NextActionTime )
 				{
-					var container = HotbarInventory.Instance;
-					var item = container.GetFromSlot( CurrentHotbarIndex );
+					var container = Hotbar;
+					var item = container.GetFromSlot( HotbarIndex );
 
 					if ( item.IsValid() )
 					{
@@ -1002,8 +964,8 @@ namespace Facepunch.CoreWars
 
 				if ( Input.Released( InputButton.Drop ) )
 				{
-					var container = HotbarInventory.Instance;
-					var item = container.GetFromSlot( CurrentHotbarIndex );
+					var container = Hotbar;
+					var item = container.GetFromSlot( HotbarIndex );
 
 					if ( item.IsValid() && item.CanBeDropped )
 					{
@@ -1011,7 +973,7 @@ namespace Facepunch.CoreWars
 
 						if ( item.StackSize > 1 )
 						{
-							itemToDrop = InventorySystem.CreateDuplicateItem( item );
+							itemToDrop = InventorySystem.DuplicateItem( item );
 							itemToDrop.StackSize = 1;
 							item.StackSize--;
 						}
@@ -1029,15 +991,15 @@ namespace Facepunch.CoreWars
 			{
 				if ( Input.Pressed( InputButton.Score ) )
 				{
-					if ( !Backpack.Current.IsOpen )
+					if ( !UI.Backpack.Current.IsOpen )
 						TimeSinceBackpackOpen = 0f;
 					else
 						IsBackpackToggleMode = false;
 
-					if ( IDialog.IsActive() )
-						IDialog.CloseActive();
+					if ( UI.IDialog.IsActive() )
+						UI.IDialog.CloseActive();
 					else
-						Backpack.Current?.Open();
+						UI.Backpack.Current?.Open();
 				}
 
 				if ( Input.Released( InputButton.Score ) )
@@ -1049,24 +1011,24 @@ namespace Facepunch.CoreWars
 
 					if ( !IsBackpackToggleMode )
 					{
-						Backpack.Current?.Close();
+						UI.Backpack.Current?.Close();
 					}
 				}
 
 				if ( Input.Down( InputButton.Menu ) )
-					TeamList.Open();
+					UI.TeamList.Open();
 				else
-					TeamList.Close();
+					UI.TeamList.Close();
 			}
 
-			var currentSlotIndex = (int)CurrentHotbarIndex;
+			var currentSlotIndex = (int)HotbarIndex;
 
 			if ( Input.MouseWheel > 0 )
 				currentSlotIndex++;
 			else if ( Input.MouseWheel < 0 )
 				currentSlotIndex--;
 
-			var maxSlotIndex = HotbarInventory.Instance.SlotLimit - 1;
+			var maxSlotIndex = Hotbar.SlotLimit - 1;
 
 			if ( currentSlotIndex < 0 )
 				currentSlotIndex = maxSlotIndex;
@@ -1074,10 +1036,10 @@ namespace Facepunch.CoreWars
 				currentSlotIndex = 0;
 
 
-			CurrentHotbarIndex = (ushort)currentSlotIndex;
+			HotbarIndex = (ushort)currentSlotIndex;
 			UpdateHotbarSlotKeys();
 
-			var hotbarItem = HotbarInventory.Instance.GetFromSlot( CurrentHotbarIndex );
+			var hotbarItem = Hotbar.GetFromSlot( HotbarIndex );
 
 			if ( hotbarItem is WeaponItem weaponItem )
 				ActiveChild = weaponItem.Weapon;
@@ -1088,7 +1050,7 @@ namespace Facepunch.CoreWars
 			{
 				if ( Input.Released( InputButton.Use ) )
 				{
-					if ( !IDialog.IsActive() )
+					if ( !UI.IDialog.IsActive() )
 					{
 						var trace = Trace.Ray( EyePosition, EyePosition + EyeRotation.Forward * 10000f )
 							.EntitiesOnly()
@@ -1103,21 +1065,17 @@ namespace Facepunch.CoreWars
 					}
 					else
 					{
-						IDialog.CloseActive();
+						UI.IDialog.CloseActive();
 					}
 				}
 			}
-
-			Projectiles.Simulate();
-
-			SimulateActiveChild( client, ActiveChild );
 		}
 
 		protected virtual void OnTeamChanged( Team team )
 		{
 			if ( IsClient )
 			{
-				TeamList.Refresh();
+				UI.TeamList.Refresh();
 			}
 		}
 
@@ -1134,40 +1092,78 @@ namespace Facepunch.CoreWars
 
 		public virtual void CreateInventories()
 		{
-			var hotbar = new InventoryContainer( this );
+			var hotbar = new HotbarContainer();
+			hotbar.SetEntity( this );
 			hotbar.SetSlotLimit( 8 );
 			hotbar.AddConnection( Client );
-			hotbar.OnItemTaken += OnHotbarItemTaken;
-			hotbar.OnItemGiven += OnHotbarItemGiven;
+			hotbar.ItemTaken += OnHotbarItemTaken;
+			hotbar.ItemGiven += OnHotbarItemGiven;
 			InventorySystem.Register( hotbar );
 
-			HotbarInventory = new NetInventoryContainer( hotbar );
+			InternalHotbar = new NetInventoryContainer( hotbar );
 
-			var backpack = new InventoryContainer( this );
+			var backpack = new BackpackContainer();
+			backpack.SetEntity( this );
 			backpack.SetSlotLimit( 24 );
 			backpack.AddConnection( Client );
-			backpack.OnItemTaken += OnBackpackItemTaken;
-			backpack.OnItemGiven += OnBackpackItemGiven;
+			backpack.ItemTaken += OnBackpackItemTaken;
+			backpack.ItemGiven += OnBackpackItemGiven;
 			InventorySystem.Register( backpack );
 
-			BackpackInventory = new NetInventoryContainer( backpack );
+			InternalBackpack = new NetInventoryContainer( backpack );
 
-			var chest = new InventoryContainer( this );
+			var chest = new InventoryContainer();
+			chest.SetEntity( this );
 			chest.SetSlotLimit( 24 );
 			chest.AddConnection( Client );
 			InventorySystem.Register( chest );
 
 			ChestInventory = new NetInventoryContainer( chest );
 
-			var equipment = new InventoryContainer( this );
+			var equipment = new EquipmentContainer( );
+			equipment.SetEntity( this );
 			equipment.SetSlotLimit( 3 );
 			equipment.AddConnection( Client );
-			equipment.OnItemTaken += OnEquipmentItemTaken;
-			equipment.OnItemGiven += OnEquipmentItemGiven;
-			equipment.SetGiveCondition( CanGiveEquipmentItem );
+			equipment.ItemTaken += OnEquipmentItemTaken;
+			equipment.ItemGiven += OnEquipmentItemGiven;
 			InventorySystem.Register( equipment );
 
-			EquipmentInventory = new NetInventoryContainer( equipment );
+			InternalEquipment = new NetInventoryContainer( equipment );
+		}
+
+		public override void OnAnimEventFootstep( Vector3 position, int foot, float volume )
+		{
+			if ( LifeState == LifeState.Dead || !IsClient )
+				return;
+
+			if ( TimeSinceLastFootstep < 0.2f )
+				return;
+
+			var block = GetBlockBelow();
+
+			if ( block is not AirBlock )
+			{
+				var sound = foot == 0 ? block.FootLeftSound : block.FootRightSound;
+
+				if ( !string.IsNullOrEmpty( sound ) )
+				{
+					Sound.FromWorld( sound, position ).SetVolume( volume );
+					return;
+				}
+			}
+
+			volume *= GetFootstepVolume();
+
+			TimeSinceLastFootstep = 0f;
+
+			var trace = Trace.Ray( position, position + Vector3.Down * 20f )
+				.Radius( 1 )
+				.Ignore( this )
+				.Run();
+
+			if ( !trace.Hit ) return;
+
+			trace.Surface.DoFootstep( this, trace, foot, volume );
 		}
 
 		public override void Touch( Entity other )
@@ -1185,7 +1181,7 @@ namespace Facepunch.CoreWars
 			if ( !itemEntity.TimeUntilCanPickup || !itemEntity.Item.IsValid() )
 				return;
 
-			var remaining = TryGiveItem( itemEntity.Item.Instance );
+			var remaining = TryGiveItem( itemEntity.Item );
 
 			if ( remaining == 0 )
 			{
@@ -1243,45 +1239,13 @@ namespace Facepunch.CoreWars
 		{
 			if ( IsServer )
 			{
-				InventorySystem.Remove( HotbarInventory.Instance, true );
-				InventorySystem.Remove( BackpackInventory.Instance, true );
-				InventorySystem.Remove( EquipmentInventory.Instance, true );
-				InventorySystem.Remove( ChestInventory.Instance, true );
+				InventorySystem.Remove( Hotbar, true );
+				InventorySystem.Remove( Backpack, true );
+				InventorySystem.Remove( Equipment, true );
+				InventorySystem.Remove( ChestInventory.Value, true );
 			}
 
 			base.OnDestroy();
-		}
-
-		private bool CanGiveEquipmentItem( ushort slot, InventoryItem item )
-		{
-			if ( item is not ArmorItem armor )
-				return false;
-
-			if ( armor.ArmorSlot == ArmorSlot.Head )
-				return slot == 0;
-
-			if ( armor.ArmorSlot == ArmorSlot.Chest )
-				return slot == 1;
-
-			if ( armor.ArmorSlot == ArmorSlot.Legs )
-				return slot == 2;
-
-			return false;
-		}
-
-		private InventoryContainer GetBackpackTransferTarget( InventoryItem item )
-		{
-			return Storage.Current.IsOpen ? Storage.Current.StorageContainer : HotbarInventory.Instance;
-		}
-
-		private InventoryContainer GetEquipmentTransferTarget( InventoryItem item )
-		{
-			return Storage.Current.IsOpen ? Storage.Current.StorageContainer : BackpackInventory.Instance;
-		}
-
-		private InventoryContainer GetHotbarTransferTarget( InventoryItem item )
-		{
-			return Storage.Current.IsOpen ? Storage.Current.StorageContainer : BackpackInventory.Instance;
 		}
 
 		private BlockGhost GetOrCreateBlockGhost()
@@ -1384,7 +1348,7 @@ namespace Facepunch.CoreWars
 
 		private void OnEquipmentItemTaken( ushort slot, InventoryItem instance )
 		{
-			if ( instance is ArmorItem armor && !EquipmentInventory.Is( instance.Container ) )
+			if ( instance is ArmorItem armor && !Equipment.Is( instance.Parent ) )
 			{
 				if ( Armor.TryGetValue( armor.ArmorSlot, out var models ) )
 				{
@@ -1420,7 +1384,7 @@ namespace Facepunch.CoreWars
 		{
 			if ( instance is WeaponItem weapon )
 			{
-				if ( weapon.Weapon.IsValid() && !HotbarInventory.Is( instance.Container ) )
+				if ( weapon.Weapon.IsValid() && !Hotbar.Is( instance.Parent ) )
 				{
 					weapon.Weapon.Delete();
 					weapon.Weapon = null;
@@ -1431,7 +1395,7 @@ namespace Facepunch.CoreWars
 
 		private void InitializeHotbarWeapons()
 		{
-			foreach ( var item in HotbarInventory.Instance.ItemList )
+			foreach ( var item in Hotbar.ItemList )
 			{
 				if ( item is WeaponItem weapon )
 				{
@@ -1460,35 +1424,35 @@ namespace Facepunch.CoreWars
 
 		private void UpdateHotbarSlotKeys()
 		{
-			var index = CurrentHotbarIndex;
+			var index = HotbarIndex;
 
 			if ( Input.Pressed( InputButton.Slot1 ) )
-				index = (ushort)Math.Min( 0, HotbarInventory.Instance.SlotLimit - 1 );
+				index = (ushort)Math.Min( 0, Hotbar.SlotLimit - 1 );
 
 			if ( Input.Pressed( InputButton.Slot2 ) )
-				index = (ushort)Math.Min( 1, HotbarInventory.Instance.SlotLimit - 1 );
+				index = (ushort)Math.Min( 1, Hotbar.SlotLimit - 1 );
 
 			if ( Input.Pressed( InputButton.Slot3 ) )
-				index = (ushort)Math.Min( 2, HotbarInventory.Instance.SlotLimit - 1 );
+				index = (ushort)Math.Min( 2, Hotbar.SlotLimit - 1 );
 
 			if ( Input.Pressed( InputButton.Slot4 ) )
-				index = (ushort)Math.Min( 3, HotbarInventory.Instance.SlotLimit - 1 );
+				index = (ushort)Math.Min( 3, Hotbar.SlotLimit - 1 );
 
 			if ( Input.Pressed( InputButton.Slot5 ) )
-				index = (ushort)Math.Min( 4, HotbarInventory.Instance.SlotLimit - 1 );
+				index = (ushort)Math.Min( 4, Hotbar.SlotLimit - 1 );
 
 			if ( Input.Pressed( InputButton.Slot6 ) )
-				index = (ushort)Math.Min( 5, HotbarInventory.Instance.SlotLimit - 1 );
+				index = (ushort)Math.Min( 5, Hotbar.SlotLimit - 1 );
 
 			if ( Input.Pressed( InputButton.Slot7 ) )
-				index = (ushort)Math.Min( 6, HotbarInventory.Instance.SlotLimit - 1 );
+				index = (ushort)Math.Min( 6, Hotbar.SlotLimit - 1 );
 
 			if ( Input.Pressed( InputButton.Slot8 ) )
-				index = (ushort)Math.Min( 7, HotbarInventory.Instance.SlotLimit - 1 );
+				index = (ushort)Math.Min( 7, Hotbar.SlotLimit - 1 );
 
-			if ( index != CurrentHotbarIndex )
+			if ( index != HotbarIndex )
 			{
-				var container = HotbarInventory.Instance;
+				var container = Hotbar;
 				var item = container.GetFromSlot( index );
 
 				if ( item is IConsumableItem consumable )
@@ -1501,7 +1465,7 @@ namespace Facepunch.CoreWars
 					return;
 				}
 
-				CurrentHotbarIndex = index;
+				HotbarIndex = index;
 			}
 		}
 	}

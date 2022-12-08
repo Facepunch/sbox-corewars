@@ -1,4 +1,4 @@
-﻿using Facepunch.CoreWars.Inventory;
+﻿
 using System.Collections.Generic;
 using Sandbox;
 using System;

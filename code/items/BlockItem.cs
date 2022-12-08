@@ -1,5 +1,4 @@
-﻿using Facepunch.CoreWars.Inventory;
-using Facepunch.Voxels;
+﻿using Facepunch.Voxels;
 using Sandbox;
 using System.IO;
 
@@ -13,7 +12,7 @@ namespace Facepunch.CoreWars
 		public override ushort MaxStackSize => 64;
 		public override bool RemoveOnDeath => true;
 		public override bool CanBeDropped => false;
-		public override Color Color => ColorPalette.Blocks;
+		public override Color Color => UI.ColorPalette.Blocks;
 		public override string Description
 		{
 			get

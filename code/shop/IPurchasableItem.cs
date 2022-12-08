@@ -6,7 +6,7 @@ namespace Facepunch.CoreWars
 	public interface IPurchasableItem
 	{
 		public string Name { get; }
-		public ItemTag[] Tags { get; }
+		public IReadOnlySet<string> Tags { get; }
 		public string Description { get; }
 		public Color Color { get; }
 		public Dictionary<Type, int> Costs { get; }

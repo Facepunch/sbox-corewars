@@ -4,716 +4,884 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Facepunch.CoreWars.Inventory
+namespace Facepunch.CoreWars;
+
+public class InventoryContainer : IValid
 {
-	public class InventoryContainer : IValid
+	public delegate void ItemTakenCallback( ushort slot, InventoryItem instance );
+	public delegate void ItemGivenCallback( ushort slot, InventoryItem instance );
+	public delegate void SlotChangedCallback( ushort slot );
+	public delegate InventoryContainer TransferHandlerCallback( InventoryItem item );
+
+	public event SlotChangedCallback SlotChanged;
+	public event SlotChangedCallback DataChanged;
+	public event ItemGivenCallback ItemGiven;
+	public event ItemTakenCallback ItemTaken;
+	public event Action<Client> ConnectionRemoved;
+	public event Action<Client> ConnectionAdded;
+
+	private bool InternalIsDirty;
+
+	public bool IsServer => Host.IsServer;
+	public bool IsClient => Host.IsClient;
+
+	public bool IsDirty
 	{
-		public delegate void ItemTakenCallback( ushort slot, InventoryItem instance );
-		public delegate void ItemGivenCallback( ushort slot, InventoryItem instance );
-		public delegate void SlotChangedCallback( ushort slot );
-		public delegate bool GiveConditionCallback( ushort slot, InventoryItem instance );
-		public delegate bool TakeConditionCallback( ushort slot, InventoryItem instance );
-		public delegate InventoryContainer TransferTargetCallback( InventoryItem instance );
+		get => InternalIsDirty;
 
-		public event SlotChangedCallback OnSlotChanged;
-		public event SlotChangedCallback OnDataChanged;
-		public event ItemGivenCallback OnItemGiven;
-		public event ItemTakenCallback OnItemTaken;
-		public event Action<Client> OnConnectionRemoved;
-		public event Action<Client> OnConnectionAdded;
-
-		private bool InternalIsDirty;
-
-		public bool IsServer => Host.IsServer;
-		public bool IsClient => Host.IsClient;
-
-		public bool IsDirty
+		set
 		{
-			get => InternalIsDirty;
+			if ( IsClient ) return;
+			if ( InternalIsDirty == value ) return;
 
-			set
+			InternalIsDirty = value;
+
+			if ( InternalIsDirty )
 			{
-				if ( IsServer )
-				{
-					if ( InternalIsDirty != value )
-					{
-						InternalIsDirty = value;
-
-						if ( InternalIsDirty )
-						{
-							InventorySystem.AddToDirtyList( this );
-						}
-					}
-				}
+				InventorySystem.AddToDirtyList( this );
 			}
 		}
+	}
 
-		public TransferTargetCallback TransferTargetHandler { get; private set; }
-		public GiveConditionCallback GiveCondition { get; private set; }
-		public TakeConditionCallback TakeCondition { get; private set; }
-		public ulong InventoryId { get; private set; }
-		public Entity Entity { get; }
-		public List<Client> Connections { get; }
-		public List<InventoryItem> ItemList { get; }
-		public ushort SlotLimit { get; private set; }
+	public InventoryItem Parent => InventorySystem.FindInstance( ParentId );
+	public ulong ParentId { get; private set; }
+	public HashSet<string> Blacklist { get; set; } = new();
+	public HashSet<string> Whitelist { get; set; } = new();
+	public ulong InventoryId { get; private set; }
+	public bool IsTakeOnly { get; set; }
+	public Entity Entity { get; private set; }
+	public List<Client> Connections { get; }
+	public List<InventoryItem> ItemList { get; }
+	public ushort SlotLimit { get; private set; }
+	public bool IsEmpty => !ItemList.Any( i => i.IsValid() );
+	public bool IsValid => true;
 
-		public bool IsValid => true;
+	protected TransferHandlerCallback TransferHandler { get; set; }
 
-		public static InventoryContainer Deserialize( byte[] data )
+	public static InventoryContainer Deserialize( byte[] data )
+	{
+		using ( var stream = new MemoryStream( data ) )
 		{
-			using ( var stream = new MemoryStream( data ) )
+			using ( var reader = new BinaryReader( stream ) )
 			{
-				using ( var reader = new BinaryReader( stream ) )
-				{
-					return reader.ReadInventoryContainer();
-				}
+				return reader.ReadInventoryContainer();
 			}
 		}
+	}
 
-		public byte[] Serialize()
+	public InventoryContainer()
+	{
+		ItemList = new List<InventoryItem>();
+		Connections = new List<Client>();
+	}
+
+	public void SetEntity( Entity entity )
+	{
+		Entity = entity;
+	}
+
+	public void SetParent( InventoryItem item )
+	{
+		ParentId = item.ItemId;
+	}
+
+	public void SetParent( ulong itemId )
+	{
+		ParentId = itemId;
+	}
+
+	public void ClearParent()
+	{
+		ParentId = 0;
+	}
+
+	public byte[] Serialize()
+	{
+		using ( var stream = new MemoryStream() )
 		{
-			using ( var stream = new MemoryStream() )
+			using ( var writer = new BinaryWriter( stream ) )
 			{
-				using ( var writer = new BinaryWriter( stream ) )
-				{
-					writer.WriteInventoryContainer( this );
-					return stream.ToArray();
-				}
+				writer.Write( this );
+				return stream.ToArray();
 			}
 		}
+	}
 
-		public void InvokeDataChanged( ushort slot )
-		{
-			OnDataChanged?.Invoke( slot );
-		}
+	public void SetTransferHandler( TransferHandlerCallback callback )
+	{
+		TransferHandler = callback;
+	}
 
-		public void SetTransferTargetHandler( TransferTargetCallback callback )
-		{
-			TransferTargetHandler = callback;
-		}
+	public void InvokeDataChanged( ushort slot )
+	{
+		DataChanged?.Invoke( slot );
+	}
 
-		public void SetGiveCondition( GiveConditionCallback condition )
-		{
-			GiveCondition = condition;
-		}
+	public bool IsOccupied( ushort slot )
+	{
+		return (GetFromSlot( slot ) != null);
+	}
 
-		public void SetTakeCondition( TakeConditionCallback condition )
+	public bool SetSlotLimit( ushort slotLimit )
+	{
+		if ( slotLimit >= ItemList.Count )
 		{
-			TakeCondition = condition;
-		}
+			var difference = slotLimit - ItemList.Count;
 
-		public bool IsOccupied( ushort slot )
-		{
-			return (GetFromSlot( slot ) != null);
-		}
-
-		public bool SetSlotLimit( ushort slotLimit )
-		{
-			if ( slotLimit >= ItemList.Count )
+			for ( var i = 0; i < difference; i++ )
 			{
-				var difference = slotLimit - ItemList.Count;
-
-				for ( var i = 0; i < difference; i++ )
-				{
-					ItemList.Add( null );
-				}
+				ItemList.Add( null );
 			}
-			else if ( slotLimit < ItemList.Count )
-			{
-				return false;
-			}
-
-			SlotLimit = slotLimit;
-
-			return true;
+		}
+		else if ( slotLimit < ItemList.Count )
+		{
+			return false;
 		}
 
-		public InventoryItem GetItem( ulong itemId )
+		SlotLimit = slotLimit;
+
+		return true;
+	}
+
+	public InventoryItem GetItem( ulong itemId )
+	{
+		if ( itemId == 0 )
 		{
-			if ( itemId == 0 )
-			{
-				return null;
-			}
-
-			for ( int i = 0; i < ItemList.Count; i++ )
-			{
-				var instance = ItemList[i];
-
-				if ( instance != null && instance.ItemId == itemId )
-				{
-					return ItemList[i];
-				}
-			}
-
 			return null;
 		}
 
-		public void AddConnection( Client connection )
+		for ( int i = 0; i < ItemList.Count; i++ )
 		{
-			if ( !Connections.Contains( connection ) )
+			var instance = ItemList[i];
+
+			if ( instance != null && instance.ItemId == itemId )
 			{
-				Connections.Add( connection );
-				OnConnectionAdded?.Invoke( connection );
+				return ItemList[i];
 			}
 		}
 
-		public void RemoveConnection( Client connection )
+		return null;
+	}
+
+	public void AddConnection( Client connection )
+	{
+		if ( !Connections.Contains( connection ) )
 		{
-			if ( Connections.Contains( connection ) )
-			{
-				Connections.Remove( connection );
-				OnConnectionRemoved?.Invoke( connection );
-			}
+			Connections.Add( connection );
+			ConnectionAdded?.Invoke( connection );
+		}
+	}
+
+	public void RemoveConnection( Client connection )
+	{
+		if ( Connections.Contains( connection ) )
+		{
+			Connections.Remove( connection );
+			ConnectionRemoved?.Invoke( connection );
+		}
+	}
+
+	public bool IsConnected( Client connection )
+	{
+		return Connections.Contains( connection );
+	}
+
+	public InventoryItem GetFromSlot( ushort slot )
+	{
+		return ItemList[slot];
+	}
+
+	public void SetInventoryId( ulong inventoryId )
+	{
+		InventoryId = inventoryId;
+	}
+
+	public IEnumerable<Client> GetRecipients()
+	{
+		var recipients = Client.All
+			.Where( c => c.Components.TryGet<InventoryViewer>( out var viewer )
+			&& viewer.ContainerIds.Contains( InventoryId ) )
+			.Concat( Connections );
+
+		if ( Parent.IsValid() && Parent.Parent.IsValid() )
+		{
+			recipients = recipients.Concat( Parent.Parent.GetRecipients() );
 		}
 
-		public bool IsConnected( Client connection )
+		return recipients.Distinct();
+	}
+
+	public void SendDirtyItems()
+	{
+		var recipients = GetRecipients();
+
+		if ( recipients.Any() )
 		{
-			return Connections.Contains( connection );
+			InventorySystem.SendDirtyItemsEvent( To.Multiple( recipients ), this );
+		}
+	}
+
+	public IEnumerable<InventoryItem> FindItems( Type type )
+	{
+		for ( int i = 0; i < ItemList.Count; i++ )
+		{
+			var item = ItemList[i];
+
+			if ( item.IsValid() && item.GetType().IsAssignableTo( type ) )
+			{
+				yield return item;
+			}
+		}
+	}
+
+	public IEnumerable<T> FindItems<T>() where T : InventoryItem
+	{
+		for ( int i = 0; i < ItemList.Count; i++ )
+		{
+			var instance = (ItemList[i] as T);
+
+			if ( instance.IsValid() )
+			{
+				yield return instance;
+			}
+		}
+	}
+
+	public bool Split( InventoryContainer target, ushort fromSlot, ushort toSlot )
+	{
+		if ( !IsOccupied( fromSlot ) )
+		{
+			return false;
 		}
 
-		public InventoryItem GetFromSlot( ushort slot )
+		var item = GetFromSlot( fromSlot );
+
+		if ( !CanTakeItem( fromSlot, item ) )
+			return false;
+
+		if ( !target.CanGiveItem( toSlot, item ) )
+			return false;
+
+		if ( IsClient )
 		{
-			return ItemList[slot];
-		}
-
-		public void SetInventoryId( ulong inventoryId )
-		{
-			InventoryId = inventoryId;
-		}
-
-		public void SendDirtyItems()
-		{
-			if ( Connections.Count > 0 )
-			{
-				InventorySystem.SendDirtyItemsEvent( To.Multiple( Connections ), this );
-			}
-		}
-
-		public List<InventoryItem> FindItems( Type type )
-		{
-			var output = new List<InventoryItem>();
-
-			for ( int i = 0; i < ItemList.Count; i++ )
-			{
-				var item = ItemList[i];
-
-				if ( item.IsValid() && item.GetType().IsAssignableTo( type ) )
-				{
-					output.Add( item );
-				}
-			}
-
-			return output;
-		}
-
-		public List<T> FindItems<T>() where T : InventoryItem
-		{
-			var output = new List<T>();
-
-			for ( int i = 0; i < ItemList.Count; i++ )
-			{
-				var instance = (ItemList[i] as T);
-
-				if ( instance != null )
-				{
-					output.Add( instance );
-				}
-			}
-
-			return output;
-		}
-
-		public bool Split( InventoryContainer target, ushort fromSlot, ushort toSlot )
-		{
-			if ( !IsOccupied( fromSlot ) )
-			{
-				return false;
-			}
-
-			var item = GetFromSlot( fromSlot );
-
-			if ( TakeCondition != null && !TakeCondition( fromSlot, item ) )
-				return false;
-
-			if ( target.GiveCondition != null && !target.GiveCondition( toSlot, item ) )
-				return false;
-
-			if ( IsClient )
-			{
-				InventorySystem.SendSplitInventoryEvent( this, target, fromSlot, toSlot );
-				return true;
-			}
-
-			if ( item.StackSize == 1 )
-			{
-				return Move( target, fromSlot, toSlot );
-			}
-
-			var splitStackSize = item.StackSize / 2;
-
-			if ( item.StackSize - splitStackSize <= 0 )
-			{
-				return Move( target, fromSlot, toSlot );
-			}
-
-			var splitItem = InventorySystem.CreateDuplicateItem( item );
-			splitItem.StackSize = (ushort)splitStackSize;
-
-			var targetItem = target.GetFromSlot( toSlot );
-
-			if ( targetItem.IsValid() )
-			{
-				var remaining = target.Stack( splitItem, toSlot );
-				splitStackSize -= remaining;
-				item.StackSize -= (ushort)splitStackSize;
-			}
-			else
-			{
-				target.Give( splitItem, toSlot );
-				item.StackSize -= (ushort)splitStackSize;
-			}
-
+			InventorySystem.SendSplitEvent( this, target, fromSlot, toSlot );
 			return true;
 		}
 
-		public bool Move( InventoryContainer target, ushort fromSlot, ushort toSlot )
+		if ( item.StackSize == 1 )
 		{
-			if ( !IsOccupied( fromSlot ) )
-			{
-				return false;
-			}
+			return Move( target, fromSlot, toSlot );
+		}
 
-			var fromInstance = ItemList[fromSlot];
+		var splitStackSize = item.StackSize / 2;
 
-			if ( TakeCondition != null && !TakeCondition( fromSlot, fromInstance ) )
-				return false;
+		if ( item.StackSize - splitStackSize <= 0 )
+		{
+			return Move( target, fromSlot, toSlot );
+		}
 
-			if ( target.GiveCondition != null && !target.GiveCondition( toSlot, fromInstance ) )
-				return false;
+		var splitItem = InventorySystem.DuplicateItem( item );
+		splitItem.StackSize = (ushort)splitStackSize;
 
-			if ( IsClient )
-			{
-				InventorySystem.SendMoveInventoryEvent( this, target, fromSlot, toSlot );
-				return true;
-			}
+		var targetItem = target.GetFromSlot( toSlot );
 
-			if ( target.IsOccupied( toSlot ) )
-			{
-				var toInstance = target.ItemList[toSlot];
-				var canStack = fromInstance.IsSameType( toInstance ) && fromInstance.CanStackWith( toInstance );
+		if ( targetItem.IsValid() )
+		{
+			var remaining = target.Stack( splitItem, toSlot );
+			splitStackSize -= remaining;
+			item.StackSize -= (ushort)splitStackSize;
+		}
+		else
+		{
+			target.Give( splitItem, toSlot );
+			item.StackSize -= (ushort)splitStackSize;
+		}
 
-				if ( canStack )
-				{
-					ushort amountCanStack = (ushort)Math.Max( toInstance.MaxStackSize - toInstance.StackSize, 0 );
-					ushort amountToTake = 0;
+		return true;
+	}
 
-					if ( amountCanStack > 0 )
-					{
-						amountToTake = fromInstance.StackSize;
+	public bool Move( InventoryContainer target, ushort fromSlot, ushort toSlot )
+	{
+		if ( !IsOccupied( fromSlot ) )
+		{
+			return false;
+		}
 
-						if ( amountCanStack < amountToTake )
-							amountToTake = amountCanStack;
+		var fromInstance = ItemList[fromSlot];
 
-						if ( amountToTake >= 0 )
-							toInstance.StackSize += amountToTake;
+		if ( !CanTakeItem( fromSlot, fromInstance ) )
+			return false;
 
-						if ( amountToTake >= fromInstance.StackSize )
-						{
-							fromInstance.StackSize = 0;
-							ClearSlot( fromSlot );
-						}
-						else
-						{
-							fromInstance.StackSize -= amountCanStack;
-						}
-					}
+		if ( target.Parent == fromInstance )
+			return false;
 
-					if ( amountToTake > 0 )
-					{
-						return true;
-					}
-				}
+		if ( !target.CanGiveItem( toSlot, fromInstance ) )
+			return false;
 
-				fromInstance.Container = target;
-				fromInstance.SlotId = toSlot;
-
-				toInstance.Container = this;
-				toInstance.SlotId = fromSlot;
-
-				SendTakeEvent( fromSlot, fromInstance );
-				target.SendTakeEvent( toSlot, toInstance );
-
-				target.ItemList[toSlot] = fromInstance;
-				target.SendGiveEvent( toSlot, fromInstance );
-
-				ItemList[fromSlot] = toInstance;
-				SendGiveEvent( fromSlot, toInstance );
-			}
-			else
-			{
-				fromInstance.SlotId = toSlot;
-				fromInstance.Container = target;
-
-				target.ItemList[toSlot] = fromInstance;
-				target.SendGiveEvent( toSlot, fromInstance );
-
-				ClearSlot( fromSlot, false );
-			}
-
+		if ( IsClient )
+		{
+			InventorySystem.SendMoveEvent( this, target, fromSlot, toSlot );
 			return true;
 		}
 
-		public bool Is( InventoryContainer container )
+		if ( target.IsOccupied( toSlot ) )
 		{
-			return container == this;
-		}
+			var toInstance = target.ItemList[toSlot];
+			var canStack = fromInstance.IsSameType( toInstance ) && fromInstance.CanStackWith( toInstance );
 
-		public bool Is( NetInventoryContainer container )
-		{
-			return container.Instance == this;
-		}
-
-		public InventoryItem Remove( InventoryItem item )
-		{
-			return Remove( item.ItemId );
-		}
-
-		public InventoryItem Remove( ulong itemId )
-		{
-			if ( itemId == 0 )
+			if ( canStack )
 			{
-				return null;
-			}
+				ushort amountCanStack = (ushort)Math.Max( toInstance.MaxStackSize - toInstance.StackSize, 0 );
+				ushort amountToTake = 0;
 
-			for ( ushort i = 0; i < ItemList.Count; i++ )
-			{
-				var instance = ItemList[i];
-
-				if ( instance != null && instance.ItemId == itemId )
+				if ( amountCanStack > 0 )
 				{
-					return ClearSlot( i );
+					amountToTake = fromInstance.StackSize;
+
+					if ( amountCanStack < amountToTake )
+						amountToTake = amountCanStack;
+
+					if ( amountToTake >= 0 )
+						toInstance.StackSize += amountToTake;
+
+					if ( amountToTake >= fromInstance.StackSize )
+					{
+						fromInstance.StackSize = 0;
+						ClearSlot( fromSlot );
+					}
+					else
+					{
+						fromInstance.StackSize -= amountCanStack;
+					}
+				}
+
+				if ( amountToTake > 0 )
+				{
+					return true;
 				}
 			}
 
+			fromInstance.Parent = target;
+			fromInstance.SlotId = toSlot;
+
+			toInstance.Parent = this;
+			toInstance.SlotId = fromSlot;
+
+			SendTakeEvent( fromSlot, fromInstance );
+			target.SendTakeEvent( toSlot, toInstance );
+
+			target.ItemList[toSlot] = fromInstance;
+			target.SendGiveEvent( toSlot, fromInstance );
+
+			ItemList[fromSlot] = toInstance;
+			SendGiveEvent( fromSlot, toInstance );
+		}
+		else
+		{
+			fromInstance.SlotId = toSlot;
+			fromInstance.Parent = target;
+
+			target.ItemList[toSlot] = fromInstance;
+			target.SendGiveEvent( toSlot, fromInstance );
+
+			ClearSlot( fromSlot, false );
+		}
+
+		return true;
+	}
+
+	public bool Is( InventoryContainer container )
+	{
+		return container == this;
+	}
+
+	public bool Is( NetInventoryContainer container )
+	{
+		return container.Value == this;
+	}
+
+	public InventoryItem Remove( InventoryItem item )
+	{
+		return Remove( item.ItemId );
+	}
+
+	public InventoryItem Remove( ulong itemId )
+	{
+		if ( itemId == 0 )
+		{
 			return null;
 		}
 
-		public InventoryItem ClearSlot( ushort slot, bool clearItemContainer = true )
+		for ( ushort i = 0; i < ItemList.Count; i++ )
 		{
-			if ( IsClient )
+			var instance = ItemList[i];
+
+			if ( instance != null && instance.ItemId == itemId )
 			{
-				return null;
+				return ClearSlot( i );
 			}
-
-			if ( !IsOccupied( slot ) )
-			{
-				return null;
-			}
-
-			var instance = GetFromSlot( slot );
-
-			if ( clearItemContainer )
-			{
-				if ( instance.Container == this )
-				{
-					instance.Container = null;
-					instance.SlotId = 0;
-				}
-			}
-
-			ItemList[slot] = null;
-
-			SendTakeEvent( slot, instance );
-
-			return instance;
 		}
 
-		public List<InventoryItem> Give( List<InventoryItem> instances )
+		return null;
+	}
+
+	public InventoryItem ClearSlot( ushort slot, bool clearItemContainer = true )
+	{
+		if ( IsClient )
 		{
-			var remainder = new List<InventoryItem>();
-
-			for ( var i = 0; i < instances.Count; i++ )
-			{
-				var instance = instances[i];
-
-				if ( !Give( instance ) )
-				{
-					remainder.Add( instance );
-				}
-			}
-
-			return remainder;
+			return null;
 		}
 
-		public bool FindFreeSlot( out ushort slot )
+		if ( !IsOccupied( slot ) )
 		{
-			var slotLimit = SlotLimit;
+			return null;
+		}
 
-			for ( ushort i = 0; i < slotLimit; i++ )
+		var instance = GetFromSlot( slot );
+
+		if ( clearItemContainer )
+		{
+			if ( instance.Parent == this )
 			{
-				if ( ItemList[i] == null )
+				instance.Parent = null;
+				instance.SlotId = 0;
+			}
+		}
+
+		ItemList[slot] = null;
+
+		SendTakeEvent( slot, instance );
+
+		return instance;
+	}
+
+	public List<InventoryItem> Give( List<InventoryItem> instances )
+	{
+		var remainder = new List<InventoryItem>();
+
+		for ( var i = 0; i < instances.Count; i++ )
+		{
+			var instance = instances[i];
+
+			if ( !Give( instance ) )
+			{
+				remainder.Add( instance );
+			}
+		}
+
+		return remainder;
+	}
+
+	public bool FindFreeSlot( out ushort slot, InventoryItem instance = null )
+	{
+		var slotLimit = SlotLimit;
+
+		for ( ushort i = 0; i < slotLimit; i++ )
+		{
+			if ( !ItemList[i].IsValid() )
+			{
+				if ( !instance.IsValid() || CanGiveItem( i, instance ) )
 				{
 					slot = i;
 					return true;
 				}
 			}
+		}
 
-			slot = 0;
+		slot = 0;
+		return false;
+	}
+
+	public bool Give( InventoryItem instance )
+	{
+		if ( !FindFreeSlot( out var slot, instance ) )
+		{
 			return false;
 		}
 
-		public bool Give( InventoryItem instance )
-		{
-			if ( !FindFreeSlot( out var slot ) )
-			{
-				return false;
-			}
+		return Give( instance, slot );
+	}
 
-			return Give( instance, slot );
+	public InventoryItem Replace( ushort slot, InventoryItem instance )
+	{
+		if ( IsClient )
+		{
+			return null;
 		}
 
-		public InventoryItem Replace( ushort slot, InventoryItem instance )
+		var slotLimit = SlotLimit;
+
+		if ( slot >= slotLimit )
 		{
-			if ( IsClient )
-			{
-				return null;
-			}
-
-			var slotLimit = SlotLimit;
-
-			if ( slot >= slotLimit )
-			{
-				Log.Info( "Unable to give an item to this inventory because slot #" + slot + " is greater than the limit of " + slotLimit );
-				return null;
-			}
-
-			var oldItem = ItemList[slot];
-
-			if ( oldItem.IsValid() )
-			{
-				oldItem.Container = null;
-				oldItem.SlotId = 0;
-			}
-
-			instance.SlotId = slot;
-			instance.Container = this;
-
-			ItemList[slot] = instance;
-
-			SendGiveEvent( slot, instance );
-
-			return oldItem;
+			Log.Info( "Unable to give an item to this inventory because slot #" + slot + " is greater than the limit of " + slotLimit );
+			return null;
 		}
 
-		public bool Give( InventoryItem instance, ushort slot )
+		instance.Remove();
+
+		var oldItem = ItemList[slot];
+
+		if ( oldItem.IsValid() )
 		{
-			if ( IsClient )
-			{
-				return false;
-			}
-
-			var slotLimit = SlotLimit;
-
-			if ( slot >= slotLimit )
-			{
-				Log.Info( "Unable to give an item to this inventory because slot #" + slot + " is greater than the limit of " + slotLimit );
-				return false;
-			}
-
-			if ( ItemList[slot] != null )
-			{
-				Log.Info( "Unable to give an item to this inventory because slot #" + slot + " is occupied!" );
-				return false;
-			}
-
-			instance.SlotId = slot;
-			instance.Container = this;
-
-			ItemList[slot] = instance;
-
-			SendGiveEvent( slot, instance );
-
-			return true;
+			oldItem.Parent = null;
+			oldItem.SlotId = 0;
 		}
 
-		public ushort Stack( InventoryItem instance, ushort slot )
-		{
-			var amount = instance.StackSize;
-			var item = ItemList[slot];
+		instance.SlotId = slot;
+		instance.Parent = this;
 
-			if ( GiveCondition != null && !GiveCondition( slot, item ) )
-				return amount;
+		ItemList[slot] = instance;
+
+		SendGiveEvent( slot, instance );
+
+		return oldItem;
+	}
+
+	public bool Give( InventoryItem instance, ushort slot )
+	{
+		if ( IsClient )
+		{
+			return false;
+		}
+
+		var slotLimit = SlotLimit;
+
+		if ( slot >= slotLimit )
+		{
+			Log.Info( "Unable to give an item to this inventory because slot #" + slot + " is greater than the limit of " + slotLimit );
+			return false;
+		}
+
+		if ( ItemList[slot] != null )
+		{
+			Log.Info( "Unable to give an item to this inventory because slot #" + slot + " is occupied!" );
+			return false;
+		}
+
+		instance.Remove();
+
+		instance.SlotId = slot;
+		instance.Parent = this;
+
+		ItemList[slot] = instance;
+
+		SendGiveEvent( slot, instance );
+
+		return true;
+	}
+
+	public ushort Stack( InventoryItem instance, ushort slot )
+	{
+		var item = ItemList[slot];
+
+		if ( Parent == instance )
+			return instance.StackSize;
+
+		if ( !CanGiveItem( slot, instance ) )
+			return instance.StackSize;
+
+		if ( item != null && item.IsSameType( instance ) && item.CanStackWith( instance ) )
+		{
+			var amountCanStack = (ushort)Math.Max( item.MaxStackSize - item.StackSize, 0 );
+
+			if ( amountCanStack >= instance.StackSize )
+			{
+				item.StackSize += instance.StackSize;
+				instance.StackSize = 0;
+			}
+			else
+			{
+				instance.StackSize = (ushort)Math.Max( instance.StackSize - amountCanStack, 0 );
+				item.StackSize += amountCanStack;
+			}
+
+			if ( instance.StackSize == 0 ) return 0;
+		}
+
+		if ( instance.StackSize > 0 )
+		{
+			var success = Give( instance );
+
+			if ( success )
+			{
+				return 0;
+			}
+		}
+
+		return instance.StackSize;
+	}
+
+	public bool CouldTakeAny( InventoryItem instance )
+	{
+		if ( Parent == instance )
+			return false;
+
+		for ( int i = 0; i < ItemList.Count; i++ )
+		{
+			var item = ItemList[i];
+
+			if ( !CanGiveItem( (ushort)i, instance ) )
+				continue;
+
+			if ( !item.IsValid() )
+				return true;
+
+			if ( item.IsSameType( instance ) && item.CanStackWith( instance ) )
+			{
+				var amountCanStack = (ushort)Math.Max( item.MaxStackSize - item.StackSize, 0 );
+
+				if ( amountCanStack > 0 )
+					return true;
+			}
+		}
+
+		return false;
+	}
+
+	public ushort Stack( InventoryItem instance )
+	{
+		if ( Parent == instance )
+			return instance.StackSize;
+
+		for ( int i = 0; i < ItemList.Count; i++ )
+		{
+			var item = ItemList[i];
+
+			if ( !CanGiveItem( (ushort)i, instance ) )
+				continue;
 
 			if ( item != null && item.IsSameType( instance ) && item.CanStackWith( instance ) )
 			{
 				var amountCanStack = (ushort)Math.Max( item.MaxStackSize - item.StackSize, 0 );
 
-				if ( amountCanStack >= amount )
+				if ( amountCanStack >= instance.StackSize )
 				{
-					item.StackSize += amount;
-					amount = 0;
+					item.StackSize += instance.StackSize;
+					instance.StackSize = 0;
 				}
 				else
 				{
+					instance.StackSize = ( ushort)Math.Max( instance.StackSize - amountCanStack, 0 );
 					item.StackSize += amountCanStack;
-					amount = (ushort)Math.Max( amount - amountCanStack, 0 );
 				}
 
-				if ( amount == 0 ) return 0;
+				if ( instance.StackSize == 0 ) return 0;
 			}
-
-			if ( amount > 0 )
-			{
-				if ( Give( instance, slot ) )
-				{
-					instance.StackSize = amount;
-					return 0;
-				}
-			}
-
-			return amount;
 		}
 
-		public ushort Stack( InventoryItem instance )
+		if ( instance.StackSize > 0 )
 		{
-			var amount = instance.StackSize;
+			var success = Give( instance );
 
-			for ( int i = 0; i < ItemList.Count; i++ )
+			if ( success )
 			{
-				var item = ItemList[i];
-
-				if ( GiveCondition != null && !GiveCondition( (ushort)i, instance ) )
-					continue;
-
-				if ( item != null && item.IsSameType( instance ) && item.CanStackWith( instance ) )
-				{
-					var amountCanStack = (ushort)Math.Max( item.MaxStackSize - item.StackSize, 0 );
-
-					if ( amountCanStack >= amount )
-					{
-						item.StackSize += amount;
-						amount = 0;
-					}
-					else
-					{
-						item.StackSize += amountCanStack;
-						amount = (ushort)Math.Max( amount - amountCanStack, 0 );
-					}
-
-					if ( amount == 0 ) return 0;
-				}
+				return 0;
 			}
-
-			if ( amount > 0 )
-			{
-				var success = Give( instance );
-
-				if ( success )
-				{
-					instance.StackSize = amount;
-					return 0;
-				}
-			}
-
-			return amount;
 		}
 
-		public List<InventoryItem> RemoveAll()
+		return instance.StackSize;
+	}
+
+	public List<InventoryItem> RemoveAll()
+	{
+		var output = new List<InventoryItem>();
+
+		for ( ushort i = 0; i < ItemList.Count; i++ )
 		{
-			var output = new List<InventoryItem>();
-
-			for ( ushort i = 0; i < ItemList.Count; i++ )
-			{
-				var instance = ClearSlot( i );
-
-				if ( instance != null )
-				{
-					output.Add( instance );
-				}
-			}
-
-			return output;
-		}
-
-		private void SendGiveEvent( ushort slot, InventoryItem instance )
-		{
-			if ( IsClient )
-			{
-				return;
-			}
-
-			if ( Connections.Count > 0 )
-			{
-				InventorySystem.SendGiveItemEvent( To.Multiple( Connections ), this, slot, instance );
-			}
-
-			HandleSlotChanged( slot );
-
-			OnItemGiven?.Invoke( slot, instance );
-		}
-
-		private void SendTakeEvent( ushort slot, InventoryItem instance )
-		{
-			if ( IsClient )
-			{
-				return;
-			}
-
-			if ( Connections.Count > 0 )
-			{
-				InventorySystem.SendTakeItemEvent( To.Multiple( Connections ), this, slot );
-			}
-
-			HandleSlotChanged( slot );
+			var instance = ClearSlot( i );
 
 			if ( instance != null )
 			{
-				OnItemTaken?.Invoke( slot, instance );
+				output.Add( instance );
 			}
 		}
 
-		private void HandleSlotChanged( ushort slot )
+		return output;
+	}
+
+	public bool DoesPassFilter( InventoryItem item )
+	{
+		if ( Whitelist.Count > 0 )
 		{
-			OnSlotChanged?.Invoke( slot );
+			if ( !item.Tags.Any( Whitelist.Contains ) )
+				return false;
 		}
 
-		public void ProcessGiveItemEvent( BinaryReader reader )
+		if ( Blacklist.Count > 0 )
 		{
-			var instance = reader.ReadInventoryItem();
-			var slot = reader.ReadUInt16();
-
-			instance.Container = this;
-			instance.SlotId = slot;
-
-			ItemList[slot] = instance;
-			HandleSlotChanged( slot );
-			OnItemGiven?.Invoke( slot, instance );
+			if ( item.Tags.Any( Blacklist.Contains ) )
+				return false;
 		}
 
-		public void ProcessTakeItemEvent( BinaryReader reader )
-		{
-			var slot = reader.ReadUInt16();
-			var instance = ItemList[slot];
+		return true;
+	}
 
-			if ( instance != null )
+	public void ProcessGiveItemEvent( BinaryReader reader )
+	{
+		var instance = reader.ReadInventoryItem();
+		var slot = reader.ReadUInt16();
+
+		instance.Parent = this;
+		instance.SlotId = slot;
+
+		ItemList[slot] = instance;
+		HandleSlotChanged( slot );
+		ItemGiven?.Invoke( slot, instance );
+		OnItemGiven( slot, instance );
+	}
+
+	public void ProcessTakeItemEvent( BinaryReader reader )
+	{
+		var slot = reader.ReadUInt16();
+		var instance = ItemList[slot];
+
+		if ( instance != null )
+		{
+			if ( instance.Parent == this && instance.SlotId == slot )
 			{
-				if ( instance.Container == this && instance.SlotId == slot )
-				{
-					instance.Container = null;
-					instance.SlotId = 0;
-				}
-
-				ItemList[slot] = null;
-				HandleSlotChanged( slot );
-				OnItemTaken?.Invoke( slot, instance );
+				instance.Parent = null;
+				instance.SlotId = 0;
 			}
+
+			ItemList[slot] = null;
+			HandleSlotChanged( slot );
+			ItemTaken?.Invoke( slot, instance );
+			OnItemTaken( slot, instance );
+		}
+	}
+
+	public override int GetHashCode()
+	{
+		var hash = 19;
+
+		foreach ( var item in ItemList )
+		{
+			if ( item.IsValid() )
+				hash = hash * 31 + item.GetHashCode();
+			else
+				hash = hash * 31 + 0;
 		}
 
-		public InventoryContainer( Entity owner )
+		return HashCode.Combine( hash, SlotLimit );
+	}
+
+	public virtual InventoryContainer GetTransferTarget( InventoryItem item )
+	{
+		if ( TransferHandler == null && Parent.IsValid() && Parent.Parent.IsValid() )
 		{
-			ItemList = new List<InventoryItem>();
-			Connections = new List<Client>();
-			Entity = owner;
+			return Parent.Parent.GetTransferTarget( item );
 		}
+
+		return TransferHandler?.Invoke( item );
+	}
+
+	public virtual void Serialize( BinaryWriter writer )
+	{
+		writer.Write( IsTakeOnly );
+
+		writer.Write( Whitelist.Count );
+		foreach ( var tag in Whitelist )
+			writer.Write( tag );
+
+		writer.Write( Blacklist.Count );
+		foreach ( var tag in Blacklist )
+			writer.Write( tag );
+	}
+
+	public virtual void Deserialize( BinaryReader reader )
+	{
+		IsTakeOnly = reader.ReadBoolean();
+
+		Whitelist.Clear();
+
+		var count = reader.ReadInt32();
+
+		for ( var i = 0; i < count; i++ )
+		{
+			Whitelist.Add( reader.ReadString() );
+		}
+
+		Blacklist.Clear();
+
+		count = reader.ReadInt32();
+
+		for ( var i = 0; i < count; i++ )
+		{
+			Blacklist.Add( reader.ReadString() );
+		}
+	}
+
+	public virtual bool CanTakeItem( ushort slot, InventoryItem item )
+	{
+		return true;
+	}
+
+	public virtual bool CanGiveItem( ushort slot, InventoryItem item )
+	{
+		return DoesPassFilter( item );
+	}
+
+	protected virtual void OnSlotChanged( ushort slot )
+	{
+
+	}
+
+	protected virtual void OnItemTaken( ushort slot, InventoryItem item )
+	{
+
+	}
+
+	protected virtual void OnItemGiven( ushort slot, InventoryItem item )
+	{
+
+	}
+
+	private void SendGiveEvent( ushort slot, InventoryItem instance )
+	{
+		if ( IsClient )
+		{
+			return;
+		}
+
+		var recipients = GetRecipients();
+
+		if ( recipients.Any() )
+		{
+			InventorySystem.SendGiveItemEvent( To.Multiple( recipients ), this, slot, instance );
+		}
+
+		HandleSlotChanged( slot );
+
+		ItemGiven?.Invoke( slot, instance );
+		OnItemGiven( slot, instance );
+	}
+
+	private void SendTakeEvent( ushort slot, InventoryItem instance )
+	{
+		if ( IsClient )
+		{
+			return;
+		}
+
+		var recipients = GetRecipients();
+
+		if ( recipients.Any() )
+		{
+			InventorySystem.SendTakeItemEvent( To.Multiple( recipients ), this, slot );
+		}
+
+		HandleSlotChanged( slot );
+
+		if ( instance != null )
+		{
+			ItemTaken?.Invoke( slot, instance );
+			OnItemTaken( slot, instance );
+		}
+	}
+
+	private void HandleSlotChanged( ushort slot )
+	{
+		SlotChanged?.Invoke( slot );
+		OnSlotChanged( slot );
 	}
 }

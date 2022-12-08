@@ -1,5 +1,5 @@
 ﻿using Facepunch.CoreWars.Editor;
-using Facepunch.CoreWars.Inventory;
+
 using Facepunch.Voxels;
 using Sandbox;
 using System;
@@ -46,11 +46,11 @@ namespace Facepunch.CoreWars
 			if ( Local.Pawn is not Player player )
 				return;
 
-			var storage = Storage.Current;
+			var storage = UI.Storage.Current;
 
 			storage.SetName( "Personal Chest" );
 			storage.SetEntity( this );
-			storage.SetContainer( player.ChestInventory.Instance );
+			storage.SetContainer( player.ChestInventory.Value );
 			storage.Open();
 
 			Util.Play( "inventory.open" );

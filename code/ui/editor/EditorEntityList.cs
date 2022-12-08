@@ -1,5 +1,5 @@
 ﻿using Facepunch.CoreWars.Editor;
-using Facepunch.CoreWars.Inventory;
+
 using Facepunch.Voxels;
 using Sandbox;
 using Sandbox.UI;
@@ -22,7 +22,7 @@ namespace Facepunch.CoreWars.Editor
 			Current = new EditorEntityList();
 			Current.PopulateItems();
 
-			Game.Hud.FindPopupPanel().AddChild( Current );
+			Local.Hud.FindPopupPanel().AddChild( Current );
 		}
 
 		public void Close()

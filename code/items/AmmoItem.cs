@@ -1,17 +1,16 @@
-﻿using Facepunch.CoreWars.Inventory;
-using Sandbox;
+﻿using Sandbox;
 using System.IO;
 
 namespace Facepunch.CoreWars
 {
-	[Library( "item_ammo" )]
 	public class AmmoItem : InventoryItem
 	{
 		public AmmoType AmmoType { get; set; }
 
 		public override string Description => AmmoType.GetDescription();
 		public override bool RemoveOnDeath => true;
-		public override Color Color => ColorPalette.Ammo;
+		public override Color Color => UI.ColorPalette.Ammo;
+		public override string UniqueId => "item_ammo";
 		public override ushort MaxStackSize => 60;
 		public override string Name => AmmoType.ToString();
 		public override string Icon => $"textures/items/ammo_{AmmoType.ToString().ToLower()}.png";

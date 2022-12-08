@@ -2,7 +2,7 @@
 using Sandbox;
 using System;
 
-namespace Facepunch.CoreWars
+namespace Facepunch.CoreWars.UI
 {
 	[UseTemplate]
 	public class Announcement : Panel

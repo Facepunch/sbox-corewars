@@ -2,7 +2,7 @@
 using Sandbox;
 using System;
 
-namespace Facepunch.CoreWars
+namespace Facepunch.CoreWars.UI
 {
 	[UseTemplate]
 	public class RespawnKillerInfo : Panel
@@ -60,7 +60,7 @@ namespace Facepunch.CoreWars
 				if ( weapon is IKillFeedInfo feedInfo )
 					WeaponName.Text = feedInfo.KillFeedName;
 				else if ( weapon is Weapon typed && typed.Item.IsValid() )
-					WeaponName.Text = typed.Item.Instance.Name;
+					WeaponName.Text = typed.Item.Value.Name;
 				else
 					WeaponName.Text = weapon.Name;
 			}

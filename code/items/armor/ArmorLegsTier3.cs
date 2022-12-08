@@ -1,13 +1,13 @@
-﻿using Facepunch.CoreWars.Inventory;
+﻿
 using Sandbox;
 using System.IO;
 
 namespace Facepunch.CoreWars
 {
-	[Library( "item_armor_legs_3" )]
 	public class ArmorLegsTier3 : ArmorItem
 	{
 		public override float DamageMultiplier => 0.3f;
+		public override string UniqueId => "item_armor_legs_3";
 		public override ArmorSlot ArmorSlot => ArmorSlot.Legs;
 		public override string Name => "Heavy Legs Armor";
 		public override string Description => "A heavy protection legs armor piece.";

@@ -1,4 +1,4 @@
-﻿namespace Facepunch.CoreWars
+﻿namespace Facepunch.CoreWars.UI
 {
 	public interface IDialog
 	{

@@ -1,11 +1,9 @@
 ﻿using Facepunch.CoreWars.Editor;
-using Facepunch.CoreWars.Inventory;
 using Facepunch.Voxels;
 using Sandbox;
 using Sandbox.UI;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,7 +15,6 @@ namespace Facepunch.CoreWars
 		[Net] public bool IsEditorMode { get; private set; }
 
 		public new static Game Current { get; private set; }
-		public static RootPanel Hud { get; private set; }
 
 		[ConVar.Server( "cw_friendly_fire", Saved = true )]
 		public static bool FriendlyFire { get; set; } = false;
@@ -43,13 +40,13 @@ namespace Facepunch.CoreWars
 		public static void AddValidTeam( Team team )
 		{
 			ValidTeamSet.Add( team );
-			TeamList.Refresh();
+			UI.TeamList.Refresh();
 		}
 
 		public static void RemoveValidTeam( Team team )
 		{
 			ValidTeamSet.Remove( team );
-			TeamList.Refresh();
+			UI.TeamList.Refresh();
 		}
 
 		public static IReadOnlySet<Team> GetValidTeams()
@@ -59,19 +56,29 @@ namespace Facepunch.CoreWars
 
 		public Game()
 		{
-			if ( IsServer )
-			{
-				IsEditorMode = Global.MapName == "facepunch.cw_editor_map";
-				StateSystem = new();
-			}
-
 			Current = this;
+		}
+
+		public override void Spawn()
+		{
+			IsEditorMode = Global.MapName == "facepunch.cw_editor_map";
+			StateSystem = new();
+
+			InventorySystem.Initialize();
+			base.Spawn();
 		}
 
 		public override void ClientSpawn()
 		{
-			// Only create the hud if we don't have one. This fixes full updates duplicating the hud.
-			Hud ??= IsEditorMode ? new EditorHud() : new Hud();
+			InventorySystem.Initialize();
+
+			ItemTag.Register( "remove_on_death", "Soulbound", Color.Green );
+			ItemTag.Register( "uses_stamina", "Uses Stamina", Color.Cyan );
+			ItemTag.Register( "droppable", "Droppable", Color.Yellow );
+
+			Local.Hud?.Delete( true );
+			Local.Hud = IsEditorMode ? new EditorHud() : new UI.Hud();
+
 			base.ClientSpawn();
 		}
 
@@ -126,7 +133,7 @@ namespace Facepunch.CoreWars
 		[ConCmd.Server( "cw_announcement" )]
 		public static void AddAnnouncementCmd( string title, string text )
 		{
-			Announcements.Send( To.Everyone, title, text, RoundStage.Start.GetIcon() );
+			UI.Announcements.Send( To.Everyone, title, text, RoundStage.Start.GetIcon() );
 		}
 
 		[ConCmd.Client( "cw_add_kill_feed" )]
@@ -134,11 +141,11 @@ namespace Facepunch.CoreWars
 		{
 			if ( suicide )
 			{
-				ToastList.Instance.AddKillFeed( Local.Pawn as Player, DamageFlags.Fall );
+				UI.ToastList.Instance.AddKillFeed( Local.Pawn as Player, DamageFlags.Fall );
 			}
 			else
 			{
-				ToastList.Instance.AddKillFeed( Local.Pawn as Player, Local.Pawn as Player, (Local.Pawn as Player).ActiveChild, DamageFlags.Fall );
+				UI.ToastList.Instance.AddKillFeed( Local.Pawn as Player, Local.Pawn as Player, (Local.Pawn as Player).ActiveChild, DamageFlags.Fall );
 			}
 		}
 

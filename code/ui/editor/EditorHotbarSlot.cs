@@ -1,10 +1,11 @@
-﻿using Facepunch.CoreWars.Inventory;
-using Facepunch.CoreWars.Utility;
+﻿using Facepunch.CoreWars.Utility;
 using Facepunch.Voxels;
+using Facepunch.CoreWars.UI;
 using Sandbox;
 using Sandbox.UI;
 using System.Linq;
 using System;
+using System.Collections.Generic;
 
 namespace Facepunch.CoreWars.Editor
 {
@@ -19,7 +20,7 @@ namespace Facepunch.CoreWars.Editor
 		public Label SlotLabel { get; set; }
 
 		public string Description => BlockType.Description;
-		public ItemTag[] Tags { get; set; }
+		public IReadOnlySet<string> Tags { get; set; }
 		public string Name => BlockType.FriendlyName;
 		public Color Color => Color.White;
 

@@ -27,7 +27,7 @@ namespace Facepunch.CoreWars
 				airdrop.Transform = spawnpoint.Transform;
 				airdrop.Position = airdrop.Position.WithZ( world.MaxSize.z * world.VoxelSize * 2f );
 
-				Hud.ToastAll( "An airdrop shop is incoming!", "textures/ui/airdrop.png" );
+				UI.Hud.ToastAll( "An airdrop shop is incoming!", "textures/ui/airdrop.png" );
 				return true;
 			}
 
@@ -200,8 +200,8 @@ namespace Facepunch.CoreWars
 		[ClientRpc]
 		private void OpenForClient()
 		{
-			AirdropStore.Current.SetAirdrop( this );
-			AirdropStore.Current.Open();
+			UI.AirdropStore.Current.SetAirdrop( this );
+			UI.AirdropStore.Current.Open();
 		}
 	}
 }

@@ -3,8 +3,9 @@ using Sandbox;
 using Sandbox.UI;
 using Sandbox.UI.Construct;
 using System;
+using System.Collections.Generic;
 
-namespace Facepunch.CoreWars
+namespace Facepunch.CoreWars.UI
 {
 	[UseTemplate]
 	public partial class PurchasableItem : Panel, ITooltipProvider
@@ -17,7 +18,7 @@ namespace Facepunch.CoreWars
 		public string Name { get; private set; }
 		public string Description { get; private set; }
 		public bool WasDisabled { get; private set; }
-		public ItemTag[] Tags { get; private set; }
+		public IReadOnlySet<string> Tags { get; private set; }
 		public Color Color => Item.Color;
 
 		public void SetItem( IPurchasableItem item )
@@ -123,8 +124,7 @@ namespace Facepunch.CoreWars
 
 				if ( Item.IsLocked( player ) )
 				{
-					tooltip.DescriptionLabel.Style.FontFamily = "NotoSansSymbols2-Regular";
-					tooltip.NameLabel.Style.FontFamily = "NotoSansSymbols2-Regular";
+					tooltip.AddClass( "obscured" );
 					AddRequirementToTooltip( tooltip );
 				}
 				else
@@ -144,29 +144,12 @@ namespace Facepunch.CoreWars
 
 		private void AddRequirementToTooltip( CustomTooltip tooltip )
 		{
-			tooltip.Container.Add.Label( $"Team Upgrade Required", "requirement" );
+			tooltip.RequirementText = "Team Upgrade Required";
 		}
 
 		private void AddCostsToTooltip( CustomTooltip tooltip )
 		{
-			if ( Local.Pawn is not Player player )
-				return;
-
-			var costContainer = tooltip.Container.AddChild<Panel>( "costs" );
-
-			foreach ( var kv in Item.Costs )
-			{
-				var itemType = TypeLibrary.Create<ResourceItem>( kv.Key );
-				if ( itemType == null ) continue;
-
-				var itemCost = kv.Value;
-				var panel = costContainer.Add.Panel( "cost" );
-
-				panel.Add.Image( itemType.Icon, "icon" );
-
-				var value = panel.Add.Label( $"x{itemCost}", "value" );
-				value.SetClass( "unaffordable", player.GetResourceCount( kv.Key ) < kv.Value );
-			}
+			tooltip.Costs = Item.Costs;
 		}
 
 		private string GetQuantityText()

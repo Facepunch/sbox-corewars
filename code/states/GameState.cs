@@ -33,13 +33,13 @@ namespace Facepunch.CoreWars
 					PlayerToTeam[playerId] = player.Team;
 				}
 
-				Announcements.Send( To.Everyone, "Core Wars", "Destroy your opponents Core to prevent them respawning!", RoundStage.Start.GetIcon() );
+				UI.Announcements.Send( To.Everyone, "Core Wars", "Destroy your opponents Core to prevent them respawning!", RoundStage.Start.GetIcon() );
 				NextStageTime = 300f * StageTimeMultiplier;
 				Stage = RoundStage.Start;
 			}
 			else
 			{
-				TeamCoreList.Current?.Update();
+				UI.TeamCoreList.Current?.Update();
 			}
 		}
 
@@ -85,39 +85,39 @@ namespace Facepunch.CoreWars
 
 			if ( Stage == RoundStage.Start )
 			{
-				Announcements.Send( To.Everyone, "Gold II", "Gold generators now generate faster!", RoundStage.GoldII.GetIcon() );
+				UI.Announcements.Send( To.Everyone, "Gold II", "Gold generators now generate faster!", RoundStage.GoldII.GetIcon() );
 				NextStageTime = 300f * StageTimeMultiplier;
 				Stage = RoundStage.GoldII;
 			}
 			else if ( Stage == RoundStage.GoldII )
 			{
-				Announcements.Send( To.Everyone, "Crystal II", "Crystal generators now generate faster!", RoundStage.CrystalII.GetIcon() );
+				UI.Announcements.Send( To.Everyone, "Crystal II", "Crystal generators now generate faster!", RoundStage.CrystalII.GetIcon() );
 				Airdrop.Create();
 				NextStageTime = 300f * StageTimeMultiplier;
 				Stage = RoundStage.CrystalII;
 			}
 			else if ( Stage == RoundStage.CrystalII )
 			{
-				Announcements.Send( To.Everyone, "Gold III", "Gold generators now even generate faster!", RoundStage.GoldIII.GetIcon() );
+				UI.Announcements.Send( To.Everyone, "Gold III", "Gold generators now even generate faster!", RoundStage.GoldIII.GetIcon() );
 				NextStageTime = 300f * StageTimeMultiplier;
 				Stage = RoundStage.GoldIII;
 			}
 			else if ( Stage == RoundStage.GoldIII )
 			{
-				Announcements.Send( To.Everyone, "Crystal III", "Crystal generators now generate even faster!", RoundStage.CrystalIII.GetIcon() );
+				UI.Announcements.Send( To.Everyone, "Crystal III", "Crystal generators now generate even faster!", RoundStage.CrystalIII.GetIcon() );
 				Airdrop.Create();
 				NextStageTime = 300f * StageTimeMultiplier;
 				Stage = RoundStage.CrystalIII;
 			}
 			else if ( Stage == RoundStage.CrystalIII )
 			{
-				Announcements.Send( To.Everyone, "Warning", "All team Cores will self-destruct in 60 seconds!", RoundStage.NoCores.GetIcon() );
+				UI.Announcements.Send( To.Everyone, "Warning", "All team Cores will self-destruct in 60 seconds!", RoundStage.NoCores.GetIcon() );
 				NextStageTime = 60f * StageTimeMultiplier;
 				Stage = RoundStage.NoCores;
 			}
 			else if ( Stage == RoundStage.NoCores )
 			{
-				Announcements.Send( To.Everyone, "Sudden Death", "All team Cores have self-destructed!", RoundStage.SuddenDeath.GetIcon() );
+				UI.Announcements.Send( To.Everyone, "Sudden Death", "All team Cores have self-destructed!", RoundStage.SuddenDeath.GetIcon() );
 				Airdrop.Create();
 				NextStageTime = 300f * StageTimeMultiplier;
 				Stage = RoundStage.SuddenDeath;

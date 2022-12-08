@@ -1,0 +1,194 @@
+﻿@using System;
+@using Sandbox;
+@using Sandbox.UI;
+@using Facepunch.CoreWars;
+@using Facepunch.CoreWars.Utility;
+@using System.Collections.Generic;
+
+@namespace Facepunch.CoreWars.UI
+@attribute [StyleSheet( "/ui/inventory/InventorySlot.scss" )]
+@inherits Panel
+@implements IDraggable
+@implements IDroppable
+@implements ITooltipProvider
+
+<root>
+    <div @ref="Glow" class="glow"></div>
+    <div @ref="Icon" class="icon"></div>
+    <label class="stacksize">@StackSize</label>
+
+    @if ( DisplaySlot > 0 )
+    {
+        <label class="slot">@DisplaySlot</label>
+    }
+
+    <div class="overlay"></div>
+</root>
+
+@code
+{
+    public InventoryContainer Container { get; set; }
+    public ushort Slot { get; set; }
+    public int DisplaySlot { get; set; }
+    public InventoryItem Item => Container.GetFromSlot( Slot );
+    public bool IsSelected { get; set; }
+    public string StackSize => GetStackSize();
+    public float IconSize => Box.Rect.Size.Length;
+    public string DefaultIcon { get; set; }
+    public Action<InventorySlot> OnSelected { get; set; }
+    public Panel Icon { get; set; }
+    public Panel Glow { get; set; }
+    public string Description => Item.Description;
+    public IReadOnlySet<string> Tags => Item.Tags;
+    public string Name => Item.Name;
+    public Color Color => Item.Color;
+
+    public bool ContainsItems
+    {
+        get
+        {
+            if ( Item is IContainerItem item && item.Container.IsValid() )
+                return !item.Container.IsEmpty;
+
+            return false;
+        }
+    }
+
+    public InventorySlot()
+    {
+        BindClass( "selected", () => IsSelected );
+    }
+
+    public string GetIconTexture()
+    {
+        return Item.IsValid() ? Item.Icon : null;
+    }
+
+    public string GetStackSize()
+    {
+        if ( !Item.IsValid() ) return string.Empty;
+
+        if ( Item is WeaponItem weaponItem )
+        {
+            var weapon = weaponItem.Weapon;
+
+            if ( weapon.IsValid() && weapon.ClipSize > 0 )
+                return weapon.AmmoClip.ToString();
+        }
+
+        return (Item.StackSize > 1) ? Item.StackSize.ToString() : string.Empty;
+    }
+
+    public bool CanDrop( IDraggable draggable, DraggableMode mode )
+    {
+        if ( draggable is not InventorySlot slot ) return false;
+        if ( slot.Item == Item ) return false;
+
+        if ( Item.IsValid() && !Container.CanTakeItem( Slot, Item ) )
+            return false;
+
+        if ( Container.Parent == slot.Item )
+            return false;
+
+        if ( Container.IsTakeOnly )
+            return false;
+
+        return Container.CanGiveItem( Slot, slot.Item );
+    }
+
+    public void OnDrop( IDraggable draggable, DraggableMode mode )
+    {
+        if ( draggable is not InventorySlot slot ) return;
+        if ( Container.IsTakeOnly ) return;
+
+        if ( mode == DraggableMode.Move )
+            InventorySystem.SendMoveEvent( slot.Container, Container, slot.Slot, Slot );
+        else
+            InventorySystem.SendSplitEvent( slot.Container, Container, slot.Slot, Slot );
+
+        Sound.FromScreen( "inventory.move" );
+    }
+
+    protected override void OnClick( MousePanelEvent e )
+    {
+        OnSelected?.Invoke( this );
+        base.OnClick( e );
+    }
+
+    protected override void OnMouseOver( MousePanelEvent e )
+    {
+        if ( Item.IsValid() )
+        {
+            CustomTooltip.Show( this );
+        }
+
+        base.OnMouseOver( e );
+    }
+
+    protected override void OnParametersSet()
+    {
+        if ( !Item.IsValid() )
+        {
+            CustomTooltip.Hide( this );
+        }
+
+        base.OnParametersSet();
+    }
+
+    protected override void OnMouseOut( MousePanelEvent e )
+    {
+        CustomTooltip.Hide( this );
+        base.OnMouseOut( e );
+    }
+
+    protected override void OnAfterTreeRender( bool firstTime )
+    {
+        if ( !Item.IsValid() )
+        {
+            if ( !string.IsNullOrEmpty( DefaultIcon ) )
+                Icon.Style.SetBackgroundImage( DefaultIcon );
+            else
+                Icon.Style.BackgroundImage = null;
+
+            SetClass( "is-empty", true );
+
+            return;
+        }
+
+        var icon = Item.Icon;
+
+        if ( !string.IsNullOrEmpty( icon ) )
+        {
+            Icon.Style.SetBackgroundImage( icon );
+            Icon.Style.BackgroundTint = Item.IconTintColor;
+        }
+        else
+        {
+            Icon.Style.BackgroundImage = null;
+        }
+
+        Glow.Style.SetRadialGradientBackground( Item.Color, 0.6f, Color.Black, 0f );
+
+        SetClass( "is-empty", false );
+    }
+
+    protected override int BuildHash()
+    {
+        return HashCode.Combine( Item, ContainsItems, DefaultIcon, StackSize );
+    }
+
+    protected override void OnMouseDown( MousePanelEvent e )
+    {
+        if ( !Item.IsValid() || e.Button == "mouseright" )
+            return;
+
+        Draggable.Start( this, Input.Down( InputButton.Run ) ? DraggableMode.Split : DraggableMode.Move );
+        base.OnMouseDown( e );
+    }
+
+    protected override void OnMouseUp( MousePanelEvent e )
+    {
+        Draggable.Stop( this );
+        base.OnMouseUp( e );
+    }
+}

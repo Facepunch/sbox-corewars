@@ -2,7 +2,7 @@
 using Sandbox.UI;
 using Sandbox.UI.Construct;
 
-namespace Facepunch.CoreWars
+namespace Facepunch.CoreWars.UI
 {
 	public partial class ChatEntry : Panel
 	{

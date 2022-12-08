@@ -1,53 +1,73 @@
 ﻿using Sandbox;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Facepunch.CoreWars.Inventory
+namespace Facepunch.CoreWars;
+
+public static partial class BinaryWriterExtension
 {
-	public static class BinaryWriterExtension
+	public static void Write( this BinaryWriter self, InventoryItem item )
 	{
-		public static void WriteInventoryItem( this BinaryWriter writer, InventoryItem item )
+		if ( item != null )
 		{
-			if ( item != null )
-			{
-				writer.Write( item.ClassName );
-				writer.Write( item.StackSize );
-				writer.Write( item.ItemId );
-				writer.Write( item.SlotId );
+			self.Write( item.UniqueId );
+			self.Write( item.StackSize );
+			self.Write( item.ItemId );
+			self.Write( item.SlotId );
 
-				item.Write( writer );
+			item.Write( self );
+		}
+		else
+		{
+			self.Write( string.Empty );
+		}
+	}
+
+	public static void Write( this BinaryWriter self, Action<BinaryWriter> wrapper )
+	{
+		using ( var stream = new MemoryStream() )
+		{
+			using ( var writer = new BinaryWriter( stream ) )
+			{
+				wrapper( writer );
+			}
+
+			var data = stream.ToArray();
+
+			self.Write( data.Length );
+			self.Write( data );
+		}
+	}
+
+	public static void Write( this BinaryWriter self, InventoryContainer container )
+	{
+		var typeDesc = TypeLibrary.GetDescription( container.GetType() );
+
+		self.Write( typeDesc.Name );
+		self.Write( container.ParentId );
+		self.Write( container.InventoryId );
+		self.Write( container.SlotLimit );
+
+		if ( container.Entity.IsValid() )
+			self.Write( container.Entity );
+		else
+			self.Write( -1 );
+
+		for ( var i = 0; i < container.SlotLimit; i++ )
+		{
+			var instance = container.ItemList[i];
+
+			if ( instance != null )
+			{
+				self.Write( true );
+				self.Write( instance );
 			}
 			else
 			{
-				writer.Write( string.Empty );
+				self.Write( false );
 			}
 		}
 
-		public static void WriteInventoryContainer( this BinaryWriter writer, InventoryContainer container )
-		{
-			writer.Write( container.InventoryId );
-			writer.Write( container.SlotLimit );
-			writer.Write( container.Entity.NetworkIdent );
-
-			for ( var i = 0; i < container.SlotLimit; i++ )
-			{
-				var instance = container.ItemList[i];
-
-				if ( instance != null )
-				{
-					writer.Write( true );
-					writer.WriteInventoryItem( instance );
-				}
-				else
-				{
-					writer.Write( false );
-				}
-			}
-		}
-
+		container.Serialize( self );
 	}
 }

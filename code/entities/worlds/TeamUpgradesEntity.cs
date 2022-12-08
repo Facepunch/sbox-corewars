@@ -1,10 +1,9 @@
 ﻿using Facepunch.CoreWars.Editor;
 using System.Collections.Generic;
 using Facepunch.Voxels;
+using Facepunch.CoreWars.UI;
 using Sandbox;
-using System;
 using System.IO;
-using System.ComponentModel;
 
 namespace Facepunch.CoreWars
 {

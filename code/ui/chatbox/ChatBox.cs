@@ -4,7 +4,7 @@ using Sandbox.UI;
 using Sandbox.UI.Construct;
 using System.Text.RegularExpressions;
 
-namespace Facepunch.CoreWars
+namespace Facepunch.CoreWars.UI
 {
 	public enum ChatBoxChannel
 	{

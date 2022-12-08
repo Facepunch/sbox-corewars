@@ -1,0 +1,21 @@
+﻿Draggable {
+    background-color: rgba( black, 0.6 );
+    border-radius: 8px;
+    position: absolute;
+    pointer-events: none;
+    background-size: 80px;
+    background-repeat: no-repeat;
+    background-position: center;
+    backdrop-filter-blur: 24px;
+    border: 1px solid white;
+    display: none;
+    z-index: 101;
+
+    &.active {
+        display: flex;
+    }
+
+    &.invalid-drag {
+        background-color: rgba( red, 0.5 );
+    }
+}

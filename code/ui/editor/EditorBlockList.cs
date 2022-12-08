@@ -25,7 +25,7 @@ namespace Facepunch.CoreWars.Editor
 			Current?.Delete();
 			Current = new EditorBlockList();
 			Current.PopulateItems();
-			Game.Hud.AddChild( Current );
+			Local.Hud.AddChild( Current );
 		}
 
 		public EditorBlockList()

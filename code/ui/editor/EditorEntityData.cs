@@ -138,7 +138,7 @@ namespace Facepunch.CoreWars.Editor
 			Current = new EditorEntityData( entity );
 			Current.PopulateItems();
 
-			var popup = Game.Hud.FindPopupPanel();
+			var popup = Local.Hud.FindPopupPanel();
 			popup?.AddChild( Current );
 		}
 

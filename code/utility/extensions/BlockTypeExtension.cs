@@ -6,17 +6,17 @@ namespace Facepunch.CoreWars.Utility
 {
 	public static class BlockTypeExtension
 	{
-		public static ItemTag[] GetItemTags( this BlockType self )
+		public static IReadOnlySet<string> GetItemTags( this BlockType self )
 		{
-			var tags = new List<ItemTag>();
+			var tags = new HashSet<string>();
 
 			if ( self.IsTranslucent )
-				tags.Add( new ItemTag( "Translucent", Color.Cyan ) );
+				tags.Add( "translucent" );
 
 			if ( self.IsPassable )
-				tags.Add( new ItemTag( "Passable", Color.Green ) );
+				tags.Add( "passablr" );
 
-			return tags.ToArray();
+			return tags;
 		}
 	}
 }

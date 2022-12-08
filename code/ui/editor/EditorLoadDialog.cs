@@ -20,7 +20,7 @@ namespace Facepunch.CoreWars.Editor
 			Current?.Delete();
 			Current = new EditorLoadDialog();
 
-			Game.Hud.AddChild( Current );
+			Local.Hud.AddChild( Current );
 		}
 
 		public EditorLoadDialog()

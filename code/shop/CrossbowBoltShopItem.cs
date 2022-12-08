@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Facepunch.CoreWars.Inventory;
 using Sandbox;
 
 namespace Facepunch.CoreWars
@@ -10,9 +9,9 @@ namespace Facepunch.CoreWars
 	{
 		public override string Name => AmmoType.Bolt.ToString();
 		public override string Description => AmmoType.Bolt.GetDescription();
-		public override ItemTag[] Tags => new ItemTag[] { ItemTag.CanDrop };
+		public override IReadOnlySet<string> Tags => new HashSet<string>();
 		public override int Quantity => 8;
-		public override Color Color => ColorPalette.Ammo;
+		public override Color Color => UI.ColorPalette.Ammo;
 		public override int SortOrder => 4;
 		public override Dictionary<Type, int> Costs => new()
 		{

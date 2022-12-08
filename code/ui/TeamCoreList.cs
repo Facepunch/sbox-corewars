@@ -1,9 +1,9 @@
-﻿using Facepunch.CoreWars.Inventory;
+﻿
 using Sandbox;
 using Sandbox.UI;
 using System.Linq;
 
-namespace Facepunch.CoreWars
+namespace Facepunch.CoreWars.UI
 {
 	[UseTemplate]
 	public partial class TeamCoreList : Panel

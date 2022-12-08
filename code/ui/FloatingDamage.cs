@@ -3,7 +3,7 @@ using Sandbox.UI;
 using Sandbox.UI.Construct;
 using System.Collections.Generic;
 
-namespace Facepunch.CoreWars
+namespace Facepunch.CoreWars.UI
 {
 	public partial class FloatingDamage : WorldPanel
 	{

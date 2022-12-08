@@ -4,7 +4,7 @@
 @using System;
 @using System.Collections.Generic;
 
-@namespace Facepunch.CoreWars
+@namespace Facepunch.CoreWars.UI
 @attribute [StyleSheet( "/ui/CustomTooltip.scss" )]
 @inherits Panel
 
@@ -16,6 +16,31 @@
         </div>
 
         <label @ref="DescriptionLabel" class="description">@Provider.Description</label>
+
+        @if ( !string.IsNullOrEmpty( RequirementText ) )
+        {
+            <div class="requirement">
+                <label>@RequirementText</label>
+            </div>
+        }
+
+        @if ( Costs != null && Costs.Count > 0 && Local.Pawn is CoreWars.Player player )
+        {
+            <div class="costs">
+                @foreach ( var kv in Costs )
+                {
+				    var itemType = TypeLibrary.Create<ResourceItem>( kv.Key );
+				    if ( itemType == null ) continue;
+                        
+				    var itemCost = kv.Value;
+
+                    <div class="cost">
+                        <img src=@itemType.Icon class="icon"/>
+                        <label class="value @(player.GetResourceCount( kv.Key ) < kv.Value ? "unaffordable" : "")">x@(itemCost)</label>
+                    </div>
+                }
+            </div>
+        }
     </div>
 </root>
 
@@ -29,7 +54,7 @@
         {
             var tooltip = new CustomTooltip();
             tooltip.SetProvider( provider );
-            Game.Hud.AddChild( tooltip );
+            Local.Hud.AddChild( tooltip );
             return tooltip;
         }
 
@@ -46,6 +71,8 @@
         }
     }
 
+    public Dictionary<Type, int> Costs { get; set; }
+    public string RequirementText { get; set; }
     public ITooltipProvider Provider { get; private set; }
     public TimeSince TimeSinceShown { get; private set; }
     public Panel TagContainer { get; private set; }
@@ -87,14 +114,17 @@
 
         DescriptionLabel.SetClass( "hidden", string.IsNullOrEmpty( Provider.Description ) );
 
-        if ( Provider.Tags != null && Provider.Tags.Length > 0 )
+        if ( Provider.Tags != null && Provider.Tags.Count > 0 )
         {
-            foreach ( var tag in Provider.Tags )
+            foreach ( var id in Provider.Tags )
             {
-                var panel = TagContainer.Add.Panel( "tag" );
-                var label = panel.Add.Label( tag.Name, "name" );
-                panel.Style.BackgroundColor = Color.Lerp( tag.Color, Color.Black, 0.7f );
-                label.Style.FontColor = Color.Lerp( tag.Color, Color.Black, 0.3f );
+                if ( ItemTag.TryGetTag( id, out var tag ) )
+                {
+                    var panel = TagContainer.Add.Panel( "tag" );
+                    var label = panel.Add.Label( tag.Name, "name" );
+                    panel.Style.BackgroundColor = Color.Lerp( tag.Color, Color.Black, 0.7f );
+                    label.Style.FontColor = Color.Lerp( tag.Color, Color.Black, 0.3f );
+                }
             }
         }
         else

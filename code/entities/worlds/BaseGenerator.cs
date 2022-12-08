@@ -1,5 +1,5 @@
 ﻿using Facepunch.CoreWars.Editor;
-using Facepunch.CoreWars.Inventory;
+
 using Facepunch.CoreWars.Utility;
 using Facepunch.Voxels;
 using Sandbox;
@@ -78,7 +78,7 @@ namespace Facepunch.CoreWars
 		{
 			var itemsInArea = FindInSphere( Position, CollisionBounds.Size.Length * 2f )
 				.OfType<ItemEntity>()
-				.Where( entity => entity.Item.Instance is T )
+				.Where( entity => entity.Item is T )
 				.Count();
 
 			if ( itemsInArea >= 16 ) return;

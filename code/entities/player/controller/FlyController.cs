@@ -2,7 +2,7 @@
 
 namespace Facepunch.CoreWars
 {
-	public partial class FlyController : BasePlayerController
+	public partial class FlyController : BaseMoveController
 	{
 		[Net] public bool EnableCollisions { get; set; } = true;
 
@@ -10,29 +10,21 @@ namespace Facepunch.CoreWars
 		protected float BodyGirth { get; set; } = 32f;
 		protected float BodyHeight { get; set; } = 72f;
 
+		protected Vector3 TraceOffset { get; set; }
 		protected Vector3 Mins { get; set; }
 		protected Vector3 Maxs { get; set; }
 
-		public override BBox GetHull()
-		{
-			var girth = BodyGirth * 0.5f;
-			var mins = new Vector3( -girth, -girth, 0 );
-			var maxs = new Vector3( +girth, +girth, BodyHeight );
-			return new BBox( mins, maxs );
-		}
-
 		public override void Simulate()
 		{
-			if ( Pawn is not Sandbox.Player pawn )
-				return;
+			base.Simulate();
 
-			EyeLocalPosition = Vector3.Up * Scale( EyeHeight );
+			Player.EyeLocalPosition = Vector3.Up * Scale( EyeHeight );
 			UpdateBBox();
 
-			EyeLocalPosition += TraceOffset;
-			EyeRotation = pawn.ViewAngles.ToRotation();
+			Player.EyeLocalPosition += TraceOffset;
+			Player.EyeRotation = Player.ViewAngles.ToRotation();
 
-			var vel = (EyeRotation.Forward * pawn.InputDirection.x) + (EyeRotation.Left * pawn.InputDirection.y);
+			var vel = (Player.EyeRotation.Forward * Player.InputDirection.x) + (Player.EyeRotation.Left * Player.InputDirection.y);
 
 			vel = vel.Normal * 2000;
 
@@ -42,43 +34,51 @@ namespace Facepunch.CoreWars
 			if ( Input.Down( InputButton.Duck ) )
 				vel *= 0.2f;
 
-			Velocity += vel * Time.Delta;
+			Player.Velocity += vel * Time.Delta;
 
-			if ( Velocity.LengthSquared > 0.01f )
+			if ( Player.Velocity.LengthSquared > 0.01f )
 			{
 				Move();
 			}
 
-			Velocity = Velocity.Approach( 0, Velocity.Length * Time.Delta * 5.0f );
+			Player.Velocity = Player.Velocity.Approach( 0, Player.Velocity.Length * Time.Delta * 5.0f );
 
 			if ( Input.Down( InputButton.Jump ) )
-				Velocity = Velocity.Approach( 0, Velocity.Length * Time.Delta * 5.0f );
+				Player.Velocity = Player.Velocity.Approach( 0, Player.Velocity.Length * Time.Delta * 5.0f );
 		}
 
 		private void Move()
 		{
 			if ( !EnableCollisions )
 			{
-				Position += Velocity * Time.Delta;
+				Player.Position += Player.Velocity * Time.Delta;
 				return;
 			}
 
-			var mover = new MoveHelper( Position, Velocity );
-			mover.Trace = mover.Trace.Size( Mins, Maxs ).Ignore( Pawn );
+			var mover = new MoveHelper( Player.Position, Player.Velocity );
+			mover.Trace = mover.Trace.Size( Mins, Maxs ).Ignore( Player );
 			mover.TryMove( Time.Delta );
 
-			Position = mover.Position;
-			Velocity = mover.Velocity;
+			Player.Position = mover.Position;
+			Player.Velocity = mover.Velocity;
+		}
+
+		private BBox GetHull()
+		{
+			var girth = BodyGirth * 0.5f;
+			var mins = new Vector3( -girth, -girth, 0 );
+			var maxs = new Vector3( +girth, +girth, BodyHeight );
+			return new BBox( mins, maxs );
 		}
 
 		private float Scale( float speed )
 		{
-			return speed * Pawn.Scale;
+			return speed * Player.Scale;
 		}
 
 		private Vector3 Scale( Vector3 velocity )
 		{
-			return velocity * Pawn.Scale;
+			return velocity * Player.Scale;
 		}
 
 		private void SetBBox( Vector3 mins, Vector3 maxs )

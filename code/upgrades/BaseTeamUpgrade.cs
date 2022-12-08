@@ -10,7 +10,7 @@ namespace Facepunch.CoreWars
 	public abstract class BaseTeamUpgrade : IPurchasableItem, IValid
 	{
 		public virtual string Description => string.Empty;
-		public virtual ItemTag[] Tags => new ItemTag[0];
+		public virtual IReadOnlySet<string> Tags => new HashSet<string>();
 		public virtual string Name => string.Empty;
 		public virtual string Group => string.Empty;
 		public virtual Dictionary<Type, int> Costs => new();

@@ -7,6 +7,20 @@ CustomTooltip {
     height: 100%;
     z-index: 200;
 
+    &.obscured {
+        .container {
+            .header {
+                .name {
+                    font-family: NotoSansSymbols2-Regular;
+                }
+            }
+
+            .description {
+                font-family: NotoSansSymbols2-Regular;
+            }
+        }
+    }
+
     .container {
         backdrop-filter-blur: 24px;
         background-color: rgba(0 0 0 0.6);
@@ -70,11 +84,16 @@ CustomTooltip {
         .requirement {
             background-color: rgba( 255 255 255 0.01 );
             border-radius: 4px;
-            font-family: $font;
-            text-align: center;
-            font-size: 20px;
-            color: crimson;
+            justify-content: center;
+            align-items: center;
             width: 100%;
+
+            label {
+                font-family: $font;
+                text-align: center;
+                font-size: 20px;
+                color: crimson;
+            }
         }
 
         .costs {

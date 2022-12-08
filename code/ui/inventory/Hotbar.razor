@@ -1,0 +1,53 @@
+﻿@using System;
+@using Sandbox;
+@using Sandbox.UI;
+@using Facepunch.CoreWars;
+
+@namespace Facepunch.CoreWars.UI
+@attribute [StyleSheet( "/ui/inventory/Hotbar.scss" )]
+@inherits Panel
+
+@if ( !CoreWars.Player.Me.IsValid() ) return;
+
+@{
+    var hotbar = CoreWars.Player.Me.Hotbar;
+    if ( !hotbar.IsValid() ) return;
+}
+
+<root>
+    @for ( ushort i = 0; i < hotbar.SlotLimit; i++ )
+    {
+        var item = hotbar.GetFromSlot( i );
+        var index = i;
+        <InventorySlot IsSelected=@(GetHotbarIndex() == i) Container=@hotbar Slot=@i DisplaySlot=@(i + 1)></InventorySlot>
+    }
+</root>
+
+@code
+{
+    public Hotbar()
+    {
+        BindClass( "hidden", IsHidden );
+    }
+
+    protected override int BuildHash()
+    {
+        return HashCode.Combine( CoreWars.Player.Me, CoreWars.Player.Me?.Hotbar, GetHotbarIndex() );
+    }
+
+    private int GetHotbarIndex()
+    {
+        return CoreWars.Player.Me?.HotbarIndex ?? 0;
+    }
+
+    private bool IsHidden()
+    {
+        if ( Local.Pawn.LifeState == LifeState.Dead )
+            return true;
+
+        if ( IDialog.IsActive() )
+            return true;
+
+        return false;
+    }
+}

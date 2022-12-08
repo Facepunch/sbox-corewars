@@ -125,7 +125,7 @@ namespace Facepunch.CoreWars.Editor
 			Current = new EditorBlockData( voxel, state );
 			Current.PopulateItems();
 
-			Game.Hud.FindPopupPanel().AddChild( Current );
+			Local.Hud.FindPopupPanel().AddChild( Current );
 		}
 
 		public EditorBlockData( Voxel voxel, BlockState state )

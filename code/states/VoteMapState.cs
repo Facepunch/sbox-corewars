@@ -1,4 +1,5 @@
 ﻿using Sandbox;
+using Facepunch.CoreWars.UI;
 
 namespace Facepunch.CoreWars
 {

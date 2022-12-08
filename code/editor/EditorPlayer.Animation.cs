@@ -24,7 +24,7 @@ public partial class EditorPlayer
 		var animHelper = new CitizenAnimationHelper( this );
 
 		animHelper.WithWishVelocity( Controller.WishVelocity );
-		animHelper.WithVelocity( Controller.Velocity );
+		animHelper.WithVelocity( Velocity );
 		animHelper.WithLookAt( EyePosition + EyeRotation.Forward * 100.0f, 1.0f, 1.0f, 0.5f );
 		animHelper.AimAngle = rotation;
 		animHelper.FootShuffle = shuffle;

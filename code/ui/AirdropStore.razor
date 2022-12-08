@@ -1,0 +1,128 @@
+﻿@using System;
+@using Sandbox;
+@using Sandbox.UI;
+@using Facepunch.CoreWars;
+@using Sandbox.UI.Construct;
+@using System.Collections.Generic;
+@using System.Linq;
+
+@namespace Facepunch.CoreWars.UI
+@attribute [StyleSheet( "/ui/AirdropStore.scss" )]
+@inherits Panel
+@implements IDialog
+
+<root>
+    <div class="modal">
+        <label class="title">Airdrop Store</label>
+        <div class="currency">
+            <div class="iron"></div>
+            <label @text="IronAmount">0</label>
+            <div class="gold"></div>
+            <label @text="GoldAmount">0</label>
+            <div class="crystal"></div>
+            <label @text="CrystalAmount">0</label>
+        </div>
+        <div @ref="ItemContainer" class="container">
+        </div>
+    </div>
+</root>
+
+@code
+{
+	public static AirdropStore Current { get; private set; }
+
+	public string IronAmount => GetResourceCount<IronItem>().ToString();
+	public string GoldAmount => GetResourceCount<GoldItem>().ToString();
+	public string CrystalAmount => GetResourceCount<CrystalItem>().ToString();
+	public Panel ItemContainer { get; set; }
+	public Airdrop Airdrop { get; set; }
+	public bool IsOpen { get; set; }
+
+	public AirdropStore()
+	{
+		Current = this;
+	}
+
+	public void Open()
+	{
+		if ( IsOpen ) return;
+		PlaySound( "itemstore.open" );
+		IDialog.Activate( this );
+		IsOpen = true;
+	}
+
+	public void Close()
+	{
+		if ( !IsOpen ) return;
+		IDialog.Deactivate( this );
+		IsOpen = false;
+	}
+
+	public void SetAirdrop( Airdrop airdrop )
+	{
+		Airdrop = airdrop;
+
+		ItemContainer.DeleteChildren( true );
+
+		airdrop.Items.Sort( ( a, b ) => a.SortOrder.CompareTo( b.SortOrder ) );
+
+		foreach ( var item in airdrop.Items )
+		{
+			var panel = ItemContainer.AddChild<PurchasableItem>( "item" );
+			panel.OnPurchaseClicked += OnItemPurchased;
+			panel.SetItem( item );
+		}
+	}
+
+	public void SetItems( List<BaseShopItem> items )
+	{
+
+	}
+
+	public override void Tick()
+	{
+        if ( Local.Pawn is not CoreWars.Player player )
+            return;
+
+		if ( Airdrop.IsValid() )
+		{
+			var distance = Airdrop.Position.Distance( player.Position );
+
+			if ( distance >= 300f )
+			{
+				Close();
+				return;
+			}
+		}
+
+		base.Tick();
+	}
+
+	protected int GetResourceCount<T>() where T : ResourceItem
+	{
+        if ( Local.Pawn is CoreWars.Player player )
+		{
+			return player.GetResourceCount<T>();
+		}
+
+		return 0;
+	}
+
+	protected virtual void OnItemPurchased( IPurchasableItem item )
+	{
+        CoreWars.Player.BuyItemCmd( Airdrop.NetworkIdent, item.GetType().Name );
+		Util.Play( "item.purchase" );
+	}
+
+	protected override void PostTemplateApplied()
+	{
+		base.PostTemplateApplied();
+
+		if ( Airdrop.IsValid() )
+		{
+			SetAirdrop( Airdrop );
+		}
+
+		BindClass( "hidden", () => !IsOpen );
+	}
+}

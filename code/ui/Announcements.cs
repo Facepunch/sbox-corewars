@@ -4,7 +4,7 @@ using Sandbox.UI.Construct;
 using System;
 using System.Collections.Generic;
 
-namespace Facepunch.CoreWars
+namespace Facepunch.CoreWars.UI
 {
 	public partial class Announcements : Panel
 	{

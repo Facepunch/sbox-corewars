@@ -28,7 +28,7 @@ namespace Facepunch.CoreWars.Editor
 			Current = new EditorMirrorMenu();
 			Current.PopulateItems();
 
-			Game.Hud.FindPopupPanel().AddChild( Current );
+			Local.Hud.FindPopupPanel().AddChild( Current );
 		}
 
 		public void PopulateItems()

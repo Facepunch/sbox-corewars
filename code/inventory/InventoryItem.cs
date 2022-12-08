@@ -1,199 +1,211 @@
 ﻿using Sandbox;
 using System.IO;
 using System.Collections.Generic;
+using System;
 
-namespace Facepunch.CoreWars.Inventory
+namespace Facepunch.CoreWars;
+
+public class InventoryItem : IValid
 {
-	public class InventoryItem : IValid
+	public InventoryContainer Parent { get; set; }
+	public ItemEntity WorldEntity { get; private set; }
+	public bool IsWorldEntity { get; private set; }
+
+	public virtual ushort DefaultStackSize => 1;
+	public virtual ushort MaxStackSize => 1;
+	public virtual string WorldModel => "models/sbox_props/burger_box/burger_box.vmdl";
+	public virtual string Description => string.Empty;
+	public virtual bool DropOnDeath => false;
+	public virtual bool RemoveOnDeath => false;
+	public virtual bool CanBeDropped => true;
+	public virtual Color Color => Color.White;
+	public virtual string Name => string.Empty;
+	public virtual Color IconTintColor => Color.White;
+	public virtual string UniqueId => GetType().Name;
+	public virtual string Icon => string.Empty;
+
+	public virtual IReadOnlySet<string> Tags => InternalTags;
+	public virtual Dictionary<string, int> RequiredItems => null;
+	public virtual bool IsCraftable => false;
+
+	protected HashSet<string> InternalTags = new( StringComparer.OrdinalIgnoreCase );
+
+	public InventoryItem()
 	{
-		public InventoryContainer Container { get; set; }
-		public ItemEntity WorldEntity { get; private set; }
-		public bool IsWorldEntity { get; private set; }
-		public string ClassName { get; set; }
+		BuildTags( InternalTags );
+	}
 
-		public virtual ushort DefaultStackSize => 1;
-		public virtual ushort MaxStackSize => 1;
-		public virtual string WorldModel => string.Empty;
-		public virtual string Description => string.Empty;
-		public virtual bool RemoveOnDeath => false;
-		public virtual bool DropOnDeath => false;
-		public virtual bool CanBeDropped => true;
-		public virtual Color Color => Color.White;
-		public virtual string Name => string.Empty;
-		public virtual Color IconTintColor => Color.White;
-		public virtual string Icon => string.Empty;
-
-		private ItemTag[] InternalTags;
-
-		public ItemTag[] Tags
+	public static InventoryItem Deserialize( byte[] data )
+	{
+		using ( var stream = new MemoryStream( data ) )
 		{
-			get
+			using ( var reader = new BinaryReader( stream ) )
 			{
-				if ( InternalTags == null )
-				{
-					var tags = new List<ItemTag>();
-					BuildTags( tags );
-					InternalTags = tags.ToArray();
-				}
-
-				return InternalTags;
+				return reader.ReadInventoryItem();
 			}
 		}
+	}
 
-		public static InventoryItem Deserialize( byte[] data )
+	public byte[] Serialize()
+	{
+		using ( var stream = new MemoryStream() )
 		{
-			using ( var stream = new MemoryStream( data ) )
+			using ( var writer = new BinaryWriter( stream ) )
 			{
-				using ( var reader = new BinaryReader( stream ) )
-				{
-					return reader.ReadInventoryItem();
-				}
+				writer.Write( this );
+				return stream.ToArray();
 			}
 		}
+	}
 
-		public byte[] Serialize()
+	private ushort InternalStackSize;
+	private bool InternalIsDirty;
+
+	public ushort StackSize
+	{
+		get => InternalStackSize;
+
+		set
 		{
-			using ( var stream = new MemoryStream() )
+			if ( InternalStackSize != value )
 			{
-				using ( var writer = new BinaryWriter( stream ) )
-				{
-					writer.WriteInventoryItem( this );
-					return stream.ToArray();
-				}
+				InternalStackSize = value;
+				IsDirty = true;
+
+				if ( InternalStackSize <= 0 )
+					Remove();
 			}
 		}
+	}
 
-		private ushort InternalStackSize;
-		private bool InternalIsDirty;
+	public bool IsServer => Host.IsServer;
+	public bool IsClient => Host.IsClient;
+	public bool IsInstance => ItemId > 0;
 
-		public ushort StackSize
+	public bool IsDirty
+	{
+		get => InternalIsDirty;
+
+		set
 		{
-			get => InternalStackSize;
-
-			set
+			if ( IsServer )
 			{
-				if ( InternalStackSize != value )
+				if ( Parent == null )
 				{
-					InternalStackSize = value;
-					IsDirty = true;
+					InternalIsDirty = false;
+					return;
 				}
-			}
-		}
 
-		public bool IsServer => Host.IsServer;
-		public bool IsClient => Host.IsClient;
-		public bool IsInstance => ItemId > 0;
+				InternalIsDirty = value;
 
-		public bool IsDirty
-		{
-			get => InternalIsDirty;
-
-			set
-			{
-				if ( IsServer )
+				if ( InternalIsDirty )
 				{
-					if ( Container == null )
-					{
-						InternalIsDirty = false;
-						return;
-					}
-
-					InternalIsDirty = value;
-
-					if ( InternalIsDirty )
-					{
-						Container.IsDirty = true;
-					}
+					Parent.IsDirty = true;
 				}
 			}
 		}
+	}
 
-		public bool IsValid { get; set; }
-		public ulong ItemId { get; set; }
-		public ushort SlotId { get; set; }
+	public bool IsValid { get; set; }
+	public ulong ItemId { get; set; }
+	public ushort SlotId { get; set; }
 
-		public void SetWorldEntity( ItemEntity entity )
+	public void SetWorldEntity( ItemEntity entity )
+	{
+		WorldEntity = entity;
+		IsWorldEntity = entity.IsValid();
+		IsDirty = true;
+		Remove();
+	}
+
+	public void ClearWorldEntity()
+	{
+		WorldEntity = null;
+		IsWorldEntity = false;
+		IsDirty = true;
+	}
+
+	public void Remove()
+	{
+		if ( Parent.IsValid() )
 		{
-			WorldEntity = entity;
-			IsWorldEntity = entity.IsValid();
-			IsDirty = true;
-			Remove();
+			Parent.Remove( this );
+		}
+	}
+
+	public void Replace( InventoryItem other )
+	{
+		if ( Parent.IsValid() )
+		{
+			Parent.Replace( SlotId, other );
+		}
+	}
+
+	public virtual bool IsSameType( InventoryItem other )
+	{
+		return (GetType() == other.GetType());
+	}
+
+	public virtual bool CanStackWith( InventoryItem other )
+	{
+		return true;
+	}
+
+	public virtual void Write( BinaryWriter writer )
+	{
+		if ( WorldEntity.IsValid() )
+		{
+			writer.Write( true );
+			writer.Write( WorldEntity.NetworkIdent );
+		}
+		else
+		{
+			writer.Write( false );
 		}
 
-		public void ClearWorldEntity()
+	}
+
+	public virtual void Read( BinaryReader reader )
+	{
+		IsWorldEntity = reader.ReadBoolean();
+
+		if ( IsWorldEntity )
 		{
+			WorldEntity = (Entity.FindByIndex( reader.ReadInt32() ) as ItemEntity);
+			return;
+		}
+
+		if ( WorldEntity.IsValid() )
+		{
+			if ( IsServer )
+			{
+				WorldEntity.Delete();
+			}
+
 			WorldEntity = null;
-			IsWorldEntity = false;
-			IsDirty = true;
 		}
+	}
 
-		public void Remove()
+	public virtual void OnRemoved()
+	{
+
+	}
+
+	public virtual void OnCreated()
+	{
+
+	}
+
+	protected virtual void BuildTags( HashSet<string> tags )
+	{
+		if ( CanBeDropped )
 		{
-			if ( Container.IsValid() )
-			{
-				Container.Remove( this );
-			}
+			tags.Add( "droppable" );
 		}
+	}
 
-		public void Replace( InventoryItem other )
-		{
-			if ( Container.IsValid() )
-			{
-				Container.Replace( SlotId, other );
-			}
-		}
-
-		public virtual void BuildTags( List<ItemTag> tags )
-		{
-			if ( CanBeDropped )
-				tags.Add( ItemTag.CanDrop );
-
-			if ( !RemoveOnDeath && !DropOnDeath )
-				tags.Add( ItemTag.Soulbound );
-		}
-
-		public virtual bool IsSameType( InventoryItem other )
-		{
-			return (GetType() == other.GetType());
-		}
-
-		public virtual bool CanStackWith( InventoryItem other )
-		{
-			return true;
-		}
-
-		public virtual void Write( BinaryWriter writer )
-		{
-			if ( WorldEntity.IsValid() )
-			{
-				writer.Write( true );
-				writer.Write( WorldEntity.NetworkIdent );
-			}
-			else
-			{
-				writer.Write( false );
-			}
-
-		}
-
-		public virtual void Read( BinaryReader reader )
-		{
-			IsWorldEntity = reader.ReadBoolean();
-
-			if ( IsWorldEntity )
-			{
-				WorldEntity = (Entity.FindByIndex( reader.ReadInt32() ) as ItemEntity);
-			}
-		}
-
-		public virtual void OnRemoved()
-		{
-
-		}
-
-		public virtual void OnCreated()
-		{
-
-		}
+	public override int GetHashCode()
+	{
+		return HashCode.Combine( IsValid, StackSize );
 	}
 }

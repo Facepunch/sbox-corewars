@@ -4,9 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sandbox;
-using Facepunch.CoreWars.Inventory;
 
-namespace Facepunch.CoreWars
+namespace Facepunch.CoreWars.UI
 {
 	public class ItemWorldIcon : WorldPanel
 	{
@@ -21,9 +20,9 @@ namespace Facepunch.CoreWars
 			Container = Add.Panel( "container" );
 			Glow = Container.Add.Panel( "glow" );
 			Entity = entity;
-			Icon = Container.Add.Image( entity.Item.Instance.Icon, "icon" );
+			Icon = Container.Add.Image( entity.Item.Icon, "icon" );
 
-			var item = entity.Item.Instance;
+			var item = entity.Item;
 
 			if ( item.IsValid() )
 			{

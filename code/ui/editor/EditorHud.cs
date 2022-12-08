@@ -22,13 +22,13 @@ namespace Facepunch.CoreWars
 		[ClientRpc]
 		public static void Toast( string text, string icon = "" )
 		{
-			ToastList.Instance.AddItem( text, Texture.Load( FileSystem.Mounted, icon ) );
+			UI.ToastList.Instance.AddItem( text, Texture.Load( FileSystem.Mounted, icon ) );
 		}
 
 		public EditorHud()
 		{
-			AddChild<ChatBox>();
-			AddChild<ToastList>();
+			AddChild<UI.ChatBox>();
+			AddChild<UI.ToastList>();
 			AddChild<VoiceList>();
 		}
 

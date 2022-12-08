@@ -3,7 +3,7 @@ using Sandbox.UI;
 using System;
 using Sandbox;
 
-namespace Facepunch.CoreWars
+namespace Facepunch.CoreWars.UI
 {
 	public class Nameplate : WorldPanel
 	{

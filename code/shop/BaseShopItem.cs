@@ -10,7 +10,7 @@ namespace Facepunch.CoreWars
 	public abstract class BaseShopItem : IPurchasableItem
 	{
 		public virtual Type RequiredUpgradeType => null;
-		public virtual ItemTag[] Tags => new ItemTag[0];
+		public virtual IReadOnlySet<string> Tags => new HashSet<string>();
 		public virtual string Description => string.Empty;
 		public virtual string Name => string.Empty;
 		public virtual Dictionary<Type, int> Costs => new();

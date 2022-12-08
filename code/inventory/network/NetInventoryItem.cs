@@ -1,43 +1,51 @@
 ﻿using Sandbox;
 
-namespace Facepunch.CoreWars.Inventory
+namespace Facepunch.CoreWars;
+
+public class NetInventoryItem : BaseNetworkable, INetworkSerializer, IValid
 {
-	public class NetInventoryItem : BaseNetworkable, INetworkSerializer, IValid
+	public InventoryItem Value { get; private set; }
+
+	public bool IsValid => Value.IsValid();
+	public uint Version { get; private set; }
+
+	public NetInventoryItem()
 	{
-		public InventoryItem Instance { get; private set; }
 
-		public bool IsValid => Instance.IsValid();
-		public uint Version { get; private set; }
+	}
 
-		public NetInventoryItem()
+	public NetInventoryItem( InventoryItem item )
+	{
+		Value = item;
+	}
+
+	public void Read( ref NetRead read )
+	{
+		var version = read.Read<uint>();
+		var itemId = read.Read<ulong>();
+		var totalBytes = read.Read<int>();
+		var output = new byte[totalBytes];
+		read.ReadUnmanagedArray( output );
+
+		if ( Version == version ) return;
+
+		var item = InventorySystem.FindInstance( itemId );
+		if ( item.IsValid() )
 		{
-
+			Value = item;
+			return;
 		}
 
-		public NetInventoryItem( InventoryItem item )
-		{
-			Instance = item;
-		}
+		Value = InventoryItem.Deserialize( output );
+		Version = version;
+	}
 
-		public void Read( ref NetRead read )
-		{
-			var version = read.Read<uint>();
-			var totalBytes = read.Read<int>();
-			var output = new byte[totalBytes];
-			read.ReadUnmanagedArray( output );
-
-			if ( Version == version ) return;
-
-			Instance = InventoryItem.Deserialize( output );
-			Version = version;
-		}
-
-		public void Write( NetWrite write )
-		{
-			var serialized = Instance.Serialize();
-			write.Write( ++Version );
-			write.Write( serialized.Length );
-			write.Write( serialized );
-		}
+	public void Write( NetWrite write )
+	{
+		var serialized = Value.Serialize();
+		write.Write( ++Version );
+		write.Write( Value.ItemId );
+		write.Write( serialized.Length );
+		write.Write( serialized );
 	}
 }

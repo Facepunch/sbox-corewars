@@ -3,7 +3,7 @@ using Sandbox;
 using Sandbox.UI;
 using System;
 
-namespace Facepunch.CoreWars
+namespace Facepunch.CoreWars.UI
 {
 	public partial class TabTextEntry : TextEntry
 	{

@@ -11,7 +11,7 @@ namespace Facepunch.CoreWars
 	public class ArmorUpgradeTier3 : BaseTeamUpgrade
 	{
 		public override string Name => "+60% Armor";
-		public override Color Color => ColorPalette.Armor;
+		public override Color Color => UI.ColorPalette.Armor;
 		public override string Description => "Increase armor protection for your team by 60%.";
 		public override Dictionary<Type, int> Costs => new()
 		{

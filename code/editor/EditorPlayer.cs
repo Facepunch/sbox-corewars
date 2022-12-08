@@ -1,10 +1,11 @@
-﻿using Facepunch.Voxels;
+﻿using System.Collections.Generic;
+using Facepunch.Voxels;
 using Sandbox;
-using System.Collections.Generic;
+using Facepunch.CoreWars.UI;
 
 namespace Facepunch.CoreWars.Editor
 {
-	public partial class EditorPlayer : Sandbox.Player, INameplate
+	public partial class EditorPlayer : BasePlayer, INameplate
 	{
 		[Net, Predicted] public int CurrentHotbarIndex { get; private set; }
 		[Net] public EditorLastEntityData LastPlacedEntity { get; set; } = new();
@@ -222,18 +223,14 @@ namespace Facepunch.CoreWars.Editor
 				Transform = spawnpoint.Value;
 			}
 
-			LifeState = LifeState.Alive;
-			Health = 100f;
-			Velocity = Vector3.Zero;
-			WaterLevel = 0f;
-
-			CreateHull();
-			ResetInterpolation();
+			base.Respawn();
 		}
 
 		public override void FrameSimulate( Client client )
 		{
 			EditorCamera?.Update();
+			Controller?.SetActivePlayer( this );
+			Controller?.FrameSimulate();
 		}
 
 		public override void Simulate( Client client )
@@ -301,8 +298,8 @@ namespace Facepunch.CoreWars.Editor
 			if ( !viewer.IsValid() ) return;
 			if ( viewer.IsInWorld() && !viewer.IsCurrentChunkReady ) return;
 
-			var controller = GetActiveController();
-			controller?.Simulate( client, this );
+			Controller?.SetActivePlayer( this );
+			Controller?.Simulate();
 
 			Tool?.Simulate( client );
 		}

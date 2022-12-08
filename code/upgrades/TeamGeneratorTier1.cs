@@ -11,7 +11,7 @@ namespace Facepunch.CoreWars
 	public class TeamGeneratorTier1 : BaseTeamUpgrade
 	{
 		public override string Name => "+50% Generator Speed";
-		public override Color Color => ColorPalette.Resources;
+		public override Color Color => UI.ColorPalette.Resources;
 		public override string Description => "Increase speed of your team's generator by 50%.";
 		public override Dictionary<Type, int> Costs => new()
 		{

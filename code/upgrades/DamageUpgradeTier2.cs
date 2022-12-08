@@ -11,7 +11,7 @@ namespace Facepunch.CoreWars
 	public class DamageUpgradeTier2 : BaseTeamUpgrade
 	{
 		public override string Name => "+35% Damage";
-		public override Color Color => ColorPalette.Weapons;
+		public override Color Color => UI.ColorPalette.Weapons;
 		public override string Description => "Increase damage dealt by your team by 35%.";
 		public override Dictionary<Type, int> Costs => new()
 		{

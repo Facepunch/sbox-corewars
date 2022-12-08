@@ -1,0 +1,186 @@
+﻿@using System;
+@using Sandbox;
+@using Sandbox.UI;
+@using Facepunch.CoreWars;
+
+@namespace Facepunch.CoreWars.UI
+@attribute [StyleSheet( "/ui/inventory/Backpack.scss" )]
+@inherits Panel
+@implements IDialog
+@implements IDroppable
+
+@if ( !CoreWars.Player.Me.IsValid() ) return;
+
+@{
+    var equipment = CoreWars.Player.Me.Equipment;
+    if (!equipment.IsValid()) return;
+
+    var backpack = CoreWars.Player.Me.Backpack;
+    if ( !backpack.IsValid() ) return;
+
+    var hotbar = CoreWars.Player.Me.Hotbar;
+    if ( !hotbar.IsValid() ) return;
+}
+
+<root>
+    <div class="body-container">
+        <div class="equipment">
+            <label class="title">Equipment</label>
+
+            <div class="slots">
+                <InventorySlot
+                    OnSelected=@OnEquipmentSlotSelected
+                    DefaultIcon="textures/ui/armor_slot_head.png"
+                    Container=@equipment
+                    Slot=@((ushort)0)>
+                </InventorySlot>
+
+                <InventorySlot
+                    OnSelected=@OnEquipmentSlotSelected
+                    DefaultIcon="textures/ui/armor_slot_chest.png"
+                    Container=@equipment
+                    Slot=@((ushort)1)>
+                </InventorySlot>
+
+                <InventorySlot
+                    OnSelected=@OnEquipmentSlotSelected
+                    DefaultIcon="textures/ui/armor_slot_legs.png"
+                    Container=@equipment
+                    Slot=@((ushort)2)>
+                </InventorySlot>
+            </div>
+        </div>
+
+        <div class="backpack">
+            <label class="title">Backpack</label>
+
+            <div class="slots">
+                @for ( ushort i = 0; i < backpack.SlotLimit; i++ )
+                {
+                    <InventorySlot OnSelected=@OnBackpackSlotSelected Container=@backpack Slot=@i></InventorySlot>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="hotbar">
+        @if ( Selected != null && Selected.Item is IContainerItem selected )
+        {
+            <label class="title">@selected.ContainerName</label>
+
+            <div class="slots" style="margin-bottom: 24px;">
+                @{
+                    var childContainer = selected.Container;
+                }
+
+                @for ( ushort i = 0; i < childContainer.SlotLimit; i++ )
+                {
+                    <InventorySlot Container=@childContainer Slot=@i></InventorySlot>
+                }
+            </div>
+        }
+
+        <label class="title">Hotbar</label>
+
+        <div class="slots">
+            @for ( ushort i = 0; i < hotbar.SlotLimit; i++ )
+            {
+                <InventorySlot OnSelected=@OnHotbarSlotSelected Container=@hotbar Slot=@i></InventorySlot>
+            }
+        </div>
+    </div>
+</root>
+
+@code
+{
+    public static Backpack Current { get; private set; }
+
+    public InventorySlot Selected { get; private set; }
+    public bool IsOpen { get; set; }
+
+    public Backpack()
+    {
+        BindClass( "hidden", () => !IsOpen );
+        Current = this;
+    }
+
+    public void Open()
+    {
+        if ( IsOpen ) return;
+        ClearSelected();
+        IDialog.Activate( this );
+        IsOpen = true;
+    }
+
+    public void Close()
+    {
+        if ( !IsOpen ) return;
+        IDialog.Deactivate( this );
+        IsOpen = false;
+    }
+
+    public virtual bool CanDrop( IDraggable draggable, DraggableMode mode )
+    {
+        return true;
+    }
+
+    public virtual void OnDrop( IDraggable draggable, DraggableMode mode )
+    {
+        if ( draggable is InventorySlot slot )
+        {
+            //CoreWars.Player.ThrowItem( slot.Item, Screen.GetDirection( Mouse.Position ), mode == DraggableMode.Split ? true : false );
+        }
+    }
+
+    protected void Select( InventorySlot slot )
+    {
+        if ( Selected != null )
+        {
+            Selected.IsSelected = false;
+        }
+
+        Sound.FromScreen( "inventory.select" );
+
+        slot.IsSelected = true;
+        Selected = slot;
+    }
+
+    protected void ClearSelected()
+    {
+        if ( Selected != null )
+        {
+            Selected.IsSelected = false;
+            Selected = null;
+        }
+    }
+
+    protected virtual void OnBackpackSlotSelected( InventorySlot slot )
+    {
+        Select( slot );
+    }
+
+    protected virtual void OnEquipmentSlotSelected( InventorySlot slot )
+    {
+        Select( slot );
+    }
+
+    protected virtual void OnHotbarSlotSelected( InventorySlot slot )
+    {
+        Select( slot );
+    }
+
+    protected override int BuildHash()
+    {
+        var equipment = CoreWars.Player.Me?.Equipment;
+        var backpack = CoreWars.Player.Me?.Backpack;
+        var hotbar = CoreWars.Player.Me?.Hotbar;
+
+        InventoryContainer childContainer = null;
+        if (Selected != null && Selected.Item is IContainerItem selected )
+        {
+            childContainer = selected.Container;
+        }
+
+        return HashCode.Combine( CoreWars.Player.Me, Selected, childContainer, equipment, backpack, hotbar );
+    }
+}

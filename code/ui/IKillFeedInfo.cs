@@ -2,7 +2,7 @@
 using Sandbox;
 using Sandbox.UI;
 
-namespace Facepunch.CoreWars
+namespace Facepunch.CoreWars.UI
 {
 	public interface IKillFeedInfo
 	{

@@ -1,13 +1,12 @@
-﻿using Facepunch.CoreWars.Inventory;
-using Sandbox;
+﻿using Sandbox;
 using System.IO;
 
 namespace Facepunch.CoreWars
 {
-	[Library( "item_armor_head_1" )]
 	public class ArmorHeadTier1 : ArmorItem
 	{
 		public override float DamageMultiplier => 0.7f;
+		public override string UniqueId => "item_armor_head_1";
 		public override ArmorSlot ArmorSlot => ArmorSlot.Head;
 		public override string Name => "Light Head Armor";
 		public override string Description => "A low protection head armor piece.";

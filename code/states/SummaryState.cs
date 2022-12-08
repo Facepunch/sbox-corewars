@@ -1,5 +1,6 @@
 ﻿using Sandbox;
 using System.Linq;
+using Facepunch.CoreWars.UI;
 
 namespace Facepunch.CoreWars
 {

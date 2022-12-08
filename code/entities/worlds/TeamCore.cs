@@ -36,7 +36,7 @@ namespace Facepunch.CoreWars
 
 		public void AddUpgrade( BaseTeamUpgrade upgrade )
 		{
-			Announcements.Send( Team.GetTo(), $"{upgrade.Name} Unlocked", upgrade.Description, upgrade.GetIcon( null ) );
+			UI.Announcements.Send( Team.GetTo(), $"{upgrade.Name} Unlocked", upgrade.Description, upgrade.GetIcon( null ) );
 			InternalUpgrades.Add( upgrade );
 			UpgradeTypes.Add( TypeLibrary.GetDescription( upgrade.GetType() ).Identity );
 		}
@@ -154,7 +154,7 @@ namespace Facepunch.CoreWars
 			if ( !Game.FriendlyFire && attacker.Team == Team )
 				return;
 
-			FloatingDamage.Show( this, info.Damage, info.Position );
+			UI.FloatingDamage.Show( this, info.Damage, info.Position );
 
 			PlaySound( "core.hit" );
 

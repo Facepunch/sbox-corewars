@@ -1,5 +1,4 @@
-﻿using Facepunch.CoreWars.Inventory;
-using Sandbox;
+﻿using Sandbox;
 using System.IO;
 
 namespace Facepunch.CoreWars
@@ -7,7 +6,7 @@ namespace Facepunch.CoreWars
 	public class WeaponItem : InventoryItem
 	{
 		public override bool CanBeDropped => false;
-		public override Color Color => ColorPalette.Weapons;
+		public override Color Color => UI.ColorPalette.Weapons;
 
 		public virtual int WorldModelMaterialGroup => 0;
 		public virtual int ViewModelMaterialGroup => 0;

@@ -1,5 +1,5 @@
 ﻿using Facepunch.CoreWars.Editor;
-using Facepunch.CoreWars.Inventory;
+
 using Facepunch.Voxels;
 using Sandbox;
 using Sandbox.UI;

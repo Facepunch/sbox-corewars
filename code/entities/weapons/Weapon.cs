@@ -1,7 +1,7 @@
 ﻿using Sandbox;
 using System;
 using System.Collections.Generic;
-using Facepunch.CoreWars.Inventory;
+using Facepunch.CoreWars.UI;
 
 namespace Facepunch.CoreWars
 {
@@ -85,7 +85,7 @@ namespace Facepunch.CoreWars
 			}
 		}
 
-		public WeaponItem WeaponItem => Item.Instance as WeaponItem;
+		public WeaponItem WeaponItem => Item.Value as WeaponItem;
 
 		public int AvailableAmmo()
 		{
@@ -405,11 +405,6 @@ namespace Facepunch.CoreWars
 
 			ViewModelEntity.SetModel( ViewModelPath );
 			ViewModelEntity.SetMaterialGroup( ViewModelMaterialGroup );
-		}
-
-		public override void CreateHudElements()
-		{
-			if ( Local.Hud == null ) return;
 		}
 
 		public bool IsUsable()

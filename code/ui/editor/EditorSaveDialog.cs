@@ -19,7 +19,7 @@ namespace Facepunch.CoreWars.Editor
 			Current?.Delete();
 			Current = new EditorSaveDialog();
 
-			Game.Hud.AddChild( Current );
+			Local.Hud.AddChild( Current );
 		}
 
 		public override void Tick()

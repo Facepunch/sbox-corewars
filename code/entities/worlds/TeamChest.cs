@@ -1,5 +1,5 @@
 ﻿using Facepunch.CoreWars.Editor;
-using Facepunch.CoreWars.Inventory;
+
 using Facepunch.Voxels;
 using Sandbox;
 using System;
@@ -30,7 +30,7 @@ namespace Facepunch.CoreWars
 
 		public virtual void Reset()
 		{
-			Inventory.Instance.RemoveAll();
+			Inventory.Value.RemoveAll();
 		}
 
 		public override void Spawn()
@@ -40,7 +40,8 @@ namespace Facepunch.CoreWars
 			Transmit = TransmitType.Always;
 			SetupPhysicsFromModel( PhysicsMotionType.Keyframed );
 
-			var inventory = new InventoryContainer( this );
+			var inventory = new InventoryContainer();
+			inventory.SetEntity( this );
 			inventory.SetSlotLimit( 24 );
 			InventorySystem.Register( inventory );
 
@@ -60,8 +61,8 @@ namespace Facepunch.CoreWars
 
 		public void OnUsed( Player player )
 		{
-			Inventory.Instance.AddConnection( player.Client );
-			OpenForClient( To.Single( player ), Inventory.Instance.Serialize() );
+			Inventory.Value.AddConnection( player.Client );
+			OpenForClient( To.Single( player ), Inventory.Value.Serialize() );
 		}
 
 		public bool IsUsable( Player player  )
@@ -75,7 +76,7 @@ namespace Facepunch.CoreWars
 			if ( Local.Pawn is not Player ) return;
 
 			var container = InventoryContainer.Deserialize( data );
-			var storage = Storage.Current;
+			var storage = UI.Storage.Current;
 
 			storage.SetName( "Team Chest" );
 			storage.SetEntity( this );

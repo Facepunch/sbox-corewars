@@ -1,7 +1,8 @@
-﻿using Facepunch.CoreWars.Inventory;
+﻿
 using System;
 using Sandbox;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Facepunch.CoreWars
 {
@@ -11,7 +12,7 @@ namespace Facepunch.CoreWars
 
 		public override string Name => ItemDefinition.Name;
 		public override string Description => ItemDefinition.Description;
-		public override ItemTag[] Tags => ItemDefinition.Tags;
+		public override IReadOnlySet<string> Tags => ItemDefinition.Tags;
 		public override Color Color => ItemDefinition.Color;
 		public override int SortOrder => 6;
 

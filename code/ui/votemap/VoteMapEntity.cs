@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Facepunch.CoreWars
+namespace Facepunch.CoreWars.UI
 {
 	public partial class VoteMapEntity : Entity
 	{
@@ -38,7 +38,7 @@ namespace Facepunch.CoreWars
 			Current = this;
 			Panel = new VoteMapPanel();
 
-			Game.Hud.AddChild( Panel );
+			Local.Hud.AddChild( Panel );
 		}
 
 		protected override void OnDestroy()

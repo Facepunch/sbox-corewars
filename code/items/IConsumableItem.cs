@@ -1,5 +1,4 @@
-﻿using Facepunch.CoreWars.Inventory;
-using Facepunch.CoreWars.Utility;
+﻿using Facepunch.CoreWars.Utility;
 using Sandbox;
 using System.IO;
 

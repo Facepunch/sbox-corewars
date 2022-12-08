@@ -2,7 +2,7 @@
 using Sandbox.UI;
 using System.Threading.Tasks;
 
-namespace Facepunch.CoreWars
+namespace Facepunch.CoreWars.UI
 {
 	[UseTemplate]
 	public class MapIcon : Panel

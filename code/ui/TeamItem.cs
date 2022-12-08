@@ -1,4 +1,4 @@
-﻿using Facepunch.CoreWars.Inventory;
+﻿
 using Facepunch.Voxels;
 using Sandbox;
 using Sandbox.UI;
@@ -6,7 +6,7 @@ using Sandbox.UI.Construct;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Facepunch.CoreWars
+namespace Facepunch.CoreWars.UI
 {
 	public class TeamPlayerItem : Panel
 	{

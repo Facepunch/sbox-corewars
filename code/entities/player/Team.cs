@@ -1,5 +1,5 @@
 ﻿using Facepunch.CoreWars.Blocks;
-using Facepunch.CoreWars.Inventory;
+
 using Facepunch.Voxels;
 using Sandbox;
 using System.Collections.Generic;

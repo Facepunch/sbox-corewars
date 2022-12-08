@@ -10,7 +10,7 @@ namespace Facepunch.CoreWars
 		public bool IsServer => Host.IsServer;
 		public bool IsClient => Host.IsClient;
 
-		public virtual Color Color => ColorPalette.Brews;
+		public virtual Color Color => UI.ColorPalette.Brews;
 		public virtual float Duration => 30f;
 		public virtual string Icon => "textures/ui/unknown.png";
 
@@ -18,7 +18,7 @@ namespace Facepunch.CoreWars
 		{
 			if ( IsClient && player.IsLocalPawn )
 			{
-				Vitals.AddBuff( this );
+				UI.Vitals.AddBuff( this );
 			}
 		}
 
@@ -27,7 +27,7 @@ namespace Facepunch.CoreWars
 			if ( IsClient && player.IsLocalPawn )
 			{
 				Sound.FromScreen( "buff.expired" );
-				Vitals.RemoveBuff( this );
+				UI.Vitals.RemoveBuff( this );
 			}
 		}
 	}

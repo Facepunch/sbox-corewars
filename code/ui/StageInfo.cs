@@ -1,12 +1,11 @@
-﻿using Facepunch.CoreWars.Inventory;
-using Facepunch.Voxels;
+﻿using Facepunch.Voxels;
 using Sandbox;
 using Sandbox.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Facepunch.CoreWars
+namespace Facepunch.CoreWars.UI
 {
 	[UseTemplate]
 	public partial class StageInfo : Panel
