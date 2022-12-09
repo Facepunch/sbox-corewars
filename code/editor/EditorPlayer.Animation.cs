@@ -4,7 +4,7 @@ namespace Facepunch.CoreWars.Editor;
 
 public partial class EditorPlayer
 {
-	private Entity LastActiveChild { get; set; }
+	private Entity LastWeaponEntity { get; set; }
 
 	protected void SimulateAnimation()
 	{
@@ -38,7 +38,7 @@ public partial class EditorPlayer
 		animHelper.IsWeaponLowered = false;
 
 		if ( Controller.HasEvent( "jump" ) ) animHelper.TriggerJump();
-		if ( ActiveChild != LastActiveChild ) animHelper.TriggerDeploy();
+		if ( ActiveChild != LastWeaponEntity ) animHelper.TriggerDeploy();
 
 		if ( ActiveChild is Weapon weapon )
 		{
@@ -50,6 +50,6 @@ public partial class EditorPlayer
 			animHelper.AimBodyWeight = 0.5f;
 		}
 
-		LastActiveChild = ActiveChild;
+		LastWeaponEntity = ActiveChild;
 	}
 }
