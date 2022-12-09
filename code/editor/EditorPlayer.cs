@@ -197,11 +197,6 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void ClientSpawn()
 		{
-			if ( IsLocalPawn )
-			{
-				EditorHotbar.Current?.Initialize( HotbarBlockIds.Count );
-			}
-
 			Nameplate = new Nameplate( this );
 
 			EditorBounds = new EditorBounds

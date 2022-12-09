@@ -20,76 +20,75 @@
 
 @code
 {
-	public BlockType BlockType { get; set; }
-	public byte BlockId { get; set; }
-	public float IconSize => Box.Rect.Size.Length;
-	public Panel Icon { get; set; }
+    public BlockType BlockType { get; set; }
+    public byte BlockId { get; set; }
+    public float IconSize => Box.Rect.Size.Length;
+    public Panel Icon { get; set; }
 
-	public string Description => BlockType.Description;
-	public IReadOnlySet<string> Tags { get; set; }
-	public string Name => BlockType.FriendlyName;
-	public Color Color => Color.White;
+    public string Description => BlockType.Description;
+    public IReadOnlySet<string> Tags { get; set; }
+    public string Name => BlockType.FriendlyName;
+    public Color Color => Color.White;
 
-	public EditorBlockItem() { }
+    protected override void OnMouseOver( MousePanelEvent e )
+    {
+        if ( BlockType.IsValid() )
+        {
+            CustomTooltip.Show( this );
+        }
 
-	public void SetBlockId( byte blockId )
-	{
-		BlockType = VoxelWorld.Current.GetBlockType( blockId );
-		BlockId = blockId;
-		Tags = BlockType.GetItemTags();
+        base.OnMouseOver( e );
+    }
 
-		var icon = $"textures/blocks/corewars/color/{BlockType.DefaultTexture}.png";
+    protected override void OnMouseOut( MousePanelEvent e )
+    {
+        CustomTooltip.Hide( this );
+        base.OnMouseOut( e );
+    }
 
-		if ( !string.IsNullOrEmpty( BlockType.Icon ) )
-			icon = BlockType.Icon;
+    protected override void OnMouseDown( MousePanelEvent e )
+    {
+        Draggable.Start( this, DraggableMode.Move );
+        base.OnMouseDown( e );
+    }
 
-		if ( !string.IsNullOrEmpty( icon ) )
-		{
-			if ( CoreWars.Util.FileExistsCached( icon ) )
-			{
-				Icon.Style.SetBackgroundImage( icon );
-				Icon.Style.BackgroundSizeX = Length.Cover;
-				Icon.Style.BackgroundSizeY = Length.Cover;
-				Icon.Style.BackgroundTint = BlockType.TintColor;
-			}
-		}
-		else
-		{
-			Icon.Style.BackgroundImage = null;
-		}
-	}
+    protected override void OnMouseUp( MousePanelEvent e )
+    {
+        Draggable.Stop( this );
+        base.OnMouseUp( e );
+    }
 
-	protected override void OnMouseOver( MousePanelEvent e )
-	{
-		if ( BlockType.IsValid() )
-		{
-			CustomTooltip.Show( this );
-		}
+    public string GetIconTexture()
+    {
+        var block = VoxelWorld.Current.GetBlockType( BlockId );
+        return $"textures/blocks/corewars/color/{ block.DefaultTexture }.png";
+    }
 
-		base.OnMouseOver( e );
-	}
+    protected override void OnAfterTreeRender( bool firstTime )
+    {
+        BlockType = VoxelWorld.Current.GetBlockType( BlockId );
+        Tags = BlockType.GetItemTags();
 
-	protected override void OnMouseOut( MousePanelEvent e )
-	{
-		CustomTooltip.Hide( this );
-		base.OnMouseOut( e );
-	}
+        var icon = $"textures/blocks/corewars/color/{BlockType.DefaultTexture}.png";
 
-	protected override void OnMouseDown( MousePanelEvent e )
-	{
-		Draggable.Start( this, DraggableMode.Move );
-		base.OnMouseDown( e );
-	}
+        if ( !string.IsNullOrEmpty( BlockType.Icon ) )
+            icon = BlockType.Icon;
 
-	protected override void OnMouseUp( MousePanelEvent e )
-	{
-		Draggable.Stop( this );
-		base.OnMouseUp( e );
-	}
+        if ( !string.IsNullOrEmpty( icon ) )
+        {
+            if ( CoreWars.Util.FileExistsCached( icon ) )
+            {
+                Icon.Style.SetBackgroundImage( icon );
+                Icon.Style.BackgroundSizeX = Length.Cover;
+                Icon.Style.BackgroundSizeY = Length.Cover;
+                Icon.Style.BackgroundTint = BlockType.TintColor;
+            }
+        }
+        else
+        {
+            Icon.Style.BackgroundImage = null;
+        }
 
-	public string GetIconTexture()
-	{
-		var block = VoxelWorld.Current.GetBlockType( BlockId );
-		return $"textures/blocks/corewars/color/{ block.DefaultTexture }.png";
-	}
+        base.OnAfterTreeRender( firstTime );
+    }
 }

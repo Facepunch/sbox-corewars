@@ -4,6 +4,7 @@
 @using Facepunch.CoreWars;
 @using Sandbox.UI.Construct;
 @using Facepunch.Voxels;
+@using System.Collections.Generic;
 
 @namespace Facepunch.CoreWars.Editor
 @attribute [StyleSheet( "/ui/editor/EditorToolDisplay.scss" )]
@@ -14,133 +15,140 @@
         <div @ref="ToolIcon" class="icon">
         </div>
         <div class="info">
-            <label @text="ToolName" class="name"></label>
-            <label @text="ToolDescription" class="description"></label>
+            <label class="name">@ToolName</label>
+            <label class="description">@ToolDescription</label>
         </div>
     </div>
 
-    <div class="hotkeys">
-        <div @ref="HotkeyList" class="list">
+    @if ( Hotkeys.Count > 0 )
+    {
+        <div class="hotkeys">
+            <div class="list">
+                @foreach ( var kv in Hotkeys )
+                {
+                    var button = kv.Key;
+                    var text = kv.Value;
+                    var texture = Input.GetGlyph( button, InputGlyphSize.Small );
+
+                    <div class="item">
+                        <img class="glyph" Texture=@texture width=@texture.Width height=@texture.Height />
+                        <label class="text">@text</label>
+                    </div>
+                }
+            </div>
         </div>
-    </div>
+    }
 </root>
-
 
 @code
 {
-	public static EditorToolDisplay Current { get; private set; }
+    public static EditorToolDisplay Current { get; private set; }
 
-	public string ToolName => GetToolName();
-	public string ToolDescription => GetToolDescription();
-	public Panel HotkeyList { get; set; }
-	public Panel ToolIcon { get; set; }
+    public string ToolName => GetToolName();
+    public string ToolDescription => GetToolDescription();
+    public Panel ToolIcon { get; set; }
+    public Dictionary<InputButton, string> Hotkeys { get; private set; } = new();
 
-	public EditorToolDisplay()
-	{
-		Current = this;
-	}
+    public EditorToolDisplay()
+    {
+        Current = this;
+    }
 
-	private string GetToolName()
-	{
-		var tool = GetActiveTool();
+    private string GetToolName()
+    {
+        var tool = GetActiveTool();
 
-		if ( tool.IsValid() )
-		{
-			var description = TypeLibrary.GetAttribute<EditorToolAttribute>( tool.GetType() );
-			var title = description.Title;
-			var mode = tool.SecondaryMode;
+        if ( tool.IsValid() )
+        {
+            var description = TypeLibrary.GetAttribute<EditorToolAttribute>( tool.GetType() );
+            var title = description.Title;
+            var mode = tool.SecondaryMode;
 
-			if ( !string.IsNullOrEmpty( mode ) )
-			{
-				return $"{title} ({mode})";
-			}
+            if ( !string.IsNullOrEmpty( mode ) )
+            {
+                return $"{title} ({mode})";
+            }
 
-			return title;
-		}
+            return title;
+        }
 
-		return string.Empty;
-	}
+        return string.Empty;
+    }
 
-	private string GetToolDescription()
-	{
-		var tool = GetActiveTool();
+    private string GetToolDescription()
+    {
+        var tool = GetActiveTool();
 
-		if ( tool.IsValid() )
-		{
-			var description = TypeLibrary.GetAttribute<EditorToolAttribute>( tool.GetType() );
-			return description.Description;
-		}
+        if ( tool.IsValid() )
+        {
+            var description = TypeLibrary.GetAttribute<EditorToolAttribute>( tool.GetType() );
+            return description.Description;
+        }
 
-		return string.Empty;
-	}
+        return string.Empty;
+    }
 
-	public EditorTool GetActiveTool()
-	{
-		if ( Local.Pawn is EditorPlayer player )
-		{
-			if ( player.Tool.IsValid() )
-			{
-				return player.Tool;
-			}
-		}
+    public EditorTool GetActiveTool()
+    {
+        if ( Local.Pawn is EditorPlayer player )
+        {
+            if ( player.Tool.IsValid() )
+            {
+                return player.Tool;
+            }
+        }
 
-		return default;
-	}
+        return default;
+    }
 
-	public override void Tick()
-	{
-		if ( !VoxelWorld.Current.IsValid() ) return;
+    public override void Tick()
+    {
+        if ( !VoxelWorld.Current.IsValid() ) return;
 
-		var tool = GetActiveTool();
+        var tool = GetActiveTool();
 
-		if ( tool.IsValid() )
-		{
-			var description = TypeLibrary.GetDescription( tool.GetType() );
-			ToolIcon.Style.SetBackgroundImage( description.Icon );
-		}
+        if ( tool.IsValid() )
+        {
+            var description = TypeLibrary.GetDescription( tool.GetType() );
+            ToolIcon.Style.SetBackgroundImage( description.Icon );
+        }
 
-		base.Tick();
-	}
+        base.Tick();
+    }
 
-	public void ClearHotkeys()
-	{
-		HotkeyList.DeleteChildren( true );
-	}
+    public void ClearHotkeys()
+    {
+        Hotkeys.Clear();
+    }
 
-	public void AddHotkey( InputButton button, string text )
-	{
-		var panel = new Panel();
-		panel.AddClass( "item" );
+    public void AddHotkey( InputButton button, string text )
+    {
+        Hotkeys[button] = text;
+    }
 
-		var glyph = panel.Add.Image( "", "glyph" );
-		glyph.Texture = Input.GetGlyph( button, InputGlyphSize.Small );
-		glyph.Style.Width = glyph.Texture.Width;
-		glyph.Style.Height = glyph.Texture.Height;
+    private bool IsHidden()
+    {
+        if ( !VoxelWorld.Current.IsValid() )
+            return true;
 
-		panel.Add.Label( text, "text" );
+        if ( Local.Pawn is EditorPlayer player )
+        {
+            if ( player.Tool.IsValid() )
+            {
+                return false;
+            }
+        }
 
-		HotkeyList.AddChild( panel );
-	}
+        return true;
+    }
 
-	private bool IsHidden()
-	{
-		if ( !VoxelWorld.Current.IsValid() )
-			return true;
-
-		if ( Local.Pawn is EditorPlayer player )
-		{
-			if ( player.Tool.IsValid() )
-			{
-				return false;
-			}
-		}
-
-		return true;
-	}
+    protected override int BuildHash()
+    {
+        return HashCode.Combine( ToolName, ToolDescription, Hotkeys.Count );
+    }
 
     protected override void OnParametersSet()
     {
-		HotkeyList.Parent.BindClass( "hidden", () => HotkeyList.ChildrenCount == 0 );
 		BindClass( "hidden", () => IsHidden() );
 
         base.OnParametersSet();

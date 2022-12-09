@@ -8,6 +8,8 @@ public partial class EditorPlayer
 
 	protected void SimulateAnimation()
 	{
+		if ( Controller is null ) return;
+
 		var turnSpeed = 0.02f;
 		Rotation rotation;
 

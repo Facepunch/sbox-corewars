@@ -1,4 +1,5 @@
 ﻿@using System;
+@using System.Linq;
 @using Sandbox;
 @using Sandbox.UI;
 @using Facepunch.CoreWars;
@@ -15,55 +16,58 @@
     <div class="modal">
         <label class="title">Blocks</label>
         <div @ref="Items" class="items">
+            @{
+                var world = VoxelWorld.Current;
+                var blocks = world.BlockData.Values;
+            }
+
+            @foreach ( var block in blocks )
+            {
+                if ( block.ShowInEditor || ShowAllBlocks )
+                {
+                    <EditorBlockItem BlockId=@block.BlockId></EditorBlockItem>
+                }
+            }
         </div>
     </div>
 </root>
 
 @code
 {
-	public static EditorBlockList Current { get; private set; }
+    public static EditorBlockList Current { get; private set; }
 
-	public Panel Items { get; set; }
+    public Panel Items { get; set; }
 
-	public static void Open()
-	{
-		Current?.Delete();
-		Current = new EditorBlockList();
-		Current.PopulateItems();
-		Local.Hud.AddChild( Current );
-	}
+    public static void Open()
+    {
+        Current?.Delete();
+        Current = new EditorBlockList();
 
-	public EditorBlockList()
-	{
-		AcceptsFocus = true;
-		Focus();
-	}
+        Local.Hud.AddChild( Current );
+    }
 
-	public void PopulateItems()
-	{
-		Items.DeleteChildren();
+    public EditorBlockList()
+    {
+        AcceptsFocus = true;
+        Focus();
+    }
 
-		var world = VoxelWorld.Current;
-		var blocks = world.BlockData.Values;
+    protected override void OnBlur( PanelEvent e )
+    {
+        Delete();
+        base.OnBlur( e );
+    }
 
-		foreach ( var block in blocks )
-		{
-			if ( block.ShowInEditor || ShowAllBlocks )
-			{
-				var item = Items.AddChild<EditorBlockItem>();
-				item.SetBlockId( block.BlockId );
-			}
-		}
-	}
+    protected override int BuildHash()
+    {
+        var world = VoxelWorld.Current;
+        var blocks = world.BlockData.Values.Where( b => b.ShowInEditor || ShowAllBlocks );
+        return HashCode.Combine( blocks.Count() );
+    }
 
-	protected override void OnBlur( PanelEvent e )
-	{
-		Delete();
-		base.OnBlur( e );
-	}
 
-	public override void OnButtonTyped( string button, KeyModifiers km )
-	{
+    public override void OnButtonTyped( string button, KeyModifiers km )
+    {
 		if ( button == "escape" )
 		{
 			Blur();

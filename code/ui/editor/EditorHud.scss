@@ -40,7 +40,7 @@ rootpanel {
 }
 
 EditorHud {
-    .crosshair {
+    > .crosshair {
         background-color: white;
         border-radius: 50%;
         transform: translate( -50% -50% );
@@ -52,7 +52,7 @@ EditorHud {
         height: 16px;
     }
 
-    .center {
+    > .center {
         position: absolute;
         display: flex;
         justify-content: center;
@@ -61,10 +61,11 @@ EditorHud {
         height: 100%;
     }
 
-    .bottom {
+    > .bottom {
         width: 100%;
         height: 100%;
         display: flex;
+        position: absolute;
         justify-content: center;
         align-items: center;
     }

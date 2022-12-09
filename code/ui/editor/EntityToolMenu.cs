@@ -10,7 +10,7 @@ namespace Facepunch.CoreWars.Editor
 	[StyleSheet( "/ui/editor/EntityToolMenu.scss" )]
 	public partial class EntityToolMenu : RadialMenu
 	{
-		public override InputButton Button => InputButton.Score;
+		public override InputButton Button => InputButton.Reload;
 
 		public override void Populate()
 		{

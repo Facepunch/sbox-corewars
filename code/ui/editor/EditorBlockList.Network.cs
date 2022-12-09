@@ -9,6 +9,6 @@ public partial class EditorBlockList
 
 	private static void OnShowAllBlocksChanged( bool oldValue, bool newValue )
 	{
-		Current?.PopulateItems();
+		
 	}
 }

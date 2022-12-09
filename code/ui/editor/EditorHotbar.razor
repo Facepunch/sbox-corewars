@@ -11,72 +11,46 @@
 @attribute [StyleSheet( "/ui/editor/EditorHotbar.scss" )]
 @inherits Panel
 
+@if ( Local.Pawn is not EditorPlayer ) return;
+@if ( !VoxelWorld.Current.IsValid() ) return;
+
+@{
+    var player = Local.Pawn as EditorPlayer;
+}
+
+<root>
+    @for ( ushort i = 0; i < player.HotbarBlockIds.Count; i++ )
+    {
+        <EditorHotbarSlot Slot=@i IsSelected=@(player.CurrentHotbarIndex == i) BlockId=@(player.HotbarBlockIds[i])></EditorHotbarSlot>
+    }
+
+    @{
+        var selected = player.HotbarBlockIds[player.CurrentHotbarIndex];
+        var blockType = VoxelWorld.Current.GetBlockType( selected );
+    }
+
+    <label class="current-block">@blockType.FriendlyName</label>
+</root>
+
 @code
 {
-	public static EditorHotbar Current { get; private set; }
+    public static EditorHotbar Current { get; private set; }
 
-	public List<EditorHotbarSlot> Slots { get; private set; }
-	public Label CurrentBlockLabel { get; private set; }
-
-	public EditorHotbar()
-	{
-		Current = this;
-	}
-
-	public void Initialize( int slots )
-	{
-		Slots ??= new();
-
-		foreach ( var slot in Slots )
-		{
-			slot.Delete();
-		}
-
-		Slots.Clear();
-
-		for ( ushort i = 0; i < slots; i++ )
-		{
-			var slot = AddChild<EditorHotbarSlot>();
-			slot.BlockId = 0;
-			slot.Slot = i;
-			Slots.Add( slot );
-		}
-	}
-
-	public override void Tick()
-	{
-		if ( !VoxelWorld.Current.IsValid() ) return;
-
-		if ( Local.Pawn is EditorPlayer player )
-		{
-			CurrentBlockLabel.Text = string.Empty;
-
-			for ( ushort i = 0; i < Slots.Count; i++)
-			{
-				var blockId = player.HotbarBlockIds[i];
-
-				Slots[i].SetBlockId( blockId );
-				Slots[i].IsSelected = player.CurrentHotbarIndex == i;
-
-				if ( Slots[i].IsSelected && Slots[i].BlockType.IsValid() )
-				{
-					CurrentBlockLabel.Text = Slots[i].BlockType.FriendlyName;
-				}
-			}
-		}
-
-		base.Tick();
-	}
-
-    protected override void OnAfterTreeRender( bool firstTime )
+    public EditorHotbar()
     {
-        base.OnAfterTreeRender( firstTime );
+        Current = this;
+    }
 
-		if ( Local.Pawn is EditorPlayer player )
-		{
-			Initialize( player.HotbarBlockIds.Count );
-		}
+    protected override int BuildHash()
+    {
+        var player = Local.Pawn as EditorPlayer;
+        var code = 0;
 
-		CurrentBlockLabel = Add.Label( "", "current-block" );
-	}
+        for ( var i = 0; i < player.HotbarBlockIds.Count; i++ )
+        {
+            code = HashCode.Combine( code, player.HotbarBlockIds[i] );
+        }
+
+        return HashCode.Combine( code, player.CurrentHotbarIndex );
+    }
 }

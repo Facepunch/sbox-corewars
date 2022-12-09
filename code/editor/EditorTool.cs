@@ -52,7 +52,10 @@ namespace Facepunch.CoreWars.Editor
 
 		protected EditorPlayer GetSimulatingPlayer()
 		{
-			return Prediction.CurrentHost.Pawn as EditorPlayer;
+			if ( Prediction.CurrentHost.IsValid() )
+				return Prediction.CurrentHost.Pawn as EditorPlayer;
+			else
+				return Local.Pawn as EditorPlayer;
 		}
 
 		protected BlockFace GetTargetBlockFace( float range )
