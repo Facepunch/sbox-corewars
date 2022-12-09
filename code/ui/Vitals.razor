@@ -95,7 +95,9 @@
     protected override int BuildHash()
     {
         var player = CoreWars.Player.Me;
-        return HashCode.Combine( player.Stamina.CeilToInt(), player.IsOutOfBreath, player.Health.CeilToInt(), player.Buffs.Count );
+        if ( !player.IsValid() ) return 0;
+
+        return HashCode.Combine( player.Stamina.CeilToInt(), player.IsOutOfBreath, player.Health.CeilToInt(), player.Buffs?.Count ?? 0 );
     }
 
     protected override void OnAfterTreeRender( bool firstTime )

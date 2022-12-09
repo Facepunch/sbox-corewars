@@ -604,6 +604,13 @@ namespace Facepunch.CoreWars
 
 		public override void OnKilled()
 		{
+			GameManager.Current?.OnKilled( this );
+
+			LifeState = LifeState.Dead;
+			StopUsing();
+
+			Client?.AddInt( "deaths", 1 );
+
 			if ( LastDamageTaken.Attacker is Player attacker )
 			{
 				var resources = FindItems<ResourceItem>();
@@ -655,8 +662,6 @@ namespace Facepunch.CoreWars
 			{
 				weapon.Delete();
 			}
-
-			base.OnKilled();
 		}
 
 		public override void ClientSpawn()
@@ -837,7 +842,21 @@ namespace Facepunch.CoreWars
 			}
 
 			LastDamageTaken = info;
-			base.TakeDamage( info );
+
+			if ( LifeState == LifeState.Alive )
+			{
+				base.TakeDamage( info );
+
+				this.ProceduralHitReaction( info );
+
+				if ( LifeState == LifeState.Dead && info.Attacker.IsValid() )
+				{
+					if ( info.Attacker.Client.IsValid() && info.Attacker.IsValid() )
+					{
+						info.Attacker.Client.AddInt( "kills" );
+					}
+				}
+			}
 		}
 
 		protected virtual void SimulateBlockGhost( Client client )
