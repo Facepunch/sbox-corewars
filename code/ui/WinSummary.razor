@@ -15,7 +15,7 @@
     <div class="modal">
         <div class="header">
             <label class="title">END OF ROUND</label>
-            <label @ref="WinningTeam" class="winner">WINNING TEAM</label>
+            <label @ref="WinningTeamPanel" class="winner">@WinningTeam.ToString().ToUpper() TEAM WINS</label>
         </div>
         <div class="stats">
             <div class="container">
@@ -24,7 +24,29 @@
                     <label class="title">MOST KILLS</label>
                 </div>
                 <div class="right">
-                    <div @ref="MostKillsList" class="players"></div>
+                    <div class="players">
+                        @for ( var i = 0; i < 4; i++ )
+                        {
+                            if ( MostKillsList is not null && MostKillsList.Count > i )
+                            {
+                                var client = MostKillsList[i];
+
+                                <div class="player">
+                                    <div class="avatar" style="background-image: url( avatar:@(client.SteamId) )"></div>
+                                    <label class="username">@client.Name</label>
+                                    <label class="score">@client.GetInt( "kills" )</label>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="player">
+                                    <div class="avatar"></div>
+                                    <label class="username"></label>
+                                    <label class="score"></label>
+                                </div>
+                            }
+                        }
+                    </div>
                 </div>
             </div>
 
@@ -34,14 +56,36 @@
                     <label class="title">CORES DESTROYED</label>
                 </div>
                 <div class="right">
-                    <div @ref="CoresDestroyedList" class="players"></div>
+                    <div class="players">
+                        @for ( var i = 0; i < 4; i++ )
+                        {
+                            if ( CoresDestroyedList is not null && CoresDestroyedList.Count > i )
+                            {
+                                var client = CoresDestroyedList[i];
+
+                                <div class="player">
+                                    <div class="avatar" style="background-image: url( avatar:@(client.SteamId) )"></div>
+                                    <label class="username">@client.Name</label>
+                                    <label class="score">@client.GetInt( "cores" )</label>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="player">
+                                    <div class="avatar"></div>
+                                    <label class="username"></label>
+                                    <label class="score"></label>
+                                </div>
+                            }
+                        }
+                    </div>
                 </div>
             </div>
         </div>
         <div class="next-round">
             <label class="title">N E X T   R O U N D</label>
             <div class="countdown">
-                <label @text="NextRoundTime" class="value">0</label>
+                <label class="value">@NextRoundTime</label>
             </div>
         </div>
     </div>
@@ -49,65 +93,52 @@
 
 @code
 {
-	public static WinSummary Current { get; private set; }
+    public static WinSummary Current { get; private set; }
 
-	public Panel CoresDestroyedList { get; private set; }
-	public Panel MostKillsList { get; private set; }
-	public string NextRoundTime => Math.Max( TimeUntilNextRound.Relative.CeilToInt(), 0 ).ToString();
-	public Label WinningTeam { get; private set; }
-	public bool IsOpen { get; set; }
+    public List<Client> CoresDestroyedList { get; private set; }
+    public List<Client> MostKillsList { get; private set; }
+    public string NextRoundTime => Math.Max( TimeUntilNextRound.Relative.CeilToInt(), 0 ).ToString();
+    public Panel WinningTeamPanel { get; private set; }
+    public Team WinningTeam { get; private set; }
+    public bool IsOpen { get; set; }
 
-	private RealTimeUntil TimeUntilNextRound { get; set; }
+    private RealTimeUntil TimeUntilNextRound { get; set; }
 
-	public WinSummary()
-	{
-		Current = this;
-	}
+    public WinSummary()
+    {
+        Current = this;
+    }
 
-	public void Open()
-	{
-		if ( IsOpen ) return;
-		PlaySound( "itemstore.open" );
-		IDialog.Activate( this );
-		IsOpen = true;
-	}
+    public void Open()
+    {
+        if ( IsOpen ) return;
+        PlaySound( "itemstore.open" );
+        IDialog.Activate( this );
+        IsOpen = true;
+    }
 
-	public void Close()
-	{
-		if ( !IsOpen ) return;
-		IDialog.Deactivate( this );
-		IsOpen = false;
-	}
+    public void Close()
+    {
+        if ( !IsOpen ) return;
+        IDialog.Deactivate( this );
+        IsOpen = false;
+    }
 
-	public void Populate( RealTimeUntil nextRoundTime, Team winningTeam )
-	{
-		TimeUntilNextRound = nextRoundTime;
-		CoresDestroyedList.DeleteChildren( true );
-		MostKillsList.DeleteChildren( true );
-
-		WinningTeam.Text = $"{winningTeam.ToString().ToUpper()} TEAM WINS";
-		WinningTeam.Style.FontColor = winningTeam.GetColor();
+    public void Populate( RealTimeUntil nextRoundTime, Team winningTeam )
+    {
+        TimeUntilNextRound = nextRoundTime;
+        WinningTeam = winningTeam;
 
         var allValidClients = Client.All.Where( c => c.Pawn is CoreWars.Player player && player.Team != Team.None );
-		var clientsByKills = allValidClients.ToList();
-		clientsByKills.Sort( ( a, b ) => a.GetInt( "kills" ).CompareTo( b.GetInt( "kills" ) ) );
 
-		var clientsByCoresDestroyed = allValidClients.ToList();
-		clientsByCoresDestroyed.Sort( ( a, b ) => a.GetInt( "cores" ).CompareTo( b.GetInt( "cores" ) ) );
+        MostKillsList = allValidClients
+        .OrderBy( a => a.GetInt( "kills" ) )
+        .ToList();
 
-		for ( var i = 0; i < 4; i++ )
-		{
-			if ( clientsByKills.Count > i )
-				AddRow( MostKillsList, clientsByKills[i], clientsByKills[i].GetInt( "kills" ) );
-			else
-				AddEmptyRow( MostKillsList );
-
-			if ( clientsByCoresDestroyed.Count > i )
-				AddRow( CoresDestroyedList, clientsByCoresDestroyed[i], clientsByCoresDestroyed[i].GetInt( "cores" ) );
-			else
-				AddEmptyRow( CoresDestroyedList );
-		}
-	}
+        CoresDestroyedList = allValidClients
+        .OrderBy( a => a.GetInt( "cores" ) )
+        .ToList();
+    }
 
     protected override void OnParametersSet()
     {
@@ -118,23 +149,12 @@
 
     protected override void OnAfterTreeRender( bool firstTime )
     {
+        WinningTeamPanel.Style.FontColor = WinningTeam.GetColor();
         base.OnAfterTreeRender( firstTime );
-	}
+    }
 
-	private void AddEmptyRow( Panel parent )
-	{
-		var row = parent.AddChild<Panel>( "player" );
-		row.AddChild<Panel>( "avatar" );
-		row.Add.Label( string.Empty, "username" );
-		row.Add.Label( string.Empty, "score" );
-	}
-
-	private void AddRow( Panel parent, Client client, int score )
-	{
-		var row = parent.AddChild<Panel>( "player" );
-		var avatar = row.AddChild<Panel>( "avatar" );
-		avatar.Style.SetBackgroundImage( $"avatar:{client.SteamId}" );
-		row.Add.Label( client.Name, "username" );
-		row.Add.Label( score.ToString(), "score" );
-	}
+    protected override int BuildHash()
+    {
+        return HashCode.Combine( MostKillsList, CoresDestroyedList, WinningTeam, TimeUntilNextRound );
+    }
 }
