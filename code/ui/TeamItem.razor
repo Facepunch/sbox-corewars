@@ -13,53 +13,25 @@
     <div @ref="Header" class="header">
         <label>Player</label>
         <label>Kills</label>
-        <div @ref="Core" class="core"></div>
+        <div class="core"></div>
     </div>
 
-    <div @ref="Players" class="players">
+    <div class="players">
+        @foreach ( var player in Entity.Team.GetPlayers() )
+        {
+            if ( player.Client.IsValid() )
+            {
+                <TeamPlayerItem class="player" Player=@player></TeamPlayerItem>
+            }
+        }
     </div>
 </root>
 
 @code
 {
-    public class TeamPlayerItem : Panel
-    {
-        public CoreWars.Player Player { get; set; }
-        public Label Name { get; private set; }
-        public Label Kills { get; private set; }
-        public Label Spacer { get; private set; }
-
-        public void Update( CoreWars.Player player )
-        {
-            Player = player;
-
-            DeleteChildren( true );
-
-            Name = Add.Label( player.Client.Name, "name" );
-            Kills = Add.Label( "0", "kills" );
-            Spacer = Add.Label( "" );
-        }
-
-        public override void Tick()
-        {
-            if ( !Player.IsValid() )
-            {
-                if ( !IsDeleting )
-                {
-                    Delete();
-                    return;
-                }
-            }
-
-            Kills.Text = Player.Client.GetInt( "kills " ).ToString();
-
-            base.Tick();
-        }
-    }
 
     private Panel Header { get; set; }
     private Panel Players { get; set; }
-    private Panel Core { get; set; }
 
     public TeamCore Entity { get; set; }
 
@@ -73,6 +45,17 @@
         return Entity.LifeState == LifeState.Dead;
     }
 
+    protected override void OnParametersSet()
+    {
+        SetClass( "hidden", IsHidden() );
+        SetClass( "destroyed", IsDestroyed() );
+
+        BindClass( "hidden", IsHidden );
+        BindClass( "destroyed", IsDestroyed );
+
+        base.OnParametersSet();
+    }
+
     protected override void OnAfterTreeRender( bool firstTime )
     {
         base.OnAfterTreeRender( firstTime );
@@ -80,25 +63,7 @@
         if ( Entity.IsValid() )
         {
             Header.Style.BackgroundColor = Entity.Team.GetColor();
-
-            var players = Entity.Team.GetPlayers();
-            Players.DeleteChildren( true );
-
-            foreach ( var player in players )
-            {
-                if ( player.Client.IsValid() )
-                {
-                    var item = Players.AddChild<TeamPlayerItem>( "player" );
-                    item.Update( player );
-                }
-            }
         }
-
-        SetClass( "hidden", IsHidden() );
-        SetClass( "destroyed", IsDestroyed() );
-
-        BindClass( "hidden", IsHidden );
-        BindClass( "destroyed", IsDestroyed );
     }
 
     protected override int BuildHash()

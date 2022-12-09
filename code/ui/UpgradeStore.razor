@@ -34,79 +34,83 @@
 
 @code
 {
-	public static UpgradeStore Current { get; private set; }
+    public static UpgradeStore Current { get; private set; }
 
-	public string IronAmount => GetResourceCount<IronItem>().ToString();
-	public string GoldAmount => GetResourceCount<GoldItem>().ToString();
-	public string CrystalAmount => GetResourceCount<CrystalItem>().ToString();
-	public Panel ItemContainer { get; set; }
-	public TeamUpgradesEntity Entity { get; set; }
-	public bool IsOpen { get; set; }
+    public string IronAmount => GetResourceCount<IronItem>().ToString();
+    public string GoldAmount => GetResourceCount<GoldItem>().ToString();
+    public string CrystalAmount => GetResourceCount<CrystalItem>().ToString();
+    public Panel ItemContainer { get; set; }
+    public TeamUpgradesEntity Entity { get; set; }
+    public bool IsOpen { get; set; }
 
-	public UpgradeStore()
-	{
-		Current = this;
-	}
+    public UpgradeStore()
+    {
+        Current = this;
+    }
 
-	public void Open()
-	{
-		if ( IsOpen ) return;
-		PlaySound( "upgrades.open" );
-		IDialog.Activate( this );
-		IsOpen = true;
-	}
+    public void Open()
+    {
+        if ( IsOpen ) return;
+        PlaySound( "upgrades.open" );
+        IDialog.Activate( this );
+        IsOpen = true;
+    }
 
-	public void Close()
-	{
-		if ( !IsOpen ) return;
-		IDialog.Deactivate( this );
-		IsOpen = false;
-	}
+    public void Close()
+    {
+        if ( !IsOpen ) return;
+        IDialog.Deactivate( this );
+        IsOpen = false;
+    }
 
-	public void SetEntity( TeamUpgradesEntity entity )
-	{
-		Entity = entity;
-	}
+    public void SetEntity( TeamUpgradesEntity entity )
+    {
+        Entity = entity;
+    }
 
-	public override void Tick()
-	{
-		if ( Local.Pawn is not CoreWars.Player player )
-        return;
+    public override void Tick()
+    {
+        if ( Local.Pawn is not CoreWars.Player player )
+            return;
 
-		if ( Entity.IsValid() )
-		{
-			var distance = Entity.Position.Distance( player.Position );
+        if ( Entity.IsValid() )
+        {
+            var distance = Entity.Position.Distance( player.Position );
 
-			if ( distance >= 300f )
-			{
-				Close();
-				return;
-			}
-		}
+            if ( distance >= 300f )
+            {
+                Close();
+                return;
+            }
+        }
 
-		base.Tick();
-	}
+        base.Tick();
+    }
 
-	protected int GetResourceCount<T>() where T : ResourceItem
-	{
+    protected int GetResourceCount<T>() where T : ResourceItem
+    {
         if ( Local.Pawn is CoreWars.Player player )
-		{
-			return player.GetResourceCount<T>();
-		}
+        {
+            return player.GetResourceCount<T>();
+        }
 
-		return 0;
-	}
+        return 0;
+    }
 
-	protected virtual void OnItemPurchased( IPurchasableItem item )
-	{
+    protected virtual void OnItemPurchased( IPurchasableItem item )
+    {
         CoreWars.Player.BuyUpgradeCmd( Entity.NetworkIdent, item.GetType().Name );
-		Util.Play( "item.purchase" );
-	}
+        Util.Play( "item.purchase" );
+    }
+
+    protected override void OnParametersSet()
+    {
+        BindClass( "hidden", () => !IsOpen );
+        base.OnParametersSet();
+    }
 
     protected override void OnAfterTreeRender( bool firstTime )
     {
         base.OnAfterTreeRender( firstTime );
-
-		BindClass( "hidden", () => !IsOpen );
 	}
 }

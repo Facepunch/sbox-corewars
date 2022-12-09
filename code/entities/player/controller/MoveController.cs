@@ -156,6 +156,17 @@ namespace Facepunch.CoreWars
 
 			Duck.PreTick();
 
+			if ( Player is Player player )
+			{
+				var modifier = player.GetModifier( StatModifier.Speed );
+				WishVelocity *= modifier;
+
+				if ( Input.Down( InputButton.Run ) && !Input.Down( InputButton.Duck ) && WishVelocity.Length > 1f )
+					player.ReduceStamina( 10f * Time.Delta );
+				else
+					player.GainStamina( 15f * Time.Delta );
+			}
+
 			var stayOnGround = false;
 
 			OnPreTickMove();
@@ -515,6 +526,11 @@ namespace Facepunch.CoreWars
 
 			AddJumpVelocity();
 			AddEvent( "jump" );
+
+			if ( Player is Player player )
+			{
+				player.ReduceStamina( 2f );
+			}
 		}
 
 		private bool CheckStuckAndFix()

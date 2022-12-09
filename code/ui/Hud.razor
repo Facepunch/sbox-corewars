@@ -16,10 +16,13 @@
     <UpgradeStore></UpgradeStore>
     <RespawnScreen></RespawnScreen>
     <Announcements></Announcements>
+    <ToastList></ToastList>
+    <ChatBox></ChatBox>
     <StageInfo></StageInfo>
     <TeamList></TeamList>
     <WinSummary></WinSummary>
     <LoadingScreen></LoadingScreen>
+    <VoiceList></VoiceList>
 
     <div class="bottom">
         <Vitals></Vitals>
@@ -59,12 +62,7 @@
 
 	public Hud()
 	{
-		AddChild<ChatBox>();
-		AddChild<ToastList>();
-		AddChild<VoiceList>();
-
 		AddClass( Team.None.GetHudClass() );
-
 		Current = this;
 	}
 

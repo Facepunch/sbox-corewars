@@ -11,25 +11,39 @@
 @attribute [StyleSheet( "/ui/Vitals.scss" )]
 @inherits Panel
 
+@if ( !CoreWars.Player.Me.IsValid() ) return;
+
+@{
+    var player = CoreWars.Player.Me;
+}
+
 <root>
     <div class="player-vitals">
-        <div @ref="BuffsContainer" class="player-buffs"></div>
+        <div class="player-buffs">
+            @foreach ( var buff in player.Buffs )
+            {
+                <BuffIcon class="buff" Buff=@buff></BuffIcon>
+            }
+        </div>
         <div class="vital health">
             <icon class="icon">favorite</icon>
             <div class="bar-wrapper">
-                <div @ref="HealthBar" class="bar">
-                    <div class="mdi mdi-name"></div>
+                <div style="width: @(player.Health.CeilToInt())%;" class="bar @(player.Health <= 15f ? "health-low" : "")">
                 </div>
-                <label class="value" @ref="HealthValue"></label>
+            </div>
+            <div class="value-wrapper">
+                <text class="value">@(player.Health.CeilToInt())%</text>
             </div>
         </div>
 
         <div class="vital stamina">
             <icon class="icon">bolt</icon>
             <div class="bar-wrapper">
-                <div @ref="StaminaBar" class="bar">
+                <div style="width: @(player.Stamina.CeilToInt())%;" class="bar @(player.Stamina <= 15f ? "stamina-low" : "")">
                 </div>
-                <label class="value" @ref="StaminaValue"></label>
+            </div>
+            <div class="value-wrapper">
+                <text class="value">@(player.Stamina.CeilToInt())%</text>
             </div>
         </div>
     </div>
@@ -37,99 +51,56 @@
 
 @code
 {
-	public class BuffIcon : Panel
-	{
-		public BaseBuff Buff { get; private set; }
-		public Panel Icon { get; private set; }
-		public Panel Timer { get; private set; }
+    public class BuffIcon : Panel
+    {
+        public BaseBuff Buff { get; set; }
+        public Panel Icon { get; private set; }
+        public Panel Timer { get; private set; }
 
-		public BuffIcon()
-		{
-			Icon = Add.Panel( "icon" );
-			Timer = Add.Panel( "timer" );
-		}
+        public BuffIcon()
+        {
+            Icon = Add.Panel( "icon" );
+            Timer = Add.Panel( "timer" );
+        }
 
-		public void SetBuff( BaseBuff buff )
-		{
-			Style.SetLinearGradientBackground( buff.Color, 0.5f, new Color( 0.2f ), 0.5f );
-			Icon.Style.SetBackgroundImage( buff.Icon );
-			Buff = buff;
-		}
+        public override void Tick()
+        {
+            Timer.Style.Height = Length.Fraction( 1f - ( Buff.TimeUntilExpired / Buff.Duration ) );
+            base.Tick();
+        }
 
-		public override void Tick()
-		{
-			Timer.Style.Height = Length.Fraction( 1f - ( Buff.TimeUntilExpired / Buff.Duration ) );
-			base.Tick();
-		}
-	}
+        protected override void OnParametersSet()
+        {
+            Style.SetLinearGradientBackground( Buff.Color, 0.5f, new Color( 0.2f ), 0.5f );
+            Icon.Style.SetBackgroundImage( Buff.Icon );
 
-	public static Vitals Current { get; private set; }
+            base.OnParametersSet();
+        }
+    }
 
-	public Panel HealthBar { get; set; }
-	public Panel StaminaBar { get; set; }
+    public static Vitals Current { get; private set; }
 
-	public Label HealthValue { get; set; }
-	public Label StaminaValue { get; set; }
+    public Vitals()
+    {
+        Current = this;
+    }
 
-	public Panel BuffsContainer { get; set; }
+    protected override void OnParametersSet()
+    {
+        BindClass( "hidden", IsHidden );
 
-	public List<BuffIcon> Icons { get; set; } = new();
+        base.OnParametersSet();
+    }
 
-	public static void AddBuff( BaseBuff buff )
-	{
-		Current?.InternalAddBuff( buff );
-	}
-
-	public static void RemoveBuff( BaseBuff buff )
-	{
-		Current?.InternalRemoveBuff( buff );
-	}
-
-	public Vitals()
-	{
-		Current = this;
-	}
-
-	public override void Tick()
-	{
-		if ( Local.Pawn is CoreWars.Player player )
-		{
-			HealthBar.Style.Width = Length.Fraction( player.Health / 100f );
-			HealthBar.SetClass( "health-low", player.Health <= 15f );
-
-			HealthValue.Text = $"{player.Health.CeilToInt()}%";
-			StaminaValue.Text = $"{player.Stamina.CeilToInt()}%";
-
-			StaminaBar.Style.Width = Length.Fraction( player.Stamina / 100f );
-			StaminaBar.SetClass( "stamina-low", player.IsOutOfBreath );
-		}
-
-		base.Tick();
-	}
+    protected override int BuildHash()
+    {
+        var player = CoreWars.Player.Me;
+        return HashCode.Combine( player.Stamina.CeilToInt(), player.IsOutOfBreath, player.Health.CeilToInt(), player.Buffs.Count );
+    }
 
     protected override void OnAfterTreeRender( bool firstTime )
     {
         base.OnAfterTreeRender( firstTime );
-
-		BindClass( "hidden", IsHidden );
-	}
-
-	private void InternalAddBuff( BaseBuff buff )
-	{
-		var icon = BuffsContainer.AddChild<BuffIcon>( "buff" );
-		icon.SetBuff( buff );
-		Icons.Add( icon );
-	}
-
-	private void InternalRemoveBuff( BaseBuff buff )
-	{
-		var icon = Icons.Find( i => i.Buff == buff );
-
-		if ( icon != null )
-		{
-			Icons.Remove( icon );
-			icon.Delete();
-		}
 	}
 
 	private bool IsHidden()

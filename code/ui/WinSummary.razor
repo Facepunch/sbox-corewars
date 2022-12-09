@@ -109,11 +109,16 @@
 		}
 	}
 
+    protected override void OnParametersSet()
+    {
+        BindClass( "hidden", () => !IsOpen );
+
+        base.OnParametersSet();
+    }
+
     protected override void OnAfterTreeRender( bool firstTime )
     {
         base.OnAfterTreeRender( firstTime );
-
-		BindClass( "hidden", () => !IsOpen );
 	}
 
 	private void AddEmptyRow( Panel parent )

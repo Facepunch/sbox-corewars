@@ -99,6 +99,7 @@ namespace Facepunch.CoreWars.UI
 		}
 	}
 
+    [StyleSheet( "/ui/ToastList.scss" )]
 	public class ToastList : Panel
 	{
 		public static ToastList Instance { get; private set; }
@@ -110,7 +111,6 @@ namespace Facepunch.CoreWars.UI
 		{
 			KillFeedContainer = Add.Panel( "killfeed" );
 			ToastsContainer = Add.Panel( "toasts" );
-			StyleSheet.Load( "/ui/ToastList.scss" );
 			Instance = this;
 		}
 

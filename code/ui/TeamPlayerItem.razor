@@ -1,0 +1,25 @@
+﻿@using System;
+@using Sandbox;
+@using Sandbox.UI;
+@using Facepunch.CoreWars;
+@using Sandbox.UI.Construct;
+@using System.Linq;
+
+@namespace Facepunch.CoreWars.UI
+@inherits Panel
+
+<root>
+    <label class="name">@Player.Client.Name</label>
+    <label class="kills">@Player.Client.GetInt( "kills " )</label>
+    <label</label>
+</root>
+
+@code
+{
+    public CoreWars.Player Player { get; set; }
+
+    protected override int BuildHash()
+    {
+        return HashCode.Combine( Player );
+    }
+}

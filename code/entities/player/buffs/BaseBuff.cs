@@ -16,10 +16,7 @@ namespace Facepunch.CoreWars
 
 		public virtual void OnActivated( Player player )
 		{
-			if ( IsClient && player.IsLocalPawn )
-			{
-				UI.Vitals.AddBuff( this );
-			}
+
 		}
 
 		public virtual void OnExpired( Player player )
@@ -27,7 +24,6 @@ namespace Facepunch.CoreWars
 			if ( IsClient && player.IsLocalPawn )
 			{
 				Sound.FromScreen( "buff.expired" );
-				UI.Vitals.RemoveBuff( this );
 			}
 		}
 	}
