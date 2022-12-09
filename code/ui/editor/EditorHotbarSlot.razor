@@ -67,12 +67,11 @@
 		}
 	}
 
-    protected override void OnAfterTreeRender( bool firstTime )
+    protected override void OnParametersSet()
     {
-        base.OnAfterTreeRender( firstTime );
-
-		BindClass( "selected", () => IsSelected );
-	}
+        BindClass( "selected", () => IsSelected );
+        base.OnParametersSet();
+    }
 
 	public bool CanDrop( IDraggable draggable, DraggableMode mode )
 	{

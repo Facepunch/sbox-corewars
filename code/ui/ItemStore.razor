@@ -111,10 +111,10 @@
         return HashCode.Combine( Entity );
     }
 
-    protected override void OnAfterTreeRender( bool firstTime )
+    protected override void OnParametersSet()
     {
-        base.OnAfterTreeRender( firstTime );
+        BindClass( "hidden", () => !IsOpen );
 
-		BindClass( "hidden", () => !IsOpen );
-	}
+        base.OnParametersSet();
+    }
 }

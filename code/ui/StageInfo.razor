@@ -46,11 +46,11 @@
         base.Tick();
     }
 
-    protected override void OnAfterTreeRender( bool firstTime )
+    protected override void OnParametersSet()
     {
-        base.OnAfterTreeRender( firstTime );
-
         BindClass( "hidden", IsHidden );
+
+        base.OnParametersSet();
     }
 
     protected override int BuildHash()

@@ -138,11 +138,11 @@
 		return true;
 	}
 
-    protected override void OnAfterTreeRender( bool firstTime )
+    protected override void OnParametersSet()
     {
-        base.OnAfterTreeRender( firstTime );
-
 		HotkeyList.Parent.BindClass( "hidden", () => HotkeyList.ChildrenCount == 0 );
 		BindClass( "hidden", () => IsHidden() );
-	}
+
+        base.OnParametersSet();
+    }
 }

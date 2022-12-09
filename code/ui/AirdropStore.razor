@@ -112,10 +112,14 @@
         Util.Play( "item.purchase" );
     }
 
-    protected override void OnAfterTreeRender( bool firstTime )
+    protected override int BuildHash()
     {
-        base.OnAfterTreeRender( firstTime );
+        return HashCode.Combine( Airdrop );
+    }
 
-		BindClass( "hidden", () => !IsOpen );
-	}
+    protected override void OnParametersSet()
+    {
+        BindClass( "hidden", () => !IsOpen );
+        base.OnParametersSet();
+    }
 }

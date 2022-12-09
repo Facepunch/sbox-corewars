@@ -54,10 +54,9 @@
 		return PopupPanel;
 	}
 
-    protected override void OnAfterTreeRender( bool firstTime )
+    protected override void OnParametersSet()
     {
-        base.OnAfterTreeRender( firstTime );
-
-		PopupPanel.BindClass( "open", () => PopupPanel.ChildrenCount > 0 );
-	}
+        PopupPanel.BindClass( "open", () => PopupPanel.ChildrenCount > 0 );
+        base.OnParametersSet();
+    }
 }
