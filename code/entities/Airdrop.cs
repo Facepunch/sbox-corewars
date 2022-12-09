@@ -186,7 +186,7 @@ namespace Facepunch.CoreWars
 
 		private void AddAllItems()
 		{
-			var types = TypeLibrary.GetDescriptions<BaseShopItem>();
+			var types = TypeLibrary.GetTypes<BaseShopItem>();
 
 			foreach ( var type in types )
 			{

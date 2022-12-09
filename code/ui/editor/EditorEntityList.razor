@@ -46,7 +46,7 @@
 	{
 		Container.DeleteChildren();
 
-		var descriptions = TypeLibrary.GetDescriptions<Entity>().Where( d => d.GetAttribute<EditorEntityAttribute>() != null ).ToList();
+		var descriptions = TypeLibrary.GetTypes<Entity>().Where( d => d.GetAttribute<EditorEntityAttribute>() != null ).ToList();
 		var categories = new Dictionary<string, List<TypeDescription>>();
 
 		descriptions.Sort( ( a, b ) => a.Group.CompareTo( b.Group ) );

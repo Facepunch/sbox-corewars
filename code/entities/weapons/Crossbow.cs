@@ -24,7 +24,7 @@ namespace Facepunch.CoreWars
 		public override int ViewModelMaterialGroup => 1;
 		public override string MuzzleFlashEffect => null;
 		public override string HitSound => null;
-		public override DamageFlags DamageType => DamageFlags.Bullet;
+		public override string DamageType => "bullet";
 		public override float PrimaryRate => 0.3f;
 		public override float SecondaryRate => 1f;
 		public override float Speed => 1500f;
@@ -90,7 +90,7 @@ namespace Facepunch.CoreWars
 					.WithWeapon( this )
 					.WithPosition( trace.EndPosition )
 					.WithForce( projectile.Velocity * 0.1f )
-					.WithFlag( DamageType )
+					.WithTag( DamageType )
 					.UsingTraceResult( trace );
 
 				info.Damage = GetDamageFalloff( projectile.StartPosition.Distance( victim.Position ), Config.Damage * WeaponItem.Tier );

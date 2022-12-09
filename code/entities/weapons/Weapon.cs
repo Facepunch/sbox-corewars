@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Facepunch.CoreWars.UI;
+using Sandbox.Utility;
 
 namespace Facepunch.CoreWars
 {
@@ -31,7 +32,7 @@ namespace Facepunch.CoreWars
 		public virtual bool UnlimitedAmmo => false;
 		public virtual bool IsPassive => false;
 		public virtual float ChargeAttackDuration => 2f;
-		public virtual DamageFlags DamageType => DamageFlags.Bullet;
+		public virtual string DamageType => "bullet";
 		public virtual string ReloadSoundName => string.Empty;
 		public virtual int HoldType => 1;
 		public virtual int ViewModelMaterialGroup => 0;
@@ -275,7 +276,7 @@ namespace Facepunch.CoreWars
 					{
 						var damageInfo = new DamageInfo()
 							.WithPosition( trace.EndPosition )
-							.WithFlag( DamageFlags.Blunt )
+							.WithTag( "blunt" )
 							.WithForce( forward * 100f * force )
 							.UsingTraceResult( trace )
 							.WithAttacker( Owner )
@@ -366,7 +367,7 @@ namespace Facepunch.CoreWars
 					{
 						var damageInfo = new DamageInfo()
 							.WithPosition( trace.EndPosition )
-							.WithFlag( DamageType )
+							.WithTag( DamageType )
 							.WithForce( forward * 100f * force )
 							.UsingTraceResult( trace )
 							.WithAttacker( Owner )
@@ -513,7 +514,7 @@ namespace Facepunch.CoreWars
 				.WithWeapon( this )
 				.WithPosition( position )
 				.WithForce( force )
-				.WithFlag( DamageType );
+				.WithTag( DamageType );
 
 			damageInfo.Damage = damage;
 

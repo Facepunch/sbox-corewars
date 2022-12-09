@@ -21,7 +21,7 @@ namespace Facepunch.CoreWars
 		public override string TrailEffect => "particles/weapons/portal_grenade/portal_grenade_trail/portal_grenade_trail.vpcf";
 		public override string ThrowSound => "portal.launch";
 		public override string HitSound => null;
-		public override DamageFlags DamageType => DamageFlags.Blast;
+		public override string DamageType => "blast";
 
 		private Player PlayerToTeleport { get; set; }
 

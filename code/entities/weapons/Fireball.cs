@@ -21,7 +21,7 @@ namespace Facepunch.CoreWars
 		public override string TrailEffect => "particles/weapons/fireball/fireball_trail.vpcf";
 		public override string ThrowSound => "fireball.launch";
 		public override string HitSound => "fireball.hit";
-		public override DamageFlags DamageType => DamageFlags.Blast;
+		public override string DamageType => "blast";
 		
 		private Particles HandEffect { get; set; }
 

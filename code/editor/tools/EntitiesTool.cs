@@ -27,7 +27,7 @@ namespace Facepunch.CoreWars.Editor
 			if ( player.Tool is not EntitiesTool tool )
 				return;
 
-			tool.SetTypeDescription( TypeLibrary.GetDescription( typeName ) );
+			tool.SetTypeDescription( TypeLibrary.GetType( typeName ) );
 		}
 
 		[ConCmd.Server]
@@ -130,7 +130,7 @@ namespace Facepunch.CoreWars.Editor
 			{
 				if ( string.IsNullOrEmpty( CurrentType ) )
 				{
-					var description = TypeLibrary.GetDescriptions<Entity>().Where( d => d.GetAttribute<EditorEntityAttribute>() != null ).FirstOrDefault();
+					var description = TypeLibrary.GetTypes<Entity>().Where( d => d.GetAttribute<EditorEntityAttribute>() != null ).FirstOrDefault();
 					SetTypeDescription( description );
 				}
 
@@ -172,7 +172,7 @@ namespace Facepunch.CoreWars.Editor
 
 		protected virtual void OnTypeChanged( string typeName )
 		{
-			CurrentTypeDescription = TypeLibrary.GetDescription( typeName );
+			CurrentTypeDescription = TypeLibrary.GetType( typeName );
 			CurrentAttribute = TypeLibrary.GetAttribute<EditorEntityAttribute>( CurrentTypeDescription.TargetType );
 			OnTypeDescriptionChanged( CurrentTypeDescription );
 		}

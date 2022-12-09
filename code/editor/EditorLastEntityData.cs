@@ -91,7 +91,7 @@ namespace Facepunch.CoreWars.Editor
 
 		protected void OnTypeNameChanged( string typeName )
 		{
-			Type = TypeLibrary.GetDescription( typeName ).TargetType;
+			Type = TypeLibrary.GetType( typeName ).TargetType;
 		}
 	}
 }

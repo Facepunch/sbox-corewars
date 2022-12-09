@@ -21,7 +21,7 @@ namespace Facepunch.CoreWars
 		public override float ScaleNonBlockDamage => 0.2f;
 		public override string ViewModelPath => "models/weapons/pickaxe/v_pickaxe01.vmdl";
 		public override bool DoesBlockDamage => true;
-		public override DamageFlags DamageType => DamageFlags.Blunt;
+		public override string DamageType => "blunt";
 		public override float MeleeRange => 80f;
 		public override float PrimaryRate => 2f;
 		public override BuildingMaterialType PrimaryMaterialType => BuildingMaterialType.Metal;

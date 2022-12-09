@@ -21,7 +21,7 @@ namespace Facepunch.CoreWars
 		public override float SecondaryMaterialMultiplier => 0f;
 		public override WeaponConfig Config => new NeutralizerConfig();
 		public override string ViewModelPath => "weapons/rust_smg/v_rust_smg.vmdl";
-		public override DamageFlags DamageType => DamageFlags.Burn;
+		public override string DamageType => "burn";
 		public override float PrimaryRate => 5f;
 		public override float SecondaryRate => 1f;
 		public override int ClipSize => 0;

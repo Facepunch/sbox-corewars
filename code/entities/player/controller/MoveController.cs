@@ -119,7 +119,7 @@ namespace Facepunch.CoreWars
 				return;
 
 			CheckLadder();
-			Swimming = Player.WaterLevel > 0.6f;
+			Swimming = false;
 
 			if ( !Swimming && !IsTouchingLadder )
 			{

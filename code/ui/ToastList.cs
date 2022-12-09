@@ -20,7 +20,7 @@ namespace Facepunch.CoreWars.UI
 			Victim = Add.Label( "", "victim" );
 		}
 
-		public void Update( Player victim, DamageFlags flags )
+		public void Update( Player victim, bool isFallDamage )
 		{
 			Attacker.SetClass( "hidden", true );
 			AddClass( "is-suicide" );
@@ -28,7 +28,7 @@ namespace Facepunch.CoreWars.UI
 			Victim.Text = victim.Client.Name;
 			Victim.AddClass( victim.Team.GetHudClass() );
 
-			if ( flags.HasFlag( DamageFlags.Fall ) )
+			if ( isFallDamage )
 			{
 				Reason.Text = "fell into the void";
 			}
@@ -41,7 +41,7 @@ namespace Facepunch.CoreWars.UI
 			EndTime = Time.Now + 3f;
 		}
 
-		public void Update( Player attacker, Player victim, Entity weapon, DamageFlags flags )
+		public void Update( Player attacker, Player victim, Entity weapon )
 		{
 			Attacker.Text = attacker.Client.Name;
 			Attacker.AddClass( attacker.Team.GetHudClass() );
@@ -114,16 +114,16 @@ namespace Facepunch.CoreWars.UI
 			Instance = this;
 		}
 
-		public void AddKillFeed( Player attacker, Player victim, Entity weapon, DamageFlags flags )
+		public void AddKillFeed( Player attacker, Player victim, Entity weapon )
 		{
 			var item = KillFeedContainer.AddChild<KillFeedItem>();
-			item.Update( attacker, victim, weapon, flags );
+			item.Update( attacker, victim, weapon );
 		}
 
-		public void AddKillFeed( Player victim, DamageFlags flags )
+		public void AddKillFeed( Player victim, bool isFallDamage )
 		{
 			var item = KillFeedContainer.AddChild<KillFeedItem>();
-			item.Update( victim, flags );
+			item.Update( victim, isFallDamage );
 		}
 
 		public void AddItem( string text, Texture icon = null )

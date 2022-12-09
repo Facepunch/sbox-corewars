@@ -44,7 +44,6 @@ namespace Facepunch.CoreWars
 			LifeState = LifeState.Alive;
 			Health = 100f;
 			Velocity = Vector3.Zero;
-			WaterLevel = 0f;
 
 			CreateHull();
 			ResetInterpolation();

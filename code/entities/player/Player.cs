@@ -621,11 +621,11 @@ namespace Facepunch.CoreWars
 					attacker.TryGiveItem( resource );
 				}
 
-				UI.Hud.AddKillFeed( To.Everyone, attacker, this, LastDamageTaken.Weapon, LastDamageTaken.Flags );
+				UI.Hud.AddKillFeed( To.Everyone, attacker, this, LastDamageTaken.Weapon );
 			}
 			else
 			{
-				UI.Hud.AddKillFeed( To.Everyone, this, LastDamageTaken.Flags );
+				UI.Hud.AddKillFeed( To.Everyone, this, LastDamageTaken.HasTag( "fall" ) );
 			}
 
 			BecomeRagdollOnClient( LastDamageTaken.Force, LastDamageTaken.BoneIndex );
@@ -706,7 +706,6 @@ namespace Facepunch.CoreWars
 				Stamina = 100f;
 				Health = 100f;
 				Velocity = Vector3.Zero;
-				WaterLevel = 0f;
 
 				CreateHull();
 
@@ -767,7 +766,7 @@ namespace Facepunch.CoreWars
 				{
 					var damageInfo = DamageInfo.Generic( 1000f )
 						.WithPosition( Position )
-						.WithFlag( DamageFlags.Fall );
+						.WithTag( "fall" );
 
 					TakeDamage( damageInfo );
 					return;
@@ -784,7 +783,7 @@ namespace Facepunch.CoreWars
 		{
 			if ( info.Attacker is Player attacker )
 			{
-				if ( attacker == this && ( info.Flags.HasFlag( DamageFlags.Fall ) || info.Flags.HasFlag( DamageFlags.Generic ) ) )
+				if ( attacker == this && ( info.HasTag( "fall" ) || info.HasTag( "generic" ) ) )
 				{
 					RemoveBuff<StealthBuff>();
 					LastDamageTaken = info;
@@ -835,7 +834,7 @@ namespace Facepunch.CoreWars
 				UI.FloatingDamage.Show( this, info.Damage, info.Position );
 				RemoveBuff<StealthBuff>();
 
-				if ( info.Flags.HasFlag( DamageFlags.Blunt ) )
+				if ( info.HasTag( "blunt" ) )
 				{
 					ApplyAbsoluteImpulse( info.Force );
 				}

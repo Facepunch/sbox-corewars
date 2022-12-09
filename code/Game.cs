@@ -139,11 +139,11 @@ namespace Facepunch.CoreWars
 		{
 			if ( suicide )
 			{
-				UI.ToastList.Instance.AddKillFeed( Local.Pawn as Player, DamageFlags.Fall );
+				UI.ToastList.Instance.AddKillFeed( Local.Pawn as Player, true );
 			}
 			else
 			{
-				UI.ToastList.Instance.AddKillFeed( Local.Pawn as Player, Local.Pawn as Player, (Local.Pawn as Player).ActiveChild, DamageFlags.Fall );
+				UI.ToastList.Instance.AddKillFeed( Local.Pawn as Player, Local.Pawn as Player, (Local.Pawn as Player).ActiveChild );
 			}
 		}
 
