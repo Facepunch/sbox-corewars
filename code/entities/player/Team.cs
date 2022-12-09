@@ -92,9 +92,9 @@ namespace Facepunch.CoreWars
 			return core;
 		}
 
-		public static IEnumerable<Player> GetPlayers( this Team team )
+		public static IEnumerable<CoreWarsPlayer> GetPlayers( this Team team )
 		{
-			foreach ( var player in Entity.All.OfType<Player>() )
+			foreach ( var player in Entity.All.OfType<CoreWarsPlayer>() )
 			{
 				if ( player.Team == team )
 				{

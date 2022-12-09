@@ -71,7 +71,7 @@ namespace Facepunch.CoreWars.Editor
 		{
 			if ( IsServer && NextBlockPlace )
 			{
-				var pawn = client.Pawn as Player;
+				var pawn = client.Pawn as CoreWarsPlayer;
 
 				if ( VoxelWorld.Current.GetBlockInDirection( pawn.EyePosition, pawn.EyeRotation.Forward, out var blockPosition ) )
 				{

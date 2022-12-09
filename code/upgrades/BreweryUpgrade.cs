@@ -18,7 +18,7 @@ namespace Facepunch.CoreWars
 			[typeof( GoldItem )] = 4
 		};
 
-		public override string GetIcon( Player player )
+		public override string GetIcon( CoreWarsPlayer player )
 		{
 			return "textures/upgrades/brewery.png";
 		}

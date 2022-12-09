@@ -15,7 +15,7 @@ namespace Facepunch.CoreWars
 		public virtual string ActivateSound => "brew.activate";
 		public virtual float ActivateDelay => 0.5f;
 
-		public async void Consume( Player player )
+		public async void Consume( CoreWarsPlayer player )
 		{
 			StackSize--;
 
@@ -53,7 +53,7 @@ namespace Facepunch.CoreWars
 			}
 		}
 
-		public virtual void OnActivated( Player player )
+		public virtual void OnActivated( CoreWarsPlayer player )
 		{
 
 		}

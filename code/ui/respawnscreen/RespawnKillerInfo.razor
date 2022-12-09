@@ -47,7 +47,7 @@
         SetClass( "hidden", !isVisible );
     }
 
-    public void Update( CoreWars.Player player )
+    public void Update( CoreWarsPlayer player )
     {
         Icon = $"avatar:{player.Client.SteamId}";
         KillerNameColor = player.Team.GetColor().Darken( 0.4f );

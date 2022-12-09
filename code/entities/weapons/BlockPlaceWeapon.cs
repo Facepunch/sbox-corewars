@@ -15,7 +15,7 @@ namespace Facepunch.CoreWars
 
 		public override void AttackPrimary()
 		{
-			if ( Owner is not Player player ) return;
+			if ( Owner is not CoreWarsPlayer player ) return;
 
 			if ( IsServer )
 			{

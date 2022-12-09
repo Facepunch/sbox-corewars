@@ -18,12 +18,12 @@ namespace Facepunch.CoreWars
 			[typeof( IronItem )] = 16
 		};
 
-		public override string GetIcon( Player player )
+		public override string GetIcon( CoreWarsPlayer player )
 		{
 			return "textures/items/ammo_bolt.png";
 		}
 
-		public override void OnPurchased( Player player )
+		public override void OnPurchased( CoreWarsPlayer player )
 		{
 			var item = InventorySystem.CreateItem<AmmoItem>();
 			item.AmmoType = AmmoType.Bolt;

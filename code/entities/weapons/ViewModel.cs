@@ -59,7 +59,7 @@ namespace Facepunch.CoreWars
 		[Event.Client.PostCamera]
 		private void AddCameraEffects()
 		{
-			if ( Owner is not Player player || player.Controller is not MoveController )
+			if ( Owner is not CoreWarsPlayer player || player.Controller is not MoveController )
 				return;
 
 			if ( IsAiming )

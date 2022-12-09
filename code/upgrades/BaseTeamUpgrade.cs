@@ -20,7 +20,7 @@ namespace Facepunch.CoreWars
 
 		public bool IsValid => true;
 
-		public virtual bool CanAfford( Player player )
+		public virtual bool CanAfford( CoreWarsPlayer player )
 		{
 			foreach ( var kv in Costs )
 			{
@@ -33,24 +33,24 @@ namespace Facepunch.CoreWars
 			return true;
 		}
 
-		public virtual string GetIcon( Player player )
+		public virtual string GetIcon( CoreWarsPlayer player )
 		{
 			return string.Empty;
 		}
 
-		public virtual Color GetIconTintColor( Player player )
+		public virtual Color GetIconTintColor( CoreWarsPlayer player )
 		{
 			return Color.White;
 		}
 
-		public virtual bool IsLocked( Player player )
+		public virtual bool IsLocked( CoreWarsPlayer player )
 		{
 			var core = player.Team.GetCore();
 			if ( !core.IsValid() ) return false;
 			return false;
 		}
 
-		public virtual bool CanPurchase( Player player )
+		public virtual bool CanPurchase( CoreWarsPlayer player )
 		{
 			var core = player.Team.GetCore();
 			if ( !core.IsValid() ) return false;
@@ -69,7 +69,7 @@ namespace Facepunch.CoreWars
 			return true;
 		}
 
-		public virtual void OnPurchased( Player player )
+		public virtual void OnPurchased( CoreWarsPlayer player )
 		{
 			var core = player.Team.GetCore();
 

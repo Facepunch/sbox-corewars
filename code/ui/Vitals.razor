@@ -11,10 +11,10 @@
 @attribute [StyleSheet( "/ui/Vitals.scss" )]
 @inherits Panel
 
-@if ( !CoreWars.Player.Me.IsValid() ) return;
+@if ( !CoreWarsPlayer.Me.IsValid() ) return;
 
 @{
-    var player = CoreWars.Player.Me;
+    var player = CoreWarsPlayer.Me;
 }
 
 <root>
@@ -94,7 +94,7 @@
 
     protected override int BuildHash()
     {
-        var player = CoreWars.Player.Me;
+        var player = CoreWarsPlayer.Me;
         if ( !player.IsValid() ) return 0;
 
         return HashCode.Combine( player.Stamina.CeilToInt(), player.IsOutOfBreath, player.Health.CeilToInt(), player.Buffs?.Count ?? 0 );

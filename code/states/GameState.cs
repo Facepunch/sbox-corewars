@@ -24,7 +24,7 @@ namespace Facepunch.CoreWars
 			{
 				IResettable.ResetAll();
 
-				foreach ( var player in Entity.All.OfType<Player>() )
+				foreach ( var player in Entity.All.OfType<CoreWarsPlayer>() )
 				{
 					player.AssignRandomTeam( true );
 					player.RespawnWhenAvailable();
@@ -41,10 +41,10 @@ namespace Facepunch.CoreWars
 
 		public override bool CanHearPlayerVoice( Client a, Client b )
 		{
-			if ( a.Pawn is not Player source )
+			if ( a.Pawn is not CoreWarsPlayer source )
 				return false;
 
-			if ( b.Pawn is not Player destination )
+			if ( b.Pawn is not CoreWarsPlayer destination )
 				return false;
 
 			return source.Team == destination.Team;
@@ -55,7 +55,7 @@ namespace Facepunch.CoreWars
 
 		}
 
-		public override void OnPlayerJoined( Player player )
+		public override void OnPlayerJoined( CoreWarsPlayer player )
 		{
 			var playerId = player.Client.SteamId;
 

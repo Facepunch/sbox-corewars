@@ -19,6 +19,8 @@ namespace Facepunch.CoreWars
 		protected TimeSince TimeSinceLastFootstep { get; set; }
 		protected Entity LastActiveChild { get; set; }
 
+		public virtual float WaterLevel { get; }
+
 		public Vector3 EyePosition
 		{
 			get => Transform.PointToWorld( EyeLocalPosition );

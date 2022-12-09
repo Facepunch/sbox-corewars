@@ -16,7 +16,7 @@ namespace Facepunch.CoreWars
 		public override Color Color => ItemDefinition.Color;
 		public override int SortOrder => 6;
 
-		public override bool CanPurchase( Player player )
+		public override bool CanPurchase( CoreWarsPlayer player )
 		{
 			if ( !base.CanPurchase( player ) ) return false;
 
@@ -35,12 +35,12 @@ namespace Facepunch.CoreWars
 			return true;
 		}
 
-		public override string GetIcon( Player player )
+		public override string GetIcon( CoreWarsPlayer player )
 		{
 			return ItemDefinition.Icon;
 		}
 
-		public override void OnPurchased( Player player )
+		public override void OnPurchased( CoreWarsPlayer player )
 		{
 			var item = InventorySystem.CreateItem<T>();
 

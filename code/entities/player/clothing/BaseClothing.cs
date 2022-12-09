@@ -5,7 +5,7 @@ namespace Facepunch.CoreWars
 {
 	public partial class BaseClothing : ModelEntity
 	{
-		public Player Wearer => Parent as Player;
+		public CoreWarsPlayer Wearer => Parent as CoreWarsPlayer;
 
 		public virtual void Attached() { }
 

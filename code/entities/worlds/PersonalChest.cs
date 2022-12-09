@@ -30,12 +30,12 @@ namespace Facepunch.CoreWars
 
 		public override void TakeDamage( DamageInfo info ) { }
 
-		public void OnUsed( Player player )
+		public void OnUsed( CoreWarsPlayer player )
 		{
 			OpenForClient( To.Single( player ) );
 		}
 
-		public bool IsUsable( Player player )
+		public bool IsUsable( CoreWarsPlayer player )
 		{
 			return true;
 		}
@@ -43,7 +43,7 @@ namespace Facepunch.CoreWars
 		[ClientRpc]
 		private void OpenForClient()
 		{
-			if ( Local.Pawn is not Player player )
+			if ( Local.Pawn is not CoreWarsPlayer player )
 				return;
 
 			var storage = UI.Storage.Current;

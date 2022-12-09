@@ -4,12 +4,12 @@ namespace Facepunch.CoreWars
 {
 	public static partial class Util
 	{
-		public static void Play( Player player, string sound )
+		public static void Play( CoreWarsPlayer player, string sound )
 		{
 			Play( To.Single( player ), sound );
 		}
 
-		public static void Play( Player player, string sound, Vector3 position )
+		public static void Play( CoreWarsPlayer player, string sound, Vector3 position )
 		{
 			Play( To.Single( player ), sound, position );
 		}

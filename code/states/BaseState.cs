@@ -18,12 +18,12 @@ namespace Facepunch.CoreWars
 			return false;
 		}
 
-		public virtual void OnPlayerKilled( Player player, DamageInfo info ) { }
+		public virtual void OnPlayerKilled( CoreWarsPlayer player, DamageInfo info ) { }
 
-		public virtual void OnPlayerJoined( Player player ) { }
+		public virtual void OnPlayerJoined( CoreWarsPlayer player ) { }
 
-		public virtual void OnPlayerRespawned( Player player ) { }
+		public virtual void OnPlayerRespawned( CoreWarsPlayer player ) { }
 
-		public virtual void OnPlayerDisconnected( Player player ) { }
+		public virtual void OnPlayerDisconnected( CoreWarsPlayer player ) { }
 	}
 }

@@ -1,14 +1,15 @@
 ﻿using Facepunch.Voxels;
 using Sandbox;
+using Sandbox.Component;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Facepunch.CoreWars
 {
-	public partial class Player : BasePlayer, IResettable, INameplate
+	public partial class CoreWarsPlayer : BasePlayer, IResettable, INameplate
 	{
-		public static Player Me => Local.Pawn as Player;
+		public static CoreWarsPlayer Me => Local.Pawn as CoreWarsPlayer;
 
 		[Net, Change( nameof( OnTeamChanged ) )] public Team Team { get; private set; }
 		[Net] public IDictionary<StatModifier, float> Modifiers { get; private set; }
@@ -44,12 +45,21 @@ namespace Facepunch.CoreWars
 		{
 			get
 			{
-				if ( Local.Pawn is Player player )
+				if ( Local.Pawn is CoreWarsPlayer player )
 				{
 					return player.Team == Team;
 				}
 
 				return false;
+			}
+		}
+
+		public override float WaterLevel
+		{
+			get
+			{
+				var c = Components.Get<WaterEffectComponent>();
+				return c?.WaterLevel ?? 0;
 			}
 		}
 
@@ -62,7 +72,7 @@ namespace Facepunch.CoreWars
 		private FirstPersonCamera FirstPersonCamera { get; set; } = new();
 		private SpectateCamera SpectateCamera { get; set; } = new();
 
-		public Player() : base()
+		public CoreWarsPlayer() : base()
 		{
 			Projectiles = new( this );
 		}
@@ -70,7 +80,7 @@ namespace Facepunch.CoreWars
 		[ConCmd.Server]
 		public static void UseEntityCmd( int index )
 		{
-			if ( ConsoleSystem.Caller.Pawn is not Player player )
+			if ( ConsoleSystem.Caller.Pawn is not CoreWarsPlayer player )
 				return;
 
 			var entity = FindByIndex( index );
@@ -87,7 +97,7 @@ namespace Facepunch.CoreWars
 		[ConCmd.Server( "cw_give_item" )]
 		public static void GiveItemCmd( string itemName, int amount )
 		{
-			if ( ConsoleSystem.Caller.Pawn is not Player player )
+			if ( ConsoleSystem.Caller.Pawn is not CoreWarsPlayer player )
 				return;
 
 			var item = InventorySystem.CreateItem( itemName );
@@ -99,7 +109,7 @@ namespace Facepunch.CoreWars
 		[ConCmd.Server]
 		public static void BuyUpgradeCmd( int index, string type )
 		{
-			if ( ConsoleSystem.Caller.Pawn is not Player player )
+			if ( ConsoleSystem.Caller.Pawn is not CoreWarsPlayer player )
 				return;
 
 			var entity = FindByIndex( index );
@@ -122,7 +132,7 @@ namespace Facepunch.CoreWars
 		[ConCmd.Server]
 		public static void BuyItemCmd( int index, string type )
 		{
-			if ( ConsoleSystem.Caller.Pawn is not Player player )
+			if ( ConsoleSystem.Caller.Pawn is not CoreWarsPlayer player )
 				return;
 
 			var entity = FindByIndex( index );
@@ -142,7 +152,7 @@ namespace Facepunch.CoreWars
 			item.OnPurchased( player );
 		}
 
-		public Player( Client client ) : this()
+		public CoreWarsPlayer( Client client ) : this()
 		{
 			HotbarIndex = 0;
 			client.Pawn = this;
@@ -611,7 +621,7 @@ namespace Facepunch.CoreWars
 
 			Client?.AddInt( "deaths", 1 );
 
-			if ( LastDamageTaken.Attacker is Player attacker )
+			if ( LastDamageTaken.Attacker is CoreWarsPlayer attacker )
 			{
 				var resources = FindItems<ResourceItem>();
 
@@ -781,7 +791,7 @@ namespace Facepunch.CoreWars
 
 		public override void TakeDamage( DamageInfo info )
 		{
-			if ( info.Attacker is Player attacker )
+			if ( info.Attacker is CoreWarsPlayer attacker )
 			{
 				if ( attacker == this && ( info.HasTag( "fall" ) || info.HasTag( "generic" ) ) )
 				{

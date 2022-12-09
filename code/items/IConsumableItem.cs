@@ -6,6 +6,6 @@ namespace Facepunch.CoreWars
 {
 	public interface IConsumableItem
 	{
-		public void Consume( Player player );
+		public void Consume( CoreWarsPlayer player );
 	}
 }

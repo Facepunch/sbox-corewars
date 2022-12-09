@@ -12,7 +12,7 @@ namespace Facepunch.CoreWars
 		{
 			if ( IsServer )
 			{
-				foreach ( var player in Entity.All.OfType<Player>() )
+				foreach ( var player in Entity.All.OfType<CoreWarsPlayer>() )
 				{
 					player.SetTeam( Team.None );
 					player.RespawnWhenAvailable();
@@ -32,7 +32,7 @@ namespace Facepunch.CoreWars
 			return true;
 		}
 
-		public override void OnPlayerJoined( Player player )
+		public override void OnPlayerJoined( CoreWarsPlayer player )
 		{
 			player.RespawnWhenAvailable();
 		}

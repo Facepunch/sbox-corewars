@@ -13,7 +13,7 @@ namespace Facepunch.CoreWars
 		public virtual string[] KillFeedReasons => new[] { "killed" };
 		public virtual string KillFeedIcon => WeaponItem?.Icon ?? string.Empty;
 		public virtual string KillFeedName => WeaponItem?.Name ?? string.Empty;
-		public virtual Team KillFeedTeam => (Owner as Player)?.Team ?? Team.None;
+		public virtual Team KillFeedTeam => (Owner as CoreWarsPlayer)?.Team ?? Team.None;
 		public virtual string MuzzleAttachment => "muzzle";
 		public virtual string MuzzleFlashEffect => "particles/pistol_muzzleflash.vpcf";
 		public virtual string ImpactEffect => null;
@@ -61,7 +61,7 @@ namespace Facepunch.CoreWars
 
 		public float ChargeAttackEndTime { get; private set; }
 		public AnimatedEntity AnimationOwner => Owner as AnimatedEntity;
-		public Player Player => Owner as Player;
+		public CoreWarsPlayer Player => Owner as CoreWarsPlayer;
 
 		private Sound ReloadSound { get; set; }
 
@@ -90,7 +90,7 @@ namespace Facepunch.CoreWars
 
 		public int AvailableAmmo()
 		{
-			if ( Owner is not Player owner ) return 0;
+			if ( Owner is not CoreWarsPlayer owner ) return 0;
 			return owner.GetAmmoCount( Config.AmmoType );
 		}
 
@@ -178,7 +178,7 @@ namespace Facepunch.CoreWars
 			if ( AmmoClip >= ClipSize )
 				return;
 
-			if ( Owner is Player player )
+			if ( Owner is CoreWarsPlayer player )
 			{
 				if ( !UnlimitedAmmo )
 				{
@@ -294,7 +294,7 @@ namespace Facepunch.CoreWars
 
 		public virtual void RenderHud( Vector2 screenSize )
 		{
-			if ( Owner is not Player player )
+			if ( Owner is not CoreWarsPlayer player )
 				return;
 
 			if ( ShouldRenderCrosshair )
@@ -303,7 +303,7 @@ namespace Facepunch.CoreWars
 			}
 		}
 
-		public virtual void RenderCrosshair( Player player, Vector2 center )
+		public virtual void RenderCrosshair( CoreWarsPlayer player, Vector2 center )
 		{
 			var draw = Util.Draw.Reset();
 			var lastHitTime = player.TimeSinceLastHit.Relative;
@@ -449,7 +449,7 @@ namespace Facepunch.CoreWars
 		{
 			IsReloading = false;
 
-			if ( Owner is Player player )
+			if ( Owner is CoreWarsPlayer player )
 			{
 				if ( !UnlimitedAmmo )
 				{

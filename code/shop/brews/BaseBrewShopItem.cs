@@ -15,12 +15,12 @@ namespace Facepunch.CoreWars
 
 		public T ItemDefinition { get; private set; } = new T();
 
-		public override string GetIcon( Player player )
+		public override string GetIcon( CoreWarsPlayer player )
 		{
 			return ItemDefinition.Icon;
 		}
 
-		public override void OnPurchased( Player player )
+		public override void OnPurchased( CoreWarsPlayer player )
 		{
 			var item = InventorySystem.CreateItem<T>();
 			player.TryGiveItem( item );

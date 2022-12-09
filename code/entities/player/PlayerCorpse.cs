@@ -4,7 +4,7 @@ namespace Facepunch.CoreWars
 {
 	public class PlayerCorpse : ModelEntity
 	{
-		public Player Player { get; set; }
+		public CoreWarsPlayer Player { get; set; }
 
 		private TimeSince TimeSinceSpawned { get; set; }
 
@@ -15,7 +15,7 @@ namespace Facepunch.CoreWars
 			PhysicsEnabled = true;
 		}
 
-		public void CopyFrom( Player player )
+		public void CopyFrom( CoreWarsPlayer player )
 		{
 			RenderColor = player.RenderColor;
 

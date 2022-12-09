@@ -5,13 +5,13 @@ namespace Facepunch.CoreWars.UI;
 public partial class Hud
 {
 	[ClientRpc]
-	public static void AddKillFeed( Player attacker, Player victim, Entity weapon )
+	public static void AddKillFeed( CoreWarsPlayer attacker, CoreWarsPlayer victim, Entity weapon )
 	{
 		ToastList.Instance.AddKillFeed( attacker, victim, weapon );
 	}
 
 	[ClientRpc]
-	public static void AddKillFeed( Player victim, bool isFallDamage )
+	public static void AddKillFeed( CoreWarsPlayer victim, bool isFallDamage )
 	{
 		ToastList.Instance.AddKillFeed( victim, isFallDamage );
 	}

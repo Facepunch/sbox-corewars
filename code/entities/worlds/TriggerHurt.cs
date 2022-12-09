@@ -15,12 +15,12 @@ namespace Facepunch.CoreWars
 		[EditorProperty, Range( 1f, 100f, 1f )]
 		public float DamagePerSecond { get; set; }
 
-		private HashSet<Player> Touching { get; set; } = new();
+		private HashSet<CoreWarsPlayer> Touching { get; set; } = new();
 		private TimeSince LastDamageTime { get; set; }
 
 		public override void StartTouch( Entity other )
 		{
-			if ( other is Player player )
+			if ( other is CoreWarsPlayer player )
 				Touching.Add( player );
 
 			base.StartTouch( other );
@@ -28,7 +28,7 @@ namespace Facepunch.CoreWars
 
 		public override void EndTouch( Entity other )
 		{
-			if ( other is Player player )
+			if ( other is CoreWarsPlayer player )
 				Touching.Remove( player );
 
 			base.EndTouch( other );

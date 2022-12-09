@@ -32,7 +32,7 @@
 
     public bool IsHidden()
     {
-        if ( Item != null && Local.Pawn is CoreWars.Player player )
+        if ( Item != null && Local.Pawn is CoreWarsPlayer player )
         {
             return !Item.CanPurchase( player );
         }
@@ -42,7 +42,7 @@
 
     public bool IsPurchaseDisabled()
     {
-        if ( Item != null && Local.Pawn is CoreWars.Player player )
+        if ( Item != null && Local.Pawn is CoreWarsPlayer player )
         {
             return Item.IsLocked( player ) || !Item.CanAfford( player );
         }
@@ -65,7 +65,7 @@
 
     protected override void OnMouseOver( MousePanelEvent e )
     {
-        if ( Local.Pawn is not CoreWars.Player player )
+        if ( Local.Pawn is not CoreWarsPlayer player )
             return;
 
         if ( Item != null )
@@ -89,7 +89,7 @@
 
     protected override void OnAfterTreeRender( bool firstTime )
     {
-        if ( Local.Pawn is CoreWars.Player player )
+        if ( Local.Pawn is CoreWarsPlayer player )
         {
             if ( Item.IsLocked( player ) )
             {

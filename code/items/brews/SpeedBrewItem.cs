@@ -12,7 +12,7 @@ namespace Facepunch.CoreWars
 		public override string Icon => "textures/items/brew_speed.png";
 		public override string Name => "Speed Brew";
 
-		public override void OnActivated( Player player )
+		public override void OnActivated( CoreWarsPlayer player )
 		{
 			player.GiveBuff( new SpeedBuff() );
 			base.OnActivated( player );

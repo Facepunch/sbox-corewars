@@ -24,7 +24,7 @@
             </div>
         }
 
-        @if ( Costs != null && Costs.Count > 0 && Local.Pawn is CoreWars.Player player )
+        @if ( Costs != null && Costs.Count > 0 && Local.Pawn is CoreWarsPlayer player )
         {
             <div class="costs">
                 @foreach ( var kv in Costs )

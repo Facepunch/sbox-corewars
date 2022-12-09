@@ -84,7 +84,7 @@ namespace Facepunch.CoreWars.UI
 
 			Log.Info( $"{caller}: {message}" );
 
-			if ( caller.Pawn is Player player )
+			if ( caller.Pawn is CoreWarsPlayer player )
 			{
 				if ( channel == ChatBoxChannel.All || player.Team == Team.None )
 					AddChatEntry( To.Everyone, caller.Name, message, $"avatar:{ConsoleSystem.Caller.SteamId}", player.Team.GetHudClass() );

@@ -14,12 +14,12 @@ namespace Facepunch.CoreWars
 		public virtual float Duration => 30f;
 		public virtual string Icon => "textures/ui/unknown.png";
 
-		public virtual void OnActivated( Player player )
+		public virtual void OnActivated( CoreWarsPlayer player )
 		{
 
 		}
 
-		public virtual void OnExpired( Player player )
+		public virtual void OnExpired( CoreWarsPlayer player )
 		{
 			if ( IsClient && player.IsLocalPawn )
 			{

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Facepunch.CoreWars
 {
-	public partial class Player
+	public partial class CoreWarsPlayer
 	{
 		protected List<BaseClothing> Clothing { get; set; } = new();
 

@@ -68,12 +68,12 @@ namespace Facepunch.CoreWars
 			clothes.SetParent( this, true );
 		}
 
-		public bool IsUsable( Player player )
+		public bool IsUsable( CoreWarsPlayer player )
 		{
 			return true;
 		}
 
-		public void OnUsed( Player player )
+		public void OnUsed( CoreWarsPlayer player )
 		{
 			OpenForClient( To.Single( player ) );
 		}

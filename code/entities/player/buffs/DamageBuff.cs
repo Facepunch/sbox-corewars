@@ -7,7 +7,7 @@ namespace Facepunch.CoreWars
 	{
 		public override string Icon => "textures/items/brew_damage.png";
 
-		public override void OnActivated( Player player )
+		public override void OnActivated( CoreWarsPlayer player )
 		{
 			if ( IsServer )
 			{
@@ -17,7 +17,7 @@ namespace Facepunch.CoreWars
 			base.OnActivated( player );
 		}
 
-		public override void OnExpired( Player player )
+		public override void OnExpired( CoreWarsPlayer player )
 		{
 			if ( IsServer )
 			{

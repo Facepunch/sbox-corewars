@@ -6,7 +6,7 @@ namespace Facepunch.CoreWars
 	{
 		public void Update()
 		{
-			if ( Local.Pawn is not Player player )
+			if ( Local.Pawn is not CoreWarsPlayer player )
 				return;
 
 			Camera.Rotation = player.ViewAngles.ToRotation();

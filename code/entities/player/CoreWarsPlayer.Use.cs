@@ -3,7 +3,7 @@ using System;
 
 namespace Facepunch.CoreWars
 {
-	public partial class Player
+	public partial class CoreWarsPlayer
 	{
 		public Entity Using { get; protected set; }
 

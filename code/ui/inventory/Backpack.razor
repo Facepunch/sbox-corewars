@@ -9,16 +9,16 @@
 @implements IDialog
 @implements IDroppable
 
-@if ( !CoreWars.Player.Me.IsValid() ) return;
+@if ( !CoreWarsPlayer.Me.IsValid() ) return;
 
 @{
-    var equipment = CoreWars.Player.Me.Equipment;
+    var equipment = CoreWarsPlayer.Me.Equipment;
     if (!equipment.IsValid()) return;
 
-    var backpack = CoreWars.Player.Me.Backpack;
+    var backpack = CoreWarsPlayer.Me.Backpack;
     if ( !backpack.IsValid() ) return;
 
-    var hotbar = CoreWars.Player.Me.Hotbar;
+    var hotbar = CoreWarsPlayer.Me.Hotbar;
     if ( !hotbar.IsValid() ) return;
 }
 
@@ -128,7 +128,7 @@
     {
         if ( draggable is InventorySlot slot )
         {
-            //CoreWars.Player.ThrowItem( slot.Item, Screen.GetDirection( Mouse.Position ), mode == DraggableMode.Split ? true : false );
+            //CoreWarsPlayer.ThrowItem( slot.Item, Screen.GetDirection( Mouse.Position ), mode == DraggableMode.Split ? true : false );
         }
     }
 
@@ -171,9 +171,9 @@
 
     protected override int BuildHash()
     {
-        var equipment = CoreWars.Player.Me?.Equipment;
-        var backpack = CoreWars.Player.Me?.Backpack;
-        var hotbar = CoreWars.Player.Me?.Hotbar;
+        var equipment = CoreWarsPlayer.Me?.Equipment;
+        var backpack = CoreWarsPlayer.Me?.Backpack;
+        var hotbar = CoreWarsPlayer.Me?.Hotbar;
 
         InventoryContainer childContainer = null;
         if (Selected != null && Selected.Item is IContainerItem selected )
@@ -181,6 +181,6 @@
             childContainer = selected.Container;
         }
 
-        return HashCode.Combine( CoreWars.Player.Me, Selected, childContainer, equipment, backpack, hotbar );
+        return HashCode.Combine( CoreWarsPlayer.Me, Selected, childContainer, equipment, backpack, hotbar );
     }
 }

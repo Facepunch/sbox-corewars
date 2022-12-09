@@ -18,7 +18,7 @@ namespace Facepunch.CoreWars.Editor
 		{
 			if ( Host.IsServer )
 			{
-				foreach ( var player in Entity.All.OfType<Player>() )
+				foreach ( var player in Entity.All.OfType<CoreWarsPlayer>() )
 				{
 					player.Respawn();
 				}
@@ -35,7 +35,7 @@ namespace Facepunch.CoreWars.Editor
 			return true;
 		}
 
-		public override void OnPlayerJoined( Player player )
+		public override void OnPlayerJoined( CoreWarsPlayer player )
 		{
 			player.Respawn();
 		}

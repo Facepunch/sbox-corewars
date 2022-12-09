@@ -33,7 +33,7 @@ namespace Facepunch.CoreWars.UI
 
 		public override void Tick()
 		{
-			if ( Local.Pawn is not Player player )
+			if ( Local.Pawn is not CoreWarsPlayer player )
 				return;
 
 			if ( IsDeleting ) return;

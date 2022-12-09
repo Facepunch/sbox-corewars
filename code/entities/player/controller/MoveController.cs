@@ -119,7 +119,7 @@ namespace Facepunch.CoreWars
 				return;
 
 			CheckLadder();
-			Swimming = false;
+			Swimming = Player.WaterLevel > 0.6f;
 
 			if ( !Swimming && !IsTouchingLadder )
 			{
@@ -156,7 +156,7 @@ namespace Facepunch.CoreWars
 
 			Duck.PreTick();
 
-			if ( Player is Player player )
+			if ( Player is CoreWarsPlayer player )
 			{
 				var modifier = player.GetModifier( StatModifier.Speed );
 				WishVelocity *= modifier;
@@ -527,7 +527,7 @@ namespace Facepunch.CoreWars
 			AddJumpVelocity();
 			AddEvent( "jump" );
 
-			if ( Player is Player player )
+			if ( Player is CoreWarsPlayer player )
 			{
 				player.ReduceStamina( 2f );
 			}

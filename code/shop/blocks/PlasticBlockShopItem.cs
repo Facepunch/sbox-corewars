@@ -17,7 +17,7 @@ namespace Facepunch.CoreWars
 		};
 		public override int Quantity => 8;
 
-		public override BlockType GetBlockType( Player player )
+		public override BlockType GetBlockType( CoreWarsPlayer player )
 		{
 			return player.Team.GetFungusBlock();
 		}

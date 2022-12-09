@@ -7,10 +7,10 @@
 @attribute [StyleSheet( "/ui/inventory/Hotbar.scss" )]
 @inherits Panel
 
-@if ( !CoreWars.Player.Me.IsValid() ) return;
+@if ( !CoreWarsPlayer.Me.IsValid() ) return;
 
 @{
-    var hotbar = CoreWars.Player.Me.Hotbar;
+    var hotbar = CoreWarsPlayer.Me.Hotbar;
     if ( !hotbar.IsValid() ) return;
 }
 
@@ -32,12 +32,12 @@
 
     protected override int BuildHash()
     {
-        return HashCode.Combine( CoreWars.Player.Me, CoreWars.Player.Me?.Hotbar, GetHotbarIndex() );
+        return HashCode.Combine( CoreWarsPlayer.Me, CoreWarsPlayer.Me?.Hotbar, GetHotbarIndex() );
     }
 
     private int GetHotbarIndex()
     {
-        return CoreWars.Player.Me?.HotbarIndex ?? 0;
+        return CoreWarsPlayer.Me?.HotbarIndex ?? 0;
     }
 
     private bool IsHidden()

@@ -2,7 +2,7 @@
 
 namespace Facepunch.CoreWars
 {
-	partial class Player
+	partial class CoreWarsPlayer
 	{
 		public PlayerCorpse Ragdoll { get; set; }
 

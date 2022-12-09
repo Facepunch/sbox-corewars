@@ -59,13 +59,13 @@ namespace Facepunch.CoreWars
 			RenderColor = Team.GetColor();
 		}
 
-		public void OnUsed( Player player )
+		public void OnUsed( CoreWarsPlayer player )
 		{
 			Inventory.Value.AddConnection( player.Client );
 			OpenForClient( To.Single( player ), Inventory.Value.Serialize() );
 		}
 
-		public bool IsUsable( Player player  )
+		public bool IsUsable( CoreWarsPlayer player  )
 		{
 			return player.Team == Team;
 		}
@@ -73,7 +73,7 @@ namespace Facepunch.CoreWars
 		[ClientRpc]
 		private void OpenForClient( byte[] data )
 		{
-			if ( Local.Pawn is not Player ) return;
+			if ( Local.Pawn is not CoreWarsPlayer ) return;
 
 			var container = InventoryContainer.Deserialize( data );
 			var storage = UI.Storage.Current;

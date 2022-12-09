@@ -9,17 +9,17 @@
 @implements IDialog
 @implements IDroppable
 
-@if ( !CoreWars.Player.Me.IsValid() ) return;
+@if ( !CoreWarsPlayer.Me.IsValid() ) return;
 @if ( !Container.IsValid() ) return;
 
 @{
-    var equipment = CoreWars.Player.Me.Equipment;
+    var equipment = CoreWarsPlayer.Me.Equipment;
     if ( !equipment.IsValid() ) return;
 
-    var backpack = CoreWars.Player.Me.Backpack;
+    var backpack = CoreWarsPlayer.Me.Backpack;
     if ( !backpack.IsValid() ) return;
 
-    var hotbar = CoreWars.Player.Me.Hotbar;
+    var hotbar = CoreWarsPlayer.Me.Hotbar;
     if ( !hotbar.IsValid() ) return;
 }
 
@@ -151,7 +151,7 @@
 
     public void SetContainer( InventoryContainer container )
     {
-        if ( !CoreWars.Player.Me.IsValid() ) return;
+        if ( !CoreWarsPlayer.Me.IsValid() ) return;
 
         Container = container;
         Container.SetTransferHandler( GetTransferTarget );
@@ -166,7 +166,7 @@
     {
         if ( draggable is InventorySlot slot )
         {
-            //CoreWars.Player.ThrowItem( slot.Item, Screen.GetDirection( Mouse.Position ), mode == DraggableMode.Split ? true : false );
+            //CoreWarsPlayer.ThrowItem( slot.Item, Screen.GetDirection( Mouse.Position ), mode == DraggableMode.Split ? true : false );
         }
     }
 
@@ -209,8 +209,8 @@
 
     protected override int BuildHash()
     {
-        var backpack = CoreWars.Player.Me?.Backpack;
-        var hotbar = CoreWars.Player.Me?.Hotbar;
+        var backpack = CoreWarsPlayer.Me?.Backpack;
+        var hotbar = CoreWarsPlayer.Me?.Hotbar;
 
         InventoryContainer childContainer = null;
         if ( Selected != null && Selected.Item is IContainerItem selected )
@@ -218,11 +218,11 @@
             childContainer = selected.Container;
         }
 
-        return HashCode.Combine( CoreWars.Player.Me, Selected, childContainer, backpack, hotbar, Container );
+        return HashCode.Combine( CoreWarsPlayer.Me, Selected, childContainer, backpack, hotbar, Container );
     }
 
     private InventoryContainer GetTransferTarget( InventoryItem item )
     {
-        return CoreWars.Player.Me?.Backpack;
+        return CoreWarsPlayer.Me?.Backpack;
     }
 }

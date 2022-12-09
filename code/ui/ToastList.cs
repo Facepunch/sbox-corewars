@@ -20,7 +20,7 @@ namespace Facepunch.CoreWars.UI
 			Victim = Add.Label( "", "victim" );
 		}
 
-		public void Update( Player victim, bool isFallDamage )
+		public void Update( CoreWarsPlayer victim, bool isFallDamage )
 		{
 			Attacker.SetClass( "hidden", true );
 			AddClass( "is-suicide" );
@@ -41,7 +41,7 @@ namespace Facepunch.CoreWars.UI
 			EndTime = Time.Now + 3f;
 		}
 
-		public void Update( Player attacker, Player victim, Entity weapon )
+		public void Update( CoreWarsPlayer attacker, CoreWarsPlayer victim, Entity weapon )
 		{
 			Attacker.Text = attacker.Client.Name;
 			Attacker.AddClass( attacker.Team.GetHudClass() );
@@ -114,13 +114,13 @@ namespace Facepunch.CoreWars.UI
 			Instance = this;
 		}
 
-		public void AddKillFeed( Player attacker, Player victim, Entity weapon )
+		public void AddKillFeed( CoreWarsPlayer attacker, CoreWarsPlayer victim, Entity weapon )
 		{
 			var item = KillFeedContainer.AddChild<KillFeedItem>();
 			item.Update( attacker, victim, weapon );
 		}
 
-		public void AddKillFeed( Player victim, bool isFallDamage )
+		public void AddKillFeed( CoreWarsPlayer victim, bool isFallDamage )
 		{
 			var item = KillFeedContainer.AddChild<KillFeedItem>();
 			item.Update( victim, isFallDamage );

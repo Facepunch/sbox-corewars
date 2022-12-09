@@ -13,11 +13,11 @@ namespace Facepunch.CoreWars
 		public Dictionary<Type, int> Costs { get; }
 		public int Quantity { get; }
 
-		public bool CanAfford( Player player );
-		public string GetIcon( Player player );
-		public Color GetIconTintColor( Player player );
-		public bool IsLocked( Player player );
-		public bool CanPurchase( Player player );
-		public void OnPurchased( Player player );
+		public bool CanAfford( CoreWarsPlayer player );
+		public string GetIcon( CoreWarsPlayer player );
+		public Color GetIconTintColor( CoreWarsPlayer player );
+		public bool IsLocked( CoreWarsPlayer player );
+		public bool CanPurchase( CoreWarsPlayer player );
+		public void OnPurchased( CoreWarsPlayer player );
 	}
 }

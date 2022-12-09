@@ -2,7 +2,7 @@
 
 namespace Facepunch.CoreWars;
 
-public partial class Player
+public partial class CoreWarsPlayer
 {
 	private Entity LastWeaponEntity { get; set; }
 

@@ -20,7 +20,7 @@ namespace Facepunch.CoreWars
 		public override string Group => "damage";
 		public override int Tier => 2;
 
-		public override string GetIcon( Player player )
+		public override string GetIcon( CoreWarsPlayer player )
 		{
 			return "textures/upgrades/damage_2.png";
 		}

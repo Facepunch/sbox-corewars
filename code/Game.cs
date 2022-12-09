@@ -89,7 +89,7 @@ namespace Facepunch.CoreWars
 		[ConCmd.Server( "cw_core_revive" )]
 		public static void ReviveCoreCmd()
 		{
-			if ( ConsoleSystem.Caller.Pawn is Player player )
+			if ( ConsoleSystem.Caller.Pawn is CoreWarsPlayer player )
 			{
 				if ( player.Core.IsValid() )
 				{
@@ -101,7 +101,7 @@ namespace Facepunch.CoreWars
 		[ConCmd.Server( "cw_explode_core" )]
 		public static void ExplodeCoreCmd()
 		{
-			if ( ConsoleSystem.Caller.Pawn is Player player )
+			if ( ConsoleSystem.Caller.Pawn is CoreWarsPlayer player )
 			{
 				if ( player.Core.IsValid() )
 				{
@@ -121,7 +121,7 @@ namespace Facepunch.CoreWars
 		{
 			var team = Enum.Parse<Team>( teamIndex );
 
-			if ( ConsoleSystem.Caller.Pawn is Player player )
+			if ( ConsoleSystem.Caller.Pawn is CoreWarsPlayer player )
 			{
 				player.SetTeam( team );
 				Log.Info( "Changed team to: " + team.ToString() );
@@ -139,11 +139,11 @@ namespace Facepunch.CoreWars
 		{
 			if ( suicide )
 			{
-				UI.ToastList.Instance.AddKillFeed( Local.Pawn as Player, true );
+				UI.ToastList.Instance.AddKillFeed( Local.Pawn as CoreWarsPlayer, true );
 			}
 			else
 			{
-				UI.ToastList.Instance.AddKillFeed( Local.Pawn as Player, Local.Pawn as Player, (Local.Pawn as Player).ActiveChild );
+				UI.ToastList.Instance.AddKillFeed( Local.Pawn as CoreWarsPlayer, Local.Pawn as CoreWarsPlayer, (Local.Pawn as CoreWarsPlayer).ActiveChild );
 			}
 		}
 
@@ -212,14 +212,14 @@ namespace Facepunch.CoreWars
 			state.CurrentFileName = fileName;
 		}
 
-		public virtual void PlayerRespawned( Player player )
+		public virtual void PlayerRespawned( CoreWarsPlayer player )
 		{
 			StateSystem.Active?.OnPlayerRespawned( player );
 		}
 
 		public override void OnKilled( Entity pawn )
 		{
-			if ( pawn is not Player player ) return;
+			if ( pawn is not CoreWarsPlayer player ) return;
 
 			StateSystem.Active?.OnPlayerKilled( player, player.LastDamageTaken );
 		}
@@ -234,7 +234,7 @@ namespace Facepunch.CoreWars
 		public override void ClientDisconnect( Client client, NetworkDisconnectionReason reason )
 		{
 			InventorySystem.ClientDisconnected( client );
-			StateSystem.Active?.OnPlayerDisconnected( client.Pawn as Player );
+			StateSystem.Active?.OnPlayerDisconnected( client.Pawn as CoreWarsPlayer );
 			base.ClientDisconnect( client, reason );
 		}
 
@@ -249,7 +249,7 @@ namespace Facepunch.CoreWars
 			}
 			else
 			{
-				var player = new Player( client );
+				var player = new CoreWarsPlayer( client );
 				player.LifeState = LifeState.Dead;
 			}
 
@@ -263,7 +263,7 @@ namespace Facepunch.CoreWars
 
 		public override void RenderHud()
 		{
-			var pawn = Local.Pawn as Player;
+			var pawn = Local.Pawn as CoreWarsPlayer;
 			if ( !pawn.IsValid() ) return;
 
 			pawn.RenderHud( Screen.Size );
@@ -363,9 +363,9 @@ namespace Facepunch.CoreWars
 		{
 			VoxelWorld.Current.Send( client );
 
-			if ( client.Pawn is Player )
+			if ( client.Pawn is CoreWarsPlayer )
 			{
-				var player = (client.Pawn as Player);
+				var player = (client.Pawn as CoreWarsPlayer);
 				StateSystem.Active?.OnPlayerJoined( player );
 				player.OnMapLoaded();
 			}

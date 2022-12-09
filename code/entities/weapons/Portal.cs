@@ -23,11 +23,11 @@ namespace Facepunch.CoreWars
 		public override string HitSound => null;
 		public override string DamageType => "blast";
 
-		private Player PlayerToTeleport { get; set; }
+		private CoreWarsPlayer PlayerToTeleport { get; set; }
 
 		protected override void OnThrown()
 		{
-			if ( IsServer && Owner is Player player )
+			if ( IsServer && Owner is CoreWarsPlayer player )
 			{
 				PlayerToTeleport = player;
 				EnableDrawing = false;

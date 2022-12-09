@@ -18,13 +18,13 @@ public partial class BackpackContainer : InventoryContainer
 			return storage.Container;
 		}
 
-		var equipment = Player.Me.Equipment;
+		var equipment = CoreWarsPlayer.Me.Equipment;
 
 		if ( item is ArmorItem && equipment.CouldTakeAny( item ) )
 		{
 			return equipment;
 		}
 
-		return Player.Me.Hotbar;
+		return CoreWarsPlayer.Me.Hotbar;
 	}
 }

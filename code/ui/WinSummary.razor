@@ -129,7 +129,7 @@
         TimeUntilNextRound = nextRoundTime;
         WinningTeam = winningTeam;
 
-        var allValidClients = Client.All.Where( c => c.Pawn is CoreWars.Player player && player.Team != Team.None );
+        var allValidClients = Client.All.Where( c => c.Pawn is CoreWarsPlayer player && player.Team != Team.None );
 
         MostKillsList = allValidClients
         .OrderBy( a => a.GetInt( "kills" ) )

@@ -11,9 +11,9 @@ public partial class HotbarContainer : InventoryContainer
 
 	public override InventoryContainer GetTransferTarget( InventoryItem item )
 	{
-		if ( Entity is Player player )
+		if ( Entity is CoreWarsPlayer player )
 		{
-			return UI.Storage.Current.IsOpen ? UI.Storage.Current.Container : Player.Me.Backpack;
+			return UI.Storage.Current.IsOpen ? UI.Storage.Current.Container : CoreWarsPlayer.Me.Backpack;
 		}
 
 		return base.GetTransferTarget( item );

@@ -26,7 +26,7 @@ namespace Facepunch.CoreWars
 
 		public virtual void FireProjectile()
 		{
-			if ( Owner is not Player player )
+			if ( Owner is not CoreWarsPlayer player )
 				return;
 
 			var projectile = new T()

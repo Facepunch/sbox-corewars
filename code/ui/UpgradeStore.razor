@@ -70,7 +70,7 @@
 
     public override void Tick()
     {
-        if ( Local.Pawn is not CoreWars.Player player )
+        if ( Local.Pawn is not CoreWarsPlayer player )
             return;
 
         if ( Entity.IsValid() )
@@ -89,7 +89,7 @@
 
     protected int GetResourceCount<T>() where T : ResourceItem
     {
-        if ( Local.Pawn is CoreWars.Player player )
+        if ( Local.Pawn is CoreWarsPlayer player )
         {
             return player.GetResourceCount<T>();
         }
@@ -99,7 +99,7 @@
 
     protected virtual void OnItemPurchased( IPurchasableItem item )
     {
-        CoreWars.Player.BuyUpgradeCmd( Entity.NetworkIdent, item.GetType().Name );
+        CoreWarsPlayer.BuyUpgradeCmd( Entity.NetworkIdent, item.GetType().Name );
         Util.Play( "item.purchase" );
     }
 

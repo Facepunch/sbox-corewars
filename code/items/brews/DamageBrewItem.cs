@@ -12,7 +12,7 @@ namespace Facepunch.CoreWars
 		public override string Icon => "textures/items/brew_damage.png";
 		public override string Name => "Damage Brew";
 
-		public override void OnActivated( Player player )
+		public override void OnActivated( CoreWarsPlayer player )
 		{
 			player.GiveBuff( new DamageBuff() );
 			base.OnActivated( player );

@@ -10,7 +10,7 @@ namespace Facepunch.CoreWars
         {
 			base.CreateEffects();
 
-			if ( Owner is Player player )
+			if ( Owner is CoreWarsPlayer player )
 			{
 				Trail?.SetPosition( 6, player.Team.GetColor() * 255f );
 			}

@@ -24,7 +24,7 @@ namespace Facepunch.CoreWars
 
 		public override void AttackPrimary()
 		{
-			if ( Owner is not Player player )
+			if ( Owner is not CoreWarsPlayer player )
 				return;
 
 			var damageScale = ScaleNonBlockDamage;
@@ -117,7 +117,7 @@ namespace Facepunch.CoreWars
 		{
 			ViewModelEntity?.SetAnimParameter( "attack_has_hit", true );
 
-			if ( victim is Player target )
+			if ( victim is CoreWarsPlayer target )
 				target.PlaySound( HitPlayerSound );
 			else
 				victim.PlaySound( HitObjectSound );

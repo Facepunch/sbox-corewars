@@ -45,12 +45,12 @@ namespace Facepunch.CoreWars
 		private Sound FallingSound { get; set; }
 		private Particles Effect { get; set; }
 
-		public bool IsUsable( Player player )
+		public bool IsUsable( CoreWarsPlayer player )
 		{
 			return true;
 		}
 
-		public void OnUsed( Player player )
+		public void OnUsed( CoreWarsPlayer player )
 		{
 			OpenForClient( To.Single( player ) );
 		}

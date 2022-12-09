@@ -55,7 +55,7 @@
 		Toast( To.Everyone, text, icon );
 	}
 
-	public static void Toast( CoreWars.Player player, string text, string icon = "" )
+    public static void Toast( CoreWarsPlayer player, string text, string icon = "" )
 	{
 		Toast( To.Single( player ), text, icon );
 	}
@@ -68,9 +68,9 @@
 
 	public override void Tick()
 	{
-		if ( Local.Pawn is CoreWars.Player player )
+        if ( CoreWarsPlayer.Me.IsValid() )
 		{
-			SetTeam( player.Team );
+            SetTeam( CoreWarsPlayer.Me.Team );
 		}
 
 		base.Tick();

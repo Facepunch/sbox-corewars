@@ -4,7 +4,7 @@ namespace Facepunch.CoreWars.UI;
 
 public partial class Storage
 {
-    public static void Open( Player player, string name, Entity entity, InventoryContainer container )
+    public static void Open( CoreWarsPlayer player, string name, Entity entity, InventoryContainer container )
     {
         OpenForClient( To.Single(player), name, entity, container.Serialize() );
 
@@ -15,7 +15,7 @@ public partial class Storage
     [ClientRpc]
     public static void OpenForClient( string name, Entity entity, byte[] data )
     {
-        if ( Local.Pawn is not Player ) return;
+        if ( Local.Pawn is not CoreWarsPlayer ) return;
 
         var container = InventoryContainer.Deserialize( data );
         var storage = Current;

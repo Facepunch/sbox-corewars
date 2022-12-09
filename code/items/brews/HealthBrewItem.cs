@@ -14,7 +14,7 @@ namespace Facepunch.CoreWars
 		public override string Icon => "textures/items/brew_health.png";
 		public override string Name => "Health Brew";
 
-		public override void OnActivated( Player player )
+		public override void OnActivated( CoreWarsPlayer player )
 		{
 			player.Health += 30f;
 			player.Health = Math.Min( player.Health, 100f );

@@ -98,7 +98,7 @@ namespace Facepunch.CoreWars
 
 		public virtual void RenderHud( Vector2 screenSize )
 		{
-			if ( Local.Pawn is not Player player || player.Team != Team )
+			if ( Local.Pawn is not CoreWarsPlayer player || player.Team != Team )
 				return;
 
 			var draw = Util.Draw.Reset();
@@ -148,7 +148,7 @@ namespace Facepunch.CoreWars
 			if ( LifeState == LifeState.Dead )
 				return;
 
-			if ( !info.Attacker.IsValid() || info.Attacker is not Player attacker )
+			if ( !info.Attacker.IsValid() || info.Attacker is not CoreWarsPlayer attacker )
 				return;
 
 			if ( !Game.FriendlyFire && attacker.Team == Team )
@@ -163,7 +163,7 @@ namespace Facepunch.CoreWars
 
 		public override void OnKilled()
 		{
-			if ( LastAttacker is Player player )
+			if ( LastAttacker is CoreWarsPlayer player )
 			{
 				player.Client.AddInt( "cores", 1 );
 			}

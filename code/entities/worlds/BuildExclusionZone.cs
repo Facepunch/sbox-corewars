@@ -9,11 +9,11 @@ namespace Facepunch.CoreWars
 	[Category( "Triggers" )]
 	public partial class BuildExclusionZone : BaseTrigger
 	{
-		private HashSet<Player> Touching { get; set; } = new();
+		private HashSet<CoreWarsPlayer> Touching { get; set; } = new();
 
 		public override void StartTouch( Entity other )
 		{
-			if ( other is Player player )
+			if ( other is CoreWarsPlayer player )
 				Touching.Add( player );
 
 			base.StartTouch( other );
@@ -21,7 +21,7 @@ namespace Facepunch.CoreWars
 
 		public override void EndTouch( Entity other )
 		{
-			if ( other is Player player )
+			if ( other is CoreWarsPlayer player )
 				Touching.Remove( player );
 
 			base.EndTouch( other );

@@ -54,7 +54,7 @@ namespace Facepunch.CoreWars
 				return;
 			}
 
-			var team = Entity.All.OfType<Player>()
+			var team = Entity.All.OfType<CoreWarsPlayer>()
 				.Where( p => p.LifeState == LifeState.Alive )
 				.Select( p => p.Team )
 				.GroupBy( i => i )
