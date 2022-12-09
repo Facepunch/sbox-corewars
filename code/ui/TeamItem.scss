@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: column;
 
-    .header {
+    > .header {
         display: flex;
         flex-direction: row;
         background-color: red;
@@ -11,7 +11,7 @@
         justify-content: center;
         align-items: center;
 
-        label {
+        > label {
             color: white;
             font-size: 20px;
             font-family: Roboto;
@@ -35,11 +35,11 @@
         }
     }
 
-    .players {
+    > .players {
         display: flex;
         flex-direction: column;
 
-        .player {
+        > .player {
             background-color: rgba( 0 0 0 0.4 );
             justify-content: center;
             align-items: center;
@@ -57,7 +57,7 @@
                 margin-right: 16px;
             }
 
-            label {
+            > label {
                 color: black;
                 font-size: 20px;
                 font-family: Roboto;
@@ -65,11 +65,11 @@
                 flex-grow: 1;
             }
 
-            .name {
+            > .name {
                 width: 25%;
             }
 
-            .kills {
+            > .kills {
                 margin-left: 6%;
             }
         }
@@ -82,8 +82,8 @@
     &.destroyed {
         opacity: 0.5;
 
-        .header {
-            .core {
+        > .header {
+            > .core {
                 background-image: url( /textures/ui/no_core.png );
             }
         }

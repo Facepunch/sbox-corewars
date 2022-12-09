@@ -10,7 +10,7 @@
 @inherits Panel
 
 <root>
-    <div @ref="Container" class="container">
+    <div class="container">
         @foreach ( var core in Entity.All.OfType<TeamCore>() )
         {
             <TeamItem Entity=@core></TeamItem>
@@ -21,7 +21,6 @@
 @code
 {
     public static TeamList Current { get; private set; }
-    public Panel Container { get; set; }
     public bool IsOpen { get; private set; }
 
     public TeamList()

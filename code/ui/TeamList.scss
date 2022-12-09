@@ -10,14 +10,14 @@
     background-color: rgba(0, 0, 0, 0.9);
     z-index: 20;
 
-    .container {
+    > .container {
         background-color: rgba( 50 50 50 0.4 );
         padding: 8px;
         border-radius: 2px;
         flex-direction: column;
-        width: 60%;
+        min-width: 600px;
 
-        TeamItem {
+        > TeamItem {
             margin-top: 4px;
         }
 
