@@ -93,8 +93,10 @@ GS
     [maxvertexcount(6)]
     void MainGs(triangle in PixelInput vertices[3], inout TriangleStream<PixelInput> triStream)
     {
+        int i = 0;
+
         PixelInput v[3];
-        for ( int i = 0; i < 3; i++ )
+        for ( i = 0; i < 3; i++ )
         {
             triStream.Append(vertices[i]);
             v[i] = vertices[i];
@@ -105,7 +107,7 @@ GS
         
         // color all vertices black
         // Convert these to world space
-        for ( int i = 0; i < 3; i++ )
+        for ( i = 0; i < 3; i++ )
         {
             v[i].vPositionWs = v[i].vPositionWs + ( v[i].vNormalWs * v[i].flCurrentOutline );
             v[i].vPositionWs += g_vHighPrecisionLightingOffsetWs.xyz;
