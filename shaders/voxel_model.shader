@@ -262,6 +262,14 @@ PS
 			o.Specular = 0;
 			return o;
 		}
+
+		//
+		// Applying any post-processing effects after all lighting is complete
+		//
+		float4 PostProcess( float4 vColor )
+		{
+			return vColor;
+		}
 	};
 
 	float3 HueShift( float3 color, float hue )
@@ -271,7 +279,7 @@ PS
 		return float3(color * cosAngle + cross(k, color) * sin(hue) + k * dot(k, color) * (1.0 - cosAngle));
 	}
 
-	PixelOutput MainPs( PixelInput i )
+	float4 MainPs( PixelInput i ) : SV_Target0
 	{
 		float4 vColor = Tex2DLevelS( g_tColor, g_sPointSampler, i.vTextureCoords.xy, 0 );
 		Material m = GatherMaterial( i );
@@ -300,8 +308,6 @@ PS
 		m.Emission.rgb = m.Albedo.rgb * vEmission;
 		
 		ShadingModelValveWithDiffuse sm;
-		PixelOutput o = FinalizePixelMaterial( i, m, sm );
-		
-		return o;
+		return FinalizePixelMaterial( i, m, sm );
 	}
 }
