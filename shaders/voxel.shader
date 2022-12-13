@@ -331,6 +331,14 @@ PS
 			o.Specular = 0;
 			return o;
 		}
+
+		//
+		// Applying any post-processing effects after all lighting is complete
+		//
+		float4 PostProcess( float4 vColor )
+		{
+			return vColor;
+		}
 	};
 
 
@@ -360,7 +368,7 @@ PS
 		return float3(color * cosAngle + cross(k, color) * sin(hue) + k * dot(k, color) * (1.0 - cosAngle));
 	}
 
-	PixelOutput MainPs( PixelInput i )
+	float4 MainPs( PixelInput i ) : SV_Target0
 	{
 		float2 vAtlasDims = TextureDimensions2D( g_tAtlasColor, 0 ).xy;
 		float2 vAltasMaxCells = vAtlasDims / g_flTextureAtlasCellSize;
@@ -374,27 +382,23 @@ PS
 
 		#if ( S_MODE_DEPTH )
 		{
-			PixelOutput o;
 			#if (S_ALPHA_TEST || S_TRANSLUCENT)
 				float4 vColor = Tex2DLevelS( g_tAtlasColor, g_sPointSampler, vTexCoordAtlas, 0 );
 				#if (S_ALPHA_TEST)
 					if(vColor.a < g_flAlphaTestReference) discard;
 				#else
 					#if S_DO_NOT_CAST_SHADOWS
-						o.vColor.rgba = float4( 0.0, 0.0, 0.0, 0.0f );
+						return 0.0f;
 					#else
-						o.vColor.rgba = float4( 0.0, 0.0, 0.0, vColor.a );
+						return float4( 0.0, 0.0, 0.0, vColor.a );
 					#endif
 				#endif
 			#endif
-			o.vColor.rgba = float4( 0.0, 0.0, 0.0, 1.0f );
-			return o;
+			return float4( 0.0, 0.0, 0.0, 1.0f );
 		}
 		#elif ( S_MODE_TOOLS_WIREFRAME )
 		{
-			PixelOutput o;
-			o.vColor.rgba = float4( g_vWireframeColor.rgb, 1.0f );
-			return o;
+			return float4( g_vWireframeColor.rgb, 1.0f );
 		}
 		#else
 		{
@@ -441,9 +445,7 @@ PS
 			m.Emission.rgb = m.Albedo.rgb * vEmission;
 			
 			ShadingModelValveWithDiffuse sm;
-			PixelOutput o = FinalizePixelMaterial( i, m, sm );
-			
-			return o;
+			return FinalizePixelMaterial( i, m, sm );
 		}
 		#endif
 	}
