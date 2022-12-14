@@ -76,7 +76,7 @@ PS
 		return float3(color * cosAngle + cross(k, color) * sin(hue) + k * dot(k, color) * (1.0 - cosAngle));
 	}
 
-	PixelOutput MainPs( PixelInput i )
+	float4 MainPs( PixelInput i ) : SV_Target0
 	{
 		float4 vColor = Tex2DLevelS( g_tColor, g_sPointSampler, i.vTextureCoords.xy, 0 );
 	
@@ -97,7 +97,7 @@ PS
 			float3 torchColor = (g_vVoxelLight.rgb / 16.0f) * (1.0f - (((sin(g_flTime * 8.0f) + 1.0f) * 0.5f) * 0.2f));
 			float sunlight = g_vVoxelLight.w / 16.0f;
 			sunlight *= sunlight;
-			m.Albedo.rgb = vColor * saturate(0.007f + torchColor + sunlight);
+			m.Albedo.rgb = vColor.rgb * saturate(0.007f + torchColor + sunlight);
 		#endif
 		
 		ShadingModelValveStandard sm;

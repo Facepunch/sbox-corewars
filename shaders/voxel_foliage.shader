@@ -8,8 +8,7 @@ HEADER
 
 FEATURES
 {
-    #include "common/features.minimal.hlsl"
-    Feature( F_ADDITIVE_BLEND, 0..1 );
+    #include "common/features.hlsl"
     Feature( F_PREPASS_ALPHA_TEST, 0..1 );
     Feature( F_FOLIAGE_TYPE, 0..1(0="Generic", 1="TODO"), "Foliage Type" );
     Feature( F_ALPHA_TEST, 0..1, "Rendering" );
@@ -232,7 +231,7 @@ PS
 
     RenderState( CullMode, F_RENDER_BACKFACES ? NONE : DEFAULT );
 
-	PixelOutput MainPs( PixelInput i )
+	float4 MainPs( PixelInput i ) : SV_Target0
 	{
         const float flAlphaTestReference = 0.01;
 

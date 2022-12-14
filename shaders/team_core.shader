@@ -93,8 +93,10 @@ GS
     [maxvertexcount(6)]
     void MainGs(triangle in PixelInput vertices[3], inout TriangleStream<PixelInput> triStream)
     {
+        int i = 0;
+
         PixelInput v[3];
-        for ( int i = 0; i < 3; i++ )
+        for ( i = 0; i < 3; i++ )
         {
             triStream.Append(vertices[i]);
             v[i] = vertices[i];
@@ -105,7 +107,7 @@ GS
         
         // color all vertices black
         // Convert these to world space
-        for ( int i = 0; i < 3; i++ )
+        for ( i = 0; i < 3; i++ )
         {
             v[i].vPositionWs = v[i].vPositionWs + ( v[i].vNormalWs * v[i].flCurrentOutline );
             v[i].vPositionWs += g_vHighPrecisionLightingOffsetWs.xyz;
@@ -145,7 +147,7 @@ PS
 	//
 	// Main
 	//
-	PixelOutput MainPs( PixelInput i )
+	float4 MainPs( PixelInput i ) : SV_Target0
 	{
         float4 vColor = float4(0,0,0,1);
 
@@ -159,7 +161,7 @@ PS
 
         float fRefractionFresnel = CalculateNormalizedFresnel( g_flReflectance, g_flExponent, PositionWs, normalize( i.vNormalWs.xyz ) );
         float3 vTexColor = TexCubeLevel( g_tCubeMap, normalize(vRayDirection + (i.vNormalWs * (flCurve * g_flRefractionScale))), 0 ).rgb;
-        vColor.rgb = (fRefractionFresnel * i.vVertexColor) + ((1.0f - fRefractionFresnel) * vTexColor);
+        vColor.rgb = (fRefractionFresnel * i.vVertexColor.rgb) + ((1.0f - fRefractionFresnel) * vTexColor);
 
         if( i.nIsOutline)
         {
@@ -170,8 +172,6 @@ PS
             vColor.rgb = vRainbow.rgb * g_flRainbowColorMultiplier;
         }
 
-        PixelOutput vOutput;
-        vOutput.vColor = vColor;
-        return vOutput;
+        return vColor;
 	}
 }
