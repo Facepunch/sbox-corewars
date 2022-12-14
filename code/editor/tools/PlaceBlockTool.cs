@@ -11,11 +11,11 @@ namespace Facepunch.CoreWars.Editor
 		private EditorBlockGhost BlockGhost { get; set; }
 		private TimeUntil NextBlockPlace { get; set; }
 
-		public override void Simulate( Client client )
+		public override void Simulate( IClient client )
 		{
 			var world = VoxelWorld.Current;
 
-			if ( IsClient && world.IsValid() )
+			if ( Game.IsClient && world.IsValid() )
 			{
 				var aimVoxelPosition = GetAimVoxelPosition( 4f );
 				var aimSourcePosition = world.ToSourcePosition( aimVoxelPosition );
@@ -30,7 +30,7 @@ namespace Facepunch.CoreWars.Editor
 		{
 			base.OnSelected();
 
-			if ( IsClient )
+			if ( Game.IsClient )
 			{
 				BlockGhost = new EditorBlockGhost
 				{
@@ -45,15 +45,15 @@ namespace Facepunch.CoreWars.Editor
 		{
 			base.OnDeselected();
 
-			if ( IsClient )
+			if ( Game.IsClient )
 			{
 				BlockGhost?.Delete();
 			}
 		}
 
-		protected override void OnPrimary( Client client )
+		protected override void OnPrimary( IClient client )
 		{
-			if ( IsServer && NextBlockPlace )
+			if ( Game.IsServer && NextBlockPlace )
 			{
 				var aimVoxelPosition = GetAimVoxelPosition( 4f );
 				var direction = GetTargetBlockFace( 4f );
@@ -67,9 +67,9 @@ namespace Facepunch.CoreWars.Editor
 			}
 		}
 
-		protected override void OnSecondary( Client client )
+		protected override void OnSecondary( IClient client )
 		{
-			if ( IsServer && NextBlockPlace )
+			if ( Game.IsServer && NextBlockPlace )
 			{
 				var pawn = client.Pawn as CoreWarsPlayer;
 

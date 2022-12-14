@@ -34,7 +34,7 @@
 
 	private bool HasWorldLoaded()
 	{
-		var viewer = Local.Client.GetChunkViewer();
+		var viewer = Game.LocalClient.GetChunkViewer();
 		if ( !viewer.IsValid() ) return false;
 
 		if ( VoxelWorld.Current == null || !VoxelWorld.Current.Initialized )

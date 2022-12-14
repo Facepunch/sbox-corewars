@@ -9,7 +9,7 @@ namespace Facepunch.CoreWars
 
 		public override void OnActivated( CoreWarsPlayer player )
 		{
-			if ( IsServer )
+			if ( Game.IsServer )
 			{
 				player.AddModifier( StatModifier.Damage, 0.15f );
 			}
@@ -19,7 +19,7 @@ namespace Facepunch.CoreWars
 
 		public override void OnExpired( CoreWarsPlayer player )
 		{
-			if ( IsServer )
+			if ( Game.IsServer )
 			{
 				player.TakeModifier( StatModifier.Damage, 0.15f );
 			}

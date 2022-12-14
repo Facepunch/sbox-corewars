@@ -89,7 +89,7 @@ namespace Facepunch.CoreWars
 
 		protected override void OnProjectileFired( T projectile )
 		{
-			if ( IsClient && IsFirstPersonMode )
+			if ( Game.IsClient && IsFirstPersonMode )
 			{
 				projectile.Position = EffectEntity.Position + EffectEntity.Rotation.Forward * 24f + EffectEntity.Rotation.Right * 8f + EffectEntity.Rotation.Down * 4f;
 			}
@@ -97,7 +97,7 @@ namespace Facepunch.CoreWars
 
 		protected override void OnProjectileHit( T projectile, TraceResult trace )
 		{
-			if ( IsServer && WeaponItem.IsValid() )
+			if ( Game.IsServer && WeaponItem.IsValid() )
 			{
 				WeaponItem.Remove();
 			}

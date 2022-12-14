@@ -17,7 +17,7 @@ namespace Facepunch.CoreWars
 		{
 			SetModel( "models/dev/playerstart_tint.vmdl" );
 
-			var isEditorMode = Game.Current.IsEditorMode;
+			var isEditorMode = CoreWarsGame.IsEditorMode;
 
 			EnableDrawing = isEditorMode;
 			Transmit = isEditorMode ? TransmitType.Always : TransmitType.Never;

@@ -151,7 +151,7 @@ namespace Facepunch.CoreWars
 		public override void ActiveStart( Entity owner )
 		{
 			base.ActiveStart( owner );
-			PlaySound( $"weapon.pickup{Rand.Int( 1, 4 )}" );
+			PlaySound( $"weapon.pickup{Game.Random.Int( 1, 4 )}" );
 			TimeSinceDeployed = 0f;
 		}
 
@@ -199,7 +199,7 @@ namespace Facepunch.CoreWars
 			DoClientReload();
 		}
 
-		public override void Simulate( Client owner )
+		public override void Simulate( IClient owner )
 		{
 			if ( !Player.IsValid() ) return;
 
@@ -251,7 +251,7 @@ namespace Facepunch.CoreWars
 			TimeSincePrimaryAttack = 0;
 			TimeSinceSecondaryAttack = 0;
 
-			Rand.SetSeed( Time.Tick );
+			Game.SetRandomSeed( Time.Tick );
 
 			ShootEffects();
 			ShootBullet( 0.05f, 1.5f, Config.Damage, 3.0f );
@@ -270,7 +270,7 @@ namespace Facepunch.CoreWars
 					continue;
 				}
 
-				if ( IsServer )
+				if ( Game.IsServer )
 				{
 					using ( Prediction.Off() )
 					{
@@ -358,7 +358,7 @@ namespace Facepunch.CoreWars
 					impact?.SetForward( 0, trace.Normal );
 				}
 
-				if ( !IsServer )
+				if ( !Game.IsServer )
 					continue;
 
 				if ( trace.Entity.IsValid() )
@@ -392,7 +392,7 @@ namespace Facepunch.CoreWars
 
 		public override void CreateViewModel()
 		{
-			Host.AssertClient();
+			Game.AssertClient();
 
 			if ( string.IsNullOrEmpty( ViewModelPath ) )
 				return;
@@ -482,7 +482,7 @@ namespace Facepunch.CoreWars
 		[ClientRpc]
 		protected virtual void ShootEffects()
 		{
-			Host.AssertClient();
+			Game.AssertClient();
 
 			if ( !IsMelee )
 			{

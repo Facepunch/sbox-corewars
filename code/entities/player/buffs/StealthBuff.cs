@@ -11,12 +11,12 @@ namespace Facepunch.CoreWars
 
 		public override void OnActivated( CoreWarsPlayer player )
 		{
-			if ( IsServer )
+			if ( Game.IsServer )
 			{
 				player.EnableDrawing = false;
 			}
 
-			if ( IsClient && player.IsLocalPawn )
+			if ( Game.IsClient && player.IsLocalPawn )
 			{
 				Effect?.Destroy();
 				Effect = Particles.Create( "particles/player/cloaked.vpcf" );
@@ -27,7 +27,7 @@ namespace Facepunch.CoreWars
 
 		public override void OnExpired( CoreWarsPlayer player )
 		{
-			if ( IsServer )
+			if ( Game.IsServer )
 			{
 				player.EnableDrawing = true;
 			}

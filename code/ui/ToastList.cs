@@ -35,7 +35,7 @@ namespace Facepunch.CoreWars.UI
 			else
 			{
 				var reasons = new string[] { "decided to end it all" };
-				Reason.Text = Rand.FromArray( reasons );
+				Reason.Text = Game.Random.FromArray( reasons );
 			}
 
 			EndTime = Time.Now + 3f;
@@ -55,7 +55,7 @@ namespace Facepunch.CoreWars.UI
 			{
 				if ( info.KillFeedReasons.Length > 0 )
 				{
-					Reason.Text = Rand.FromArray( info.KillFeedReasons );
+					Reason.Text = Game.Random.FromArray( info.KillFeedReasons );
 				}
 			}
 
@@ -134,7 +134,7 @@ namespace Facepunch.CoreWars.UI
 
 		public override void Tick()
 		{
-			ToastsContainer.SetClass( "is-editor", Game.Current.IsEditorMode );
+			ToastsContainer.SetClass( "is-editor", CoreWarsGame.IsEditorMode );
 			base.Tick();
 		}
 	}

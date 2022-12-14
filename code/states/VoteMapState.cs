@@ -9,7 +9,7 @@ namespace Facepunch.CoreWars
 
 		public override void OnEnter()
 		{
-			if ( IsServer )
+			if ( Game.IsServer )
 			{
 				VoteMap = new();
 			}
@@ -20,7 +20,7 @@ namespace Facepunch.CoreWars
 		{
 			if ( VoteMap.IsValid() && VoteMap.VoteTimeLeft )
 			{
-				Global.ChangeLevel( VoteMap.WinningMap );
+				Game.ChangeLevel( VoteMap.WinningMap );
 			}
 		}
 	}

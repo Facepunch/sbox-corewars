@@ -4,16 +4,13 @@ namespace Facepunch.CoreWars
 {
 	public class BaseState : BaseNetworkable
 	{
-		public bool IsServer => Host.IsServer;
-		public bool IsClient => Host.IsClient;
-
 		public StateSystem System { get; set; }
 
 		public virtual void OnEnter() { }
 
 		public virtual void OnLeave() { }
 
-		public virtual bool CanHearPlayerVoice( Client a, Client b )
+		public virtual bool CanHearPlayerVoice( IClient a, IClient b )
 		{
 			return false;
 		}

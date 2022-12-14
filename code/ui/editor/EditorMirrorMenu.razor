@@ -36,7 +36,7 @@
 		Current = new EditorMirrorMenu();
 		Current.PopulateItems();
 
-		Local.Hud.FindPopupPanel().AddChild( Current );
+		Game.RootPanel.FindPopupPanel().AddChild( Current );
 	}
 
 	public void PopulateItems()
@@ -79,7 +79,7 @@
 
 	protected virtual void Save()
 	{
-		if ( Local.Pawn is EditorPlayer player )
+		if ( Game.LocalPawn is EditorPlayer player )
 		{
 			if ( player.Tool is MirrorBlocksTool tool )
 			{
@@ -93,7 +93,7 @@
 
 	protected virtual void Cancel()
 	{
-		if ( Local.Pawn is EditorPlayer player )
+		if ( Game.LocalPawn is EditorPlayer player )
 		{
 			if ( player.Tool is MirrorBlocksTool tool )
 			{

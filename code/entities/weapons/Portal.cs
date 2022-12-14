@@ -27,7 +27,7 @@ namespace Facepunch.CoreWars
 
 		protected override void OnThrown()
 		{
-			if ( IsServer && Owner is CoreWarsPlayer player )
+			if ( Game.IsServer && Owner is CoreWarsPlayer player )
 			{
 				PlayerToTeleport = player;
 				EnableDrawing = false;
@@ -36,7 +36,7 @@ namespace Facepunch.CoreWars
 
 		protected override void OnProjectileHit( BulletDropProjectile projectile, TraceResult trace )
 		{
-			if ( IsClient ) return;
+			if ( Game.IsClient ) return;
 
 			var position = projectile.Position;
 			var world = VoxelWorld.Current;

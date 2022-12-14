@@ -14,11 +14,11 @@ namespace Facepunch.CoreWars.Editor
 		private TimeUntil NextBlockPlace { get; set; }
 		private Vector3? StartPosition { get; set; }
 
-		public override void Simulate( Client client )
+		public override void Simulate( IClient client )
 		{
 			var world = VoxelWorld.Current;
 
-			if ( IsClient && world.IsValid() )
+			if ( Game.IsClient && world.IsValid() )
 			{
 				var aimVoxelPosition = GetAimVoxelPosition( 6f );
 				var aimSourcePosition = world.ToSourcePosition( aimVoxelPosition );
@@ -44,7 +44,7 @@ namespace Facepunch.CoreWars.Editor
 		{
 			base.OnSelected();
 
-			if ( IsClient )
+			if ( Game.IsClient )
 			{
 				VoxelWorld.Current.GlobalOpacity = 0.8f;
 
@@ -65,7 +65,7 @@ namespace Facepunch.CoreWars.Editor
 		{
 			base.OnDeselected();
 
-			if ( IsClient )
+			if ( Game.IsClient )
 			{
 				VoxelWorld.Current.GlobalOpacity = 1f;
 				Player.EditorCamera.ZoomOut = 0f;
@@ -95,7 +95,7 @@ namespace Facepunch.CoreWars.Editor
 			}
 		}
 
-		protected override void OnPrimary( Client client )
+		protected override void OnPrimary( IClient client )
 		{
 			if ( NextBlockPlace )
 			{
@@ -104,7 +104,7 @@ namespace Facepunch.CoreWars.Editor
 
 				if ( StartPosition.HasValue )
 				{
-					if ( IsServer )
+					if ( Game.IsServer )
 					{
 						var startVoxelPosition = VoxelWorld.Current.ToVoxelPosition( StartPosition.Value );
 						var endVoxelPosition = aimVoxelPosition;
@@ -126,7 +126,7 @@ namespace Facepunch.CoreWars.Editor
 			}
 		}
 
-		protected override void OnSecondary( Client client )
+		protected override void OnSecondary( IClient client )
 		{
 			if ( NextBlockPlace )
 			{
@@ -135,7 +135,7 @@ namespace Facepunch.CoreWars.Editor
 
 				if ( StartPosition.HasValue )
 				{
-					if ( IsServer )
+					if ( Game.IsServer )
 					{
 						var startVoxelPosition = VoxelWorld.Current.ToVoxelPosition( StartPosition.Value );
 						var endVoxelPosition = aimVoxelPosition;

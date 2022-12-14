@@ -8,7 +8,7 @@ namespace Facepunch.CoreWars
 
 		public void Set( BaseState state )
 		{
-			Host.AssertServer();
+			Game.AssertServer();
 
 			if ( Active != null )
 			{

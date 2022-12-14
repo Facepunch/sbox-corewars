@@ -41,9 +41,6 @@ namespace Facepunch.CoreWars
 
 		public DuckController Duck { get; private set; }
 
-		public bool IsServer => Host.IsServer;
-		public bool IsClient => Host.IsClient;
-
 		private int StuckTries { get; set; } = 0;
 
 		public MoveController()
@@ -543,7 +540,7 @@ namespace Facepunch.CoreWars
 				return false;
 			}
 
-			if ( IsClient ) return true;
+			if ( Game.IsClient ) return true;
 
 			var attemptsPerTick = 20;
 

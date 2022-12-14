@@ -52,7 +52,7 @@ namespace Facepunch.CoreWars
 
 		protected override float GetNextGenerateTime()
 		{
-			if ( Game.TryGetState<GameState>( out var state ) )
+			if ( CoreWarsGame.TryGetState<GameState>( out var state ) )
 			{
 				if ( state.HasReachedStage( RoundStage.CrystalIII ) )
 					return 15f;

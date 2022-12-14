@@ -25,7 +25,7 @@ namespace Facepunch.CoreWars.Editor
 
 		protected override bool ShouldOpen()
 		{
-			if ( Local.Pawn is not EditorPlayer player )
+			if ( Game.LocalPawn is not EditorPlayer player )
 				return false;
 
 			if ( Input.Down( InputButton.Duck ) )
@@ -36,7 +36,7 @@ namespace Facepunch.CoreWars.Editor
 
 		private void SetToolMode( EntitiesToolMode mode )
 		{
-			if ( Local.Pawn is not EditorPlayer player )
+			if ( Game.LocalPawn is not EditorPlayer player )
 				return;
 
 			EntitiesTool.ChangeModeCmd( (int)mode );

@@ -38,7 +38,7 @@ namespace Facepunch.CoreWars
 
 		public override void AttackPrimary()
 		{
-			if ( IsServer && WeaponItem.IsValid() )
+			if ( Game.IsServer && WeaponItem.IsValid() )
 			{
 				DamageVoxelInDirection( 80f, Config.Damage );
 			}

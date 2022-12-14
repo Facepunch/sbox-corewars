@@ -49,7 +49,7 @@ namespace Facepunch.CoreWars
 			Effect?.Destroy( true );
 			Effect = Particles.Create( ParticlePath, this );
 
-			var isEditorMode = Game.Current.IsEditorMode;
+			var isEditorMode = CoreWarsGame.IsEditorMode;
 
 			if ( isEditorMode )
 			{

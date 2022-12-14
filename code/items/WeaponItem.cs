@@ -46,7 +46,7 @@ namespace Facepunch.CoreWars
 
 		public override void OnRemoved()
 		{
-			if ( IsServer && Weapon.IsValid() )
+			if ( Game.IsServer && Weapon.IsValid() )
 			{
 				Weapon.Delete();
 			}

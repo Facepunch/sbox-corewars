@@ -15,7 +15,7 @@ namespace Facepunch.CoreWars
 
 		public override void Spawn()
 		{
-			var isEditorMode = Game.Current.IsEditorMode;
+			var isEditorMode = CoreWarsGame.IsEditorMode;
 
 			EnableDrawing = isEditorMode;
 			Transmit = isEditorMode ? TransmitType.Always : TransmitType.Never;
@@ -25,7 +25,7 @@ namespace Facepunch.CoreWars
 
 		public override void ClientSpawn()
 		{
-			var isEditorMode = Game.Current.IsEditorMode;
+			var isEditorMode = CoreWarsGame.IsEditorMode;
 
 			if ( isEditorMode )
 			{
@@ -54,7 +54,7 @@ namespace Facepunch.CoreWars
 
 			SetupPhysicsFromAABB( PhysicsMotionType.Keyframed, Transform.PointToLocal( mins ), Transform.PointToLocal( maxs ) );
 
-			var isEditorMode = Game.Current.IsEditorMode;
+			var isEditorMode = CoreWarsGame.IsEditorMode;
 
 			if ( !isEditorMode )
 			{
@@ -86,7 +86,7 @@ namespace Facepunch.CoreWars
 		{
 			if ( !VoxelWorld.Current.IsValid() ) return;
 
-			var isEditorMode = Game.Current.IsEditorMode;
+			var isEditorMode = CoreWarsGame.IsEditorMode;
 
 			if ( isEditorMode && Volume.IsValid() )
 			{

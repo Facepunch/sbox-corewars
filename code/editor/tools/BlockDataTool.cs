@@ -49,13 +49,13 @@ namespace Facepunch.CoreWars.Editor
 			DebugOverlay.Text( $"Edit {block.FriendlyName}", sourceBBox.Center, Color.Cyan, Time.Delta );
 		}
 
-		protected override void OnPrimary( Client client )
+		protected override void OnPrimary( IClient client )
 		{
 			if ( NextActionTime )
 			{
 				var position = GetTargetBlockPosition();
 
-				if ( IsClient && position.HasValue )
+				if ( Game.IsClient && position.HasValue )
 				{
 					EditorBlockData.SendOpenRequest( position.Value.x, position.Value.y, position.Value.z );
 				}
@@ -64,9 +64,9 @@ namespace Facepunch.CoreWars.Editor
 			}
 		}
 
-		protected override void OnSecondary( Client client )
+		protected override void OnSecondary( IClient client )
 		{
-			if ( IsServer )
+			if ( Game.IsServer )
 			{
 
 			}

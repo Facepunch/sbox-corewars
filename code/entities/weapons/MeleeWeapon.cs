@@ -39,7 +39,7 @@ namespace Facepunch.CoreWars
 			MeleeStrike( Config.Damage * damageScale, Force );
 			PlaySound( SwingSound );
 
-			if ( IsServer && WeaponItem.IsValid() && DoesBlockDamage )
+			if ( Game.IsServer && WeaponItem.IsValid() && DoesBlockDamage )
 			{
 				DamageVoxelInDirection( MeleeRange, Config.Damage + ( Config.Damage * ( WeaponItem.Tier - 1 ) * 0.75f ) );
 			}
@@ -52,7 +52,7 @@ namespace Facepunch.CoreWars
 
 		public override void CreateViewModel()
 		{
-			Host.AssertClient();
+			Game.AssertClient();
 
 			if ( WeaponItem.IsValid() )
 			{
@@ -85,7 +85,7 @@ namespace Facepunch.CoreWars
 
 		protected override void OnWeaponItemChanged()
 		{
-			if ( IsServer && WeaponItem.IsValid() && !string.IsNullOrEmpty( WeaponItem.WorldModelPath ) )
+			if ( Game.IsServer && WeaponItem.IsValid() && !string.IsNullOrEmpty( WeaponItem.WorldModelPath ) )
 			{
 				SetModel( WeaponItem.WorldModelPath );
 				SetMaterialGroup( WeaponItem.WorldModelMaterialGroup );

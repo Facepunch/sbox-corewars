@@ -78,8 +78,6 @@ public class InventoryItem : IValid
 		}
 	}
 
-	public bool IsServer => Host.IsServer;
-	public bool IsClient => Host.IsClient;
 	public bool IsInstance => ItemId > 0;
 
 	public bool IsDirty
@@ -88,7 +86,7 @@ public class InventoryItem : IValid
 
 		set
 		{
-			if ( IsServer )
+			if ( Game.IsServer )
 			{
 				if ( Parent == null )
 				{
@@ -177,7 +175,7 @@ public class InventoryItem : IValid
 
 		if ( WorldEntity.IsValid() )
 		{
-			if ( IsServer )
+			if ( Game.IsServer )
 			{
 				WorldEntity.Delete();
 			}

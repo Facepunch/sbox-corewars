@@ -10,11 +10,9 @@ namespace Facepunch.CoreWars.Editor
 
 		[Net] public EditorPlayer Player { get; set; }
 
-		public bool IsClient => Host.IsClient;
-		public bool IsServer => Host.IsServer;
 		public bool IsValid => true;
 
-		public virtual void Simulate( Client client )
+		public virtual void Simulate( IClient client )
 		{
 			if ( Input.Pressed( InputButton.PrimaryAttack ) )
 			{
@@ -43,7 +41,7 @@ namespace Facepunch.CoreWars.Editor
 
 		public virtual void OnDeselected()
 		{
-			if ( IsClient )
+			if ( Game.IsClient )
 			{
 				var display = EditorToolDisplay.Current;
 				display?.ClearHotkeys();
@@ -55,7 +53,7 @@ namespace Facepunch.CoreWars.Editor
 			if ( Prediction.CurrentHost.IsValid() )
 				return Prediction.CurrentHost.Pawn as EditorPlayer;
 			else
-				return Local.Pawn as EditorPlayer;
+				return Game.LocalPawn as EditorPlayer;
 		}
 
 		protected BlockFace GetTargetBlockFace( float range )
@@ -87,12 +85,12 @@ namespace Facepunch.CoreWars.Editor
 			return aimVoxelPosition;
 		}
 
-		protected virtual void OnPrimary( Client client )
+		protected virtual void OnPrimary( IClient client )
 		{
 
 		}
 
-		protected virtual void OnSecondary( Client client )
+		protected virtual void OnSecondary( IClient client )
 		{
 
 		}

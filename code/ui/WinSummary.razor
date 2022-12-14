@@ -95,8 +95,8 @@
 {
     public static WinSummary Current { get; private set; }
 
-    public List<Client> CoresDestroyedList { get; private set; }
-    public List<Client> MostKillsList { get; private set; }
+    public List<IClient> CoresDestroyedList { get; private set; }
+    public List<IClient> MostKillsList { get; private set; }
     public string NextRoundTime => Math.Max( TimeUntilNextRound.Relative.CeilToInt(), 0 ).ToString();
     public Panel WinningTeamPanel { get; private set; }
     public Team WinningTeam { get; private set; }
@@ -129,7 +129,7 @@
         TimeUntilNextRound = nextRoundTime;
         WinningTeam = winningTeam;
 
-        var allValidClients = Client.All.Where( c => c.Pawn is CoreWarsPlayer player && player.Team != Team.None );
+        var allValidClients = Game.Clients.Where( c => c.Pawn is CoreWarsPlayer player && player.Team != Team.None );
 
         MostKillsList = allValidClients
         .OrderBy( a => a.GetInt( "kills" ) )

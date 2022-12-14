@@ -9,7 +9,7 @@ namespace Facepunch.CoreWars
 {
 	public partial class CoreWarsPlayer : BasePlayer, IResettable, INameplate
 	{
-		public static CoreWarsPlayer Me => Local.Pawn as CoreWarsPlayer;
+		public static CoreWarsPlayer Me => Game.LocalPawn as CoreWarsPlayer;
 
 		[Net, Change( nameof( OnTeamChanged ) )] public Team Team { get; private set; }
 		[Net] public IDictionary<StatModifier, float> Modifiers { get; private set; }
@@ -45,7 +45,7 @@ namespace Facepunch.CoreWars
 		{
 			get
 			{
-				if ( Local.Pawn is CoreWarsPlayer player )
+				if ( Game.LocalPawn is CoreWarsPlayer player )
 				{
 					return player.Team == Team;
 				}
@@ -152,7 +152,7 @@ namespace Facepunch.CoreWars
 			item.OnPurchased( player );
 		}
 
-		public CoreWarsPlayer( Client client ) : this()
+		public CoreWarsPlayer( IClient client ) : this()
 		{
 			HotbarIndex = 0;
 			client.Pawn = this;
@@ -425,7 +425,7 @@ namespace Facepunch.CoreWars
 
 		public void SetTeam( Team team )
 		{
-			Host.AssertServer();
+			Game.AssertServer();
 
 			Team = team;
 			Core = team.GetCore();
@@ -435,7 +435,7 @@ namespace Facepunch.CoreWars
 
 		public void AssignRandomTeam( bool assignToSmallestTeam = false )
 		{
-			var teams = Game.GetValidTeams().ToArray();
+			var teams = CoreWarsGame.GetValidTeams().ToArray();
 
 			if ( teams.Length == 0 )
 			{
@@ -448,7 +448,7 @@ namespace Facepunch.CoreWars
 			if ( assignToSmallestTeam )
 				team = teams.OrderBy( t => t.GetPlayers().Count() ).First();
 			else
-				team = Rand.FromArray( teams );
+				team = Game.Random.FromArray( teams );
 
 			SetTeam( team );
 		}
@@ -562,7 +562,7 @@ namespace Facepunch.CoreWars
 				if ( world.Spawnpoints.Count == 0 )
 					return null;
 
-				return new Transform( Rand.FromList( world.Spawnpoints ) );
+				return new Transform( Game.Random.FromList( world.Spawnpoints ) );
 			}
 
 			var teamSpawnpoints = spawnpoints.Where( s => s.Team == Team ).ToList();
@@ -574,13 +574,13 @@ namespace Facepunch.CoreWars
 				var lobbySpawnpoints = teamSpawnpoints.Where( s => s.Team == Team.None ).ToList();
 
 				if ( lobbySpawnpoints.Count > 0 )
-					spawnpoint = Rand.FromList( lobbySpawnpoints );
+					spawnpoint = Game.Random.FromList( lobbySpawnpoints );
 				else
-					spawnpoint = Rand.FromList( spawnpoints );
+					spawnpoint = Game.Random.FromList( spawnpoints );
 			}
 			else
 			{
-				spawnpoint = Rand.FromList( teamSpawnpoints );
+				spawnpoint = Game.Random.FromList( teamSpawnpoints );
 			}
 
 			if ( !spawnpoint.IsValid() )
@@ -605,7 +605,7 @@ namespace Facepunch.CoreWars
 
 			SetModel( "models/citizen/citizen.vmdl" );
 			AttachClothing( "models/citizen_clothes/shoes/slippers/models/slippers.vmdl" );
-			SetMaterialGroup( Rand.Int( MaterialGroupCount - 1 ) );
+			SetMaterialGroup( Game.Random.Int( MaterialGroupCount - 1 ) );
 
 			Tags.Add( "player" );
 
@@ -683,7 +683,7 @@ namespace Facepunch.CoreWars
 
 		public override void Respawn()
 		{
-			var isLobbyState = Game.IsState<LobbyState>();
+			var isLobbyState = CoreWarsGame.IsState<LobbyState>();
 
 			UI.RespawnScreen.Hide( To.Single( this ) );
 
@@ -702,7 +702,7 @@ namespace Facepunch.CoreWars
 			}
 			else
 			{
-				Game.Current?.PlayerRespawned( this );
+				CoreWarsGame.Entity?.PlayerRespawned( this );
 
 				EnableAllCollisions = true;
 				ResetEyeRotation( To.Single( this ) );
@@ -738,7 +738,7 @@ namespace Facepunch.CoreWars
 			ResetInterpolation();
 		}
 
-		public override void FrameSimulate( Client client )
+		public override void FrameSimulate( IClient client )
 		{
 			if ( LifeState == LifeState.Alive )
 				FirstPersonCamera?.Update();
@@ -749,12 +749,12 @@ namespace Facepunch.CoreWars
 			Controller?.FrameSimulate();
 		}
 
-		public override void Simulate( Client client )
+		public override void Simulate( IClient client )
 		{
 			var world = VoxelWorld.Current;
 			if ( !world.IsValid() ) return;
 
-			if ( Game.IsState<GameState>() )
+			if ( CoreWarsGame.IsState<GameState>() )
 			{
 				if ( LifeState == LifeState.Alive )
 				{
@@ -770,7 +770,7 @@ namespace Facepunch.CoreWars
 			if ( viewer.IsInWorld() && !viewer.IsCurrentChunkReady )
 				return;
 
-			if ( IsServer && viewer.IsBelowWorld() )
+			if ( Game.IsServer && viewer.IsBelowWorld() )
 			{
 				if ( LifeState == LifeState.Alive )
 				{
@@ -801,7 +801,7 @@ namespace Facepunch.CoreWars
 					return;
 				}
 
-				if ( !Game.FriendlyFire && attacker.Team == Team )
+				if ( !CoreWarsGame.FriendlyFire && attacker.Team == Team )
 					return;
 
 				info.Damage *= attacker.GetModifier( StatModifier.Damage );
@@ -868,7 +868,7 @@ namespace Facepunch.CoreWars
 			}
 		}
 
-		protected virtual void SimulateBlockGhost( Client client )
+		protected virtual void SimulateBlockGhost( IClient client )
 		{
 			var world = VoxelWorld.Current;
 			var container = Hotbar;
@@ -905,7 +905,7 @@ namespace Facepunch.CoreWars
 			}
 		}
 
-		protected virtual void TryPlaceBlockItem( Client client, BlockItem item, Vector3 eyePosition, Vector3 direction )
+		protected virtual void TryPlaceBlockItem( IClient client, BlockItem item, Vector3 eyePosition, Vector3 direction )
 		{
 			var position = GetBlockPosition( EyePosition, EyeRotation.Forward );
 			if ( !position.HasValue ) return;
@@ -942,7 +942,7 @@ namespace Facepunch.CoreWars
 			}
 		}
 
-		protected virtual void SimulateGameState( Client client )
+		protected virtual void SimulateGameState( IClient client )
 		{
 			Projectiles.Simulate();
 
@@ -956,12 +956,12 @@ namespace Facepunch.CoreWars
 			else if ( IsOutOfBreath && Stamina >= 25f )
 				IsOutOfBreath = false;
 
-			if ( IsClient )
+			if ( Game.IsClient )
 			{
 				SimulateBlockGhost( client );
 			}
 
-			if ( IsServer )
+			if ( Game.IsServer )
 			{
 				if ( Input.Pressed( InputButton.PrimaryAttack ) && ActiveChild is Weapon )
 				{
@@ -1072,7 +1072,7 @@ namespace Facepunch.CoreWars
 			else
 				ActiveChild = null;
 
-			if ( IsClient && Prediction.FirstTime )
+			if ( Game.IsClient && Prediction.FirstTime )
 			{
 				if ( Input.Released( InputButton.Use ) )
 				{
@@ -1156,7 +1156,7 @@ namespace Facepunch.CoreWars
 
 		public override void OnAnimEventFootstep( Vector3 position, int foot, float volume )
 		{
-			if ( LifeState == LifeState.Dead || !IsClient )
+			if ( LifeState == LifeState.Dead || !Game.IsClient )
 				return;
 
 			if ( TimeSinceLastFootstep < 0.2f )
@@ -1193,7 +1193,7 @@ namespace Facepunch.CoreWars
 		{
 			base.Touch( other );
 
-			if ( IsClient ) return;
+			if ( Game.IsClient ) return;
 
 			if ( LifeState == LifeState.Dead )
 				return;
@@ -1260,7 +1260,7 @@ namespace Facepunch.CoreWars
 
 		protected override void OnDestroy()
 		{
-			if ( IsServer )
+			if ( Game.IsServer )
 			{
 				InventorySystem.Remove( Hotbar, true );
 				InventorySystem.Remove( Backpack, true );
@@ -1480,7 +1480,7 @@ namespace Facepunch.CoreWars
 
 				if ( item is IConsumableItem consumable )
 				{
-					if ( IsServer )
+					if ( Game.IsServer )
 					{
 						consumable.Consume( this );
 					}

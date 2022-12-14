@@ -70,7 +70,7 @@ namespace Facepunch.CoreWars
 
 		protected override void OnProjectileFired( CrossbowBoltProjectile projectile )
 		{
-			if ( IsClient && IsFirstPersonMode )
+			if ( Game.IsClient && IsFirstPersonMode )
 			{
 				projectile.Position = EffectEntity.Position + EffectEntity.Rotation.Forward * 24f + EffectEntity.Rotation.Right * 8f + EffectEntity.Rotation.Down * 4f;
 			}
@@ -83,7 +83,7 @@ namespace Facepunch.CoreWars
 
 		protected override void OnProjectileHit( CrossbowBoltProjectile projectile, TraceResult trace )
 		{
-			if ( IsServer && trace.Entity is CoreWarsPlayer victim )
+			if ( Game.IsServer && trace.Entity is CoreWarsPlayer victim )
 			{
 				var info = new DamageInfo()
 					.WithAttacker( Owner )

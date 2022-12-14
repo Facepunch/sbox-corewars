@@ -51,7 +51,7 @@ namespace Facepunch.CoreWars
 			var explosion = Particles.Create( "particles/weapons/fireball/fireball_explosion.vpcf" );
 			explosion.SetPosition( 0, position - projectile.Velocity.Normal * projectile.Radius );
 
-			if ( IsClient ) return;
+			if ( Game.IsClient ) return;
 
 			var world = VoxelWorld.Current;
 			var voxelPosition = world.ToVoxelPosition( position );

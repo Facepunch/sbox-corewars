@@ -9,12 +9,15 @@ using System.Threading.Tasks;
 
 namespace Facepunch.CoreWars
 {
-	public partial class Game : GameManager
+	public partial class CoreWarsGame : GameManager
 	{
-		[Net] public StateSystem StateSystem { get; private set; }
-		[Net] public bool IsEditorMode { get; private set; }
+		public static CoreWarsGame Entity => Current as CoreWarsGame;
 
-		public new static Game Current { get; private set; }
+		public static bool IsEditorMode => Entity?.InernalIsEditorMode ?? false;
+		public static StateSystem StateSystem => Entity?.InernalStateSystem;
+
+		[Net] private StateSystem InernalStateSystem { get; set; }
+		[Net] private bool InernalIsEditorMode { get; set; }
 
 		[ConVar.Server( "cw_friendly_fire", Saved = true )]
 		public static bool FriendlyFire { get; set; } = false;
@@ -23,12 +26,12 @@ namespace Facepunch.CoreWars
 
 		public static T GetStateAs<T>() where T : BaseState
 		{
-			return Current.StateSystem.Active as T;
+			return StateSystem.Active as T;
 		}
 
 		public static bool IsState<T>() where T : BaseState
 		{
-			return Current.StateSystem.Active is T;
+			return StateSystem.Active is T;
 		}
 
 		public static bool TryGetState<T>( out T state ) where T : BaseState
@@ -52,15 +55,15 @@ namespace Facepunch.CoreWars
 			return ValidTeamSet;
 		}
 
-		public Game()
+		public CoreWarsGame() : base()
 		{
-			Current = this;
+
 		}
 
 		public override void Spawn()
 		{
-			IsEditorMode = Global.MapName == "facepunch.cw_editor_map";
-			StateSystem = new();
+			InernalIsEditorMode = Game.Server.MapIdent == "facepunch.cw_editor_map";
+			InernalStateSystem = new();
 
 			InventorySystem.Initialize();
 			base.Spawn();
@@ -74,8 +77,8 @@ namespace Facepunch.CoreWars
 			ItemTag.Register( "uses_stamina", "Uses Stamina", Color.Cyan );
 			ItemTag.Register( "droppable", "Droppable", Color.Yellow );
 
-			Local.Hud?.Delete( true );
-			Local.Hud = IsEditorMode ? new EditorHud() : new UI.Hud();
+			Game.RootPanel?.Delete( true );
+			Game.RootPanel = InernalIsEditorMode ? new EditorHud() : new UI.Hud();
 
 			base.ClientSpawn();
 		}
@@ -83,7 +86,7 @@ namespace Facepunch.CoreWars
 		[ConCmd.Server( "cw_end_game" )]
 		public static void EndGameCmd()
 		{
-			Current.StateSystem.Set( new SummaryState() );
+			Entity.InernalStateSystem.Set( new SummaryState() );
 		}
 
 		[ConCmd.Server( "cw_core_revive" )]
@@ -139,11 +142,11 @@ namespace Facepunch.CoreWars
 		{
 			if ( suicide )
 			{
-				UI.ToastList.Instance.AddKillFeed( Local.Pawn as CoreWarsPlayer, true );
+				UI.ToastList.Instance.AddKillFeed( Game.LocalPawn as CoreWarsPlayer, true );
 			}
 			else
 			{
-				UI.ToastList.Instance.AddKillFeed( Local.Pawn as CoreWarsPlayer, Local.Pawn as CoreWarsPlayer, (Local.Pawn as CoreWarsPlayer).ActiveChild );
+				UI.ToastList.Instance.AddKillFeed( Game.LocalPawn as CoreWarsPlayer, Game.LocalPawn as CoreWarsPlayer, (Game.LocalPawn as CoreWarsPlayer).ActiveChild );
 			}
 		}
 
@@ -224,21 +227,19 @@ namespace Facepunch.CoreWars
 			StateSystem.Active?.OnPlayerKilled( player, player.LastDamageTaken );
 		}
 
-		public override bool CanHearPlayerVoice( Client a, Client b )
+		public override bool CanHearPlayerVoice( IClient a, IClient b )
 		{
 			return StateSystem.Active.CanHearPlayerVoice( a, b );
 		}
 
-		public override void DoPlayerNoclip( Client client ) { }
-
-		public override void ClientDisconnect( Client client, NetworkDisconnectionReason reason )
+		public override void ClientDisconnect( IClient client, NetworkDisconnectionReason reason )
 		{
 			InventorySystem.ClientDisconnected( client );
 			StateSystem.Active?.OnPlayerDisconnected( client.Pawn as CoreWarsPlayer );
 			base.ClientDisconnect( client, reason );
 		}
 
-		public override void ClientJoined( Client client )
+		public override void ClientJoined( IClient client )
 		{
 			base.ClientJoined( client );
 
@@ -263,7 +264,7 @@ namespace Facepunch.CoreWars
 
 		public override void RenderHud()
 		{
-			var pawn = Local.Pawn as CoreWarsPlayer;
+			var pawn = Game.LocalPawn as CoreWarsPlayer;
 			if ( !pawn.IsValid() ) return;
 
 			pawn.RenderHud( Screen.Size );
@@ -279,7 +280,7 @@ namespace Facepunch.CoreWars
 
 		public override void PostLevelLoaded()
 		{
-			if ( !IsServer )
+			if ( !Game.IsServer )
 				return;
 
 			if ( IsEditorMode )
@@ -351,7 +352,7 @@ namespace Facepunch.CoreWars
 
 		private void OnMapInitialized()
 		{
-			var clients = Client.All.ToList();
+			var clients = Game.Clients.ToList();
 
 			foreach ( var client in clients )
 			{
@@ -359,7 +360,7 @@ namespace Facepunch.CoreWars
 			}
 		}
 
-		private void SendMapToClient( Client client )
+		private void SendMapToClient( IClient client )
 		{
 			VoxelWorld.Current.Send( client );
 

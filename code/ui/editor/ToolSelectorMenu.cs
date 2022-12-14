@@ -29,7 +29,7 @@ namespace Facepunch.CoreWars.Editor
 
 			AddItem( "Block List", "View available blocks", "textures/ui/blocklist.png", () => EditorBlockList.Open() );
 
-			if ( Local.Client.IsListenServerHost )
+			if ( Game.LocalClient.IsListenServerHost )
 			{
 				AddItem( "Save World", "Save world to disk", "textures/ui/save.png", () => EditorSaveDialog.Open() );
 				AddItem( "Load World", "Load world from disk", "textures/ui/load.png", () => EditorLoadDialog.Open() );

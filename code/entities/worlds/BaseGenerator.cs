@@ -48,7 +48,7 @@ namespace Facepunch.CoreWars
 			position.x -= iconSize * 0.5f;
 			position.y -= iconSize * 0.5f;
 
-			var distanceToPawn = Local.Pawn.Position.Distance( Position );
+			var distanceToPawn = Game.LocalPawn.Position.Distance( Position );
 
 			if ( distanceToPawn <= 1024f )
 				iconAlpha = distanceToPawn.Remap( 512f, 1024f, 0f, 1f );
@@ -97,7 +97,7 @@ namespace Facepunch.CoreWars
 		[Event.Tick.Server]
 		protected virtual void ServerTick()
 		{
-			if ( !Game.IsState<GameState>() )
+			if ( !CoreWarsGame.IsState<GameState>() )
 				return;
 
 			if ( NextGenerateTime )

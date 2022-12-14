@@ -43,7 +43,7 @@ namespace Facepunch.CoreWars
 
 		public override void OnNewModel( Model model )
 		{
-			if ( IsClient )
+			if ( Game.IsClient )
 			{
 				VoxelWorld.RegisterVoxelModel( this );
 			}
@@ -80,7 +80,7 @@ namespace Facepunch.CoreWars
 
 		protected override void OnDestroy()
 		{
-			if ( IsClient )
+			if ( Game.IsClient )
 			{
 				VoxelWorld.RegisterVoxelModel( this );
 				Nameplate?.Delete();

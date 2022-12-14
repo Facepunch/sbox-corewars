@@ -37,7 +37,7 @@
 
     public override void Tick()
     {
-        if ( Game.TryGetState<GameState>( out var state ) )
+        if ( CoreWarsGame.TryGetState<GameState>( out var state ) )
         {
             var iconPath = state.Stage.GetIcon();
             Icon.Style.SetBackgroundImage( iconPath );
@@ -60,7 +60,7 @@
 
     private string GetNextStageText()
     {
-		if ( Game.TryGetState<GameState>( out var state ) )
+		if ( CoreWarsGame.TryGetState<GameState>( out var state ) )
 		{
 			return state.Stage.GetNextStage().GetName();
 		}
@@ -70,7 +70,7 @@
 
 	private string GetStageText()
 	{
-		if ( Game.TryGetState<GameState>( out var state ) )
+		if ( CoreWarsGame.TryGetState<GameState>( out var state ) )
 		{
 			return state.Stage.GetName();
 		}
@@ -80,7 +80,7 @@
 
 	private string GetTimeText()
 	{
-		if ( Game.TryGetState<GameState>( out var state ) )
+		if ( CoreWarsGame.TryGetState<GameState>( out var state ) )
 		{
 			return TimeSpan.FromSeconds( state.NextStageTime ).ToString( @"mm\:ss" );
 		}
@@ -90,7 +90,7 @@
 
 	private bool IsHidden()
 	{
-		if ( IDialog.IsActive() || !Game.IsState<GameState>() )
+		if ( IDialog.IsActive() || !CoreWarsGame.IsState<GameState>() )
 			return true;
 
 		return false;

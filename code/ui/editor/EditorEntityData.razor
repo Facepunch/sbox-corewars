@@ -55,7 +55,7 @@
 		Current = new EditorEntityData( entity );
 		Current.PopulateItems();
 
-		var popup = Local.Hud.FindPopupPanel();
+		var popup = Game.RootPanel.FindPopupPanel();
 		popup?.AddChild( Current );
 	}
 

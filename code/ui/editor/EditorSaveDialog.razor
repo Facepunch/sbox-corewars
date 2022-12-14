@@ -32,7 +32,7 @@
 		Current?.Delete();
 		Current = new EditorSaveDialog();
 
-		Local.Hud.AddChild( Current );
+		Game.RootPanel.AddChild( Current );
 	}
 
 	public override void Tick()
@@ -44,7 +44,7 @@
 
 	protected virtual void HandleSubmit()
 	{
-		Game.SaveEditorMapCmd( Input.Text );
+        CoreWarsGame.SaveEditorMapCmd( Input.Text );
 	}
 
 	protected virtual void HandleClose()
@@ -59,7 +59,7 @@
 		Input.AutoCompleteHandler = DoAutoComplete;
 		Input.AutoCompleteList = Suggestions;
 
-		var state = Game.GetStateAs<EditorState>();
+		var state = CoreWarsGame.GetStateAs<EditorState>();
 
 		if ( !string.IsNullOrEmpty( state.CurrentFileName ) )
 		{

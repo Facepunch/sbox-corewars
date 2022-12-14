@@ -38,7 +38,7 @@ namespace Facepunch.CoreWars.Editor
 			}
 		}
 
-		public EditorPlayer( Client client ) : this()
+		public EditorPlayer( IClient client ) : this()
 		{
 			UndoStack = new( 20 );
 			RedoStack = new( 20 );
@@ -75,14 +75,14 @@ namespace Facepunch.CoreWars.Editor
 
 		public void Perform( EditorAction action )
 		{
-			Host.AssertServer();
+			Game.AssertServer();
 			UndoStack.Push( action );
 			action.Perform();
 		}
 
 		public void Undo()
 		{
-			Host.AssertServer();
+			Game.AssertServer();
 
 			if ( UndoStack.TryPop( out var action ) )
 			{
@@ -93,7 +93,7 @@ namespace Facepunch.CoreWars.Editor
 
 		public void Redo()
 		{
-			Host.AssertServer();
+			Game.AssertServer();
 
 			if ( RedoStack.TryPop( out var action ) )
 			{
@@ -104,7 +104,7 @@ namespace Facepunch.CoreWars.Editor
 
 		public void SetActiveTool( EditorTool tool )
 		{
-			Host.AssertServer();
+			Game.AssertServer();
 
 			if ( Tool.IsValid() )
 			{
@@ -221,14 +221,14 @@ namespace Facepunch.CoreWars.Editor
 			base.Respawn();
 		}
 
-		public override void FrameSimulate( Client client )
+		public override void FrameSimulate( IClient client )
 		{
 			EditorCamera?.Update();
 			Controller?.SetActivePlayer( this );
 			Controller?.FrameSimulate();
 		}
 
-		public override void Simulate( Client client )
+		public override void Simulate( IClient client )
 		{
 			SimulateAnimation();
 
@@ -252,13 +252,13 @@ namespace Facepunch.CoreWars.Editor
 
 				CurrentHotbarIndex = (ushort)currentSlotIndex;
 
-				if ( IsClient && Input.Down( InputButton.Duck ) && Input.Pressed( InputButton.Back ) )
+				if ( Game.IsClient && Input.Down( InputButton.Duck ) && Input.Pressed( InputButton.Back ) )
 				{
-					var state = Game.GetStateAs<EditorState>();
+					var state = CoreWarsGame.GetStateAs<EditorState>();
 
 					if ( !string.IsNullOrEmpty( state.CurrentFileName ) )
 					{
-						Game.SaveEditorMapCmd( state.CurrentFileName );
+						CoreWarsGame.SaveEditorMapCmd( state.CurrentFileName );
 					}
 					else
 					{
@@ -266,7 +266,7 @@ namespace Facepunch.CoreWars.Editor
 					}
 				}
 
-				if ( IsServer && Input.Down( InputButton.Duck ) )
+				if ( Game.IsServer && Input.Down( InputButton.Duck ) )
 				{
 					if ( Input.Pressed( InputButton.Reload ) )
 					{
@@ -301,7 +301,7 @@ namespace Facepunch.CoreWars.Editor
 
 		protected override void OnDestroy()
 		{
-			if ( IsServer || IsLocalPawn )
+			if ( Game.IsServer || IsLocalPawn )
 			{
 				Tool?.OnDeselected();
 			}

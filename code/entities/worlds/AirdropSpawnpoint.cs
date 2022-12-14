@@ -13,7 +13,7 @@ namespace Facepunch.CoreWars
 		{
 			SetModel( "models/gameplay/temp/shrine_test/air_drop_shrine.vmdl" );
 
-			var isEditorMode = Game.Current.IsEditorMode;
+			var isEditorMode = CoreWarsGame.IsEditorMode;
 
 			EnableDrawing = isEditorMode;
 			Transmit = isEditorMode ? TransmitType.Always : TransmitType.Never;

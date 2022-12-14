@@ -1,5 +1,6 @@
 ﻿using Facepunch.CoreWars.Editor;
 using Sandbox;
+using Sandbox.Diagnostics;
 using Sandbox.UI;
 using Sandbox.UI.Construct;
 using System.Text.RegularExpressions;
@@ -55,7 +56,7 @@ namespace Facepunch.CoreWars.UI
 		{
 			Current?.AddEntry( name, message, avatar, className, channel );
 
-			if ( !Global.IsListenServer )
+			if ( !Game.IsListenServer )
 			{
 				Log.Info( $"{name}: {message}" );
 			}
@@ -107,7 +108,7 @@ namespace Facepunch.CoreWars.UI
 
 			Canvas = Add.Panel( "chat_canvas" );
 
-			if ( Game.Current.IsEditorMode )
+			if ( CoreWarsGame.IsEditorMode )
 			{
 				Channel = ChatBoxChannel.All;
 			}
@@ -156,10 +157,10 @@ namespace Facepunch.CoreWars.UI
 
 		public override void Tick()
 		{
-			if ( NextTipTime && !Game.Current.IsEditorMode )
+			if ( NextTipTime && !CoreWarsGame.IsEditorMode )
 			{
 				ShowRandomTip();
-				NextTipTime = Rand.Float( 45f, 60f );
+				NextTipTime = Game.Random.Float( 45f, 60f );
 			}
 
 			if ( Input.Pressed( InputButton.Chat ) )
@@ -172,7 +173,7 @@ namespace Facepunch.CoreWars.UI
 
 		private void ShowRandomTip()
 		{
-			var tip = Rand.FromArray( Tips );
+			var tip = Game.Random.FromArray( Tips );
 
 			tip = Regex.Replace( tip, "(\\+iv_[a-zA-Z0-9]+)", ( match ) =>
 			{
@@ -184,7 +185,7 @@ namespace Facepunch.CoreWars.UI
 
 		private void OnTabPressed()
 		{
-			if ( Game.Current.IsEditorMode )
+			if ( CoreWarsGame.IsEditorMode )
 			{
 				Channel = ChatBoxChannel.All;
 				TextEntry.SetChannel( Channel );

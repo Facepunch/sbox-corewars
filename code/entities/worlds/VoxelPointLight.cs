@@ -51,7 +51,7 @@ namespace Facepunch.CoreWars
 
 		public override void Spawn()
 		{
-			var isEditorMode = Game.Current.IsEditorMode;
+			var isEditorMode = CoreWarsGame.IsEditorMode;
 
 			SetModel( "models/editor/omni.vmdl" );
 			Transmit = isEditorMode ? TransmitType.Always : TransmitType.Never;
@@ -84,7 +84,7 @@ namespace Facepunch.CoreWars
 
 			RenderColor = Light.Color;
 
-			var isEditorMode = Game.Current.IsEditorMode;
+			var isEditorMode = CoreWarsGame.IsEditorMode;
 
 			if ( isEditorMode )
 				SetupPhysicsFromAABB( PhysicsMotionType.Keyframed, Model.Bounds.Mins, Model.Bounds.Maxs );

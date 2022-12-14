@@ -13,7 +13,7 @@ namespace Facepunch.CoreWars
 
 		public override void OnEnter()
 		{
-			if ( IsServer )
+			if ( Game.IsServer )
 			{
 				NextStageTime = 10f;
 				CalculateWinningTeam();
@@ -27,7 +27,7 @@ namespace Facepunch.CoreWars
 
 		public override void OnLeave()
 		{
-			if ( IsClient )
+			if ( Game.IsClient )
 			{
 				WinSummary.Current.Close();
 			}

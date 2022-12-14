@@ -21,7 +21,7 @@ namespace Facepunch.CoreWars
 			if ( spawnpoints.Count > 0 )
 			{
 				var world = VoxelWorld.Current;
-				var spawnpoint = Rand.FromList( spawnpoints );
+				var spawnpoint = Game.Random.FromList( spawnpoints );
 
 				var airdrop = new Airdrop();
 				airdrop.Transform = spawnpoint.Transform;
@@ -69,7 +69,7 @@ namespace Facepunch.CoreWars
 			position.x -= iconSize * 0.5f;
 			position.y -= iconSize * 0.5f;
 
-			var distanceToPawn = Local.Pawn.Position.Distance( Position );
+			var distanceToPawn = Game.LocalPawn.Position.Distance( Position );
 
 			if ( distanceToPawn <= 1024f )
 				iconAlpha = distanceToPawn.Remap( 512f, 1024f, 0f, 1f );
@@ -119,7 +119,7 @@ namespace Facepunch.CoreWars
 
 		public override void OnNewModel( Model model )
 		{
-			if ( IsClient )
+			if ( Game.IsClient )
 			{
 				VoxelWorld.RegisterVoxelModel( this );
 			}
@@ -129,7 +129,7 @@ namespace Facepunch.CoreWars
 
 		protected override void OnDestroy()
 		{
-			if ( IsClient )
+			if ( Game.IsClient )
 			{
 				VoxelWorld.UnregisterVoxelModel( this );
 			}

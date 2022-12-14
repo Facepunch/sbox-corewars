@@ -11,11 +11,11 @@
 @attribute [StyleSheet( "/ui/editor/EditorHotbar.scss" )]
 @inherits Panel
 
-@if ( Local.Pawn is not EditorPlayer ) return;
+@if ( Game.LocalPawn is not EditorPlayer ) return;
 @if ( !VoxelWorld.Current.IsValid() ) return;
 
 @{
-    var player = Local.Pawn as EditorPlayer;
+    var player = Game.LocalPawn as EditorPlayer;
 }
 
 <root>
@@ -43,7 +43,7 @@
 
     protected override int BuildHash()
     {
-        var player = Local.Pawn as EditorPlayer;
+        var player = Game.LocalPawn as EditorPlayer;
         var code = 0;
 
         for ( var i = 0; i < player.HotbarBlockIds.Count; i++ )

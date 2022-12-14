@@ -7,9 +7,6 @@ namespace Facepunch.CoreWars
 	{
 		[Net] public RealTimeUntil TimeUntilExpired { get; set; }
 
-		public bool IsServer => Host.IsServer;
-		public bool IsClient => Host.IsClient;
-
 		public virtual Color Color => UI.ColorPalette.Brews;
 		public virtual float Duration => 30f;
 		public virtual string Icon => "textures/ui/unknown.png";
@@ -21,7 +18,7 @@ namespace Facepunch.CoreWars
 
 		public virtual void OnExpired( CoreWarsPlayer player )
 		{
-			if ( IsClient && player.IsLocalPawn )
+			if ( Game.IsClient && player.IsLocalPawn )
 			{
 				Sound.FromScreen( "buff.expired" );
 			}

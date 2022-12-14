@@ -73,7 +73,7 @@ namespace Facepunch.CoreWars
 		[ClientRpc]
 		private void OpenForClient( byte[] data )
 		{
-			if ( Local.Pawn is not CoreWarsPlayer ) return;
+			if ( Game.LocalPawn is not CoreWarsPlayer ) return;
 
 			var container = InventoryContainer.Deserialize( data );
 			var storage = UI.Storage.Current;

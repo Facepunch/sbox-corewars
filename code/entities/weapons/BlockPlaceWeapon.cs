@@ -17,7 +17,7 @@ namespace Facepunch.CoreWars
 		{
 			if ( Owner is not CoreWarsPlayer player ) return;
 
-			if ( IsServer )
+			if ( Game.IsServer )
 			{
 				var world = VoxelWorld.Current;
 				var block = world.GetBlockType<T>();

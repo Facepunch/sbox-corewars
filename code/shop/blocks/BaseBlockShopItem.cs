@@ -11,8 +11,8 @@ namespace Facepunch.CoreWars
 {
 	public abstract class BaseBlockShopItem : BaseShopItem
 	{
-		public override string Name => GetBlockType( Local.Pawn as CoreWarsPlayer ).FriendlyName;
-		public override string Description => GetBlockType( Local.Pawn as CoreWarsPlayer ).Description;
+		public override string Name => GetBlockType( Game.LocalPawn as CoreWarsPlayer ).FriendlyName;
+		public override string Description => GetBlockType( Game.LocalPawn as CoreWarsPlayer ).Description;
 		public override Color Color => UI.ColorPalette.Blocks;
 		public override int SortOrder => 2;
 

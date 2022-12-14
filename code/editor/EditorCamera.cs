@@ -10,7 +10,7 @@ namespace Facepunch.CoreWars.Editor
 
 		public void Update()
 		{
-			var pawn = Local.Pawn as EditorPlayer;
+			var pawn = Game.LocalPawn as EditorPlayer;
 			if ( pawn == null ) return;
 
 			var targetPosition = pawn.EyePosition;

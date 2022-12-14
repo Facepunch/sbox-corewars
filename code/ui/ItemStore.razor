@@ -74,7 +74,7 @@
 
     public override void Tick()
     {
-        if ( Local.Pawn is not CoreWarsPlayer player ) return;
+        if ( Game.LocalPawn is not CoreWarsPlayer player ) return;
 
         if ( Entity.IsValid() )
         {
@@ -92,7 +92,7 @@
 
     protected int GetResourceCount<T>() where T : ResourceItem
     {
-        if ( Local.Pawn is CoreWarsPlayer player )
+        if ( Game.LocalPawn is CoreWarsPlayer player )
         {
             return player.GetResourceCount<T>();
         }

@@ -90,7 +90,7 @@
 
     public EditorTool GetActiveTool()
     {
-        if ( Local.Pawn is EditorPlayer player )
+        if ( Game.LocalPawn is EditorPlayer player )
         {
             if ( player.Tool.IsValid() )
             {
@@ -131,7 +131,7 @@
         if ( !VoxelWorld.Current.IsValid() )
             return true;
 
-        if ( Local.Pawn is EditorPlayer player )
+        if ( Game.LocalPawn is EditorPlayer player )
         {
             if ( player.Tool.IsValid() )
             {

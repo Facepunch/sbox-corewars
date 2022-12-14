@@ -16,7 +16,7 @@ namespace Facepunch.CoreWars.Editor
 
 		public override void OnEnter()
 		{
-			if ( Host.IsServer )
+			if ( Game.IsServer )
 			{
 				foreach ( var player in Entity.All.OfType<CoreWarsPlayer>() )
 				{
@@ -30,7 +30,7 @@ namespace Facepunch.CoreWars.Editor
 
 		}
 
-		public override bool CanHearPlayerVoice( Client a, Client b )
+		public override bool CanHearPlayerVoice( IClient a, IClient b )
 		{
 			return true;
 		}
@@ -45,7 +45,7 @@ namespace Facepunch.CoreWars.Editor
 		{
 			if ( NextBackupSave && !string.IsNullOrEmpty( CurrentFileName ) )
 			{
-				Game.SaveEditorMap( CurrentFileName, true );
+				CoreWarsGame.SaveEditorMap( CurrentFileName, true );
 				NextBackupSave = 60f;
 			}
 		}

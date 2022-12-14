@@ -33,7 +33,7 @@ namespace Facepunch.CoreWars.UI
 
 		public override void Tick()
 		{
-			if ( Local.Pawn is not CoreWarsPlayer player )
+			if ( Game.LocalPawn is not CoreWarsPlayer player )
 				return;
 
 			if ( IsDeleting ) return;
@@ -130,7 +130,7 @@ namespace Facepunch.CoreWars.UI
 			if ( Entity.LifeState == LifeState.Dead )
 				return false;
 
-			if ( Entity == Local.Pawn )
+			if ( Entity == Game.LocalPawn )
 				return false;
 
 			return true;

@@ -32,7 +32,7 @@
 
     public bool IsHidden()
     {
-        if ( Item != null && Local.Pawn is CoreWarsPlayer player )
+        if ( Item != null && Game.LocalPawn is CoreWarsPlayer player )
         {
             return !Item.CanPurchase( player );
         }
@@ -42,7 +42,7 @@
 
     public bool IsPurchaseDisabled()
     {
-        if ( Item != null && Local.Pawn is CoreWarsPlayer player )
+        if ( Item != null && Game.LocalPawn is CoreWarsPlayer player )
         {
             return Item.IsLocked( player ) || !Item.CanAfford( player );
         }
@@ -65,7 +65,7 @@
 
     protected override void OnMouseOver( MousePanelEvent e )
     {
-        if ( Local.Pawn is not CoreWarsPlayer player )
+        if ( Game.LocalPawn is not CoreWarsPlayer player )
             return;
 
         if ( Item != null )
@@ -89,26 +89,26 @@
 
     protected override void OnAfterTreeRender( bool firstTime )
     {
-        if ( Local.Pawn is CoreWarsPlayer player )
+        if ( Game.LocalPawn is CoreWarsPlayer player )
         {
             if ( Item.IsLocked( player ) )
             {
-                Rand.SetSeed( Item.GetHashCode() );
+                Game.SetRandomSeed( Item.GetHashCode() );
 
                 var symbolCharacters = new string[] { "𐆓", "𐆕", "𐆖", "𐆗", "𐆙", "𐆚", "𐆛", "𐆜", "𐆠", "𐅍", "𐅍", "𐅡", "𐅍", "𐹳", "𐅢" };
                 var randomDescription = string.Empty;
-                var randomDescriptionCount = Rand.Int( 16, 24 );
+                var randomDescriptionCount = Game.Random.Int( 16, 24 );
                 var randomName = string.Empty;
-                var randomNameCount = Rand.Int( 6, 12 );
+                var randomNameCount = Game.Random.Int( 6, 12 );
 
                 for ( var i = 0; i < randomDescriptionCount; i++ )
                 {
-                    randomDescription += Rand.FromArray( symbolCharacters );
+                    randomDescription += Game.Random.FromArray( symbolCharacters );
                 }
 
                 for ( var i = 0; i < randomNameCount; i++ )
                 {
-                    randomName += Rand.FromArray( symbolCharacters );
+                    randomName += Game.Random.FromArray( symbolCharacters );
                 }
 
                 Description = randomDescription;

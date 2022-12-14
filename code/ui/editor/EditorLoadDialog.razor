@@ -34,7 +34,7 @@
 		Current?.Delete();
 		Current = new EditorLoadDialog();
 
-		Local.Hud.AddChild( Current );
+		Game.RootPanel.AddChild( Current );
 	}
 
 	public EditorLoadDialog()
@@ -67,7 +67,7 @@
 
 	protected virtual void OpenFile( string fileName )
 	{
-		Game.LoadEditorMapCmd( fileName );
+        CoreWarsGame.LoadEditorMapCmd( fileName );
 		Delete();
 	}
 
@@ -85,7 +85,7 @@
     {
         base.OnAfterTreeRender( firstTime );
 
-		var state = Game.GetStateAs<EditorState>();
+		var state = CoreWarsGame.GetStateAs<EditorState>();
 
 		Input.SetAutoCompleteList( Suggestions );
 		Input.AutoCompleteHandler = DoAutoComplete;

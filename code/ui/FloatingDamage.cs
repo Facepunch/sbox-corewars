@@ -18,9 +18,9 @@ namespace Facepunch.CoreWars.UI
 
 			var panel = Rent();
 
-			panel.SetLifeTime( Rand.Float( 2f, 3f ) );
+			panel.SetLifeTime( Game.Random.Float( 2f, 3f ) );
 			panel.SetDamage( damage );
-			panel.Velocity = Vector3.Up * Rand.Float( 30f, 50f ) + Vector3.Random * Rand.Float( 50f, 100f );
+			panel.Velocity = Vector3.Up * Game.Random.Float( 30f, 50f ) + Vector3.Random * Game.Random.Float( 50f, 100f );
 			panel.Position = position;
 		}
 

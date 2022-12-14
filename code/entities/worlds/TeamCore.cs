@@ -70,14 +70,14 @@ namespace Facepunch.CoreWars
 
 		public void Explode()
 		{
-			Game.RemoveValidTeam( Team );
+			CoreWarsGame.RemoveValidTeam( Team );
 			CreateDeathEffect();
 			LifeState = LifeState.Dead;
 		}
 
 		public virtual void Reset()
 		{
-			Game.AddValidTeam( Team );
+			CoreWarsGame.AddValidTeam( Team );
 
 			CreateCoreEffect();
 			LifeState = LifeState.Alive;
@@ -98,7 +98,7 @@ namespace Facepunch.CoreWars
 
 		public virtual void RenderHud( Vector2 screenSize )
 		{
-			if ( Local.Pawn is not CoreWarsPlayer player || player.Team != Team )
+			if ( Game.LocalPawn is not CoreWarsPlayer player || player.Team != Team )
 				return;
 
 			var draw = Util.Draw.Reset();
@@ -111,7 +111,7 @@ namespace Facepunch.CoreWars
 			position.x -= iconSize * 0.5f;
 			position.y -= iconSize * 0.5f;
 
-			var distanceToPawn = Local.Pawn.Position.Distance( Position );
+			var distanceToPawn = Game.LocalPawn.Position.Distance( Position );
 
 			if ( distanceToPawn <= 1024f )
 			{
@@ -151,7 +151,7 @@ namespace Facepunch.CoreWars
 			if ( !info.Attacker.IsValid() || info.Attacker is not CoreWarsPlayer attacker )
 				return;
 
-			if ( !Game.FriendlyFire && attacker.Team == Team )
+			if ( !CoreWarsGame.FriendlyFire && attacker.Team == Team )
 				return;
 
 			UI.FloatingDamage.Show( this, info.Damage, info.Position );

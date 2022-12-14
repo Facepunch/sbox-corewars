@@ -48,7 +48,7 @@ namespace Facepunch.CoreWars
 		{
 			SetModel( ModelPath );
 
-			var isEditorMode = Game.Current.IsEditorMode;
+			var isEditorMode = CoreWarsGame.IsEditorMode;
 
 			if ( isEditorMode )
 				SetupPhysicsFromAABB( PhysicsMotionType.Keyframed, Model.Bounds.Mins, Model.Bounds.Maxs );

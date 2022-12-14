@@ -24,7 +24,7 @@
             </div>
         }
 
-        @if ( Costs != null && Costs.Count > 0 && Local.Pawn is CoreWarsPlayer player )
+        @if ( Costs != null && Costs.Count > 0 && Game.LocalPawn is CoreWarsPlayer player )
         {
             <div class="costs">
                 @foreach ( var kv in Costs )
@@ -54,7 +54,7 @@
         {
             var tooltip = new CustomTooltip();
             tooltip.SetProvider( provider );
-            Local.Hud.AddChild( tooltip );
+            Game.RootPanel.AddChild( tooltip );
             return tooltip;
         }
 

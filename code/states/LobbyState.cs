@@ -10,7 +10,7 @@ namespace Facepunch.CoreWars
 
 		public override void OnEnter()
 		{
-			if ( IsServer )
+			if ( Game.IsServer )
 			{
 				foreach ( var player in Entity.All.OfType<CoreWarsPlayer>() )
 				{
@@ -27,7 +27,7 @@ namespace Facepunch.CoreWars
 
 		}
 
-		public override bool CanHearPlayerVoice( Client sourceClient, Client destinationClient )
+		public override bool CanHearPlayerVoice( IClient src, IClient dest )
 		{
 			return true;
 		}

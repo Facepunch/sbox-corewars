@@ -33,7 +33,7 @@ namespace Facepunch.CoreWars
 
 		protected override void OnBlockPlaced( IntVector3 position )
 		{
-			if ( IsServer && Owner is CoreWarsPlayer player )
+			if ( Game.IsServer && Owner is CoreWarsPlayer player )
 			{
 				if ( WeaponItem.IsValid() )
 				{

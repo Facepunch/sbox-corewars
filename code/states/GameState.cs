@@ -20,7 +20,7 @@ namespace Facepunch.CoreWars
 
 		public override void OnEnter()
 		{
-			if ( IsServer )
+			if ( Game.IsServer )
 			{
 				IResettable.ResetAll();
 
@@ -39,15 +39,15 @@ namespace Facepunch.CoreWars
 			}
 		}
 
-		public override bool CanHearPlayerVoice( Client a, Client b )
+		public override bool CanHearPlayerVoice( IClient a, IClient b )
 		{
-			if ( a.Pawn is not CoreWarsPlayer source )
+			if ( a.Pawn is not CoreWarsPlayer src )
 				return false;
 
-			if ( b.Pawn is not CoreWarsPlayer destination )
+			if ( b.Pawn is not CoreWarsPlayer dest )
 				return false;
 
-			return source.Team == destination.Team;
+			return src.Team == dest.Team;
 		}
 
 		public override void OnLeave()

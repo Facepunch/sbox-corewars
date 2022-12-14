@@ -55,7 +55,7 @@
 		Current = new EditorBlockData( voxel, state );
 		Current.PopulateItems();
 
-		Local.Hud.FindPopupPanel().AddChild( Current );
+		Game.RootPanel.FindPopupPanel().AddChild( Current );
 	}
 
 	public EditorBlockData( Voxel voxel, BlockState state )

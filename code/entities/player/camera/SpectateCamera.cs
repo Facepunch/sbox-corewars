@@ -6,7 +6,7 @@ namespace Facepunch.CoreWars
 	{
 		public void Update()
 		{
-			if ( Local.Pawn is not CoreWarsPlayer player )
+			if ( Game.LocalPawn is not CoreWarsPlayer player )
 				return;
 
 			Camera.Position = player.EyePosition;

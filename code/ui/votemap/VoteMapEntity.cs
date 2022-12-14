@@ -10,7 +10,7 @@ namespace Facepunch.CoreWars.UI
 
 		private VoteMapPanel Panel { get; set; }
 
-		[Net] public IDictionary<Client, string> Votes { get; set; }
+		[Net] public IDictionary<IClient, string> Votes { get; set; }
 		[Net] public string WinningMap { get; set; } = "facepunch.cw_newworld";
 		[Net] public RealTimeUntil VoteTimeLeft { get; set; } = 30f;
 
@@ -38,7 +38,7 @@ namespace Facepunch.CoreWars.UI
 			Current = this;
 			Panel = new VoteMapPanel();
 
-			Local.Hud.AddChild( Panel );
+			Game.RootPanel.AddChild( Panel );
 		}
 
 		protected override void OnDestroy()
@@ -78,7 +78,7 @@ namespace Facepunch.CoreWars.UI
 			WinningMap = Votes.GroupBy( x => x.Value ).OrderBy( x => x.Count() ).First().Key;
 		}
 
-		private void SetVote( Client client, string map )
+		private void SetVote( IClient client, string map )
 		{
 			CullInvalidClients();
 			Votes[client] = map;

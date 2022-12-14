@@ -57,10 +57,10 @@
 
     private bool IsHidden()
     {
-		if ( Local.Pawn.LifeState == LifeState.Dead )
+		if ( Game.LocalPawn.LifeState == LifeState.Dead )
 			return true;
 
-		if ( IDialog.IsActive() || !Game.IsState<GameState>() )
+		if ( IDialog.IsActive() || !CoreWarsGame.IsState<GameState>() )
 			return true;
 
 		return !IsOpen;

@@ -47,7 +47,7 @@ namespace Facepunch.CoreWars.Editor
 
 		public void Cancel()
 		{
-			if ( IsClient )
+			if ( Game.IsClient )
 			{
 				SendCancelCmd();
 			}
@@ -60,12 +60,12 @@ namespace Facepunch.CoreWars.Editor
 
 		public void Mirror( bool flipX, bool flipY, bool fromOrigin, int offsetX, int offsetY )
 		{
-			if ( IsClient )
+			if ( Game.IsClient )
 			{
 				SendMirrorCmd( flipX, flipY, fromOrigin, offsetX, offsetY );
 			}
 
-			if ( IsServer && Stage == MirrorStage.Mirror )
+			if ( Game.IsServer && Stage == MirrorStage.Mirror )
 			{
 				var startVoxelPosition = VoxelWorld.Current.ToVoxelPosition( StartPosition.Value );
 				var endVoxelPosition = VoxelWorld.Current.ToVoxelPosition( EndPosition.Value );
@@ -90,11 +90,11 @@ namespace Facepunch.CoreWars.Editor
 			Stage = MirrorStage.Select;
 		}
 
-		public override void Simulate( Client client )
+		public override void Simulate( IClient client )
 		{
 			var world = VoxelWorld.Current;
 
-			if ( IsClient && world.IsValid() && AreaGhost.IsValid() )
+			if ( Game.IsClient && world.IsValid() && AreaGhost.IsValid() )
 			{
 				var aimVoxelPosition = GetAimVoxelPosition( 6f );
 				var aimSourcePosition = world.ToSourcePosition( aimVoxelPosition );
@@ -125,7 +125,7 @@ namespace Facepunch.CoreWars.Editor
 		{
 			base.OnSelected();
 
-			if ( IsClient )
+			if ( Game.IsClient )
 			{
 				VoxelWorld.Current.GlobalOpacity = 0.8f;
 
@@ -148,7 +148,7 @@ namespace Facepunch.CoreWars.Editor
 		{
 			base.OnDeselected();
 
-			if ( IsClient )
+			if ( Game.IsClient )
 			{
 				Player.EditorCamera.ZoomOut = 0f;
 				VoxelWorld.Current.GlobalOpacity = 1f;
@@ -156,7 +156,7 @@ namespace Facepunch.CoreWars.Editor
 			}
 		}
 
-		protected override void OnPrimary( Client client )
+		protected override void OnPrimary( IClient client )
 		{
 			if ( NextBlockPlace )
 			{
@@ -167,7 +167,7 @@ namespace Facepunch.CoreWars.Editor
 				{
 					if ( StartPosition.HasValue )
 					{
-						if ( IsClient )
+						if ( Game.IsClient )
 						{
 							EditorMirrorMenu.Open();
 						}
@@ -185,7 +185,7 @@ namespace Facepunch.CoreWars.Editor
 			}
 		}
 
-		protected override void OnSecondary( Client client )
+		protected override void OnSecondary( IClient client )
 		{
 			if ( NextBlockPlace )
 			{

@@ -58,7 +58,7 @@ namespace Facepunch.CoreWars.Editor
 
 		public void SetTypeDescription( TypeDescription description )
 		{
-			Host.AssertServer();
+			Game.AssertServer();
 
 			if ( CurrentType != description.ClassName )
 			{
@@ -71,7 +71,7 @@ namespace Facepunch.CoreWars.Editor
 
 		public void SetMode( EntitiesToolMode mode )
 		{
-			Host.AssertServer();
+			Game.AssertServer();
 
 			if ( Mode != mode )
 			{
@@ -80,11 +80,11 @@ namespace Facepunch.CoreWars.Editor
 			}
 		}
 
-		public override void Simulate( Client client )
+		public override void Simulate( IClient client )
 		{
 			var world = VoxelWorld.Current;
 
-			if ( IsClient && world.IsValid() && CurrentAttribute != null )
+			if ( Game.IsClient && world.IsValid() && CurrentAttribute != null )
 			{
 				var aimVoxelPosition = GetAimVoxelPosition( 4f );
 
@@ -126,7 +126,7 @@ namespace Facepunch.CoreWars.Editor
 		{
 			base.OnSelected();
 
-			if ( IsServer )
+			if ( Game.IsServer )
 			{
 				if ( string.IsNullOrEmpty( CurrentType ) )
 				{
@@ -137,7 +137,7 @@ namespace Facepunch.CoreWars.Editor
 				SetMode( EntitiesToolMode.Place );
 			}
 
-			if ( IsClient )
+			if ( Game.IsClient )
 			{
 				OnModeChanged( Mode );
 			}
@@ -151,14 +151,14 @@ namespace Facepunch.CoreWars.Editor
 		{
 			base.OnDeselected();
 
-			if ( IsClient )
+			if ( Game.IsClient )
 			{
 				DestroyGhostEntity();
 			}
 
 			Event.Unregister( this );
 
-			if ( IsServer && SelectedEntity.IsValid() )
+			if ( Game.IsServer && SelectedEntity.IsValid() )
 			{
 				SelectedEntity.EnableDrawing = true;
 				SelectedEntity = null;
@@ -179,7 +179,7 @@ namespace Facepunch.CoreWars.Editor
 
 		protected virtual void OnTypeDescriptionChanged( TypeDescription attribute )
 		{
-			if ( IsClient )
+			if ( Game.IsClient )
 			{
 				if ( Mode == EntitiesToolMode.Place )
 					CreateGhostEntity();
@@ -225,7 +225,7 @@ namespace Facepunch.CoreWars.Editor
 
 		protected virtual void OnModeChanged( EntitiesToolMode mode )
 		{
-			if ( IsClient )
+			if ( Game.IsClient )
 			{
 				if ( Mode == EntitiesToolMode.Place )
 					CreateGhostEntity();
@@ -248,7 +248,7 @@ namespace Facepunch.CoreWars.Editor
 				}
 			}
 
-			if ( IsServer && SelectedEntity.IsValid() )
+			if ( Game.IsServer && SelectedEntity.IsValid() )
 			{
 				SelectedEntity.EnableDrawing = true;
 				SelectedEntity = null;
@@ -257,7 +257,7 @@ namespace Facepunch.CoreWars.Editor
 			StartPosition = null;
 		}
 
-		protected override void OnPrimary( Client client )
+		protected override void OnPrimary( IClient client )
 		{
 			var world = VoxelWorld.Current;
 
@@ -273,7 +273,7 @@ namespace Facepunch.CoreWars.Editor
 
 						if ( StartPosition.HasValue )
 						{
-							if ( IsServer )
+							if ( Game.IsServer )
 							{
 								var startVoxelPosition = VoxelWorld.Current.ToVoxelPosition( StartPosition.Value );
 								var endVoxelPosition = aimVoxelPosition;
@@ -298,7 +298,7 @@ namespace Facepunch.CoreWars.Editor
 							StartPosition = aimSourcePosition;
 						}
 					}
-					else if ( IsServer )
+					else if ( Game.IsServer )
 					{
 						var shouldCenterOnX = !Input.Down( InputButton.Run );
 						var shouldCenterOnY = !Input.Down( InputButton.Duck );
@@ -327,7 +327,7 @@ namespace Facepunch.CoreWars.Editor
 				}
 				else if ( Mode == EntitiesToolMode.MoveAndRotate )
 				{
-					if ( IsServer )
+					if ( Game.IsServer )
 					{
 						if ( SelectedEntity.IsValid() )
 						{
@@ -361,7 +361,7 @@ namespace Facepunch.CoreWars.Editor
 				}
 				else if ( Mode == EntitiesToolMode.Remove )
 				{
-					if ( IsServer )
+					if ( Game.IsServer )
 					{
 						if ( TryGetTargetEntity( out var target, out _ ) )
 						{
@@ -373,7 +373,7 @@ namespace Facepunch.CoreWars.Editor
 				}
 				else if ( Mode == EntitiesToolMode.DataEditor )
 				{
-					if ( IsClient )
+					if ( Game.IsClient )
 					{
 						if ( TryGetTargetEntity( out var target, out _ ) )
 						{
@@ -384,9 +384,9 @@ namespace Facepunch.CoreWars.Editor
 			}
 		}
 
-		protected override void OnSecondary( Client client )
+		protected override void OnSecondary( IClient client )
 		{
-			if ( IsServer )
+			if ( Game.IsServer )
 			{
 				CurrentRotation = CurrentRotation.RotateAroundAxis( Vector3.Up, 90f );
 			}
@@ -472,7 +472,7 @@ namespace Facepunch.CoreWars.Editor
 				GhostEntity = new ModelEntity( CurrentAttribute.EditorModel );
 				GhostEntity.RenderColor = Color.White.WithAlpha( 0.5f );
 
-				if ( Local.Pawn is not EditorPlayer player )
+				if ( Game.LocalPawn is not EditorPlayer player )
 					return;
 
 				if ( player.LastPlacedEntity.IsSameType( CurrentTypeDescription ) )
