@@ -103,7 +103,6 @@ namespace Facepunch.CoreWars
 
 			Player.EyeLocalPosition = Vector3.Up * (EyeHeight * Player.Scale);
 			UpdateBBox();
-
 			Player.EyeLocalPosition += TraceOffset;
 
 			// If we're a bot, spin us around 180 degrees.
