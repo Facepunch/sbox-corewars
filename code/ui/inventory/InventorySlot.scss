@@ -1,8 +1,10 @@
-﻿InventorySlot {
+﻿@import "../scss/base.scss";
+
+InventorySlot {
     transition: all 0.1s ease-in;
     border: 2px solid rgba( #FFF, 0.2 );
     background: linear-gradient(rgba(#000000, 0.8), rgba(#444, 0.8));
-    border-radius: 2px;
+    border-radius: $border-radius-default;
     justify-content: center;
     align-items: center;
     width: 80px;
@@ -18,7 +20,7 @@
 
     .glow {
         position: absolute;
-        border-radius: 4px;
+        border-radius: $border-radius-default;
         width: 80px;
         height: 80px;
     }
@@ -33,7 +35,7 @@
     .slot {
         position: absolute;
         pointer-events: none;
-        font-family: Vollkorn;
+        font-family: Roboto;
         text-shadow: 0 2px 0 rgba(0, 0, 0, 0.8);
         font-size: 16px;
         color: white;
@@ -44,7 +46,7 @@
     .stacksize {
         position: absolute;
         pointer-events: none;
-        font-family: Vollkorn;
+        font-family: Roboto;
         text-shadow: 0 2px 0 rgba(0, 0, 0, 0.8);
         font-size: 20px;
         color: white;
@@ -97,7 +99,7 @@
 
         .overlay {
             background: linear-gradient(darken( red, 0.3 ), rgba( red, 0.5 ));
-            border-radius: 4px;
+            border-radius: $border-radius-default;
             display: flex;
             opacity: 0.6;
         }

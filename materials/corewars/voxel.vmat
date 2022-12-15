@@ -2,12 +2,14 @@
 
 Layer0
 {
-	shader "voxel.vfx"
+	shader "voxel.shader"
 
 	//---- Translucent ----
 	F_ALPHA_TEST 1
 
 	g_flDiffuseBoost "0.050"
+	g_flDirectionalLightmapMinZ "0.050"
+	g_flDirectionalLightmapStrength "1.000"
 	g_flLightDirectionBias "1.000"
 	g_flSpecularBoost "0.100"
 	g_flTextureAtlasCellSize "32.000"
@@ -23,10 +25,6 @@ Layer0
 
 	//---- Fog ----
 	g_bFogEnabled "1"
-
-	//---- Lighting ----
-	g_flDirectionalLightmapMinZ "0.050"
-	g_flDirectionalLightmapStrength "1.000"
 
 	//---- Material ----
 	TextureColor "materials/default/default_color.tga"

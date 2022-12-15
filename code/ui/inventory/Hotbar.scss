@@ -1,4 +1,6 @@
-﻿Hotbar {
+﻿@import "../scss/base.scss";
+
+Hotbar {
     position: absolute;
     bottom: 32px;
     display: flex;

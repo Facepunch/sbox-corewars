@@ -1,4 +1,6 @@
-﻿Storage {
+﻿@import "../scss/base.scss";
+
+Storage {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -7,7 +9,7 @@
     pointer-events: all;
     backdrop-filter-blur: 24px;
     flex-direction: column;
-    background-color: rgba(0, 0, 0, 0.9);
+    background-color: rgba(0, 0, 0, 0.95);
     transition: backdrop-filter-blur 0.15s ease-in;
     transition: opacity 0.15s ease-in;
     padding-bottom: 100px;
@@ -19,8 +21,8 @@
         margin-top: 100px;
 
         .title {
-            color: white;
-            font-family: Vollkorn;
+            color: $red;
+            font-family: $font;
             font-size: 40px;
         }
 
@@ -69,8 +71,8 @@
         bottom: 32px;
 
         .title {
-            color: white;
-            font-family: Vollkorn;
+            color: $red;
+            font-family: $font;
             font-size: 40px;
         }
 
