@@ -8,6 +8,13 @@ namespace Facepunch.CoreWars.Editor
 		public Material BoxMaterial = Material.Load( "materials/editor/place_block.vmat" );
 		public Color Color { get; set; }
 
+		public override void Spawn()
+		{
+			RenderBounds = new BBox( new Vector3( -VoxelWorld.Current.VoxelSize ), new Vector3( VoxelWorld.Current.VoxelSize ) );
+
+			base.Spawn();
+		}
+
 		public override void DoRender( SceneObject sceneObject )
 		{
 			if ( !EnableDrawing || !VoxelWorld.Current.IsValid() )

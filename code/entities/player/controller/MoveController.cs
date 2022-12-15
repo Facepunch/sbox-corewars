@@ -1,33 +1,35 @@
 ﻿using Sandbox;
+using System;
 using System.Collections.Generic;
 
 namespace Facepunch.CoreWars
 {
 	public class MoveController : BaseMoveController
 	{
-		public virtual bool EnableSprinting => true;
 		public virtual float SprintSpeed { get; set; } = 320f;
 		public virtual float WalkSpeed { get; set; } = 150f;
 
-		public float Acceleration { get; set; } = 10f;
-		public float AirAcceleration { get; set; } = 50f;
-		public float FallSoundZ { get; set; } = -30f;
-		public float GroundFriction { get; set; } = 4f;
+		public float FallDamageThreshold { get; set; } = 250f;
+		public float FallDamageMin { get; set; } = 0f;
+		public float FallDamageMax { get; set; } = 100f;
+		public float Acceleration { get; set; } = 8f;
+		public float AirAcceleration { get; set; } = 24f;
+		public float GroundFriction { get; set; } = 6f;
 		public float StopSpeed { get; set; } = 100f;
 		public float Size { get; set; } = 20f;
 		public float DistEpsilon { get; set; } = 0.03125f;
 		public float GroundAngle { get; set; } = 46f;
 		public float Bounce { get; set; } = 0f;
 		public float MoveFriction { get; set; } = 1f;
-		public float StepSize { get; set; } = 18f;
+		public float StepSize { get; set; } = 28f;
 		public float MaxNonJumpVelocity { get; set; } = 140f;
 		public float BodyGirth { get; set; } = 32f;
 		public float BodyHeight { get; set; } = 72f;
-		public float EyeHeight { get; set; } = 64f;
+		public float EyeHeight { get; set; } = 72f;
 		public float Gravity { get; set; } = 800f;
-		public float AirControl { get; set; } = 30f;
+		public float AirControl { get; set; } = 48f;
 		public bool Swimming { get; set; } = false;
-		public bool AutoJump { get; set; } = false;
+		public bool AutoJump { get; set; } = true;
 
 		protected float SurfaceFriction { get; set; }
 		protected bool IsTouchingLadder { get; set; }
@@ -152,6 +154,8 @@ namespace Facepunch.CoreWars
 
 			Duck.PreTick();
 
+			PreVelocity = Player.Velocity;
+
 			if ( Player is CoreWarsPlayer player )
 			{
 				var modifier = player.GetModifier( StatModifier.Speed );
@@ -164,8 +168,6 @@ namespace Facepunch.CoreWars
 			}
 
 			var stayOnGround = false;
-
-			OnPreTickMove();
 
 			if ( Swimming )
 			{
@@ -202,12 +204,11 @@ namespace Facepunch.CoreWars
 		public float GetWishSpeed()
 		{
 			var ws = Duck.GetWishSpeed();
-			if ( ws >= 0 ) return ws;
+			if ( ws > 0 ) return ws;
 
-			if ( EnableSprinting && Input.Down( InputButton.Run ) )
-			{
+			if ( Input.Down( InputButton.Run ) )
 				return SprintSpeed;
-			}
+
 			if ( Input.Down( InputButton.Walk ) )
 				return WalkSpeed * 0.5f;
 			
@@ -320,9 +321,6 @@ namespace Facepunch.CoreWars
 			}
 		}
 
-		/// <summary>
-		/// Add our wish direction and speed onto our velocity.
-		/// </summary>
 		public virtual void Accelerate( Vector3 wishDir, float wishSpeed, float speedLimit, float acceleration )
 		{
 			if ( speedLimit > 0 && wishSpeed > speedLimit )
@@ -342,9 +340,6 @@ namespace Facepunch.CoreWars
 			Player.Velocity += wishDir * accelSpeed;
 		}
 
-		/// <summary>
-		/// Remove ground friction from velocity.
-		/// </summary>
 		public virtual void ApplyFriction( float frictionAmount = 1.0f )
 		{
 			var speed = Player.Velocity.Length;
@@ -444,27 +439,59 @@ namespace Facepunch.CoreWars
 			Player.Velocity = mover.Velocity;
 		}
 
-		/// <summary>
-		/// Check for a new ground entity.
-		/// </summary>
 		public virtual void UpdateGroundEntity( TraceResult tr )
 		{
 			GroundNormal = tr.Normal;
 
 			SurfaceFriction = tr.Surface.Friction * 1.25f;
-			if ( SurfaceFriction > 1 ) SurfaceFriction = 1;
+
+			if ( SurfaceFriction > 1 )
+				SurfaceFriction = 1;
+
+			var wasOnGround = Player.GroundEntity.IsValid();
 
 			Player.GroundEntity = tr.Entity;
 
 			if ( Player.GroundEntity.IsValid() )
 			{
 				Player.BaseVelocity = Player.GroundEntity.Velocity;
+
+				if ( !wasOnGround )
+				{
+					var fallVelocity = PreVelocity.z + (Gravity * 0.5f);
+					var threshold = -FallDamageThreshold;
+
+					if ( fallVelocity < threshold )
+					{
+						var overstep = threshold - fallVelocity;
+						var fraction = overstep.Remap( 0f, FallDamageThreshold, 0f, 1f ).Clamp( 0f, 1f );
+
+						Player.PlaySound( $"player.fall{Game.Random.Int( 1, 3 )}" )
+							.SetVolume( 0.7f + (0.3f * fraction) )
+							.SetPitch( 1f - (0.35f * fraction) );
+
+						if ( Game.IsServer )
+						{
+							var damage = new DamageInfo()
+								.WithAttacker( Player )
+								.WithTag( "fall" )
+								.WithForce( Vector3.Down * Player.Velocity.Length * fraction )
+								.WithPosition( Player.Position );
+
+							damage.Damage = (MathF.Abs( fallVelocity ) - FallDamageThreshold) * 0.2f;
+
+							Player.TakeDamage( damage );
+						}
+					}
+					else
+					{
+						var volume = Player.Velocity.Length.Remap( 0f, SprintSpeed, 0.1f, 0.5f );
+						Player.PlaySound( $"player.land{Game.Random.Int( 1, 4 )}" ).SetVolume( volume );
+					}
+				}
 			}
 		}
 
-		/// <summary>
-		/// Try to keep a walking player on the ground when running down slopes, etc.
-		/// </summary>
 		public virtual void StayOnGround()
 		{
 			var start = Player.Position + Vector3.Up * 2;
@@ -481,9 +508,6 @@ namespace Facepunch.CoreWars
 
 			Player.Position = trace.EndPosition;
 		}
-
-		public virtual void OnPreTickMove() { }
-		public virtual void AddJumpVelocity() { }
 
 		public virtual void HandleJumping()
 		{
@@ -520,7 +544,6 @@ namespace Facepunch.CoreWars
 			Player.Velocity = Player.Velocity.WithZ( startZ + flMul * flGroundFactor );
 			Player.Velocity -= new Vector3( 0f, 0f, Gravity * 0.5f ) * Time.Delta;
 
-			AddJumpVelocity();
 			AddEvent( "jump" );
 
 			if ( Player is CoreWarsPlayer player )

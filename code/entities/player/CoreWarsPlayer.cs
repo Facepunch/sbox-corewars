@@ -1288,8 +1288,8 @@ namespace Facepunch.CoreWars
 		private IntVector3? GetBlockPosition( Vector3 eyePosition, Vector3 direction )
 		{
 			var world = VoxelWorld.Current;
-			var range = 3.5f;
-			var face = world.Trace( eyePosition * (1.0f / world.VoxelSize), direction, range, out var position, out var _ );
+			var range = 5f;
+			var face = world.Trace( eyePosition * (1f / world.VoxelSize), direction, range, out var position, out var _ );
 
 			if ( face == BlockFace.Invalid )
 			{

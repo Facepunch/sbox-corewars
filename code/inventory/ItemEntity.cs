@@ -1,6 +1,7 @@
 ﻿using Sandbox;
 using System.IO;
 using Facepunch.CoreWars.UI;
+using System;
 
 namespace Facepunch.CoreWars;
 
@@ -12,7 +13,6 @@ public partial class ItemEntity : ModelEntity, IResettable
 	public TimeUntil TimeUntilCanPickup { get; set; }
 	public Vector3 IconPosition { get; set; }
 
-	private PickupTrigger PickupTrigger { get; set; }
 	private ItemWorldIcon Icon { get; set; }
 	private Particles Effect { get; set; }
 
@@ -51,8 +51,6 @@ public partial class ItemEntity : ModelEntity, IResettable
 
 	public void SetItem( InventoryItem item )
 	{
-		var worldModel = !string.IsNullOrEmpty( item.WorldModel ) ? item.WorldModel : "models/sbox_props/burger_box/burger_box.vmdl";
-
 		if ( !string.IsNullOrEmpty( item.WorldModel ) )
 		{
 			SetModel( item.WorldModel );
@@ -90,6 +88,17 @@ public partial class ItemEntity : ModelEntity, IResettable
 		Delete();
 	}
 
+	public override void ClientSpawn()
+	{
+		Effect = Particles.Create( "particles/gameplay/items/item_on_ground/generic/items_on_ground.vpcf" );
+		Icon = new ItemWorldIcon( this );
+
+		if ( Item.IsValid() )
+		{
+			Effect.SetPosition( 6, Item.Color.Saturate( 1.5f ) * 255f );
+		}
+	}
+
 	public override void Spawn()
 	{
 		TimeUntilCanPickup = 1f;
@@ -99,5 +108,19 @@ public partial class ItemEntity : ModelEntity, IResettable
 
 		base.Spawn();
 	}
-}
 
+	protected override void OnDestroy()
+	{
+		Effect?.Destroy( true );
+		Icon?.Delete();
+		Icon = null;
+	}
+
+	[Event.Tick.Client]
+	protected virtual void ClientTick()
+	{
+		IconPosition = WorldSpaceBounds.Center + Vector3.Up * (8f + MathF.Sin( Time.Now ) * 8f);
+		Effect?.SetPosition( 0, IconPosition );
+		Effect?.SetForward( 0, Vector3.Forward );
+	}
+}

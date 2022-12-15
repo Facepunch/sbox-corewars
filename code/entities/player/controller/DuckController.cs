@@ -79,10 +79,7 @@ namespace Facepunch.CoreWars
 
 		public float GetWishSpeed()
 		{
-			if ( !IsActive )
-				return -1f;
-
-			return 64f;
+			return IsActive ? 100f : 0f;
 		}
 	}
 }
