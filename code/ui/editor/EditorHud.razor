@@ -33,26 +33,26 @@
 
 @code
 {
-	public Panel PopupPanel { get; set; }
+    public Panel PopupPanel { get; set; }
 
-	public static void ToastAll( string text, string icon = "" )
-	{
-		Toast( To.Everyone, text, icon );
-	}
+    public static void ToastAll( string text, string icon = "" )
+    {
+        Toast( To.Everyone, text, icon );
+    }
 
     public static void Toast( BasePlayer player, string text, string icon = "" )
-	{
-		Toast( To.Single( player ), text, icon );
-	}
+    {
+        Toast( To.Single( player ), text, icon );
+    }
 
-	public override Panel FindPopupPanel()
-	{
-		return PopupPanel;
-	}
+    public override Panel FindPopupPanel()
+    {
+        return PopupPanel;
+    }
 
-    protected override void OnParametersSet()
+    protected override void OnAfterTreeRender( bool firstTime )
     {
         PopupPanel.BindClass( "open", () => PopupPanel.ChildrenCount > 0 );
-        base.OnParametersSet();
+        base.OnAfterTreeRender( firstTime );
     }
 }

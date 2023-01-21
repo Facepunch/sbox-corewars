@@ -8,13 +8,6 @@ namespace Facepunch.CoreWars.Editor
 		public Material BoxMaterial = Material.Load( "materials/editor/place_block.vmat" );
 		public Color Color { get; set; }
 
-		public override void Spawn()
-		{
-			RenderBounds = new BBox( new Vector3( -VoxelWorld.Current.VoxelSize ), new Vector3( VoxelWorld.Current.VoxelSize ) );
-
-			base.Spawn();
-		}
-
 		public override void DoRender( SceneObject sceneObject )
 		{
 			if ( !EnableDrawing || !VoxelWorld.Current.IsValid() )
@@ -27,6 +20,15 @@ namespace Facepunch.CoreWars.Editor
 			var size = new IntVector3( VoxelWorld.Current.VoxelSize );
 
 			DrawBox( vb, center, size * 1f );
+		}
+
+		[Event.Tick.Client]
+		private void ClientTick()
+		{
+			if ( VoxelWorld.Current.IsValid() )
+			{
+				RenderBounds = new BBox( new Vector3( -VoxelWorld.Current.VoxelSize ), new Vector3( VoxelWorld.Current.VoxelSize ) );
+			}
 		}
 
 		private void DrawBox( VertexBuffer vb, Vector3 center, Vector3 size )
