@@ -56,7 +56,7 @@ namespace Facepunch.CoreWars
 		[Event.Tick.Client]
 		protected virtual void ClientTick()
 		{
-			RenderColor = Team.GetColor();
+			SceneObject?.Attributes?.Set( "TintColor", Team.GetColor() );
 		}
 
 		public void OnUsed( CoreWarsPlayer player )
