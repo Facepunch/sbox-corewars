@@ -6,7 +6,7 @@ namespace Facepunch.CoreWars.Blocks
 	[Library]
 	public class TemperedGlassBlock : BaseBuildingBlock
 	{
-		public override string DefaultTexture => "tempered_glass_01";
+		public override string DefaultTexture => "window_01";
 		public override string FriendlyName => "Tempered Glass";
 		public override string Description => "An easily broken but blastproof defensive block.";
 		public override string DestroySound => "break.glass";
