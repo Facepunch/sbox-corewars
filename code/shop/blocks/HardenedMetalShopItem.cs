@@ -13,7 +13,7 @@ namespace Facepunch.CoreWars
 		{
 			[typeof( IronItem )] = 40
 		};
-		public override int Quantity => 16;
+		public override int Quantity => 8;
 
 		public override BlockType GetBlockType( CoreWarsPlayer player )
 		{

@@ -10,7 +10,7 @@ namespace Facepunch.CoreWars
 	{
 		public override Dictionary<Type, int> Costs => new()
 		{
-			[typeof( CrystalItem )] = 7
+			[typeof( CrystalItem )] = 6
 		};
 		public override Type RequiredUpgradeType => typeof( ArmoryUpgrade );
 	}

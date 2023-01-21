@@ -11,9 +11,9 @@ namespace Facepunch.CoreWars
 	{
 		public override Dictionary<Type, int> Costs => new()
 		{
-			[typeof( IronItem )] = 34
+			[typeof( IronItem )] = 24
 		};
-		public override int Quantity => 16;
+		public override int Quantity => 8;
 
 		public override BlockType GetBlockType( CoreWarsPlayer player )
 		{

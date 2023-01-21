@@ -11,7 +11,7 @@ namespace Facepunch.CoreWars
 	{
 		public override Dictionary<Type, int> Costs => new()
 		{
-			[typeof( IronItem )] = 18
+			[typeof( IronItem )] = 16
 		};
 		public override int Quantity => 4;
 
