@@ -49,18 +49,36 @@ namespace Facepunch.CoreWars
 				DestroyTime = LifeTime.Value;
 			}
 
-			if ( Simulator != null && Simulator.IsValid() )
-			{
-				Simulator?.Add( this );
-				Owner = Simulator.Owner;
-			}
-
 			InitialVelocity = velocity;
 			StartPosition = start;
 			EnableDrawing = false;
 			Velocity = velocity;
 			Callback = callback;
 			Position = start;
+
+			if ( Simulator.IsValid() )
+			{
+				Simulator?.Add( this );
+				Owner = Simulator.Owner;
+
+				if ( Game.IsServer )
+				{
+					using ( LagCompensation() )
+					{
+						// Work out the number of ticks for this client's latency that it took for us to receive this input.
+						var tickDifference = ((float)(Owner.Client.Ping / 2000f) / Time.Delta).CeilToInt();
+
+						// Advance the simulation by that number of ticks.
+						for ( var i = 0; i < tickDifference; i++ )
+						{
+							if ( IsValid )
+							{
+								Simulate();
+							}
+						}
+					}
+				}
+			}
 
 			if ( IsClientOnly )
 			{
@@ -80,8 +98,8 @@ namespace Facepunch.CoreWars
 
         public override void ClientSpawn()
         {
-			// We only want to create effects if we don't have a client proxy.
-			if ( !HasClientProxy() )
+			// We only want to create effects if we're the server-side copy.
+			if ( !IsServerSideCopy() )
             {
 				CreateEffects();
 			}
@@ -154,7 +172,7 @@ namespace Facepunch.CoreWars
 			}
 		}
 
-		public bool HasClientProxy()
+		public bool IsServerSideCopy()
         {
 			return !IsClientOnly && Owner.IsValid() && Owner.IsLocalPawn;
 
@@ -179,9 +197,9 @@ namespace Facepunch.CoreWars
 		[ClientRpc]
 		protected virtual void PlayHitEffects( Vector3 normal )
         {
-			if ( HasClientProxy() )
+			if ( IsServerSideCopy() )
             {
-				// We don't want to play hit effects if we have a client proxy.
+				// We don't want to play hit effects if we're the server-side copy.
 				return;
             }
 
@@ -200,7 +218,7 @@ namespace Facepunch.CoreWars
 				Util.Play( HitSound, Position );
 		}
 
-		[Event.Tick.Client]
+		[Event.PreRender]
 		protected virtual void ClientTick()
 		{
 			if ( ModelEntity.IsValid() )
