@@ -14,27 +14,21 @@ namespace Facepunch.CoreWars
 	}
 
 	[Library( "weapon_crossbow" )]
-	public partial class Crossbow : BulletDropWeapon<CrossbowBoltProjectile>
+	public partial class Crossbow : ProjectileWeapon<CrossbowBoltProjectile>
 	{
 		public override WeaponConfig Config => new CrossbowConfig();
 		public override string[] KillFeedReasons => new[] { "shot", "blasted" };
-		public override string ImpactEffect => GetImpactEffect();
-		public override string TrailEffect => GetTrailEffect();
+		public override string ProjectileData => (WeaponItem.IsValid() && WeaponItem.Tier == 2) ? "cw_bolt_2" : "cw_bolt";
 		public override string ViewModelPath => "weapons/rust_crossbow/v_rust_crossbow.vmdl";
 		public override int ViewModelMaterialGroup => 1;
 		public override string MuzzleFlashEffect => null;
-		public override string HitSound => null;
 		public override string DamageType => "bullet";
 		public override float PrimaryRate => 0.3f;
 		public override float SecondaryRate => 1f;
-		public override float Speed => 1500f;
-		public override float Gravity => 6f;
 		public override float InheritVelocity => 0f;
 		public override string ReloadSoundName => "crossbow.reload";
-		public override string ProjectileModel => null;
 		public override int ClipSize => 1;
 		public override float ReloadTime => 2.3f;
-		public override float ProjectileLifeTime => 4f;
 
 		public override void Spawn()
 		{
@@ -102,26 +96,6 @@ namespace Facepunch.CoreWars
 					victim.PlaySound( "melee.hitflesh" );
 				}
 			}
-		}
-
-		private string GetTrailEffect()
-		{
-			if ( WeaponItem.IsValid() && WeaponItem.Tier == 2 )
-			{
-				return "particles/weapons/crossbow/tier2/crossbow_trail_2.vpcf";
-			}
-
-			return "particles/weapons/crossbow/crossbow_trail.vpcf";
-		}
-
-		private string GetImpactEffect()
-		{
-			if ( WeaponItem.IsValid() && WeaponItem.Tier == 2 )
-			{
-				return "particles/weapons/crossbow/tier2/crossbow_impact_2.vpcf";
-			}
-
-			return "particles/weapons/crossbow/crossbow_impact.vpcf";
 		}
 	}
 }

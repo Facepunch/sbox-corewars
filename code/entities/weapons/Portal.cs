@@ -15,12 +15,11 @@ namespace Facepunch.CoreWars
 	}
 
 	[Library( "weapon_portal" )]
-	partial class Portal : Throwable<BulletDropProjectile>
+	partial class Portal : Throwable<Projectile>
 	{
 		public override WeaponConfig Config => new PortalConfig();
-		public override string TrailEffect => "particles/weapons/portal_grenade/portal_grenade_trail/portal_grenade_trail.vpcf";
+		public override string ProjectileData => "cw_portal";
 		public override string ThrowSound => "portal.launch";
-		public override string HitSound => null;
 		public override string DamageType => "blast";
 
 		private CoreWarsPlayer PlayerToTeleport { get; set; }
@@ -34,7 +33,7 @@ namespace Facepunch.CoreWars
 			}
 		}
 
-		protected override void OnProjectileHit( BulletDropProjectile projectile, TraceResult trace )
+		protected override void OnProjectileHit( Projectile projectile, TraceResult trace )
 		{
 			if ( Game.IsClient ) return;
 

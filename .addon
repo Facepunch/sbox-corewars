@@ -1,5 +1,5 @@
 {
-  "Title": "Core Wars",
+  "Title": "core wars",
   "Type": "game",
   "Org": "facepunch",
   "Ident": "corewars",
@@ -8,17 +8,17 @@
   "HasAssets": true,
   "AssetsPath": "",
   "ResourcePaths": [
-    "/textures/*",
-    "/shaders/*",
-    "/code/ui/*",
-    "/fonts/*",
-    "/blocks/*"
+    "\u0022/textures/*\u0022",
+    "\u0022/shaders/*\u0022",
+    "\u0022/code/ui/*\u0022",
+    "\u0022/fonts/*\u0022",
+    "\u0022/blocks/*\u0022"
   ],
   "HasCode": true,
   "CodePath": "code",
   "Metadata": {
     "MapList": [
-      "facepunch.cw_new_world",
+      "facepunch.cw_newworld",
       "facepunch.cw_editor_map"
     ],
     "MinPlayers": 1,
@@ -117,6 +117,7 @@
     "DefaultLeaderboards": null,
     "Summary": "A voxel-based PvP game where teams fight to build to and destroy their enemy\u0027s Core. ",
     "Description": "",
-    "Public": true
+    "Public": true,
+    "CsProjName": ""
   }
 }

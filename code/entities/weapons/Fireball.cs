@@ -15,12 +15,10 @@ namespace Facepunch.CoreWars
 	}
 
 	[Library( "weapon_fireball" )]
-	public partial class Fireball : Throwable<BulletDropProjectile>
+	public partial class Fireball : Throwable<Projectile>
 	{
 		public override WeaponConfig Config => new FireballConfig();
-		public override string TrailEffect => "particles/weapons/fireball/fireball_trail.vpcf";
-		public override string ThrowSound => "fireball.launch";
-		public override string HitSound => "fireball.hit";
+		public override string ProjectileData => "cw_fireball";
 		public override string DamageType => "blast";
 		
 		private Particles HandEffect { get; set; }
@@ -39,17 +37,17 @@ namespace Facepunch.CoreWars
 			base.ActiveEnd( entity, dropped );
 		}
 
-		protected override void OnProjectileFired( BulletDropProjectile projectile )
+		protected override void OnProjectileFired( Projectile projectile )
 		{
 			HandEffect?.Destroy( true );
 			base.OnProjectileFired( projectile );
 		}
 
-		protected override void OnProjectileHit( BulletDropProjectile projectile, TraceResult trace )
+		protected override void OnProjectileHit( Projectile projectile, TraceResult trace )
 		{
 			var position = projectile.Position;
 			var explosion = Particles.Create( "particles/weapons/fireball/fireball_explosion.vpcf" );
-			explosion.SetPosition( 0, position - projectile.Velocity.Normal * projectile.Radius );
+			explosion.SetPosition( 0, position - projectile.Velocity.Normal * projectile.Data.Radius );
 
 			if ( Game.IsClient ) return;
 

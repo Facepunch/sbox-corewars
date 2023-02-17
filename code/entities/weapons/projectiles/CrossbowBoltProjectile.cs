@@ -4,7 +4,7 @@ using System;
 namespace Facepunch.CoreWars
 {
 	[Library]
-	public partial class CrossbowBoltProjectile : BulletDropProjectile
+	public partial class CrossbowBoltProjectile : Projectile
 	{
 		public override void CreateEffects()
         {
