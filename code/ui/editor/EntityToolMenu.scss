@@ -12,6 +12,10 @@
     .items {
         RadialMenuItem {
             background-color: rgba( $editor 0.6 );
+
+            .icon {
+                background-tint: darken( $editor, 0.4 );
+            }
         }
     }
 
