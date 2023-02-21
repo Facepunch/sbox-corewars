@@ -1,5 +1,6 @@
 ﻿using Facepunch.Voxels;
 using Sandbox;
+using System;
 
 namespace Facepunch.CoreWars.Blocks
 {
@@ -13,7 +14,7 @@ namespace Facepunch.CoreWars.Blocks
 		{
 			if ( Game.IsServer && Health < 100 && LastDamageTime >= 2f )
 			{
-				Health = 100;
+				Health = (byte)Math.Min( Health + 1, 100 );
 				IsDirty = true;
 			}
 

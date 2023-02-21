@@ -17,15 +17,15 @@ namespace Facepunch.CoreWars
 	[Library( "weapon_pickaxe" )]
 	public partial class Pickaxe : MeleeWeapon
 	{
-		public override WeaponConfig Config => new AxeConfig();
+		public override WeaponConfig Config => new PickaxeConfig();
 		public override float ScaleNonBlockDamage => 0.2f;
 		public override string ViewModelPath => "models/weapons/pickaxe/v_pickaxe01.vmdl";
 		public override bool DoesBlockDamage => true;
 		public override string DamageType => "blunt";
 		public override float MeleeRange => 80f;
-		public override float PrimaryRate => 2f;
+		public override float PrimaryRate => 1.2f;
 		public override BuildingMaterialType PrimaryMaterialType => BuildingMaterialType.Metal;
-		public override float SecondaryMaterialMultiplier => 0.75f;
+		public override float SecondaryMaterialMultiplier => 0.5f;
 
 		public override void Spawn()
 		{

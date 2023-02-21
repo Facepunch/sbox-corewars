@@ -22,7 +22,7 @@ namespace Facepunch.CoreWars
 		public override bool DoesBlockDamage => true;
 		public override string DamageType => "blunt";
 		public override float MeleeRange => 80f;
-		public override float PrimaryRate => 2f;
+		public override float PrimaryRate => 1.5f;
 		public override BuildingMaterialType PrimaryMaterialType => BuildingMaterialType.Wooden;
 		public override float SecondaryMaterialMultiplier => 0.5f;
 

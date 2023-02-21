@@ -16,7 +16,7 @@ namespace Facepunch.CoreWars
 	[Library( "weapon_vortex_bomb" )]
 	public partial class VortexBomb : BlockPlaceWeapon<VortexBombBlock>
 	{
-		public override WeaponConfig Config => new FireballConfig();
+		public override WeaponConfig Config => new VortexBombConfig();
 		public override string ViewModelPath => null;
 		public override int ViewModelMaterialGroup => 1;
 

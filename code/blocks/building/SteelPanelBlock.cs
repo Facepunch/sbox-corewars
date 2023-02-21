@@ -12,6 +12,6 @@ namespace Facepunch.CoreWars.Blocks
 		public override string DestroySound => "break.metal";
 		public override string HitSound => "melee.hitmetal";
 		public override BuildingMaterialType MaterialType => BuildingMaterialType.Metal;
-		public override float DamageMultiplier => 0.25f;
+		public override float DamageMultiplier => 0.1f;
 	}
 }
