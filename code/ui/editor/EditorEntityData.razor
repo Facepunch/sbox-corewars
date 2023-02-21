@@ -12,96 +12,106 @@
 @inherits Panel
 
 <root>
-    <div class="modal">
+    <div @ref="Modal" class="modal">
         <label @text="Title"class="title">Entity</label>
-
-        <SimpleForm @ref="PropertyForm">
-
-        </SimpleForm>
     </div>
 </root>
 
 @code
 {
-	private static object ConvertPropertyValue( PropertyDescription property, string value )
-	{
-		object convertedValue;
+    private static object ConvertPropertyValue( PropertyDescription property, string value )
+    {
+        object convertedValue;
 
-		if ( property.PropertyType.IsEnum )
-			convertedValue = Enum.Parse( property.PropertyType, value );
-		else if ( property.PropertyType == typeof( float ) )
-			convertedValue = Convert.ToSingle( value );
-		else if ( property.PropertyType == typeof( int ) )
-			convertedValue = Convert.ToInt32( value );
-		else if ( property.PropertyType == typeof( bool ) )
-			convertedValue = Convert.ToBoolean( value );
-		else
-			convertedValue = value;
+        if ( property.PropertyType.IsEnum )
+            convertedValue = Enum.Parse( property.PropertyType, value );
+        else if ( property.PropertyType == typeof( float ) )
+            convertedValue = Convert.ToSingle( value );
+        else if ( property.PropertyType == typeof( int ) )
+            convertedValue = Convert.ToInt32( value );
+        else if ( property.PropertyType == typeof( bool ) )
+            convertedValue = Convert.ToBoolean( value );
+        else
+            convertedValue = value;
 
-		return convertedValue;
-	}
+        return convertedValue;
+    }
 
-	public static EditorEntityData Current { get; private set; }
+    public static EditorEntityData Current { get; private set; }
 
-	public SimpleForm PropertyForm { get; set; }
-	public string Title => Entity.GetType().Name;
-	public ISourceEntity Entity { get; private set; }
+    public Panel Modal { get; private set; }
+    public SimpleForm PropertyForm { get; private set; }
+    public string Title => Entity.GetType().Name;
+    public ISourceEntity Entity { get; private set; }
 
-	private Dictionary<string, object> ChangedValues { get; set; } = new();
+    private Dictionary<string, object> ChangedValues { get; set; } = new();
 
-	public static void Open( ISourceEntity entity )
-	{
-		Current?.Delete();
-		Current = new EditorEntityData( entity );
-		Current.PopulateItems();
+    public static void Open( ISourceEntity entity )
+    {
+        Current?.Delete();
+        Current = new EditorEntityData( entity );
 
-		var popup = Game.RootPanel.FindPopupPanel();
-		popup?.AddChild( Current );
-	}
+        var popup = Game.RootPanel.FindPopupPanel();
+        popup?.AddChild( Current );
+    }
 
-	public EditorEntityData( ISourceEntity entity )
-	{
-		Entity = entity;
-	}
+    public EditorEntityData( ISourceEntity entity )
+    {
+        Entity = entity;
+    }
 
-	public void PopulateItems()
-	{
-		PropertyForm.Clear();
-		PropertyForm.StartGroup();
+    public void PopulateItems()
+    {
+        if ( PropertyForm is null )
+        {
+            if ( Modal is null ) return;
 
-		ChangedValues.Clear();
+            PropertyForm = Modal.AddChild<SimpleForm>();
+        }
 
-		var properties = TypeLibrary.GetPropertyDescriptions( Entity );
+        PropertyForm.Clear();
+        PropertyForm.StartGroup();
 
-		for ( int i = 0; i < properties.Length; i++ )
-		{
-			var property = properties[i];
+        ChangedValues.Clear();
 
-			if ( property.GetCustomAttribute<EditorPropertyAttribute>() == null )
-				continue;
+        var properties = TypeLibrary.GetPropertyDescriptions( Entity );
 
-			PropertyForm.AddRowWithCallback( property, Entity, PropertyForm.CreateControlFor( property ), ( value ) =>
-			{
-				ChangedValues[property.Name] = value;
-			} );
-		}
+        for ( int i = 0; i < properties.Length; i++ )
+        {
+            var property = properties[i];
 
-		PropertyForm.EndGroup();
+            if ( property.GetCustomAttribute<EditorPropertyAttribute>() == null )
+                continue;
 
-		var button = PropertyForm.Add.Button( "Save" );
-		button.AddClass( "editor-button" );
-		button.AddEventListener( "onclick", () => Save() );
-	}
+            PropertyForm.AddRowWithCallback( property, Entity, PropertyForm.CreateControlFor( property ), ( value ) =>
+            {
+                ChangedValues[property.Name] = value;
+            } );
+        }
 
-	protected virtual void Save()
-	{
-		foreach ( var kv in ChangedValues )
-		{
-			SaveEntityKeyValue( Entity.NetworkIdent, kv.Key, kv.Value.ToString() );
-		}
+        PropertyForm.EndGroup();
 
-		ChangedValues.Clear();
+        var button = PropertyForm.Add.Button( "Save" );
+        button.AddClass( "editor-button" );
+        button.AddEventListener( "onclick", () => Save() );
+    }
 
-		Delete();
-	}
+    protected virtual void Save()
+    {
+        foreach ( var kv in ChangedValues )
+        {
+            SaveEntityKeyValue( Entity.NetworkIdent, kv.Key, kv.Value.ToString() );
+        }
+
+        ChangedValues.Clear();
+
+        Delete();
+    }
+
+    protected override void OnAfterTreeRender( bool firstTime )
+    {
+        if ( firstTime ) PopulateItems();
+
+        base.OnAfterTreeRender( firstTime );
+    }
 }

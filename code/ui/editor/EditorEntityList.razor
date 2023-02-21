@@ -24,67 +24,75 @@
 
 @code
 {
-	public static EditorEntityList Current { get; private set; }
+    public static EditorEntityList Current { get; private set; }
 
-	public Panel Container { get; set; }
+    public Panel Container { get; set; }
 
-	public static void Open()
-	{
-		Current?.Delete();
-		Current = new EditorEntityList();
-		Current.PopulateItems();
+    public static void Open()
+    {
+        Current?.Delete();
+        Current = new EditorEntityList();
 
-		Game.RootPanel.FindPopupPanel().AddChild( Current );
-	}
+        Game.RootPanel.FindPopupPanel().AddChild( Current );
+    }
 
-	public void Close()
-	{
-		Delete();
-	}
+    public void Close()
+    {
+        Delete();
+    }
 
-	public void PopulateItems()
-	{
-		Container.DeleteChildren();
+    public void PopulateItems()
+    {
+        if (Container == null) return;
 
-		var descriptions = TypeLibrary.GetTypes<Entity>().Where( d => d.GetAttribute<EditorEntityAttribute>() != null ).ToList();
-		var categories = new Dictionary<string, List<TypeDescription>>();
+        Container.DeleteChildren();
 
-		descriptions.Sort( ( a, b ) => a.Group.CompareTo( b.Group ) );
+        var descriptions = TypeLibrary.GetTypes<Entity>().Where( d => d.GetAttribute<EditorEntityAttribute>() != null ).ToList();
+        var categories = new Dictionary<string, List<TypeDescription>>();
 
-		for ( int i = 0; i < descriptions.Count; i++ )
-		{
-			var description = descriptions[i];
-			var group = string.IsNullOrEmpty( description.Group ) ? "Other" : description.Group;
-				
-			if ( !categories.TryGetValue( group, out var list ) )
-			{
-				list = new List<TypeDescription>();
-				categories.Add( group, list );
-			}
+        descriptions.Sort( ( a, b ) => a.Group.CompareTo( b.Group ) );
 
-			list.Add( description );
-		}
+        for ( int i = 0; i < descriptions.Count; i++ )
+        {
+            var description = descriptions[i];
+            var group = string.IsNullOrEmpty( description.Group ) ? "Other" : description.Group;
 
-		foreach ( var kv in categories )
-		{
-			var category = kv.Key;
-			var values = kv.Value;
-			var container = Container.Add.Panel( "category" );
-			var label = container.Add.Label( category, "title" );
+            if ( !categories.TryGetValue( group, out var list ) )
+            {
+                list = new List<TypeDescription>();
+                categories.Add( group, list );
+            }
 
-			for ( int i = 0; i < values.Count; i++ )
-			{
-				var description = values[i];
-				var button = container.Add.Button( description.Title );
-				button.AddClass( "editor-button" );
-				button.AddEventListener( "onclick", () => OnItemSelected( description ) );
-			}
-		}
-	}
+            list.Add( description );
+        }
 
-	protected virtual void OnItemSelected( TypeDescription description )
-	{
-		EntitiesTool.ChangeEntityToolCmd( description.ClassName );
-		Delete();
-	}
+        foreach ( var kv in categories )
+        {
+            var category = kv.Key;
+            var values = kv.Value;
+            var container = Container.Add.Panel( "category" );
+            var label = container.Add.Label( category, "title" );
+
+            for ( int i = 0; i < values.Count; i++ )
+            {
+                var description = values[i];
+                var button = container.Add.Button( description.Title );
+                button.AddClass( "editor-button" );
+                button.AddEventListener( "onclick", () => OnItemSelected( description ) );
+            }
+        }
+    }
+
+    protected virtual void OnItemSelected( TypeDescription description )
+    {
+        EntitiesTool.ChangeEntityToolCmd( description.ClassName );
+        Delete();
+    }
+
+    protected override void OnAfterTreeRender( bool firstTime )
+    {
+        if (firstTime) PopulateItems();
+
+        base.OnAfterTreeRender( firstTime );
+    }
 }

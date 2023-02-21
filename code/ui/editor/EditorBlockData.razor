@@ -11,97 +11,107 @@
 @inherits Panel
 
 <root>
-    <div class="modal">
+    <div @ref="Modal" class=" modal">
         <label @text="Title"class="title">Entity</label>
-
-        <SimpleForm @ref="PropertyForm">
-
-        </SimpleForm>
     </div>
 </root>
 
 @code
 {
-	private static object ConvertPropertyValue( PropertyDescription property, string value )
-	{
-		object convertedValue;
+    private static object ConvertPropertyValue( PropertyDescription property, string value )
+    {
+        object convertedValue;
 
-		if ( property.PropertyType.IsEnum )
-			convertedValue = Enum.Parse( property.PropertyType, value );
-		else if ( property.PropertyType == typeof( float ) )
-			convertedValue = Convert.ToSingle( value );
-		else if ( property.PropertyType == typeof( int ) )
-			convertedValue = Convert.ToInt32( value );
-		else if ( property.PropertyType == typeof( bool ) )
-			convertedValue = Convert.ToBoolean( value );
-		else
-			convertedValue = value;
+        if ( property.PropertyType.IsEnum )
+            convertedValue = Enum.Parse( property.PropertyType, value );
+        else if ( property.PropertyType == typeof( float ) )
+            convertedValue = Convert.ToSingle( value );
+        else if ( property.PropertyType == typeof( int ) )
+            convertedValue = Convert.ToInt32( value );
+        else if ( property.PropertyType == typeof( bool ) )
+            convertedValue = Convert.ToBoolean( value );
+        else
+            convertedValue = value;
 
-		return convertedValue;
-	}
+        return convertedValue;
+    }
 
-	public static EditorBlockData Current { get; private set; }
+    public static EditorBlockData Current { get; private set; }
 
-	public SimpleForm PropertyForm { get; set; }
-	public string Title => Voxel.GetBlockType().FriendlyName;
-	public BlockState State { get; private set; }
-	public Voxel Voxel { get; private set; }
+    public Panel Modal { get; private set; }
+    public SimpleForm PropertyForm { get; private set; }
+    public string Title => Voxel.GetBlockType().FriendlyName;
+    public BlockState State { get; private set; }
+    public Voxel Voxel { get; private set; }
 
-	private Dictionary<string, object> ChangedValues { get; set; } = new();
+    private Dictionary<string, object> ChangedValues { get; set; } = new();
 
-	public static void Open( Voxel voxel, BlockState state )
-	{
-		Current?.Delete();
-		Current = new EditorBlockData( voxel, state );
-		Current.PopulateItems();
+    public static void Open( Voxel voxel, BlockState state )
+    {
+        Current?.Delete();
+        Current = new EditorBlockData( voxel, state );
 
-		Game.RootPanel.FindPopupPanel().AddChild( Current );
-	}
+        Game.RootPanel.FindPopupPanel().AddChild( Current );
+    }
 
-	public EditorBlockData( Voxel voxel, BlockState state )
-	{
-		Voxel = voxel;
-		State = state;
-	}
+    public EditorBlockData( Voxel voxel, BlockState state )
+    {
+        Voxel = voxel;
+        State = state;
+    }
 
-	public void PopulateItems()
-	{
-		PropertyForm.Clear();
-		PropertyForm.StartGroup();
+    public void PopulateItems()
+    {
+        if ( PropertyForm is null )
+        {
+            if ( Modal is null ) return;
 
-		ChangedValues.Clear();
+            PropertyForm = Modal.AddChild<SimpleForm>();
+        }
 
-		var properties = TypeLibrary.GetPropertyDescriptions( State );
+        PropertyForm.Clear();
+        PropertyForm.StartGroup();
 
-		for ( int i = 0; i < properties.Length; i++ )
-		{
-			var property = properties[i];
+        ChangedValues.Clear();
 
-			if ( property.GetCustomAttribute<EditorPropertyAttribute>() == null )
-				continue;
+        var properties = TypeLibrary.GetPropertyDescriptions( State );
 
-			PropertyForm.AddRowWithCallback( property, State, PropertyForm.CreateControlFor( property ), ( value ) =>
-			{
-				ChangedValues[property.Name] = value;
-			} );
-		}
+        for ( int i = 0; i < properties.Length; i++ )
+        {
+            var property = properties[i];
 
-		PropertyForm.EndGroup();
+            if ( property.GetCustomAttribute<EditorPropertyAttribute>() == null )
+                continue;
 
-		var button = PropertyForm.Add.Button( "Save" );
-		button.AddClass( "editor-button" );
-		button.AddEventListener( "onclick", () => Save() );
-	}
+            PropertyForm.AddRowWithCallback( property, State, PropertyForm.CreateControlFor( property ), ( value ) =>
+            {
+                ChangedValues[property.Name] = value;
+            } );
+        }
 
-	protected virtual void Save()
-	{
-		foreach ( var kv in ChangedValues )
-		{
-			SaveBlockDataValue( Voxel.Position.x, Voxel.Position.y, Voxel.Position.z, kv.Key, kv.Value.ToString() );
-		}
+        PropertyForm.EndGroup();
 
-		ChangedValues.Clear();
+        var button = PropertyForm.Add.Button( "Save" );
+        button.AddClass( "editor-button" );
+        button.AddEventListener( "onclick", () => Save() );
+    }
 
-		Delete();
-	}
+    protected virtual void Save()
+    {
+        foreach ( var kv in ChangedValues )
+        {
+            SaveBlockDataValue( Voxel.Position.x, Voxel.Position.y, Voxel.Position.z, kv.Key, kv.Value.ToString() );
+        }
+
+        ChangedValues.Clear();
+
+        Delete();
+    }
+
+    protected override void OnAfterTreeRender( bool firstTime )
+    {
+        if (firstTime) PopulateItems();
+
+        base.OnAfterTreeRender( firstTime );
+    }
 }
