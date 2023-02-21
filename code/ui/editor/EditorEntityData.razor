@@ -75,6 +75,7 @@
         ChangedValues.Clear();
 
         var properties = TypeLibrary.GetPropertyDescriptions( Entity );
+        var anyProperties = false;
 
         for ( int i = 0; i < properties.Length; i++ )
         {
@@ -87,6 +88,13 @@
             {
                 ChangedValues[property.Name] = value;
             } );
+
+            anyProperties = true;
+        }
+
+        if ( !anyProperties )
+        {
+            PropertyForm.Clear();
         }
 
         PropertyForm.EndGroup();
