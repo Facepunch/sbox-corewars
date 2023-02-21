@@ -1,5 +1,5 @@
 {
-  "Title": "core wars",
+  "Title": "Core Wars",
   "Type": "game",
   "Org": "facepunch",
   "Ident": "corewars",
@@ -118,6 +118,11 @@
     "Summary": "A voxel-based PvP game where teams fight to build to and destroy their enemy\u0027s Core. ",
     "Description": "",
     "Public": true,
-    "CsProjName": ""
+    "CsProjName": "",
+    "Compiler": {
+      "RootNamespace": "Sandbox",
+      "DefineConstants": "SANDBOX;ADDON;DEBUG",
+      "NoWarn": "1701;1702;1591;"
+    }
   }
 }

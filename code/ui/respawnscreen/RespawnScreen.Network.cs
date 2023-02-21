@@ -10,9 +10,9 @@ public partial class RespawnScreen
 	{
 		Instance.SetClass( "hidden", false );
 
-		if ( attacker is CoreWars.CoreWarsPlayer player )
+		if ( attacker is CoreWarsPlayer player )
 			Instance.KillerInfo.Update( player );
-		else if ( attacker.IsWorld )
+		else if ( !attacker.IsValid() || attacker.IsWorld )
 			Instance.KillerInfo.Update( "Unknown" );
 		else if ( attacker is IKillFeedInfo info )
 			Instance.KillerInfo.Update( info );
