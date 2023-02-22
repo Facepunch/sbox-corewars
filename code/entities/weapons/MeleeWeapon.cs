@@ -12,7 +12,7 @@ namespace Facepunch.CoreWars
 		public virtual bool DoesBlockDamage => false;
 		public virtual bool UseTierBodyGroups => false;
 		public virtual string HitPlayerSound => "melee.hitflesh";
-		public virtual string HitObjectSound => "sword.hit";
+		public virtual string HitObjectSound => "sword.slash";
 		public virtual string SwingSound => "melee.swing";
 		public virtual float Force => 1.5f;
 
@@ -36,8 +36,8 @@ namespace Facepunch.CoreWars
 
 			PlayAttackAnimation();
 			ShootEffects();
-			MeleeStrike( Config.Damage * damageScale, Force );
 			PlaySound( SwingSound );
+			MeleeStrike( Config.Damage * damageScale, Force );
 
 			if ( Game.IsServer && WeaponItem.IsValid() && DoesBlockDamage )
 			{

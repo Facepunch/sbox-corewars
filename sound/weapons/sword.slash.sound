@@ -1,0 +1,14 @@
+{
+  "UI": false,
+  "Volume": "0.35,0.35,0",
+  "Pitch": "1.00,1.00,0",
+  "Decibels": 45,
+  "SelectionMode": "Random",
+  "Sounds": [
+    "sound/weapons/knife.swipe.vsnd",
+    "sound/weapons/knife.swipe1.vsnd",
+    "sound/weapons/knife.swipe2.vsnd"
+  ],
+  "MaximumDistance": 491.52356,
+  "MinimumDistance": 24.576178
+}
