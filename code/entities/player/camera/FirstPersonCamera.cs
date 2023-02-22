@@ -15,6 +15,8 @@ namespace Facepunch.CoreWars
 			Camera.FirstPersonViewer = player;
 			Camera.ZNear = 1f;
 			Camera.ZFar = 5000f;
+
+			ScreenShake.Apply();
 		}
 	}
 }

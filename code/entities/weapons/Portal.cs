@@ -47,6 +47,9 @@ namespace Facepunch.CoreWars
 				var player = PlayerToTeleport;
 				if ( !player.IsValid() ) return;
 
+				player.Position = position;
+				player.ResetInterpolation();
+
 				using ( Prediction.Off() )
 				{
 					var startFx = Particles.Create( "particles/weapons/portal_grenade/portal_spawn/portal_spawn.vpcf" );
@@ -57,11 +60,10 @@ namespace Facepunch.CoreWars
 					endFx.SetPosition( 0, position );
 					endFx.AutoDestroy( 3f );
 
+					ScreenShake.DoRandomShake( To.Single( player ), position, 512f, 2f );
+
 					player.PlaySound( "portal.teleport" );
 				}
-
-				player.Position = position;
-				player.ResetInterpolation();
 
 				if ( WeaponItem.IsValid() )
 				{

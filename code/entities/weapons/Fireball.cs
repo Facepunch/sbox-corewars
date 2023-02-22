@@ -49,6 +49,8 @@ namespace Facepunch.CoreWars
 			var explosion = Particles.Create( "particles/weapons/fireball/fireball_explosion.vpcf" );
 			explosion.SetPosition( 0, position - projectile.Velocity.Normal * projectile.Data.Radius );
 
+			ScreenShake.DoRandomShake( projectile.Position, 512f, 3f );
+
 			if ( Game.IsClient ) return;
 
 			var world = VoxelWorld.Current;

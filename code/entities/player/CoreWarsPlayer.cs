@@ -41,6 +41,8 @@ namespace Facepunch.CoreWars
 		public TimeSince LastPickupTime { get; private set; }
 		public string DisplayName => Client.Name;
 
+		public float MaxHealth => 100f;
+
 		public bool IsFriendly
 		{
 			get
@@ -714,7 +716,7 @@ namespace Facepunch.CoreWars
 					SprintSpeed = 325f
 				};
 				Stamina = 100f;
-				Health = 100f;
+				Health = MaxHealth;
 				Velocity = Vector3.Zero;
 
 				CreateHull();

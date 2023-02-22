@@ -84,6 +84,8 @@ namespace Facepunch.CoreWars
 			if ( !TimeUntilExplode || HasExploded || IsBeingNeutralized )
 				return;
 
+			ScreenShake.DoRandomShake( Position, 512f, 3f );
+
 			DoExplodeEffect();
 			DestroyAfter( 1f );
 

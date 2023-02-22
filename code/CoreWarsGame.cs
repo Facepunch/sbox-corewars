@@ -1,7 +1,7 @@
 ﻿using Facepunch.CoreWars.Editor;
 using Facepunch.Voxels;
 using Sandbox;
-using Sandbox.UI;
+using Sandbox.Effects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +21,8 @@ namespace Facepunch.CoreWars
 
 		[ConVar.Server( "cw_friendly_fire", Saved = true )]
 		public static bool FriendlyFire { get; set; } = false;
+
+		private ScreenEffects PostProcessing { get; set; }
 
 		private static readonly HashSet<Team> ValidTeamSet = new();
 
@@ -57,7 +59,13 @@ namespace Facepunch.CoreWars
 
 		public CoreWarsGame() : base()
 		{
+			if ( Game.IsClient )
+			{
+				PostProcessing = new();
 
+				Camera.Main.RemoveAllHooks();
+				Camera.Main.AddHook( PostProcessing );
+			}
 		}
 
 		public override void Spawn()
@@ -348,6 +356,33 @@ namespace Facepunch.CoreWars
 			await GameTask.Delay( 500 );
 
 			world.Initialize();
+		}
+
+		[Event.Client.Frame]
+		private void OnFrame()
+		{
+			if ( Game.LocalPawn is not CoreWarsPlayer player )
+				return;
+
+			var pp = PostProcessing;
+
+			pp.ChromaticAberration.Scale = 0.1f;
+			pp.ChromaticAberration.Offset = Vector3.Zero;
+
+			pp.Sharpen = 0.1f;
+
+			var healthScale = (0.4f / player.MaxHealth) * player.Health;
+			pp.Saturation = 0.7f + healthScale;
+
+			pp.Vignette.Intensity = 0.8f - healthScale * 2f;
+			pp.Vignette.Color = Color.Red.WithAlpha( 0.1f );
+			pp.Vignette.Smoothness = 1f;
+			pp.Vignette.Roundness = 0.8f;
+
+			var sum = ScreenShake.List.OfType<ScreenShake.Random>().Sum( s => (1f - s.Progress) );
+
+			PostProcessing.Pixelation = 0.02f * sum;
+			PostProcessing.ChromaticAberration.Scale += (0.05f * sum);
 		}
 
 		private void OnMapInitialized()
