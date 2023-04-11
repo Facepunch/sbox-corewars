@@ -1,50 +1,32 @@
-// THIS FILE IS AUTO-GENERATED
-
-Layer0
+"Layer0"
 {
-	shader "voxel_model.vfx"
-
-	g_flDiffuseBoost "0.000"
-	g_flLightDirectionBias "0.000"
-	g_flSpecularBoost "1.000"
-	g_HueShift "0"
-	g_vTintColor "[1.000 1.000 1.000]"
-
-	//---- Color ----
-	g_flModelTintAmount "1.000"
-	g_vColorTint "[1.000000 1.000000 1.000000 0.000000]"
-
-	//---- Fade ----
-	g_flFadeExponent "1.000"
-
-	//---- Fog ----
-	g_bFogEnabled "1"
-
-	//---- Lighting ----
-	g_flDirectionalLightmapMinZ "0.050"
-	g_flDirectionalLightmapStrength "1.000"
-
-	//---- Material ----
-	TextureColor "models/gameplay/base_core/texture2/cores_color.png"
-	TextureTintMask "materials/default/default.tga"
-
-	//---- Model Material ----
-	ModelTextureAmbientOcclusion "materials/default/default_ao.tga"
-	ModelTextureEmission "[0.000000 0.000000 0.000000 0.000000]"
-	ModelTextureMetalness "models/gameplay/base_core/texture2/cores_metal.png"
-	ModelTextureNormal "models/gameplay/base_core/texture2/cores_normal.png"
-	ModelTextureRoughness "models/gameplay/base_core/texture2/cores_rough.png"
-
-	//---- Texture Coordinates ----
-	g_nScaleTexCoordUByModelScaleAxis "0"
-	g_nScaleTexCoordVByModelScaleAxis "0"
-	g_vTexCoordOffset "[0.000 0.000]"
-	g_vTexCoordScale "[1.000 1.000]"
-	g_vTexCoordScrollSpeed "[0.000 0.000]"
-
-	DynamicParams
+	"shader"		"shaders/voxel_model.shader_c"
+	"g_flDiffuseBoost"		"0.000000"
+	"g_flLightDirectionBias"		"0.000000"
+	"g_flSpecularBoost"		"1.000000"
+	"g_HueShift"		"0"
+	"g_vTintColor"		"[1.000 1.000 1.000]"
+	"g_flModelTintAmount"		"1.000000"
+	"g_vColorTint"		"[1.000000 1.000000 1.000000 0.000000]"
+	"g_flFadeExponent"		"1.000000"
+	"g_bFogEnabled"		"1"
+	"g_flDirectionalLightmapMinZ"		"0.050000"
+	"g_flDirectionalLightmapStrength"		"1.000000"
+	"TextureColor"		"models/gameplay/base_core/texture2/cores_color.png"
+	"TextureTintMask"		"materials/default/default.tga"
+	"ModelTextureAmbientOcclusion"		"materials/default/default_ao.tga"
+	"ModelTextureEmission"		"[0.000000 0.000000 0.000000 0.000000]"
+	"ModelTextureMetalness"		"models/gameplay/base_core/texture2/cores_metal.png"
+	"ModelTextureNormal"		"models/gameplay/base_core/texture2/cores_normal.png"
+	"ModelTextureRoughness"		"models/gameplay/base_core/texture2/cores_rough.png"
+	"g_nScaleTexCoordUByModelScaleAxis"		"0"
+	"g_nScaleTexCoordVByModelScaleAxis"		"0"
+	"g_vTexCoordOffset"		"[0.000 0.000]"
+	"g_vTexCoordScale"		"[1.000 1.000]"
+	"g_vTexCoordScrollSpeed"		"[0.000 0.000]"
+	"DynamicParams"
 	{
-		g_HueShift "HueShift"
-		g_vTintColor "TintColor"
+		"g_HueShift"		"HueShift"
+		"g_vTintColor"		"TintColor"
 	}
 }

@@ -1,57 +1,35 @@
-// THIS FILE IS AUTO-GENERATED
-
-Layer0
+"Layer0"
 {
-	shader "voxel_model.vfx"
-
-	//---- Translucent ----
-	F_ALPHA_TEST 1
-
-	g_flDiffuseBoost "0.050"
-	g_flLightDirectionBias "1.000"
-	g_flSpecularBoost "0.100"
-	g_HueShift "0"
-	g_vTintColor "[1.000 1.000 1.000]"
-
-	//---- Color ----
-	g_flModelTintAmount "1.000"
-	g_vColorTint "[1.000000 1.000000 1.000000 0.000000]"
-
-	//---- Fade ----
-	g_flFadeExponent "1.000"
-
-	//---- Fog ----
-	g_bFogEnabled "1"
-
-	//---- Lighting ----
-	g_flDirectionalLightmapMinZ "0.050"
-	g_flDirectionalLightmapStrength "1.000"
-
-	//---- Material ----
-	TextureColor "models/maps/stairs/stone_block/textures/step_stone_block_color.png"
-	TextureTranslucency "materials/default/default_trans.tga"
-
-	//---- Model Material ----
-	ModelTextureAmbientOcclusion "materials/default/default_ao.tga"
-	ModelTextureEmission "[0.000000 0.000000 0.000000 0.000000]"
-	ModelTextureMetalness "materials/default/default_metal.tga"
-	ModelTextureNormal "models/maps/stairs/stone_block/textures/step_stone_block_normal.png"
-	ModelTextureRoughness "models/maps/stairs/stone_block/textures/step_stone_block_rough.png"
-
-	//---- Texture Coordinates ----
-	g_nScaleTexCoordUByModelScaleAxis "0"
-	g_nScaleTexCoordVByModelScaleAxis "0"
-	g_vTexCoordOffset "[0.000 0.000]"
-	g_vTexCoordScale "[1.000 1.000]"
-	g_vTexCoordScrollSpeed "[0.000 0.000]"
-
-	//---- Translucent ----
-	g_flAlphaTestReference "0.500"
-	g_flAntiAliasedEdgeStrength "1.000"
-
-	DynamicParams
+	"shader"		"shaders/voxel_model.shader_c"
+	"F_ALPHA_TEST"		"1"
+	"g_flDiffuseBoost"		"0.050000"
+	"g_flLightDirectionBias"		"1.000000"
+	"g_flSpecularBoost"		"0.100000"
+	"g_HueShift"		"0"
+	"g_vTintColor"		"[1.000 1.000 1.000]"
+	"g_flModelTintAmount"		"1.000000"
+	"g_vColorTint"		"[1.000000 1.000000 1.000000 0.000000]"
+	"g_flFadeExponent"		"1.000000"
+	"g_bFogEnabled"		"1"
+	"g_flDirectionalLightmapMinZ"		"0.050000"
+	"g_flDirectionalLightmapStrength"		"1.000000"
+	"TextureColor"		"models/maps/stairs/stone_block/textures/step_stone_block_color.png"
+	"TextureTranslucency"		"materials/default/default_trans.tga"
+	"ModelTextureAmbientOcclusion"		"materials/default/default_ao.tga"
+	"ModelTextureEmission"		"[0.000000 0.000000 0.000000 0.000000]"
+	"ModelTextureMetalness"		"materials/default/default_metal.tga"
+	"ModelTextureNormal"		"models/maps/stairs/stone_block/textures/step_stone_block_normal.png"
+	"ModelTextureRoughness"		"models/maps/stairs/stone_block/textures/step_stone_block_rough.png"
+	"g_nScaleTexCoordUByModelScaleAxis"		"0"
+	"g_nScaleTexCoordVByModelScaleAxis"		"0"
+	"g_vTexCoordOffset"		"[0.000 0.000]"
+	"g_vTexCoordScale"		"[1.000 1.000]"
+	"g_vTexCoordScrollSpeed"		"[0.000 0.000]"
+	"g_flAlphaTestReference"		"0.500000"
+	"g_flAntiAliasedEdgeStrength"		"1.000000"
+	"DynamicParams"
 	{
-		g_HueShift "HueShift"
-		g_vTintColor "TintColor"
+		"g_HueShift"		"HueShift"
+		"g_vTintColor"		"TintColor"
 	}
 }

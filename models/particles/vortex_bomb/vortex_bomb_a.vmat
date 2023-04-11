@@ -1,36 +1,24 @@
-// THIS FILE IS AUTO-GENERATED
-
-Layer0
+"Layer0"
 {
-	shader "team_core.vfx"
-
-	//---- Color ----
-	g_flModelTintAmount "1.000"
-	g_vColorTint "[0.000000 0.000000 0.000000 0.000000]"
-
-	//---- Core ----
-	g_flExponent "3.264"
-	g_flMaxThickness "0.000"
-	g_flMinThickness "0.000"
-	g_flRainbowBandMultiplier "0.000"
-	g_flRainbowColorMultiplier "0.000"
-	g_flRainbowSpeed "0.000"
-	g_flReflectance "0.000"
-	g_flRefractionScale "3.184"
-
-	//---- Fade ----
-	g_flFadeExponent "1.000"
-
-	//---- Material ----
-	TextureColor "materials/default/default_color.tga"
-	TextureCurve "models/particles/vortex_bomb/vortex_bomb_curve.png"
-	TextureInteriorMap "models/particles/core/space_sky.png"
-	TextureTintMask "materials/default/default.tga"
-
-	//---- Texture Coordinates ----
-	g_nScaleTexCoordUByModelScaleAxis "0"
-	g_nScaleTexCoordVByModelScaleAxis "0"
-	g_vTexCoordOffset "[0.000 0.000]"
-	g_vTexCoordScale "[1.000 1.000]"
-	g_vTexCoordScrollSpeed "[0.100 0.100]"
+	"shader"		"shaders/team_core.shader_c"
+	"g_flModelTintAmount"		"1.000000"
+	"g_vColorTint"		"[0.000000 0.000000 0.000000 0.000000]"
+	"g_flExponent"		"3.264000"
+	"g_flMaxThickness"		"0.000000"
+	"g_flMinThickness"		"0.000000"
+	"g_flRainbowBandMultiplier"		"0.000000"
+	"g_flRainbowColorMultiplier"		"0.000000"
+	"g_flRainbowSpeed"		"0.000000"
+	"g_flReflectance"		"0.000000"
+	"g_flRefractionScale"		"3.184000"
+	"g_flFadeExponent"		"1.000000"
+	"TextureColor"		"materials/default/default_color.tga"
+	"TextureCurve"		"models/particles/vortex_bomb/vortex_bomb_curve.png"
+	"TextureInteriorMap"		"models/particles/core/space_sky.png"
+	"TextureTintMask"		"materials/default/default.tga"
+	"g_nScaleTexCoordUByModelScaleAxis"		"0"
+	"g_nScaleTexCoordVByModelScaleAxis"		"0"
+	"g_vTexCoordOffset"		"[0.000 0.000]"
+	"g_vTexCoordScale"		"[1.000 1.000]"
+	"g_vTexCoordScrollSpeed"		"[0.100 0.100]"
 }
