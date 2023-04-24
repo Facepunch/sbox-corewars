@@ -252,7 +252,7 @@ namespace Facepunch.CoreWars.Editor
 
 				CurrentHotbarIndex = (ushort)currentSlotIndex;
 
-				if ( Game.IsClient && Input.Down( InputButton.Duck ) && Input.Pressed( InputButton.Back ) )
+				if ( Game.IsClient && Input.Down( "duck" ) && Input.Pressed( "back" ) )
 				{
 					var state = CoreWarsGame.GetStateAs<EditorState>();
 
@@ -266,19 +266,19 @@ namespace Facepunch.CoreWars.Editor
 					}
 				}
 
-				if ( Game.IsServer && Input.Down( InputButton.Duck ) )
+				if ( Game.IsServer && Input.Down( "duck" ) )
 				{
-					if ( Input.Pressed( InputButton.Reload ) )
+					if ( Input.Pressed( "reload" ) )
 					{
 						Redo();
 					}
-					else if ( Input.Pressed( InputButton.Menu ) )
+					else if ( Input.Pressed( "menu" ) )
 					{
 						Undo();
 					}
 				}
 
-				if ( Input.Released( InputButton.Drop ) )
+				if ( Input.Released( "drop" ) )
 				{
 					if ( Controller is FlyController )
 						EnterWalkMode();
@@ -316,14 +316,14 @@ namespace Facepunch.CoreWars.Editor
 
 		private void UpdateHotbarSlotKeys()
 		{
-			if ( Input.Pressed( InputButton.Slot1 ) ) CurrentHotbarIndex = 0;
-			if ( Input.Pressed( InputButton.Slot2 ) ) CurrentHotbarIndex = 1;
-			if ( Input.Pressed( InputButton.Slot3 ) ) CurrentHotbarIndex = 2;
-			if ( Input.Pressed( InputButton.Slot4 ) ) CurrentHotbarIndex = 3;
-			if ( Input.Pressed( InputButton.Slot5 ) ) CurrentHotbarIndex = 4;
-			if ( Input.Pressed( InputButton.Slot6 ) ) CurrentHotbarIndex = 5;
-			if ( Input.Pressed( InputButton.Slot7 ) ) CurrentHotbarIndex = 6;
-			if ( Input.Pressed( InputButton.Slot8 ) ) CurrentHotbarIndex = 7;
+			if ( Input.Pressed( "slot1" ) ) CurrentHotbarIndex = 0;
+			if ( Input.Pressed( "slot2" ) ) CurrentHotbarIndex = 1;
+			if ( Input.Pressed( "slot3" ) ) CurrentHotbarIndex = 2;
+			if ( Input.Pressed( "slot4" ) ) CurrentHotbarIndex = 3;
+			if ( Input.Pressed( "slot5" ) ) CurrentHotbarIndex = 4;
+			if ( Input.Pressed( "slot6" ) ) CurrentHotbarIndex = 5;
+			if ( Input.Pressed( "slot7" ) ) CurrentHotbarIndex = 6;
+			if ( Input.Pressed( "slot8" ) ) CurrentHotbarIndex = 7;
 		}
 	}
 }

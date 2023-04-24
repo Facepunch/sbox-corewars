@@ -17,7 +17,7 @@ namespace Facepunch.CoreWars
 
 		public void PreTick()
 		{
-			bool wants = Input.Down( InputButton.Duck );
+			bool wants = Input.Down( "duck" );
 
 			if ( wants != IsActive )
 			{

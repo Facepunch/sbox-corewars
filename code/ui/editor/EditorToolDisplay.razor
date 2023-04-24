@@ -47,7 +47,7 @@
     public string ToolName => GetToolName();
     public string ToolDescription => GetToolDescription();
     public Panel ToolIcon { get; set; }
-    public Dictionary<InputButton, string> Hotkeys { get; private set; } = new();
+    public Dictionary<string, string> Hotkeys { get; private set; } = new();
 
     public EditorToolDisplay()
     {
@@ -121,7 +121,7 @@
         Hotkeys.Clear();
     }
 
-    public void AddHotkey( InputButton button, string text )
+    public void AddHotkey( string button, string text )
     {
         Hotkeys[button] = text;
     }

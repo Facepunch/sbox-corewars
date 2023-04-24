@@ -103,11 +103,11 @@ namespace Facepunch.CoreWars.Editor
 					}
 					else if ( GhostEntity.IsValid() )
 					{
-						var shouldCenterOnX = !Input.Down( InputButton.Run );
-						var shouldCenterOnY = !Input.Down( InputButton.Duck );
+						var shouldCenterOnX = !Input.Down( "run" );
+						var shouldCenterOnY = !Input.Down( "duck" );
 						var aimSourcePosition = VoxelWorld.Current.ToSourcePositionCenter( aimVoxelPosition, shouldCenterOnX, shouldCenterOnY, false );
 
-						if ( Input.Down( InputButton.Flashlight ) )
+						if ( Input.Down( "flashlight" ) )
 						{
 							var topSourcePosition = world.ToSourcePosition( aimVoxelPosition ) + world.VoxelSize;
 							aimSourcePosition.z = topSourcePosition.z - GhostEntity.Model.Bounds.Size.z;
@@ -234,17 +234,17 @@ namespace Facepunch.CoreWars.Editor
 
 				var display = EditorToolDisplay.Current;
 				display.ClearHotkeys();
-				display.AddHotkey( InputButton.Use, "Aim Voxel Align" );
+				display.AddHotkey( "use", "Aim Voxel Align" );
 
 				if ( !SelectedEntity.IsValid() && mode != EntitiesToolMode.Place )
 				{
-					display.AddHotkey( InputButton.Run, "Ignore Volume" );
+					display.AddHotkey( "run", "Ignore Volume" );
 				}
 				else
 				{
-					display.AddHotkey( InputButton.Run, "No Center X" );
-					display.AddHotkey( InputButton.Duck, "No Center X" );
-					display.AddHotkey( InputButton.Flashlight, "Align Top" );
+					display.AddHotkey( "run", "No Center X" );
+					display.AddHotkey( "duck", "No Center X" );
+					display.AddHotkey( "flashlight", "Align Top" );
 				}
 			}
 
@@ -300,12 +300,12 @@ namespace Facepunch.CoreWars.Editor
 					}
 					else if ( Game.IsServer )
 					{
-						var shouldCenterOnX = !Input.Down( InputButton.Run );
-						var shouldCenterOnY = !Input.Down( InputButton.Duck );
+						var shouldCenterOnX = !Input.Down( "run" );
+						var shouldCenterOnY = !Input.Down( "duck" );
 						var aimSourcePosition = world.ToSourcePositionCenter( aimVoxelPosition, shouldCenterOnX, shouldCenterOnY, false );
 						var model = Model.Load( CurrentAttribute.EditorModel );
 
-						if ( Input.Down( InputButton.Flashlight ) )
+						if ( Input.Down( "flashlight" ) )
 						{
 							var topSourcePosition = world.ToSourcePosition( aimVoxelPosition ) + world.VoxelSize;
 							aimSourcePosition.z = topSourcePosition.z - model.Bounds.Size.z;
@@ -331,11 +331,11 @@ namespace Facepunch.CoreWars.Editor
 					{
 						if ( SelectedEntity.IsValid() )
 						{
-							var shouldCenterOnX = !Input.Down( InputButton.Run );
-							var shouldCenterOnY = !Input.Down( InputButton.Duck );
+							var shouldCenterOnX = !Input.Down( "run" );
+							var shouldCenterOnY = !Input.Down( "duck" );
 							var aimSourcePosition = world.ToSourcePositionCenter( aimVoxelPosition, shouldCenterOnX, shouldCenterOnY, false );
 
-							if ( Input.Down( InputButton.Flashlight ) )
+							if ( Input.Down( "flashlight" ) )
 							{
 								var topSourcePosition = world.ToSourcePosition( aimVoxelPosition ) + world.VoxelSize;
 								aimSourcePosition.z = topSourcePosition.z - SelectedEntity.Model.Bounds.Size.z;
@@ -398,7 +398,7 @@ namespace Facepunch.CoreWars.Editor
 			var request = Trace.Ray( player.EyePosition, player.EyePosition + player.EyeRotation.Forward * 5000f )
 				.EntitiesOnly();
 
-			if ( Input.Down( InputButton.Run ) )
+			if ( Input.Down( "run" ) )
 				request = request.WithoutTags( "volume" );
 
 			trace = request.Run();

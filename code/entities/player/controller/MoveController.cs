@@ -161,7 +161,7 @@ namespace Facepunch.CoreWars
 				var modifier = player.GetModifier( StatModifier.Speed );
 				WishVelocity *= modifier;
 
-				if ( Input.Down( InputButton.Run ) && !Input.Down( InputButton.Duck ) && WishVelocity.Length > 1f )
+				if ( Input.Down( "run" ) && !Input.Down( "duck" ) && WishVelocity.Length > 1f )
 					player.ReduceStamina( 10f * Time.Delta );
 				else
 					player.GainStamina( 15f * Time.Delta );
@@ -206,10 +206,10 @@ namespace Facepunch.CoreWars
 			var ws = Duck.GetWishSpeed();
 			if ( ws > 0 ) return ws;
 
-			if ( Input.Down( InputButton.Run ) )
+			if ( Input.Down( "run" ) )
 				return SprintSpeed;
 
-			if ( Input.Down( InputButton.Walk ) )
+			if ( Input.Down( "walk" ) )
 				return WalkSpeed * 0.5f;
 			
 			return WalkSpeed;
@@ -390,7 +390,7 @@ namespace Facepunch.CoreWars
 
 		public virtual void CheckLadder()
 		{
-			if ( IsTouchingLadder && Input.Pressed( InputButton.Jump ) )
+			if ( IsTouchingLadder && Input.Pressed( "jump" ) )
 			{
 				Player.Velocity = LadderNormal * 100.0f;
 				IsTouchingLadder = false;
@@ -511,7 +511,7 @@ namespace Facepunch.CoreWars
 
 		public virtual void HandleJumping()
 		{
-			if ( AutoJump ? Input.Down( InputButton.Jump ) : Input.Pressed( InputButton.Jump ) )
+			if ( AutoJump ? Input.Down( "jump" ) : Input.Pressed( "jump" ) )
 			{
 				CheckJumpButton();
 			}

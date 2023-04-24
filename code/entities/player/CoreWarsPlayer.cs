@@ -965,12 +965,12 @@ namespace Facepunch.CoreWars
 
 			if ( Game.IsServer )
 			{
-				if ( Input.Pressed( InputButton.PrimaryAttack ) && ActiveChild is Weapon )
+				if ( Input.Pressed( "attack1" ) && ActiveChild is Weapon )
 				{
 					RemoveBuff<StealthBuff>();
 				}
 
-				if ( Input.Released( InputButton.PrimaryAttack ) && NextActionTime )
+				if ( Input.Released( "attack1" ) && NextActionTime )
 				{
 					var container = Hotbar;
 					var item = container.GetFromSlot( HotbarIndex );
@@ -990,7 +990,7 @@ namespace Facepunch.CoreWars
 					NextActionTime = 0.1f;
 				}
 
-				if ( Input.Released( InputButton.Drop ) )
+				if ( Input.Released( "drop" ) )
 				{
 					var container = Hotbar;
 					var item = container.GetFromSlot( HotbarIndex );
@@ -1017,7 +1017,7 @@ namespace Facepunch.CoreWars
 			}
 			else if ( Prediction.FirstTime )
 			{
-				if ( Input.Pressed( InputButton.Score ) )
+				if ( Input.Pressed( "score" ) )
 				{
 					if ( !UI.Backpack.Current.IsOpen )
 						TimeSinceBackpackOpen = 0f;
@@ -1030,7 +1030,7 @@ namespace Facepunch.CoreWars
 						UI.Backpack.Current?.Open();
 				}
 
-				if ( Input.Released( InputButton.Score ) )
+				if ( Input.Released( "score" ) )
 				{
 					if ( TimeSinceBackpackOpen <= 0.2f )
 					{
@@ -1043,7 +1043,7 @@ namespace Facepunch.CoreWars
 					}
 				}
 
-				if ( Input.Down( InputButton.Menu ) )
+				if ( Input.Down( "menu" ) )
 					UI.TeamList.Open();
 				else
 					UI.TeamList.Close();
@@ -1076,7 +1076,7 @@ namespace Facepunch.CoreWars
 
 			if ( Game.IsClient && Prediction.FirstTime )
 			{
-				if ( Input.Released( InputButton.Use ) )
+				if ( Input.Released( "use" ) )
 				{
 					if ( !UI.IDialog.IsActive() )
 					{
@@ -1451,28 +1451,28 @@ namespace Facepunch.CoreWars
 		{
 			var index = HotbarIndex;
 
-			if ( Input.Pressed( InputButton.Slot1 ) )
+			if ( Input.Pressed( "slot1" ) )
 				index = (ushort)Math.Min( 0, Hotbar.SlotLimit - 1 );
 
-			if ( Input.Pressed( InputButton.Slot2 ) )
+			if ( Input.Pressed( "slot2" ) )
 				index = (ushort)Math.Min( 1, Hotbar.SlotLimit - 1 );
 
-			if ( Input.Pressed( InputButton.Slot3 ) )
+			if ( Input.Pressed( "slot3" ) )
 				index = (ushort)Math.Min( 2, Hotbar.SlotLimit - 1 );
 
-			if ( Input.Pressed( InputButton.Slot4 ) )
+			if ( Input.Pressed( "slot4" ) )
 				index = (ushort)Math.Min( 3, Hotbar.SlotLimit - 1 );
 
-			if ( Input.Pressed( InputButton.Slot5 ) )
+			if ( Input.Pressed( "slot5" ) )
 				index = (ushort)Math.Min( 4, Hotbar.SlotLimit - 1 );
 
-			if ( Input.Pressed( InputButton.Slot6 ) )
+			if ( Input.Pressed( "slot6" ) )
 				index = (ushort)Math.Min( 5, Hotbar.SlotLimit - 1 );
 
-			if ( Input.Pressed( InputButton.Slot7 ) )
+			if ( Input.Pressed( "slot7" ) )
 				index = (ushort)Math.Min( 6, Hotbar.SlotLimit - 1 );
 
-			if ( Input.Pressed( InputButton.Slot8 ) )
+			if ( Input.Pressed( "slot8" ) )
 				index = (ushort)Math.Min( 7, Hotbar.SlotLimit - 1 );
 
 			if ( index != HotbarIndex )

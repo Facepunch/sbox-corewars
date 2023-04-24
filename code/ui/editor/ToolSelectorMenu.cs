@@ -11,7 +11,7 @@ namespace Facepunch.CoreWars.Editor
 	[StyleSheet( "/ui/editor/ToolSelectorMenu.scss" )]
 	public partial class ToolSelectorMenu : RadialMenu
 	{
-		public override InputButton Button => InputButton.Score;
+		public override string Button => "score";
 
 		public override void Populate()
 		{

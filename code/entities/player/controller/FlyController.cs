@@ -28,10 +28,10 @@ namespace Facepunch.CoreWars
 
 			vel = vel.Normal * 2000;
 
-			if ( Input.Down( InputButton.Run ) )
+			if ( Input.Down( "run" ) )
 				vel *= 5.0f;
 
-			if ( Input.Down( InputButton.Duck ) )
+			if ( Input.Down( "duck" ) )
 				vel *= 0.2f;
 
 			Player.Velocity += vel * Time.Delta;
@@ -43,7 +43,7 @@ namespace Facepunch.CoreWars
 
 			Player.Velocity = Player.Velocity.Approach( 0, Player.Velocity.Length * Time.Delta * 5.0f );
 
-			if ( Input.Down( InputButton.Jump ) )
+			if ( Input.Down( "jump" ) )
 				Player.Velocity = Player.Velocity.Approach( 0, Player.Velocity.Length * Time.Delta * 5.0f );
 		}
 

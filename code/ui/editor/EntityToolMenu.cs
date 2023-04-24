@@ -10,7 +10,7 @@ namespace Facepunch.CoreWars.Editor
 	[StyleSheet( "/ui/editor/EntityToolMenu.scss" )]
 	public partial class EntityToolMenu : RadialMenu
 	{
-		public override InputButton Button => InputButton.Reload;
+		public override string Button => "reload";
 
 		public override void Populate()
 		{
@@ -28,7 +28,7 @@ namespace Facepunch.CoreWars.Editor
 			if ( Game.LocalPawn is not EditorPlayer player )
 				return false;
 
-			if ( Input.Down( InputButton.Duck ) )
+			if ( Input.Down( "duck" ) )
 				return false;
 
 			return player.Tool is EntitiesTool;

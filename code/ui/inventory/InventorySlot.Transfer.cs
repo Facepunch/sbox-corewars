@@ -27,7 +27,7 @@ public partial class InventorySlot
 
     public override void Tick()
     {
-        if ( Item.IsValid() && HasHovered && Input.Down( InputButton.Duck ) )
+        if ( Item.IsValid() && HasHovered && Input.Down( "duck" ) )
         {
             if ( !TransferQueue.Contains( this ) )
             {

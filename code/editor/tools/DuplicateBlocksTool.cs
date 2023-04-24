@@ -28,7 +28,7 @@ namespace Facepunch.CoreWars.Editor
 
 			if ( Stage == DuplicateStage.Paste )
 			{
-				if ( Input.Released( InputButton.Reload ) )
+				if ( Input.Released( "reload" ) )
 				{
 					PasteRotation = PasteRotation + 90f;
 					PasteRotation = PasteRotation % 360f;
@@ -138,8 +138,8 @@ namespace Facepunch.CoreWars.Editor
 
 			if ( stage == DuplicateStage.Paste )
 			{
-				display.AddHotkey( InputButton.Reload, "Rotate" );
-				display.AddHotkey( InputButton.Run, "Copy Entities" );
+				display.AddHotkey( "reload", "Rotate" );
+				display.AddHotkey( "run", "Copy Entities" );
 			}
 		}
 
@@ -170,7 +170,7 @@ namespace Facepunch.CoreWars.Editor
 						var endSourceVoxelPosition = VoxelWorld.Current.ToVoxelPosition( EndPosition.Value );
 
 						var action = new DuplicateBlocksAction();
-						action.Initialize( startSourceVoxelPosition, endSourceVoxelPosition, aimVoxelPosition, Input.Down( InputButton.Run ), PasteRotation );
+						action.Initialize( startSourceVoxelPosition, endSourceVoxelPosition, aimVoxelPosition, Input.Down( "run" ), PasteRotation );
 
 						Player.Perform( action );
 					}
