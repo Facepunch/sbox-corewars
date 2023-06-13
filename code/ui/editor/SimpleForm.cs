@@ -64,10 +64,10 @@ namespace Facepunch.CoreWars.Editor
 
 				if ( range != null )
 				{
-					var slider = new SliderEntry
+					var slider = new SliderControl
 					{
-						MinValue = range.Min,
-						MaxValue = range.Max,
+						Min = range.Min,
+						Max = range.Max,
 						Step = range.Step
 					};
 					return slider;
@@ -87,17 +87,17 @@ namespace Facepunch.CoreWars.Editor
 
 				if ( range != null )
 				{
-					var slider = new SliderEntry
+					var slider = new SliderControl
 					{
-						MinValue = range.Min,
-						MaxValue = range.Max,
+						Min = range.Min,
+						Max = range.Max,
 						Step = range.Step
 					};
 
 					if ( property.PropertyType == typeof( int ) || property.PropertyType == typeof( uint ) )
 					{
-						slider.TextEntry.NumberFormat = "0.";
-						slider.Slider.Step = 1;
+						slider.NumberFormat = "0.";
+						slider.Step = 1f;
 					}
 
 					return slider;

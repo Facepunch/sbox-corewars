@@ -26,9 +26,9 @@
 	public SimpleForm PropertyForm { get; set; }
 	public Checkbox FromOrigin { get; set; }
 	public Checkbox XAxis { get; set; }
-	public SliderEntry XOriginOffset { get; set; }
+	public SliderControl XOriginOffset { get; set; }
 	public Checkbox YAxis { get; set; }
-	public SliderEntry YOriginOffset { get; set; }
+    public SliderControl YOriginOffset { get; set; }
 
 	public static void Open()
 	{
@@ -44,15 +44,15 @@
 		PropertyForm.Clear();
 		PropertyForm.StartGroup();
 
-		XOriginOffset = new SliderEntry();
-		XOriginOffset.MinValue = -10f;
-		XOriginOffset.MaxValue = 10f;
+		XOriginOffset = new SliderControl();
+		XOriginOffset.Min = -10f;
+		XOriginOffset.Max = 10f;
 		XOriginOffset.Value = 0f;
 		XOriginOffset.Step = 1f;
 
-		YOriginOffset = new SliderEntry();
-		YOriginOffset.MinValue = -10f;
-		YOriginOffset.MaxValue = 10f;
+        YOriginOffset = new SliderControl();
+		YOriginOffset.Min = -10f;
+		YOriginOffset.Max = 10f;
 		YOriginOffset.Value = 0f;
 		YOriginOffset.Step = 1f;
 

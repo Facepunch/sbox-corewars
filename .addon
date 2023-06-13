@@ -7,13 +7,8 @@
   "Schema": 1,
   "HasAssets": true,
   "AssetsPath": "",
-  "ResourcePaths": [
-    "\u0022/textures/*\u0022",
-    "\u0022/shaders/*\u0022",
-    "\u0022/code/ui/*\u0022",
-    "\u0022/fonts/*\u0022",
-    "\u0022/blocks/*\u0022"
-  ],
+  "Resources": null,
+  "MenuResources": null,
   "HasCode": true,
   "CodePath": "code",
   "PackageReferences": [
