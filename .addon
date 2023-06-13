@@ -7,7 +7,7 @@
   "Schema": 1,
   "HasAssets": true,
   "AssetsPath": "",
-  "Resources": null,
+  "Resources": "textures/*\nshaders/*\ncode/*\nfonts/*\nblocks/*",
   "MenuResources": null,
   "HasCode": true,
   "CodePath": "code",
